@@ -548,8 +548,20 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                                     <span className="bg-slate-700 text-purple-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
                                     Ürün Görseli
                                 </h2>
-                                <div className="flex-grow">
+                                <div className="flex-grow relative">
                                     <ImageUploader onImageUpload={handleProductUpload} imagePreviewUrl={productPreviewUrl} />
+                                    {/* Download button for product image */}
+                                    {(generatedProductUrl || productPreviewUrl) && (
+                                        <button
+                                            onClick={() => handleDownload(generatedProductUrl || productPreviewUrl, 'urun-gorseli.png')}
+                                            className="absolute bottom-4 right-4 bg-cyan-600/90 text-white p-3 rounded-full hover:bg-cyan-500 transition-all shadow-lg backdrop-blur-sm z-10"
+                                            title="Ürün Görselini İndir"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
                                 <p className="text-xs text-slate-500 mt-2 text-center">
                                     {generatedProductUrl ? "Çizimden üretilen görsel kullanılıyor." : "Çizim yoksa, doğrudan ürün fotoğrafı yükleyin."}
