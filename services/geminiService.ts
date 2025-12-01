@@ -264,6 +264,7 @@ export const generateImage = async (
     customPrompt: string,
     lighting: string,
     cameraAngle: string,
+    cameraZoom: string,
     aspectRatio: '9:16' | '3:4' | '4:5' | '1:1' | '16:9' = '3:4',
     customBackground?: File
 ): Promise<string> => {
@@ -291,7 +292,7 @@ export const generateImage = async (
     1. Kumaş Simülasyonu: Kumaşın fiziksel özellikleri (ağırlık, döküm, parlaklık, doku) mükemmel şekilde yansıtılmalı.
     2. Işık ve Atmosfer: Sahneye derinlik katan, ${lighting} tarzında profesyonel aydınlatma. Cilt üzerinde gerçekçi ışık kırılımları (subsurface scattering).
     3. Cilt Dokusu: Modelin cildi pürüzsüz plastik gibi değil, doğal gözenekli, kusurları ve detayları olan gerçek insan cildi gibi olmalı.
-    4. Kamera Tekniği: ${cameraAngle} açısı ile çekilmiş. Arka plan (bokeh) estetik bir şekilde bulanıklaştırılarak odak modelde tutulmalı.
+    4. Kamera Tekniği: ${cameraAngle} açısı ile ${cameraZoom === 'Yakın' ? 'yakın çekim (close-up), detaylar net görünmeli' : cameraZoom === 'Uzak' ? 'uzak çekim (wide shot), tüm vücut ve mekan çerçevede' : 'orta mesafe çekim (medium shot)'}. Arka plan (bokeh) estetik bir şekilde bulanıklaştırılarak odak modelde tutulmalı.
     
     *** KIYAFET YAPILANDIRMASI ***:
     Kıyafet Türü: ${clothingType}

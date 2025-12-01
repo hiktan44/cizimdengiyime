@@ -217,6 +217,7 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
     const [customPrompt, setCustomPrompt] = useState('');
     const [lighting, setLighting] = useState('Doğal');
     const [cameraAngle, setCameraAngle] = useState('Normal');
+    const [cameraZoom, setCameraZoom] = useState('Normal'); // Yeni: Çekim mesafesi
 
     // Aspect Ratio
     const [aspectRatio, setAspectRatio] = useState<'9:16' | '3:4' | '4:5' | '1:1' | '16:9'>('3:4');
@@ -346,6 +347,7 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                 customPrompt,
                 lighting,
                 cameraAngle,
+                cameraZoom,
                 aspectRatio,
                 customBackgroundFile
             );
@@ -663,6 +665,16 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                                                 <option value="Portre">Yakın Çekim (Portre)</option>
                                             </select>
                                         </div>
+                                    </div>
+                                    
+                                    {/* Camera Zoom (Shot Distance) */}
+                                    <div>
+                                        <label className="font-medium text-slate-300 block mb-2 text-sm">Çekim Mesafesi (Zoom)</label>
+                                        <select value={cameraZoom} onChange={(e) => setCameraZoom(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                            <option value="Uzak">Uzak Çekim (Wide Shot) - Tüm vücut + mekan</option>
+                                            <option value="Normal">Normal Çekim (Medium Shot) - Bel üstü</option>
+                                            <option value="Yakın">Yakın Çekim (Close-Up) - Yüz ve detaylar</option>
+                                        </select>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
