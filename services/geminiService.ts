@@ -2,8 +2,8 @@ import { GoogleGenAI, Modality } from "@google/genai";
 import { fileToGenerativePart } from '../utils/fileUtils';
 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır.
-// Netlify/Vercel ayarlarında değişken adının "VITE_API_KEY" olduğundan emin olun.
-const API_KEY = process.env.API_KEY as string;
+// .env.local dosyasında VITE_GEMINI_API_KEY olarak tanımlanmalıdır.
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
 // Interface for Video Settings
 export interface VideoGenerationSettings {
