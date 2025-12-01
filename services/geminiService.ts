@@ -283,25 +283,38 @@ export const generateImage = async (
     let prompt = `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
     Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.
     
-    *** KRİTİK: MARKA VE TASARIM KORUMA TALİMATLARI (MUTLAK UYULACAK) ***
-    1. LOGO VE YAZI KORUMASI: Kıyafetin üzerindeki marka isimleri, logolar, grafik baskılar ve metinler PİKSELİ PİKSELİNE KORUNMALIDIR. Bu alanları asla "yeniden çizme" veya "değiştirme". Görüntüyü bir doku (texture) olarak al ve olduğu gibi mankenin üzerine yerleştir. Harfler bozulmamalı, logo deforme olmamalıdır.
-    2. RENK DOĞRULUĞU (Color Fidelity) - YÜKSEK ÖNCELİK: ${color ? `Kıyafetin rengi MUTLAKA TAM OLARAK "${color}" OLMALIDIR. Bu rengi tam ve eksiksiz uygula. Işıklandırma nedeniyle renk tonunu DEĞİŞTİRME, sadece doğal gölge ekle. Renk pigmenti sabit kalmalı.` : 'Referans görseldeki kıyafet rengini %100 koru. Ortam ışığı rengi değiştirmemeli.'}
-    3. TASARIM SADAKATİ: Kıyafetin kesimi, dikiş detayları, yaka şekli ve kalıbı referans görselle tıpatıp aynı olmalıdır.
+    *** 1. RENK KONTROLU - EN YÜKSEK ÖNCELİK (Bu kurala tam uyum ZORUNLUDUR) ***
+    ${color ? `
+    >>> KıYAFET RENGİ KURALI <<<
+    - Kıyafet rengi KESİNLİKLE ve MUTLAKA "${color}" OLMALIDIR.
+    - ${color} rengini HARFEN HARFENE uygula. Benzer tonlar, açık/koyu varyasyonlar KABUL EDİLMEZ.
+    - Işıklandırma kıyafet rengini DEĞİŞTİRMEMELİ, sadece gölge/parlaklık eklenebilir.
+    - Referans görselin rengini YOKSAY, sadece "${color}" rengini kullan.
+    - Eğer referans görseldeki kıyafet farklı renkteyse, onu "${color}" rengine DÖNÜŞTÜR.
+    ` : `
+    >>> KıYAFET RENGİ KURALI <<<
+    - Referans görseldeki kıyafet rengini %100 KORU.
+    - Renk tonunu, pigmentini hiçbir şekilde değiştirme.
+    `}
+    ${secondaryColor && (clothingType === 'Alt & Üst' || clothingType === 'Takım Elbise') ? `
+    >>> İKİNCİ RENK (${clothingType === 'Takım Elbise' ? 'Gömlek/İç' : 'Alt Parça'}) <<<
+    - ${clothingType === 'Takım Elbise' ? 'Gömlek/İç' : 'Alt parça'} rengi MUTLAKA "${secondaryColor}" OLMALIDIR.
+    - Hiçbir şekilde başka renk kullanma.
+    ` : ''}
     
-    *** GÖRSEL KALİTESİ VE GERÇEKÇİLİK ***:
+    *** 2. MARKA VE TASARIM KORUMA TALİMATLARI ***
+    - LOGO VE YAZI KORUMASI: Kıyafetin üzerindeki marka isimleri, logolar, grafik baskılar ve metinler PİKSELİ PİKSELİNE KORUNMALIDIR.
+    - TASARIM SADAKATİ: Kıyafetin kesimi, dikiş detayları, yaka şekli ve kalıbı referans görselle tıpatıp aynı olmalıdır.
+    
+    *** 3. GÖRSEL KALİTESİ VE GERÇEKÇİLİK ***:
     1. Kumaş Simülasyonu: Kumaşın fiziksel özellikleri (ağırlık, döküm, parlaklık, doku) mükemmel şekilde yansıtılmalı.
     2. Işık ve Atmosfer: Sahneye derinlik katan, ${lighting} tarzında profesyonel aydınlatma. Cilt üzerinde gerçekçi ışık kırılımları (subsurface scattering).
     3. Cilt Dokusu: Modelin cildi pürüzsüz plastik gibi değil, doğal gözenekli, kusurları ve detayları olan gerçek insan cildi gibi olmalı.
     4. Kamera Tekniği: ${cameraAngle} açısı ile ${cameraZoom === 'Yakın' ? 'yakın çekim (close-up), detaylar net görünmeli' : cameraZoom === 'Uzak' ? 'uzak çekim (wide shot), tüm vücut ve mekan çerçevede' : 'orta mesafe çekim (medium shot)'}. Arka plan (bokeh) estetik bir şekilde bulanıklaştırılarak odak modelde tutulmalı.
     
-    *** KIYAFET YAPILANDIRMASI ***:
+    *** 4. KIYAFET YAPILANDIRMASI ***:
     Kıyafet Türü: ${clothingType}
-    
-    ${clothingType === 'Alt & Üst' ? `Bu bir kombin. ÜST PARÇA rengi MUTLAKA: ${color || 'REFERANS GÖRSELDEKİYLE AYNI'}. ALT PARÇA rengi MUTLAKA: ${secondaryColor || 'REFERANS GÖRSELDEKİYLE AYNI'}. Bu renkleri TAM OLARAK uygula.` : ''}
-    ${clothingType === 'Takım Elbise' ? `Bu bir takım elbise. CEKET/PANTOLON rengi MUTLAKA: ${color || 'REFERANS GÖRSELDEKİYLE AYNI'}. İÇ/GÖMLEK rengi MUTLAKA: ${secondaryColor || 'Beyaz'}. Bu renkleri TAM OLARAK uygula.` : ''}
-    ${clothingType === 'Elbise' ? `Bu bir elbise. Rengi MUTLAKA TAM OLARAK: ${color || 'REFERANS GÖRSELDEKİYLE AYNI'}. Başka bir renk tonuna kaçma.` : ''}
-    ${clothingType === 'Üst Giyim' ? `Modelin sadece üstündeki kıyafetin rengi MUTLAKA TAM OLARAK: ${color || 'REFERANS GÖRSELDEKİYLE AYNI'}. Altına uygun nötr bir parça giymeli. Üst parça rengini değiştirme.` : ''}
-    ${clothingType === 'Alt Giyim' ? `Modelin sadece altındaki kıyafetin rengi MUTLAKA TAM OLARAK: ${color || 'REFERANS GÖRSELDEKİYLE AYNI'}. Üstüne uygun nötr bir parça giymeli. Alt parça rengini değiştirme.` : ''}
+    ${clothingType === 'Genel' && color ? `Kıyafet rengi: ${color}` : ''}
 
     ${getStylePromptFragment(style)}`;
 
