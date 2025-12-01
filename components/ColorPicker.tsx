@@ -2,7 +2,7 @@
 import React from 'react';
 import { XCircleIcon } from './icons/XCircleIcon';
 
-const colors = [
+export const colors = [
   { name: 'Siyah', value: '#000000' },
   { name: 'Beyaz', value: '#ffffff', border: true },
   { name: 'Antrasit', value: '#374151' },

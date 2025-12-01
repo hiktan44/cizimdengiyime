@@ -1,9 +1,16 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { fileToGenerativePart } from '../utils/fileUtils';
+import { colors } from '../components/ColorPicker';
 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır.
 // .env.local dosyasında VITE_GEMINI_API_KEY olarak tanımlanmalıdır.
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
+
+// Helper function to get hex code from color name
+const getColorHex = (colorName: string): string => {
+    const colorObj = colors.find(c => c.name === colorName);
+    return colorObj?.value || '';
+};
 
 // Interface for Video Settings
 export interface VideoGenerationSettings {
