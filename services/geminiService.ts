@@ -287,26 +287,33 @@ export const generateImage = async (
         promptParts.push(bgPart);
     }
 
+    // Get hex codes for colors
+    const colorHex = getColorHex(color);
+    const secondaryColorHex = getColorHex(secondaryColor);
+
     let prompt = `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
     Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.
     
     *** 1. RENK KONTROLU - EN YÜKSEK ÖNCELİK (Bu kurala tam uyum ZORUNLUDUR) ***
-    ${color ? `
+    ${color && colorHex ? `
     >>> KıYAFET RENGİ KURALI <<<
-    - Kıyafet rengi KESİNLİKLE ve MUTLAKA "${color}" OLMALIDIR.
-    - ${color} rengini HARFEN HARFENE uygula. Benzer tonlar, açık/koyu varyasyonlar KABUL EDİLMEZ.
-    - Işıklandırma kıyafet rengini DEĞİŞTİRMEMELİ, sadece gölge/parlaklık eklenebilir.
-    - Referans görselin rengini YOKSAY, sadece "${color}" rengini kullan.
-    - Eğer referans görseldeki kıyafet farklı renkteyse, onu "${color}" rengine DÖNÜŞTÜR.
+    - Kıyafet rengi KESİNLİKLE "${color}" (HEX: ${colorHex}) OLMALIDIR.
+    - Bu RGB/HEX değerini KULLAN: ${colorHex}
+    - Referans görseldeki kıyafet FARKLI renkte olsa bile, ONU YOKSAY ve ${colorHex} rengine DÖNÜŞTÜR.
+    - ${color} rengini TAM OLARAK uygula. Benzer tonlar KABUL EDİLMEZ.
+    - Işıklandırma SADECE gölge/parlaklık ekler, ${colorHex} temel rengini DEĞİŞTİRMEZ.
+    ` : color ? `
+    >>> KıYAFET RENGİ KURALI <<<
+    - Kıyafet rengi KESİNLİKLE "${color}" OLMALIDIR.
+    - Referans görseli YOKSAY, sadece "${color}" rengini kullan.
     ` : `
     >>> KıYAFET RENGİ KURALI <<<
     - Referans görseldeki kıyafet rengini %100 KORU.
-    - Renk tonunu, pigmentini hiçbir şekilde değiştirme.
     `}
-    ${secondaryColor && (clothingType === 'Alt & Üst' || clothingType === 'Takım Elbise') ? `
+    ${secondaryColor && secondaryColorHex && (clothingType === 'Alt & Üst' || clothingType === 'Takım Elbise') ? `
     >>> İKİNCİ RENK (${clothingType === 'Takım Elbise' ? 'Gömlek/İç' : 'Alt Parça'}) <<<
-    - ${clothingType === 'Takım Elbise' ? 'Gömlek/İç' : 'Alt parça'} rengi MUTLAKA "${secondaryColor}" OLMALIDIR.
-    - Hiçbir şekilde başka renk kullanma.
+    - ${clothingType === 'Takım Elbise' ? 'Gömlek/İç' : 'Alt parça'} rengi "${secondaryColor}" (HEX: ${secondaryColorHex}) OLMALIDIR.
+    - RGB/HEX: ${secondaryColorHex}
     ` : ''}
     
     *** 2. MARKA VE TASARIM KORUMA TALİMATLARI ***
