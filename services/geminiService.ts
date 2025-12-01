@@ -173,6 +173,8 @@ export const generateVideoFromImage = async (
 
     const modelName = settings.quality === 'high' ? 'veo-3.1-generate-preview' : 'veo-3.1-fast-generate-preview';
 
+    console.log('Starting video generation with model:', modelName);
+    
     let operation = await ai.models.generateVideos({
         model: modelName,
         prompt: settings.prompt,
@@ -187,22 +189,41 @@ export const generateVideoFromImage = async (
         }
     });
 
-    while (!operation.done) {
+    console.log('Initial operation response:', operation);
+    
+    // Poll for completion with timeout
+    let pollCount = 0;
+    const maxPolls = 60; // 10 minutes max (60 * 10 seconds)
+    
+    while (!operation.done && pollCount < maxPolls) {
         await new Promise(resolve => setTimeout(resolve, 10000));
+        pollCount++;
+        console.log(`Polling attempt ${pollCount}/${maxPolls}...`);
+        
         try {
              operation = await ai.operations.getVideosOperation({operation: operation});
+             console.log('Operation status:', { done: operation.done, pollCount });
         } catch (e: any) {
              // Handle "Requested entity was not found" error during polling (common Veo issue)
              if (e.message && e.message.includes('404')) {
-                 console.warn("Polling 404 received, proceeding to fallback demo.");
-                 throw new Error("Video işlenirken bağlantı koptu (404).");
+                 console.warn("Polling 404 received.");
+                 throw new Error("Video işlenirken bağlantı koptu (404). Lütfen tekrar deneyin.");
              }
+             console.error('Polling error:', e);
              throw e;
         }
     }
+    
+    if (pollCount >= maxPolls) {
+        throw new Error('Video oluşturma zaman aşımına uğradı. Lütfen daha kısa bir video deneyin veya tekrar deneyin.');
+    }
+
+    console.log('Final operation response:', JSON.stringify(operation, null, 2));
 
     if (operation.response?.generatedVideos?.[0]?.video?.uri) {
         const downloadLink = operation.response.generatedVideos[0].video.uri;
+        console.log('Video URI found:', downloadLink);
+        
         // Append API key strictly from the variable
         const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
         
@@ -216,7 +237,16 @@ export const generateVideoFromImage = async (
         return URL.createObjectURL(blob);
     }
     
-    throw new Error("Video generation failed. No video URI returned.");
+    // More detailed error message
+    const errorDetails = {
+        done: operation.done,
+        hasResponse: !!operation.response,
+        hasVideos: !!operation.response?.generatedVideos,
+        videoCount: operation.response?.generatedVideos?.length || 0,
+    };
+    
+    console.error('Video generation failed. Operation details:', errorDetails);
+    throw new Error(`Video oluşturulamadı. API'den video URI alınamadı. Lütfen tekrar deneyin veya farklı ayarlar kullanın.`);
 };
 
 export const generateImage = async (
