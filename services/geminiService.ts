@@ -299,7 +299,14 @@ export const generateImage = async (
         console.log('==================');
     }
 
-    let prompt = `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
+    // Create color-focused prompt opening
+    const colorOpening = color && colorHex ? 
+        `KRITIK RENK TALIMAT: Kiyafet rengi MUTLAKA ${color} (${colorHex}) olmalidir. Bu renk ZORUNLUDUR.\n\n` : '';
+    
+    const colorClosing = color && colorHex ?
+        `\n\n*** FINAL RENK KONTROLU ***\nTEKRAR EDIYORUM: Kiyafet rengi ${color} (${colorHex}) olmalidir. Yeşil, mavi, kırmızı gibi BAŞKA RENKLER KULLANILAMAZ. Sadece ve sadece ${colorHex} kullan.` : '';
+
+    let prompt = colorOpening + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
     Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.
     
     *** 1. RENK KONTROLU - EN YÜKSEK ÖNCELİK (Bu kurala tam uyum ZORUNLUDUR) ***
@@ -372,6 +379,9 @@ export const generateImage = async (
     }
 
     prompt += ` Model doğrudan kameraya (veya promptta belirtilen yöne), kendine güvenen, profesyonel bir model ifadesiyle bakmalıdır.`;
+    
+    // Add final color reminder at the end
+    prompt += colorClosing;
     
     // Add text prompt to parts
     promptParts.push({ text: prompt });
