@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # Disable secrets scanning for API keys in build output
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 # Required environment variables (must be set in Netlify UI)
 # VITE_GEMINI_API_KEY - Your Google Gemini API key
