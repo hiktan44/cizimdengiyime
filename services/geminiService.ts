@@ -8,7 +8,19 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
 // Helper function to get hex code from color name
 const getColorHex = (colorName: string): string => {
+    if (!colorName) return '';
+    
+    console.log('getColorHex called with:', colorName);
+    console.log('Available colors:', colors.map(c => c.name));
+    
     const colorObj = colors.find(c => c.name === colorName);
+    
+    if (colorObj) {
+        console.log('Found color:', colorObj.name, '=', colorObj.value);
+    } else {
+        console.warn('Color NOT found:', colorName);
+    }
+    
     return colorObj?.value || '';
 };
 
