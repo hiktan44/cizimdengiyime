@@ -89,17 +89,37 @@ export const generateProductFromSketch = async (sketchFile: File, color?: string
 Bu RGB/HEX değerini KULLAN: ${colorHex}
 Referans çizimdeki rengi YOKSAY ve ${colorHex} rengini uygula.
 BAŞKA RENK KULLANMA.` : '';
+    
+    const colorClosing = color && colorHex ?
+        `\n\n*** FİNAL RENK KONTROLU ***\nTEKRAR EDİYORUM: Ürün rengi ${color} (${colorHex}) olmalidir. Yeşil, mavi, kırmızı gibi BAŞKA RENKLER KULLANILAMAZ. Sadece ve sadece ${colorHex} kullan.` : '';
 
     const prompt = `Bu moda çizimini (sketches/flat drawing) analiz et ve onu ultra-gerçekçi, yüksek çözünürlüklü bir hayalet manken (ghost mannequin) ürün fotoğrafına dönüştür.${colorInstruction}
     
-    *** GÖRSEL KALİTE ODAĞI ***:
+    *** 1. RENK KONTROLU - EN YÜKSEK ÖNCELİK (Bu kurala tam uyum ZORUNLUDUR) ***
+    ${color && colorHex ? `
+    >>> ÜRÜN RENGİ KURALI <<<
+    - Ürün rengi KESİNLİKLE "${color}" (HEX: ${colorHex}) OLMALIDIR.
+    - Bu RGB/HEX değerini KULLAN: ${colorHex}
+    - Referans çizimdeki rengi FARKLI ise, ONU YOKSAY ve ${colorHex} rengine DÖNÜŞTÜR.
+    - ${color} rengini TAM OLARAK uygula. Benzer tonlar KABUL EDİLMEZ.
+    - Işıklandırma SADECE gölge/parlaklık ekler, ${colorHex} temel rengini DEĞİŞTİRMEZ.
+    ` : color ? `
+    >>> ÜRÜN RENGİ KURALI <<<
+    - Ürün rengi KESİNLİKLE "${color}" OLMALIDIR.
+    - Referans çizimi YOKSAY, sadece "${color}" rengini kullan.
+    ` : `
+    >>> ÜRÜN RENGİ KURALI <<<
+    - Referans çizimdeki rengi %100 KORU.
+    `}
+    
+    *** 2. GÖRSEL KALİTE ODAĞI ***:
     1. Kumaş Dokusu: Kumaşın cinsi (pamuk, ipek, yün, denim vb.) fotoğrafta net bir şekilde anlaşılmalı. İplik dokusu ve malzemenin ağırlığı hissedilmeli.
     2. Işıklandırma: Ürünün formunu ortaya çıkaran yumuşak, profesyonel stüdyo aydınlatması. Gerçekçi gölgeler ve ışık yansımaları.
     3. Detaylar: Dikişler, fermuarlar, düğmeler, cepler ve kat yerleri makro detay seviyesinde keskin olmalı.
     4. Sadakat: Çizim üzerindeki her türlü desen, logo eskizi veya baskı detayı ürüne aynen aktarılmalı.
     5. Arka Plan: Temiz, saf beyaz veya çok açık nötr gri.
     
-    Sonuç, e-ticaret sitelerinde kullanılan 'High-End' ürün fotoğrafı kalitesinde, 8k çözünürlükte olmalıdır.`;
+    Sonuç, e-ticaret sitelerinde kullanılan 'High-End' ürün fotoğrafı kalitesinde, 8k çözünürlükte olmalıdır.` + colorClosing;
 
     try {
         const response = await ai.models.generateContent({
