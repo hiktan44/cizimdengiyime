@@ -61,11 +61,31 @@ const getLocationPromptFragment = (location: string): string => {
     }
 };
 
-export const generateProductFromSketch = async (sketchFile: File): Promise<string> => {
+export const generateProductFromSketch = async (sketchFile: File, color?: string): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(sketchFile);
 
-    const prompt = `Bu moda çizimini (sketches/flat drawing) analiz et ve onu ultra-gerçekçi, yüksek çözünürlüklü bir hayalet manken (ghost mannequin) ürün fotoğrafına dönüştür.
+    // Get hex code if color is provided
+    const colorHex = color ? getColorHex(color) : '';
+    
+    // Debug log
+    if (color) {
+        console.log('=== ÜRÜN RENK DEBUG ===');
+        console.log('Seçilen renk:', color);
+        console.log('HEX değer:', colorHex);
+        console.log('====================');
+    }
+
+    const colorInstruction = color && colorHex ? 
+        `
+
+*** RENK TALİMATI (EN YÜKSEK ÖNCELİK) ***
+Ürün rengi MUTLAKA "${color}" (HEX: ${colorHex}) OLMALIDIR.
+Bu RGB/HEX değerini KULLAN: ${colorHex}
+Referans çizimdeki rengi YOKSAY ve ${colorHex} rengini uygula.
+BAŞKA RENK KULLANMA.` : '';
+
+    const prompt = `Bu moda çizimini (sketches/flat drawing) analiz et ve onu ultra-gerçekçi, yüksek çözünürlüklü bir hayalet manken (ghost mannequin) ürün fotoğrafına dönüştür.${colorInstruction}
     
     *** GÖRSEL KALİTE ODAĞI ***:
     1. Kumaş Dokusu: Kumaşın cinsi (pamuk, ipek, yün, denim vb.) fotoğrafta net bir şekilde anlaşılmalı. İplik dokusu ve malzemenin ağırlığı hissedilmeli.

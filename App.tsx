@@ -199,6 +199,9 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
     const [techInputPreview, setTechInputPreview] = useState<string|undefined>(undefined);
     const [generatedTechSketchUrl, setGeneratedTechSketchUrl] = useState<string|null>(null);
     const [isTechLoading, setIsTechLoading] = useState(false);
+    
+    // Product color for sketch-to-product
+    const [productColor, setProductColor] = useState('');
 
     // Options
     const [clothingType, setClothingType] = useState('Genel'); // New
@@ -273,7 +276,7 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
         startProgressSimulation(80, 200);
 
         try {
-            const productUrl = await generateProductFromSketch(uploadedSketchFile);
+            const productUrl = await generateProductFromSketch(uploadedSketchFile, productColor || undefined);
             finishProgress();
             setGeneratedProductUrl(productUrl);
             // Automatically set this as the preview for step 2
@@ -524,6 +527,18 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                                 <div className="flex-grow">
                                     <ImageUploader onImageUpload={handleSketchUpload} imagePreviewUrl={sketchPreviewUrl} />
                                 </div>
+                                
+                                {/* Color picker for product */}
+                                {uploadedSketchFile && (
+                                    <div className="mt-4">
+                                        <ColorPicker 
+                                            label="Ürün Rengi (Opsiyonel)" 
+                                            selectedColor={productColor} 
+                                            onColorChange={setProductColor} 
+                                        />
+                                    </div>
+                                )}
+                                
                                 <button
                                     onClick={handleGenerateProductClick}
                                     disabled={!uploadedSketchFile || isProductLoading}
