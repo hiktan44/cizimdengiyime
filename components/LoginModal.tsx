@@ -20,8 +20,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
     };
 
     const fillAdminCreds = () => {
-        setEmail('admin@demo.com');
-        setPassword('admin');
+        setEmail('hikmet');
+        setPassword('Malatya4462!');
     };
 
     return (
@@ -40,34 +40,27 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                     </button>
                 </div>
 
-                {/* Demo Credentials Hint */}
+                {/* Admin Credentials Hint */}
                 <div 
                     className="bg-slate-900/50 p-4 rounded-lg border border-slate-700 mb-6 text-sm cursor-pointer hover:border-cyan-500/30 transition-colors group"
                     onClick={fillAdminCreds}
                     title="Otomatik doldurmak için tıklayın"
                 >
-                    <p className="text-slate-400 mb-2 text-xs uppercase tracking-wider font-semibold">Demo Hesap Bilgileri</p>
-                    <div className="grid grid-cols-2 gap-2">
-                        <div className="group-hover:text-cyan-400 transition-colors">
-                            <span className="text-xs text-slate-500 block">Admin:</span>
-                            <span className="font-mono">admin@demo.com</span>
-                            <br/>
-                            <span className="font-mono text-slate-500">admin</span>
-                        </div>
-                        <div>
-                            <span className="text-xs text-slate-500 block">Kullanıcı:</span>
-                            <span className="font-mono text-slate-300">user@demo.com</span>
-                             <br/>
-                            <span className="font-mono text-slate-500">user</span>
-                        </div>
+                    <p className="text-slate-400 mb-2 text-xs uppercase tracking-wider font-semibold">Admin Girişi</p>
+                    <div className="group-hover:text-cyan-400 transition-colors">
+                        <span className="text-xs text-slate-500 block">Kullanıcı Adı:</span>
+                        <span className="font-mono">hikmet</span>
+                        <br/>
+                        <span className="text-xs text-slate-500 block mt-1">Şifre:</span>
+                        <span className="font-mono text-slate-500">••••••••••</span>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="email" className="font-medium text-slate-300 block mb-2">E-posta</label>
+                        <label htmlFor="email" className="font-medium text-slate-300 block mb-2">Kullanıcı Adı</label>
                         <input
-                            type="email"
+                            type="text"
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -93,12 +86,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                         Giriş Yap
                     </button>
                 </form>
-                <p className="text-center text-sm text-slate-400 mt-6">
-                    Hesabınız yok mu?{' '}
-                    <button onClick={onSwitchToRegister} className="font-medium text-cyan-400 hover:underline">
-                        Hesap Oluşturun
-                    </button>
-                </p>
             </div>
         </div>
     );

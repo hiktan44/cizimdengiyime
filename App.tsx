@@ -14,7 +14,6 @@ import { VideoIcon } from './components/icons/VideoIcon';
 import { PencilIcon } from './components/icons/PencilIcon';
 import { VideoSettingsModal } from './components/VideoSettingsModal';
 import { LoginModal } from './components/LoginModal';
-import { RegisterModal } from './components/RegisterModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { BeforeAfterSlider } from './components/BeforeAfterSlider';
 
@@ -941,7 +940,6 @@ const App: React.FC = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
     const [showLogin, setShowLogin] = useState(false);
-    const [showRegister, setShowRegister] = useState(false);
     
     // Admin editable content state
     const [sketchUrl, setSketchUrl] = useState(localStorage.getItem('sketchUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_sketch_1.jpg');
@@ -950,16 +948,13 @@ const App: React.FC = () => {
     const [videoUrl, setVideoUrl] = useState(localStorage.getItem('videoUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_video_1.mp4');
 
     const handleLogin = (email: string, pass: string) => {
-        if (email === 'admin@demo.com' && pass === 'admin') {
+        // Only allow admin access with specific credentials
+        if (email === 'hikmet' && pass === 'Malatya4462!') {
             setIsLoggedIn(true);
             setUserRole('admin');
             setShowLogin(false);
-        } else if (email && pass) {
-            setIsLoggedIn(true);
-            setUserRole('user');
-            setShowLogin(false);
         } else {
-            alert("Giriş başarısız.");
+            alert("Giriş başarısız. Sadece admin girişi yapılabilir.");
         }
     };
 
@@ -1034,13 +1029,7 @@ const App: React.FC = () => {
                 isOpen={showLogin}
                 onClose={() => setShowLogin(false)}
                 onLogin={handleLogin}
-                onSwitchToRegister={() => { setShowLogin(false); setShowRegister(true); }}
-            />
-            <RegisterModal
-                isOpen={showRegister}
-                onClose={() => setShowRegister(false)}
-                onRegister={(e, p) => { handleLogin(e, p); setShowRegister(false); }}
-                onSwitchToLogin={() => { setShowRegister(false); setShowLogin(true); }}
+                onSwitchToRegister={() => {}} // No register functionality
             />
         </>
     );
