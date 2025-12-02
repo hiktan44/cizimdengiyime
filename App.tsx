@@ -282,7 +282,13 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
             // Automatically set this as the preview for step 2
             setProductPreviewUrl(productUrl);
             // Reset manual upload if any
-            setUploadedProductFile(null); 
+            setUploadedProductFile(null);
+            
+            // Transfer product color to model color if selected
+            if (productColor && !colorSuggestion) {
+                setColorSuggestion(productColor);
+                console.log('Ürün rengi canlı model rengine aktarıldı:', productColor);
+            }
         } catch (error) {
             alert(`Ürün oluşturma hatası: ${error}`);
         } finally {
