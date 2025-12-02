@@ -217,6 +217,9 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
     const [hairColor, setHairColor] = useState('Doğal');
     const [hairStyle, setHairStyle] = useState('Doğal');
     const [customPrompt, setCustomPrompt] = useState('');
+    const [customBackgroundPrompt, setCustomBackgroundPrompt] = useState(''); // New: Custom background description
+    const [fabricType, setFabricType] = useState(''); // New: Dokuma/Örme
+    const [fabricFinish, setFabricFinish] = useState(''); // New: Soft/Parlak/Mat/Pastel
     const [lighting, setLighting] = useState('Doğal');
     const [cameraAngle, setCameraAngle] = useState('Normal');
     const [cameraZoom, setCameraZoom] = useState('Normal'); // Yeni: Çekim mesafesi
@@ -357,7 +360,10 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                 cameraAngle,
                 cameraZoom,
                 aspectRatio,
-                customBackgroundFile
+                customBackgroundFile,
+                customBackgroundPrompt,
+                fabricType,
+                fabricFinish
             );
             finishProgress();
             setTimeout(() => {
@@ -761,6 +767,30 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                                         </div>
                                     </div>
 
+                                    {/* Fabric Settings */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Kumaş Cinsi</label>
+                                            <select value={fabricType} onChange={(e) => setFabricType(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                                <option value="">Seçiniz</option>
+                                                <option value="Dokuma">Dokuma</option>
+                                                <option value="Örme">Örme</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Kumaş Yüzey Detayı</label>
+                                            <select value={fabricFinish} onChange={(e) => setFabricFinish(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                                <option value="">Seçiniz</option>
+                                                <option value="Soft">Soft (Yumuşak)</option>
+                                                <option value="Parlak">Parlak (Glossy)</option>
+                                                <option value="Mat">Mat (Matte)</option>
+                                                <option value="Pastel">Pastel</option>
+                                                <option value="Saten">Saten (Satin)</option>
+                                                <option value="İpek">İpek (Silk)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                      {/* Aspect Ratio Selection */}
                                     <div>
                                         <label className="font-medium text-slate-300 block mb-2 text-sm">En/Boy Oranı</label>
@@ -785,7 +815,7 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                                         </select>
                                          {/* Custom Background Upload */}
                                         {location === 'Özel Arka Plan' && (
-                                            <div className="mt-2">
+                                            <div className="mt-2 space-y-2">
                                                 <input
                                                     type="file"
                                                     onChange={(e) => e.target.files && handleBackgroundUpload(e.target.files[0])}
@@ -795,6 +825,17 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                                                 {customBackgroundFile && <p className="text-xs text-green-400 mt-1">✓ Yüklendi: {customBackgroundFile.name}</p>}
                                             </div>
                                         )}
+                                        {/* Custom Background Prompt */}
+                                        <div className="mt-2">
+                                            <textarea
+                                                value={customBackgroundPrompt}
+                                                onChange={(e) => setCustomBackgroundPrompt(e.target.value)}
+                                                placeholder="Örn: Güneş batarken sahilde, kumda yürüyor... (isteğe bağlı)"
+                                                rows={2}
+                                                className="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-white text-xs placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-none"
+                                            />
+                                            <p className="text-xs text-slate-500 mt-1">İsteğe bağlı: Arka plan hakkında özel detaylar ekleyin</p>
+                                        </div>
                                     </div>
                                 </div>
 
