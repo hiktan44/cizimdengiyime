@@ -290,6 +290,14 @@ export const generateImage = async (
     // Get hex codes for colors
     const colorHex = getColorHex(color);
     const secondaryColorHex = getColorHex(secondaryColor);
+    
+    // Debug: Log color information  
+    if (color) {
+        console.log('=== RENK DEBUG ===');
+        console.log('Seçilen renk adı:', color);
+        console.log('Renk HEX değeri:', colorHex);
+        console.log('==================');
+    }
 
     let prompt = `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
     Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.
