@@ -6,6 +6,11 @@ import { colors } from '../components/ColorPicker';
 // .env.local dosyasında VITE_GEMINI_API_KEY olarak tanımlanmalıdır.
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
+if (!API_KEY) {
+    console.error('VITE_GEMINI_API_KEY environment variable is not set!');
+    console.error('Please add VITE_GEMINI_API_KEY to your Netlify environment variables.');
+}
+
 // Helper function to get hex code from color name
 const getColorHex = (colorName: string): string => {
     if (!colorName) return '';

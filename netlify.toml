@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Required environment variables (must be set in Netlify UI)
+# VITE_GEMINI_API_KEY - Your Google Gemini API key
