@@ -99,6 +99,84 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
       }
   };
 
+  const handleDownloadGallery = async () => {
+      if (!currentImageUrl) return;
+      
+      try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+
+          // Load images
+          const images = await Promise.all([
+              sketchImageUrl ? loadImage(sketchImageUrl) : null,
+              beforeImageUrl ? loadImage(beforeImageUrl) : null,
+              loadImage(currentImageUrl)
+          ].filter(Boolean) as Promise<HTMLImageElement>[]);
+
+          if (images.length === 0) return;
+
+          // Calculate canvas dimensions (3:4 aspect ratio per image)
+          const imageWidth = 800;
+          const imageHeight = Math.round(imageWidth * 4 / 3);
+          const gap = 20;
+          const padding = 40;
+          
+          canvas.width = (imageWidth * images.length) + (gap * (images.length - 1)) + (padding * 2);
+          canvas.height = imageHeight + (padding * 2);
+
+          // Fill background
+          ctx.fillStyle = '#0f172a'; // slate-900
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Draw images
+          let xOffset = padding;
+          const labels = ['1. Çizim', '2. Ürün', '3. Model (Sonuç)'];
+          const labelColors = ['#94a3b8', '#c084fc', '#22d3ee']; // slate-400, purple-400, cyan-400
+          
+          images.forEach((img, index) => {
+              // Draw image
+              ctx.drawImage(img, xOffset, padding, imageWidth, imageHeight);
+              
+              // Draw border
+              ctx.strokeStyle = index === images.length - 1 ? '#22d3ee' : '#475569'; // cyan or slate-600
+              ctx.lineWidth = index === images.length - 1 ? 4 : 2;
+              ctx.strokeRect(xOffset, padding, imageWidth, imageHeight);
+              
+              // Draw label
+              ctx.fillStyle = labelColors[labels.length - images.length + index];
+              ctx.font = 'bold 24px Inter, sans-serif';
+              ctx.fillText(labels[labels.length - images.length + index], xOffset + 10, padding - 10);
+              
+              xOffset += imageWidth + gap;
+          });
+
+          // Download
+          canvas.toBlob((blob) => {
+              if (!blob) return;
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'galeri-cizim-urun-model.png';
+              a.click();
+              URL.revokeObjectURL(url);
+          }, 'image/png');
+      } catch (e) {
+          console.error('Galeri indirme hatası:', e);
+          alert('Galeri indirilemedi.');
+      }
+  };
+
+  const loadImage = (src: string): Promise<HTMLImageElement> => {
+      return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+      });
+  };
+
   const tabs = [
       { id: 'image', label: 'Sonuç' },
       { id: 'comparison', label: 'Karşılaştırma', disabled: !beforeImageUrl || !currentImageUrl },
@@ -162,22 +240,37 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 )}
                 
                 {activeTab === 'gallery' && (
-                    <div className="w-full h-full p-4 grid grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto">
-                        {sketchImageUrl && (
-                            <div className="flex flex-col gap-2">
-                                <span className="text-xs text-slate-400 font-semibold uppercase">1. Çizim</span>
-                                <img src={sketchImageUrl} alt="Sketch" className="w-full aspect-[3/4] object-cover rounded-lg border border-slate-600" />
+                    <div className="w-full h-full p-4 flex flex-col gap-4">
+                        {/* Gallery Grid */}
+                        <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto">
+                            {sketchImageUrl && (
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs text-slate-400 font-semibold uppercase">1. Çizim</span>
+                                    <img src={sketchImageUrl} alt="Sketch" className="w-full aspect-[3/4] object-cover rounded-lg border border-slate-600" />
+                                </div>
+                            )}
+                            {beforeImageUrl && (
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs text-purple-400 font-semibold uppercase">2. Ürün</span>
+                                    <img src={beforeImageUrl} alt="Product" className="w-full aspect-[3/4] object-cover rounded-lg border border-slate-600" />
+                                </div>
+                            )}
+                             <div className="flex flex-col gap-2">
+                                <span className="text-xs text-cyan-400 font-semibold uppercase">3. Model (Sonuç)</span>
+                                <img src={currentImageUrl!} alt="Model" className="w-full aspect-[3/4] object-cover rounded-lg border-2 border-cyan-500/50 shadow-lg shadow-cyan-900/20" />
                             </div>
-                        )}
-                        {beforeImageUrl && (
-                            <div className="flex flex-col gap-2">
-                                <span className="text-xs text-purple-400 font-semibold uppercase">2. Ürün</span>
-                                <img src={beforeImageUrl} alt="Product" className="w-full aspect-[3/4] object-cover rounded-lg border border-slate-600" />
-                            </div>
-                        )}
-                         <div className="flex flex-col gap-2">
-                            <span className="text-xs text-cyan-400 font-semibold uppercase">3. Model (Sonuç)</span>
-                            <img src={currentImageUrl!} alt="Model" className="w-full aspect-[3/4] object-cover rounded-lg border-2 border-cyan-500/50 shadow-lg shadow-cyan-900/20" />
+                        </div>
+                        
+                        {/* Gallery Download Button */}
+                        <div className="flex justify-center pt-2 border-t border-slate-700">
+                            <button
+                                onClick={handleDownloadGallery}
+                                className="bg-gradient-to-r from-cyan-600 to-purple-600 text-white px-6 py-3 rounded-full hover:from-cyan-500 hover:to-purple-500 transition-all shadow-lg flex items-center gap-2 font-semibold"
+                                title="Galeriyi Tek Görsel Olarak İndir"
+                            >
+                                <DownloadIcon />
+                                Galeriyi Tek Görsel Olarak İndir
+                            </button>
                         </div>
                     </div>
                 )}
