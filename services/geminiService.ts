@@ -333,7 +333,10 @@ export const generateImage = async (
     customBackground?: File,
     customBackgroundPrompt?: string,
     fabricType?: string,
-    fabricFinish?: string
+    fabricFinish?: string,
+    shoeType?: string,
+    shoeColor?: string,
+    accessories?: string
 ): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
@@ -430,6 +433,20 @@ export const generateImage = async (
 
     if (hairStyle && hairStyle !== 'Doğal') {
         prompt += ` Modelin saç stili: ${hairStyle}.`;
+    }
+
+    // Shoe settings
+    if (shoeType && shoeType.trim()) {
+        prompt += ` *** AYAKKABI TALİMATI ***: Model ${shoeType} giymelidir.`;
+        if (shoeColor && shoeColor.trim()) {
+            prompt += ` Ayakkabı rengi: ${shoeColor}.`;
+        }
+        prompt += ` Ayakkabılar çerçevede NET görünmelidir (tam vücut çekiminde).`;
+    }
+
+    // Accessories
+    if (accessories && accessories.trim()) {
+        prompt += ` *** AKSESUAR TALİMATI ***: Model ${accessories} kullanmalıdır. Aksesuar doğal ve estetik bir şekilde modelin üzerinde/elinde olmalıdır.`;
     }
 
     if (customBackground) {

@@ -220,6 +220,9 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
     const [customBackgroundPrompt, setCustomBackgroundPrompt] = useState(''); // New: Custom background description
     const [fabricType, setFabricType] = useState(''); // New: Dokuma/Örme
     const [fabricFinish, setFabricFinish] = useState(''); // New: Soft/Parlak/Mat/Pastel
+    const [shoeType, setShoeType] = useState(''); // New: Ayakkabı tipi
+    const [shoeColor, setShoeColor] = useState(''); // New: Ayakkabı rengi
+    const [accessories, setAccessories] = useState(''); // New: Aksesuar
     const [lighting, setLighting] = useState('Doğal');
     const [cameraAngle, setCameraAngle] = useState('Normal');
     const [cameraZoom, setCameraZoom] = useState('Normal'); // Yeni: Çekim mesafesi
@@ -363,7 +366,10 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                 customBackgroundFile,
                 customBackgroundPrompt,
                 fabricType,
-                fabricFinish
+                fabricFinish,
+                shoeType,
+                shoeColor,
+                accessories
             );
             finishProgress();
             setTimeout(() => {
@@ -789,6 +795,54 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                                                 <option value="İpek">İpek (Silk)</option>
                                             </select>
                                         </div>
+                                    </div>
+
+                                    {/* Shoe Settings */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Ayakkabı Tipi</label>
+                                            <select value={shoeType} onChange={(e) => setShoeType(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                                <option value="">Otomatik / Yok</option>
+                                                <option value="Spor Ayakkabı">Spor Ayakkabı (Sneakers)</option>
+                                                <option value="Topuklu">Topuklu (High Heels)</option>
+                                                <option value="Bot">Bot (Boots)</option>
+                                                <option value="Sandalet">Sandalet</option>
+                                                <option value="Loafer">Loafer / Mokosen</option>
+                                                <option value="Oxford">Oxford / Klasik</option>
+                                                <option value="Çizme">Çizme</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Ayakkabı Rengi</label>
+                                            <select value={shoeColor} onChange={(e) => setShoeColor(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                                <option value="">Otomatik</option>
+                                                <option value="Siyah">Siyah</option>
+                                                <option value="Beyaz">Beyaz</option>
+                                                <option value="Kahverengi">Kahverengi</option>
+                                                <option value="Lacivert">Lacivert</option>
+                                                <option value="Kırmızı">Kırmızı</option>
+                                                <option value="Bej">Bej / Ten Rengi</option>
+                                                <option value="Gri">Gri</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Accessories Settings */}
+                                    <div>
+                                        <label className="font-medium text-slate-300 block mb-2 text-sm">Aksesuar</label>
+                                        <select value={accessories} onChange={(e) => setAccessories(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
+                                            <option value="">Yok / Otomatik</option>
+                                            <option value="Güneş Gözlüğü">Güneş Gözlüğü</option>
+                                            <option value="Şapka">Şapka</option>
+                                            <option value="Bere">Bere</option>
+                                            <option value="Şarf / Atkı">Şarf / Atkı</option>
+                                            <option value="Çanta (El)">Çanta (El Çantası)</option>
+                                            <option value="Çanta (Omuz)">Çanta (Omuz / Sirt)</option>
+                                            <option value="Kol Saati">Kol Saati</option>
+                                            <option value="Eldiven">Eldiven</option>
+                                            <option value="Kemer">Kemer (Vurgulu)</option>
+                                            <option value="Kolye / Küpe">Kolye / Küpe</option>
+                                        </select>
                                     </div>
 
                                      {/* Aspect Ratio Selection */}
