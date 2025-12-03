@@ -16,6 +16,12 @@ import { VideoSettingsModal } from './components/VideoSettingsModal';
 import { LoginModal } from './components/LoginModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { BeforeAfterSlider } from './components/BeforeAfterSlider';
+import { useAuth } from './hooks/useAuth';
+import { AuthModal } from './components/AuthModal';
+import { LandingPage } from './pages/LandingPage';
+import { Dashboard } from './components/Dashboard';
+import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from './lib/database';
+import { CREDIT_COSTS } from './lib/supabase';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -25,152 +31,19 @@ interface PageHeaderProps {
     onAdminClick?: () => void;
 }
 
-interface LandingPageProps extends PageHeaderProps {
-    onStartClick: () => void;
-    sketchUrl: string;
-    productUrl: string;
-    modelUrl: string;
-    videoUrl: string;
-}
-
-const LandingPage: React.FC<LandingPageProps> = ({ 
-    onStartClick, 
-    sketchUrl, 
-    productUrl, 
-    modelUrl, 
-    videoUrl, 
-    ...headerProps 
-}) => {
-    return (
-        <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-cyan-500/30">
-            <Header {...headerProps} />
-
-            <main className="container mx-auto px-4 py-16">
-                <div className="text-center max-w-4xl mx-auto mb-20">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 mb-6 animate-fade-in-up">
-                        <SparklesIcon />
-                        <span className="font-semibold text-sm tracking-wide uppercase">Yapay Zeka Destekli Moda Tasarımı</span>
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight mb-8 leading-tight">
-                        Çizimden Gerçeğe <br />
-                        <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 text-transparent bg-clip-text">
-                            Saniyeler İçinde
-                        </span>
-                    </h1>
-                    <p className="text-xl text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto">
-                        Tasarımlarınızı yükleyin, yapay zeka onları ultra gerçekçi mankenler üzerinde canlandırsın.
-                        Fotoğraf çekimi maliyetlerine son.
-                    </p>
-                    <button
-                        onClick={onStartClick}
-                        className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-cyan-600 font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-600 focus:ring-offset-gray-900 hover:bg-cyan-500 shadow-lg shadow-cyan-500/30"
-                    >
-                        Hemen Başla
-                        <div className="absolute -inset-3 rounded-xl bg-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity blur-lg" />
-                    </button>
-                </div>
-
-                {/* 3-Column Grid Layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-                    {/* Column 1: Sketch -> Product */}
-                    <div className="bg-slate-800/50 rounded-3xl p-6 border border-slate-700/50 backdrop-blur-sm hover:border-cyan-500/30 transition-all group flex flex-col">
-                        <div className="flex flex-col gap-4 mb-6 flex-grow">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 shrink-0 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition-transform">
-                                    <UploadIcon />
-                                </div>
-                                <h3 className="text-xl font-bold text-white">1. Çizimden Ürüne</h3>
-                            </div>
-                            <p className="text-sm text-slate-400 leading-relaxed">
-                                Basit karakalem veya dijital teknik çizimlerinizi yükleyin. Yapay zeka, kumaş dokusunu, ışık ve gölge detaylarını algılayarak çiziminizi birebir yansıtan <strong>gerçekçi bir ürün fotoğrafına</strong> dönüştürsün.
-                            </p>
-                        </div>
-                        <div className="rounded-2xl overflow-hidden border border-slate-700 shadow-lg">
-                             <BeforeAfterSlider beforeImageUrl={sketchUrl} afterImageUrl={productUrl} />
-                        </div>
-                    </div>
-
-                    {/* Column 2: Product -> Model */}
-                    <div className="bg-slate-800/50 rounded-3xl p-6 border border-slate-700/50 backdrop-blur-sm hover:border-purple-500/30 transition-all group flex flex-col">
-                        <div className="flex flex-col gap-4 mb-6 flex-grow">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 shrink-0 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
-                                    <AdjustmentsIcon />
-                                </div>
-                                <h3 className="text-xl font-bold text-white">2. Üründen Modele</h3>
-                            </div>
-                            <p className="text-sm text-slate-400 leading-relaxed">
-                                Oluşturulan veya yüklenen ürün fotoğrafını dilediğiniz manken üzerinde görün. Farklı etnik köken ve vücut tiplerine sahip <strong>yapay zeka modelleriyle</strong> stüdyo çekimi kalitesinde sonuçlar alın.
-                            </p>
-                        </div>
-                        <div className="rounded-2xl overflow-hidden border border-slate-700 shadow-lg">
-                             <BeforeAfterSlider beforeImageUrl={productUrl} afterImageUrl={modelUrl} />
-                        </div>
-                    </div>
-
-                    {/* Column 3: Live Video */}
-                    <div className="bg-slate-800/50 rounded-3xl p-6 border border-slate-700/50 backdrop-blur-sm hover:border-pink-500/30 transition-all group flex flex-col">
-                        <div className="flex flex-col gap-4 mb-6 flex-grow">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 shrink-0 rounded-2xl bg-pink-500/10 flex items-center justify-center text-pink-400 group-hover:scale-110 transition-transform">
-                                    <VideoIcon />
-                                </div>
-                                <h3 className="text-xl font-bold text-white">3. Canlı Video</h3>
-                            </div>
-                             <p className="text-sm text-slate-400 leading-relaxed">
-                                Statik görsellerle sınırlı kalmayın. Modelinizi podyumda yürütmek, dönmek veya poz vermek için <strong>sinematik videolar</strong> oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.
-                            </p>
-                        </div>
-                        <div className="relative w-full aspect-[4/5] max-w-lg mx-auto rounded-2xl overflow-hidden border-4 border-slate-700 shadow-2xl">
-                            <video
-                                src={videoUrl}
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
-                                className="absolute inset-0 w-full h-full object-cover"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    {[
-                        { 
-                            icon: <CheckCircleIcon />, 
-                            title: "Ultra Hızlı Sonuç", 
-                            desc: "Geleneksel fotoğraf çekimleri günler sürerken, yapay zeka ile saniyeler içinde tasarımınızı canlı manken üzerinde görün. Pazara çıkış sürenizi kısaltın." 
-                        },
-                        { 
-                            icon: <SparklesIcon />, 
-                            title: "4K Stüdyo Kalitesi", 
-                            desc: "Profesyonel stüdyo aydınlatması ve yüksek çözünürlüklü çıktılarla baskıya veya dijital kullanıma hazır görseller elde edin." 
-                        },
-                        { 
-                            icon: <VideoIcon />, 
-                            title: "Etkileyici Videolar", 
-                            desc: "Tasarımınızın hareket halindeki duruşunu, kumaşın akışını gösteren videolarla müşterilerinizi etkileyin ve satışlarınızı artırın." 
-                        }
-                    ].map((feature, i) => (
-                        <div key={i} className="p-6 rounded-2xl bg-slate-800/30 border border-slate-700/30 hover:bg-slate-800 transition-colors flex flex-col items-center">
-                            <div className="mb-4 text-cyan-400 scale-125 p-3 bg-cyan-500/10 rounded-full">{feature.icon}</div>
-                            <h3 className="text-lg font-bold text-white mb-3">{feature.title}</h3>
-                            <p className="text-slate-400 leading-relaxed text-sm md:text-base">{feature.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </main>
-        </div>
-    );
-};
-
-const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({ 
+const ToolPage: React.FC<{ 
+    onNavigateHome: () => void;
+    profile: any;
+    onRefreshProfile: () => void;
+} & PageHeaderProps> = ({ 
     onNavigateHome, 
     isLoggedIn, 
     onLoginClick, 
     onLogoutClick, 
     userRole, 
-    onAdminClick
+    onAdminClick,
+    profile,
+    onRefreshProfile
 }) => {
     const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical'>('design');
 
@@ -276,6 +149,13 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
     const handleGenerateProductClick = async () => {
         if (!uploadedSketchFile) return;
 
+        // Check credits
+        const creditCheck = await checkAndDeductCredits(profile.id, 'sketch_to_product');
+        if (!creditCheck.success) {
+            alert(creditCheck.message);
+            return;
+        }
+
         setIsProductLoading(true);
         setLoadingText('Çizim ürüne dönüştürülüyor...');
         startProgressSimulation(80, 200);
@@ -294,6 +174,20 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                 setColorSuggestion(productColor);
                 console.log('Ürün rengi canlı model rengine aktarıldı:', productColor);
             }
+
+            // Save to database
+            await saveGeneration(
+                profile.id,
+                'sketch_to_product',
+                CREDIT_COSTS.SKETCH_TO_PRODUCT,
+                null,
+                productUrl,
+                null,
+                { productColor }
+            );
+
+            // Refresh profile to update credits
+            onRefreshProfile();
         } catch (error) {
             alert(`Ürün oluşturma hatası: ${error}`);
         } finally {
@@ -338,6 +232,13 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
             return;
         }
 
+        // Check credits
+        const creditCheck = await checkAndDeductCredits(profile.id, 'product_to_model');
+        if (!creditCheck.success) {
+            alert(creditCheck.message);
+            return;
+        }
+
         setIsModelLoading(true);
         setGeneratedImageUrl(null);
         setGeneratedVideoUrl(null);
@@ -376,6 +277,25 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                 setGeneratedImageUrl(imageUrl);
                 setIsModelLoading(false);
             }, 600);
+
+            // Save to database
+            await saveGeneration(
+                profile.id,
+                'product_to_model',
+                CREDIT_COSTS.PRODUCT_TO_MODEL,
+                null,
+                imageUrl,
+                null,
+                { 
+                    clothingType, colorSuggestion, secondaryColor, modelEthnicity, 
+                    artisticStyle, location, bodyType, pose, hairColor, hairStyle,
+                    customPrompt, lighting, cameraAngle, cameraZoom, aspectRatio,
+                    fabricType, fabricFinish, shoeType, shoeColor, accessories
+                }
+            );
+
+            // Refresh profile to update credits
+            onRefreshProfile();
         } catch (error) {
             console.error('Görsel oluşturma hatası:', error);
             alert(`Görsel oluşturulurken bir hata oluştu: ${error instanceof Error ? error.message : String(error)}`);
@@ -414,6 +334,13 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
     const handleVideoGeneration = async (settings: VideoGenerationSettings) => {
         if (!generatedImageUrl) return;
 
+        // Check credits
+        const creditCheck = await checkAndDeductCredits(profile.id, 'video');
+        if (!creditCheck.success) {
+            alert(creditCheck.message);
+            return;
+        }
+
         setIsVideoModalOpen(false);
         setIsModelLoading(true);
         
@@ -437,6 +364,20 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                 setGeneratedVideoUrl(videoUrl);
                 setIsModelLoading(false);
             }, 600);
+
+            // Save to database
+            await saveGeneration(
+                profile.id,
+                'video',
+                CREDIT_COSTS.VIDEO,
+                null,
+                null,
+                videoUrl,
+                { settings }
+            );
+
+            // Refresh profile to update credits
+            onRefreshProfile();
         } catch (error) {
             console.error('Video oluşturma hatası:', error);
             alert(`Video oluşturulurken hata: ${error instanceof Error ? error.message : String(error)}`);
@@ -499,6 +440,7 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
                 onLogoutClick={onLogoutClick} 
                 onHomeClick={onNavigateHome} 
                 onAdminClick={onAdminClick}
+                credits={profile.credits}
             />
 
             <main className="flex-grow container mx-auto p-4 md:p-8">
@@ -1031,33 +973,18 @@ const ToolPage: React.FC<{ onNavigateHome: () => void } & PageHeaderProps> = ({
 };
 
 const App: React.FC = () => {
-    const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'admin'>('landing');
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
-    const [showLogin, setShowLogin] = useState(false);
+    const { user, profile, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, signOut, refreshProfile } = useAuth();
+    const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin'>('landing');
+    const [showAuthModal, setShowAuthModal] = useState(false);
     
-    // Admin editable content state
+    // Admin check (old admin still works)
+    const isAdmin = user?.email === 'hikmet@example.com' || profile?.subscription_tier === 'admin';
+    
+    // Admin editable content state (keep for backward compatibility)
     const [sketchUrl, setSketchUrl] = useState(localStorage.getItem('sketchUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_sketch_1.jpg');
     const [productUrl, setProductUrl] = useState(localStorage.getItem('productUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_product_1.jpg');
     const [modelUrl, setModelUrl] = useState(localStorage.getItem('modelUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_model_1.jpg');
     const [videoUrl, setVideoUrl] = useState(localStorage.getItem('videoUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_video_1.mp4');
-
-    const handleLogin = (email: string, pass: string) => {
-        // Only allow admin access with specific credentials
-        if (email === 'hikmet' && pass === 'Malatya4462!') {
-            setIsLoggedIn(true);
-            setUserRole('admin');
-            setShowLogin(false);
-        } else {
-            alert("Giriş başarısız. Sadece admin girişi yapılabilir.");
-        }
-    };
-
-    const handleLogout = () => {
-        setIsLoggedIn(false);
-        setUserRole(null);
-        setCurrentPage('landing');
-    };
 
     const handleFileUpload = (file: File, type: 'sketch' | 'product' | 'model' | 'video') => {
         const url = URL.createObjectURL(file);
@@ -1076,39 +1003,68 @@ const App: React.FC = () => {
         }
     };
 
+    const handleGetStarted = () => {
+        if (!user) {
+            setShowAuthModal(true);
+        } else {
+            setCurrentPage('tool');
+        }
+    };
+
+    const handleSignIn = () => {
+        setShowAuthModal(true);
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mb-4"></div>
+                    <p className="text-slate-400">Yükleniyor...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
             {currentPage === 'landing' && (
                 <LandingPage
-                    onStartClick={() => setCurrentPage('tool')}
-                    isLoggedIn={isLoggedIn}
-                    userRole={userRole}
-                    onLoginClick={() => setShowLogin(true)}
-                    onLogoutClick={handleLogout}
-                    onAdminClick={() => setCurrentPage('admin')}
-                    sketchUrl={sketchUrl}
-                    productUrl={productUrl}
-                    modelUrl={modelUrl}
-                    videoUrl={videoUrl}
+                    onGetStarted={handleGetStarted}
+                    onSignIn={handleSignIn}
                 />
             )}
-            {currentPage === 'tool' && (
+            {currentPage === 'tool' && user && profile && (
                 <ToolPage
                     onNavigateHome={() => setCurrentPage('landing')}
-                    isLoggedIn={isLoggedIn}
-                    userRole={userRole}
-                    onLoginClick={() => setShowLogin(true)}
-                    onLogoutClick={handleLogout}
+                    isLoggedIn={!!user}
+                    userRole={isAdmin ? 'admin' : 'user'}
+                    onLoginClick={handleSignIn}
+                    onLogoutClick={() => {
+                        signOut();
+                        setCurrentPage('landing');
+                    }}
                     onAdminClick={() => setCurrentPage('admin')}
+                    profile={profile}
+                    onRefreshProfile={refreshProfile}
                 />
             )}
-             {currentPage === 'admin' && (
+            {currentPage === 'dashboard' && user && profile && (
+                <Dashboard
+                    profile={profile}
+                    onRefresh={refreshProfile}
+                />
+            )}
+            {currentPage === 'admin' && user && isAdmin && (
                 <AdminDashboard
                     onNavigateHome={() => setCurrentPage('landing')}
-                    isLoggedIn={isLoggedIn}
-                    userRole={userRole}
-                    onLoginClick={() => setShowLogin(true)}
-                    onLogoutClick={handleLogout}
+                    isLoggedIn={!!user}
+                    userRole="admin"
+                    onLoginClick={handleSignIn}
+                    onLogoutClick={() => {
+                        signOut();
+                        setCurrentPage('landing');
+                    }}
                     sketchUrl={sketchUrl}
                     productUrl={productUrl}
                     modelUrl={modelUrl}
@@ -1120,11 +1076,13 @@ const App: React.FC = () => {
                 />
             )}
 
-            <LoginModal
-                isOpen={showLogin}
-                onClose={() => setShowLogin(false)}
-                onLogin={handleLogin}
-                onSwitchToRegister={() => {}} // No register functionality
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                onGoogleSignIn={signInWithGoogle}
+                onAppleSignIn={signInWithApple}
+                onEmailSignIn={signInWithEmail}
+                onEmailSignUp={signUpWithEmail}
             />
         </>
     );
