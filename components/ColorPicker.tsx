@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { XCircleIcon } from './icons/XCircleIcon';
 
 export const colors = [
@@ -35,6 +35,8 @@ interface ColorPickerProps {
 }
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi:", selectedColor, onColorChange }) => {
+  const [customColorHex, setCustomColorHex] = useState('#3b82f6');
+  const [showColorPicker, setShowColorPicker] = useState(false);
   
   const handleColorClick = (colorName: string) => {
     if (selectedColor === colorName) {
@@ -42,6 +44,17 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
     } else {
       onColorChange(colorName);
     }
+  };
+
+  const handleCustomColorSelect = () => {
+    // Create a custom color name with hex value
+    const customColorName = `Özel Renk (${customColorHex})`;
+    onColorChange(customColorName);
+    setShowColorPicker(false);
+  };
+
+  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomColorHex(e.target.value);
   };
 
   return (
@@ -65,6 +78,49 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
             aria-label={`Renk seç: ${color.name}`}
           />
         ))}
+        
+        {/* Custom Color Picker Button */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowColorPicker(!showColorPicker)}
+            className="w-6 h-6 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-cyan-500 flex items-center justify-center"
+            style={{ 
+                background: `conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red)`,
+                border: '2px solid #fff'
+            }}
+            title="Özel Renk Seç"
+            aria-label="Özel renk paleti aç"
+          >
+            <span className="text-white text-xs font-bold drop-shadow">+</span>
+          </button>
+          
+          {showColorPicker && (
+            <div className="absolute top-8 left-0 z-50 bg-slate-800 p-3 rounded-lg border border-slate-600 shadow-2xl flex flex-col gap-2">
+              <label className="text-xs text-slate-400 font-medium">Özel Renk Ton Seç</label>
+              <input
+                type="color"
+                value={customColorHex}
+                onChange={handleColorInputChange}
+                className="w-20 h-20 cursor-pointer border-2 border-slate-600 rounded"
+              />
+              <div className="text-xs text-slate-400 font-mono text-center">{customColorHex}</div>
+              <button
+                onClick={handleCustomColorSelect}
+                className="bg-cyan-600 text-white px-3 py-1.5 rounded text-xs font-semibold hover:bg-cyan-500 transition"
+              >
+                Kullan
+              </button>
+              <button
+                onClick={() => setShowColorPicker(false)}
+                className="bg-slate-700 text-slate-300 px-3 py-1 rounded text-xs hover:bg-slate-600 transition"
+              >
+                İptal
+              </button>
+            </div>
+          )}
+        </div>
+
          {selectedColor && (
           <button 
             onClick={() => onColorChange('')} 

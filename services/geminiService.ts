@@ -16,6 +16,14 @@ const getColorHex = (colorName: string): string => {
     if (!colorName) return '';
     
     console.log('getColorHex called with:', colorName);
+    
+    // Check if it's a custom color with hex format: "Özel Renk (#XXXXXX)"
+    const customColorMatch = colorName.match(/Özel Renk \((#[0-9a-fA-F]{6})\)/);
+    if (customColorMatch) {
+        console.log('Found custom color hex:', customColorMatch[1]);
+        return customColorMatch[1];
+    }
+    
     console.log('Available colors:', colors.map(c => c.name));
     
     const colorObj = colors.find(c => c.name === colorName);
