@@ -38,7 +38,28 @@ export const uploadHeroVideo = async (
 ): Promise<{ success: boolean; videoUrl?: string; error?: string }> => {
   try {
     const fileExt = file.name.split('.').pop();
-    const fileName = `hero-${Date.now()}.${fileExt}`;
+    const fileName = `hero-${orderIndex}-${Date.now()}.${fileExt}`;
+
+    // Check if a video with this order_index already exists
+    const { data: existingVideos } = await supabase
+      .from('hero_videos')
+      .select('id, video_url')
+      .eq('order_index', orderIndex)
+      .limit(1);
+
+    // If exists, delete old file from storage and old record from DB
+    if (existingVideos && existingVideos.length > 0) {
+      const oldVideo = existingVideos[0];
+      const oldFileName = oldVideo.video_url.split('/').pop();
+      
+      // Delete old file from storage
+      if (oldFileName) {
+        await supabase.storage.from('hero-videos').remove([oldFileName]);
+      }
+
+      // Delete old record from database
+      await supabase.from('hero_videos').delete().eq('id', oldVideo.id);
+    }
 
     // Upload to storage
     const { error: uploadError } = await supabase.storage
@@ -82,6 +103,27 @@ export const uploadShowcaseImage = async (
   try {
     const fileExt = file.name.split('.').pop();
     const fileName = `${type}-${Date.now()}.${fileExt}`;
+
+    // Check if an image with this type already exists
+    const { data: existingImages } = await supabase
+      .from('showcase_images')
+      .select('id, image_url')
+      .eq('type', type)
+      .limit(1);
+
+    // If exists, delete old file from storage and old record from DB
+    if (existingImages && existingImages.length > 0) {
+      const oldImage = existingImages[0];
+      const oldFileName = oldImage.image_url.split('/').pop();
+      
+      // Delete old file from storage
+      if (oldFileName) {
+        await supabase.storage.from('showcase-images').remove([oldFileName]);
+      }
+
+      // Delete old record from database
+      await supabase.from('showcase_images').delete().eq('id', oldImage.id);
+    }
 
     // Upload to storage
     const { error: uploadError } = await supabase.storage

@@ -23,6 +23,7 @@ import { Dashboard } from './components/Dashboard';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from './lib/database';
 import { CREDIT_COSTS } from './lib/supabase';
 import { BuyCreditsModal } from './components/BuyCreditsModal';
+import { uploadHeroVideo, uploadShowcaseImage, getPublicHeroVideos, getPublicShowcaseImages } from './lib/adminService';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -1069,39 +1070,164 @@ const App: React.FC = () => {
         return saved && saved.startsWith('data:') ? saved : '';
     });
 
-    const handleFileUpload = (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3') => {
-        // Convert file to base64 for persistent storage
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result as string;
-            
-            if (type === 'sketch') {
-                setSketchUrl(base64String);
-                localStorage.setItem('sketchUrl', base64String);
-            } else if (type === 'product') {
-                setProductUrl(base64String);
-                localStorage.setItem('productUrl', base64String);
-            } else if (type === 'model') {
-                setModelUrl(base64String);
-                localStorage.setItem('modelUrl', base64String);
-            } else if (type === 'video') {
-                setVideoUrl(base64String);
-                localStorage.setItem('videoUrl', base64String);
-            } else if (type === 'heroVideo') {
-                setHeroVideoUrl(base64String);
-                localStorage.setItem('heroVideoUrl', base64String);
-            } else if (type === 'heroVideo1') {
-                setHeroVideo1Url(base64String);
-                localStorage.setItem('heroVideo1Url', base64String);
-            } else if (type === 'heroVideo2') {
-                setHeroVideo2Url(base64String);
-                localStorage.setItem('heroVideo2Url', base64String);
-            } else if (type === 'heroVideo3') {
-                setHeroVideo3Url(base64String);
-                localStorage.setItem('heroVideo3Url', base64String);
+    // Load content from Supabase on mount
+    React.useEffect(() => {
+        const loadContentFromSupabase = async () => {
+            try {
+                // Fetch hero videos
+                const heroVideos = await getPublicHeroVideos();
+                if (heroVideos.length > 0) {
+                    heroVideos.forEach((video, index) => {
+                        if (index === 0) {
+                            setHeroVideoUrl(video.video_url);
+                            localStorage.setItem('heroVideoUrl', video.video_url);
+                        } else if (index === 1) {
+                            setHeroVideo1Url(video.video_url);
+                            localStorage.setItem('heroVideo1Url', video.video_url);
+                        } else if (index === 2) {
+                            setHeroVideo2Url(video.video_url);
+                            localStorage.setItem('heroVideo2Url', video.video_url);
+                        } else if (index === 3) {
+                            setHeroVideo3Url(video.video_url);
+                            localStorage.setItem('heroVideo3Url', video.video_url);
+                        }
+                    });
+                    console.log('✅ Hero videolar Supabase\'den yüklendi:', heroVideos.length);
+                }
+
+                // Fetch showcase images
+                const showcaseImages = await getPublicShowcaseImages();
+                showcaseImages.forEach((image) => {
+                    if (image.type === 'sketch') {
+                        setSketchUrl(image.image_url);
+                        localStorage.setItem('sketchUrl', image.image_url);
+                    } else if (image.type === 'product') {
+                        setProductUrl(image.image_url);
+                        localStorage.setItem('productUrl', image.image_url);
+                    } else if (image.type === 'model') {
+                        setModelUrl(image.image_url);
+                        localStorage.setItem('modelUrl', image.image_url);
+                    } else if (image.type === 'video') {
+                        setVideoUrl(image.image_url);
+                        localStorage.setItem('videoUrl', image.image_url);
+                    }
+                });
+                console.log('✅ Showcase görseller Supabase\'den yüklendi:', showcaseImages.length);
+            } catch (error) {
+                console.error('❌ Supabase içerik yükleme hatası:', error);
             }
         };
-        reader.readAsDataURL(file);
+
+        loadContentFromSupabase();
+    }, []);
+
+    const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3') => {
+        try {
+            // Convert file to base64 for immediate display
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                
+                // Update local state immediately for instant feedback
+                if (type === 'sketch') {
+                    setSketchUrl(base64String);
+                    localStorage.setItem('sketchUrl', base64String);
+                } else if (type === 'product') {
+                    setProductUrl(base64String);
+                    localStorage.setItem('productUrl', base64String);
+                } else if (type === 'model') {
+                    setModelUrl(base64String);
+                    localStorage.setItem('modelUrl', base64String);
+                } else if (type === 'video') {
+                    setVideoUrl(base64String);
+                    localStorage.setItem('videoUrl', base64String);
+                } else if (type === 'heroVideo') {
+                    setHeroVideoUrl(base64String);
+                    localStorage.setItem('heroVideoUrl', base64String);
+                } else if (type === 'heroVideo1') {
+                    setHeroVideo1Url(base64String);
+                    localStorage.setItem('heroVideo1Url', base64String);
+                } else if (type === 'heroVideo2') {
+                    setHeroVideo2Url(base64String);
+                    localStorage.setItem('heroVideo2Url', base64String);
+                } else if (type === 'heroVideo3') {
+                    setHeroVideo3Url(base64String);
+                    localStorage.setItem('heroVideo3Url', base64String);
+                }
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to Supabase in the background
+            if (type === 'heroVideo' || type === 'heroVideo1' || type === 'heroVideo2' || type === 'heroVideo3') {
+                // Upload hero video to Supabase
+                const orderIndex = type === 'heroVideo' ? 0 : type === 'heroVideo1' ? 1 : type === 'heroVideo2' ? 2 : 3;
+                const result = await uploadHeroVideo(file, orderIndex);
+                
+                if (result.success && result.videoUrl) {
+                    console.log(`✅ Hero video ${orderIndex + 1} Supabase'e yüklendi:`, result.videoUrl);
+                    alert(`✅ Hero Video ${orderIndex + 1} başarıyla yüklendi!\n\nAna sayfada görünecektir.`);
+                    
+                    // Update state with Supabase URL
+                    if (type === 'heroVideo') {
+                        setHeroVideoUrl(result.videoUrl);
+                        localStorage.setItem('heroVideoUrl', result.videoUrl);
+                    } else if (type === 'heroVideo1') {
+                        setHeroVideo1Url(result.videoUrl);
+                        localStorage.setItem('heroVideo1Url', result.videoUrl);
+                    } else if (type === 'heroVideo2') {
+                        setHeroVideo2Url(result.videoUrl);
+                        localStorage.setItem('heroVideo2Url', result.videoUrl);
+                    } else if (type === 'heroVideo3') {
+                        setHeroVideo3Url(result.videoUrl);
+                        localStorage.setItem('heroVideo3Url', result.videoUrl);
+                    }
+                } else {
+                    console.error('❌ Hero video Supabase yüklemesi başarısız:', result.error);
+                    alert(`❌ Hero video yükleme başarısız: ${result.error}\n\nLütfen Supabase storage bucket'larının oluşturulduğundan emin olun.`);
+                }
+            } else if (type === 'sketch' || type === 'product' || type === 'model') {
+                // Upload showcase image to Supabase
+                const imageType = type as 'sketch' | 'product' | 'model';
+                const result = await uploadShowcaseImage(file, imageType, 0);
+                
+                if (result.success && result.imageUrl) {
+                    console.log(`✅ ${imageType} görseli Supabase'e yüklendi:`, result.imageUrl);
+                    const typeNames = { sketch: 'Çizim', product: 'Ürün', model: 'Model' };
+                    alert(`✅ ${typeNames[imageType]} görseli başarıyla yüklendi!\n\nAna sayfada showcase bölümünde görünecektir.`);
+                    
+                    // Update state with Supabase URL
+                    if (type === 'sketch') {
+                        setSketchUrl(result.imageUrl);
+                        localStorage.setItem('sketchUrl', result.imageUrl);
+                    } else if (type === 'product') {
+                        setProductUrl(result.imageUrl);
+                        localStorage.setItem('productUrl', result.imageUrl);
+                    } else if (type === 'model') {
+                        setModelUrl(result.imageUrl);
+                        localStorage.setItem('modelUrl', result.imageUrl);
+                    }
+                } else {
+                    console.error(`❌ ${imageType} görseli Supabase yüklemesi başarısız:`, result.error);
+                    alert(`❌ ${imageType} görseli yükleme başarısız: ${result.error}\n\nLütfen Supabase storage bucket'larının oluşturulduğundan emin olun.`);
+                }
+            } else if (type === 'video') {
+                // Upload showcase video to Supabase
+                const result = await uploadShowcaseImage(file, 'video', 0);
+                
+                if (result.success && result.imageUrl) {
+                    console.log('✅ Showcase video Supabase\'e yüklendi:', result.imageUrl);
+                    alert('✅ Showcase video başarıyla yüklendi!\n\nAna sayfada showcase bölümünde görünecektir.');
+                    setVideoUrl(result.imageUrl);
+                    localStorage.setItem('videoUrl', result.imageUrl);
+                } else {
+                    console.error('❌ Showcase video Supabase yüklemesi başarısız:', result.error);
+                    alert(`❌ Showcase video yükleme başarısız: ${result.error}\n\nLütfen Supabase storage bucket'larının oluşturulduğundan emin olun.`);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Dosya yükleme hatası:', error);
+            alert('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+        }
     };
 
     const handleGetStarted = () => {

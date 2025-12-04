@@ -176,14 +176,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     large: { credits: 200, price: 1000 },
   });
 
-  // Fetch content from DB on mount
+  // Fetch content from DB on mount and periodically
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        console.log('🔄 Ana sayfa içeriği Supabase\'den çekiliyor...');
+        
         // Fetch hero videos
         const videos = await getPublicHeroVideos();
         const videoUrls = videos.map(v => v.video_url);
         setHeroVideos(videoUrls);
+        console.log('✅ Hero videolar yüklendi:', videoUrls.length, 'video');
 
         // Fetch showcase images
         const images = await getPublicShowcaseImages();
@@ -192,6 +195,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           imagesByType[img.type] = img.image_url;
         });
         setShowcaseImages(imagesByType);
+        console.log('✅ Showcase görseller yüklendi:', images.length, 'görsel');
 
         // Fetch credit packages from settings
         const settings = await getSiteSettings();
@@ -212,11 +216,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           });
         }
       } catch (error) {
-        console.error('Error fetching content:', error);
+        console.error('❌ İçerik yükleme hatası:', error);
       }
     };
 
+    // Initial fetch
     fetchContent();
+
+    // Refresh content every 30 seconds (optional - for real-time updates)
+    const interval = setInterval(fetchContent, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Demo images - use DB content if available, fallback to props or defaults
