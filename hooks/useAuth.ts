@@ -9,6 +9,12 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Handle OAuth callback hash in URL
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+      // Clean up URL after OAuth
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -58,20 +64,10 @@ export function useAuth() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}`,
       },
     });
     if (error) console.error('Error signing in with Google:', error);
-  };
-
-  const signInWithApple = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    if (error) console.error('Error signing in with Apple:', error);
   };
 
   const signInWithEmail = async (email: string, password: string) => {
@@ -114,7 +110,6 @@ export function useAuth() {
     profile,
     loading,
     signInWithGoogle,
-    signInWithApple,
     signInWithEmail,
     signUpWithEmail,
     signOut,

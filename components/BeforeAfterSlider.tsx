@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 interface BeforeAfterSliderProps {
-  beforeImageUrl: string | null;
-  afterImageUrl: string | null;
+  beforeImage: string;
+  afterImage: string;
+  beforeLabel?: string;
+  afterLabel?: string;
 }
 
 export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
-  beforeImageUrl,
-  afterImageUrl,
+  beforeImage,
+  afterImage,
+  beforeLabel = 'BEFORE',
+  afterLabel = 'AFTER',
 }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
@@ -45,53 +49,64 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
     };
   }, [isDragging, handleMove]);
 
-  const hasBothImages = beforeImageUrl && afterImageUrl;
+  const hasBothImages = beforeImage && afterImage;
 
   return (
     <div 
         ref={containerRef}
-        className="relative w-full aspect-[4/5] max-w-lg mx-auto select-none rounded-2xl overflow-hidden shadow-2xl shadow-slate-950/50 border-4 border-slate-700"
+        className="relative w-full h-full select-none overflow-hidden"
         onMouseDown={hasBothImages ? handleMouseDown : undefined}
         onTouchStart={hasBothImages ? handleMouseDown : undefined}
         style={{ cursor: hasBothImages ? 'ew-resize' : 'default' }}
     >
       {hasBothImages ? (
         <>
-          <div className="relative w-full h-full bg-slate-800">
+          <div className="relative w-full h-full bg-slate-900">
+            {/* Before Image */}
             <img
-              src={beforeImageUrl!}
-              alt="ÖNCE"
+              src={beforeImage}
+              alt={beforeLabel}
               className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
             />
             
+            {/* After Image (clipped) */}
             <div 
                 className="absolute top-0 left-0 w-full h-full overflow-hidden" 
                 style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
             >
               <img
-                src={afterImageUrl!}
-                alt="SONRA"
+                src={afterImage}
+                alt={afterLabel}
                 className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
               />
             </div>
+
+            {/* Labels */}
+            <div className="absolute top-4 left-4 bg-slate-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-slate-600">
+              <span className="text-xs font-bold text-white">{beforeLabel}</span>
+            </div>
+            <div className="absolute top-4 right-4 bg-cyan-600/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-cyan-400">
+              <span className="text-xs font-bold text-white">{afterLabel}</span>
+            </div>
           </div>
 
+          {/* Slider Handle */}
           <div 
-              className="absolute top-0 bottom-0 w-1 bg-white/50 backdrop-blur-sm cursor-ew-resize"
-              style={{ left: `calc(${sliderPosition}% - 2px)` }}
+              className="absolute top-0 bottom-0 w-1 bg-white shadow-lg cursor-ew-resize z-10"
+              style={{ left: `${sliderPosition}%` }}
               onMouseDown={handleMouseDown}
               onTouchStart={handleMouseDown}
           >
-            <div className="absolute top-1/2 -translate-y-1/2 -left-4 bg-white rounded-full h-9 w-9 flex items-center justify-center shadow-lg pointer-events-none">
-              <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full h-10 w-10 flex items-center justify-center shadow-xl border-2 border-slate-300 pointer-events-none">
+              <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
               </svg>
             </div>
           </div>
         </>
       ) : (
          <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-            <p className="text-slate-500">Görseller yükleniyor veya mevcut değil.</p>
+            <p className="text-slate-500">Görseller yükleniyor...</p>
         </div>
       )}
     </div>

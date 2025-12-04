@@ -160,11 +160,21 @@ BAŞKA RENK KULLANMA.` : '';
     }
 };
 
-export const generateSketchFromProduct = async (productFile: File): Promise<string> => {
+export const generateSketchFromProduct = async (productFile: File, style: 'colored' | 'blackwhite' = 'blackwhite'): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(productFile);
 
-    const prompt = `Bu ürün fotoğrafını analiz et ve moda tasarımı üretimi için profesyonel bir 'Teknik Çizim' (Technical Flat Sketch / CAD) oluştur.
+    const prompt = style === 'colored'
+        ? `Bu ürün fotoğrafını analiz et ve moda tasarımı üretimi için profesyonel bir 'Renkli Teknik Çizim' (Colored Technical Flat Sketch) oluştur.
+    
+    Kurallar:
+    1. Stil: Siyah kontur çizgileri + Gerçekçi renkler. Ürünün orijinal renklerini koru.
+    2. Detay: Dikiş yerleri (topstitching), fermuarlar, cepler, ribana detayları, düğmeler net bir şekilde çizilmeli.
+    3. Perspektif: Ürün tamamen önden, düz (flat) ve simetrik bir şekilde çizilmeli.
+    4. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
+    5. Kalite: Vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
+    6. Renklendirme: Kumaş renkleri, detay renkleri (düğme, fermuar vb.) gerçekçi olmalı.`
+        : `Bu ürün fotoğrafını analiz et ve moda tasarımı üretimi için profesyonel bir 'Teknik Çizim' (Technical Flat Sketch / CAD) oluştur.
     
     Kurallar:
     1. Stil: Sadece siyah kontur çizgileri (clean line art). Gölgelendirme, renk veya doku YOK.

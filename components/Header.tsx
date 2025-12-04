@@ -48,11 +48,11 @@ export const Header: React.FC<HeaderProps> = ({
             
             {onAdminClick && (
                 <button 
-                    onClick={userRole === 'admin' ? onAdminClick : onLoginClick}
+                    onClick={onAdminClick}
                     className={`text-xs md:text-sm font-medium px-3 py-1.5 rounded-full border transition-all ${
                         userRole === 'admin' 
                             ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/50 hover:bg-cyan-500/20' 
-                            : 'text-slate-500 border-slate-700 hover:border-slate-500 hover:text-slate-300'
+                            : 'text-slate-400 border-slate-700 hover:border-cyan-500/50 hover:text-cyan-400'
                     }`}
                 >
                     {userRole === 'admin' ? 'Admin Paneli' : 'Admin'}

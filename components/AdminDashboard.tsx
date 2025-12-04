@@ -13,10 +13,18 @@ interface AdminDashboardProps {
     productUrl: string;
     modelUrl: string;
     videoUrl: string;
+    heroVideoUrl?: string;
+    heroVideo1Url?: string;
+    heroVideo2Url?: string;
+    heroVideo3Url?: string;
     onSketchUpload: (file: File) => void;
     onProductUpload: (file: File) => void;
     onModelUpload: (file: File) => void;
     onVideoUpload: (file: File) => void;
+    onHeroVideoUpload?: (file: File) => void;
+    onHeroVideo1Upload?: (file: File) => void;
+    onHeroVideo2Upload?: (file: File) => void;
+    onHeroVideo3Upload?: (file: File) => void;
 }
 
 const ContentCard: React.FC<{
@@ -74,9 +82,53 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                 <h1 className="text-3xl font-extrabold mb-8 text-white">Admin Paneli</h1>
                 <p className="text-slate-400 mb-8 max-w-3xl">
                     Bu panelden ana sayfada gösterilen içerikleri yönetebilirsiniz. Değişiklikleriniz tarayıcınızda saklanır. 
-                    Tam akışı sağlamak için 4 parçayı da yükleyiniz: Çizim, Gerçek Ürün, Model ve Video.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                {/* Hero Gömülü Videolar Section - 4 Adet */}
+                <div className="mb-12">
+                    <h2 className="text-2xl font-bold text-white mb-4">🎬 Hero Gömülü Videolar (4 Adet)</h2>
+                    <p className="text-slate-400 mb-6">
+                        Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <ContentCard
+                            title="Hero Video 1"
+                            mediaUrl={props.heroVideoUrl || ''}
+                            mediaType="video"
+                            onFileSelect={props.onHeroVideoUpload || (() => {})}
+                            accept="video/*"
+                        />
+                        <ContentCard
+                            title="Hero Video 2"
+                            mediaUrl={props.heroVideo1Url || ''}
+                            mediaType="video"
+                            onFileSelect={props.onHeroVideo1Upload || (() => {})}
+                            accept="video/*"
+                        />
+                        <ContentCard
+                            title="Hero Video 3"
+                            mediaUrl={props.heroVideo2Url || ''}
+                            mediaType="video"
+                            onFileSelect={props.onHeroVideo2Upload || (() => {})}
+                            accept="video/*"
+                        />
+                        <ContentCard
+                            title="Hero Video 4"
+                            mediaUrl={props.heroVideo3Url || ''}
+                            mediaType="video"
+                            onFileSelect={props.onHeroVideo3Upload || (() => {})}
+                            accept="video/*"
+                        />
+                    </div>
+                </div>
+
+                {/* Showcase Section */}
+                <div>
+                    <h2 className="text-2xl font-bold text-white mb-4">📸 Showcase Görselleri</h2>
+                    <p className="text-slate-400 mb-6">
+                        Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <ContentCard
                         title="1. Çizim (Sketch)"
                         mediaUrl={props.sketchUrl}
@@ -105,6 +157,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                         onFileSelect={props.onVideoUpload}
                         accept="video/*"
                     />
+                    </div>
                 </div>
             </main>
         </div>

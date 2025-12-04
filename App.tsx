@@ -71,6 +71,7 @@ const ToolPage: React.FC<{
     const [techInputPreview, setTechInputPreview] = useState<string|undefined>(undefined);
     const [generatedTechSketchUrl, setGeneratedTechSketchUrl] = useState<string|null>(null);
     const [isTechLoading, setIsTechLoading] = useState(false);
+    const [techSketchStyle, setTechSketchStyle] = useState<'colored' | 'blackwhite'>('blackwhite'); // New: Renkli veya Karakalem
     
     // Product color for sketch-to-product
     const [productColor, setProductColor] = useState('');
@@ -318,7 +319,7 @@ const ToolPage: React.FC<{
         startProgressSimulation(90, 200);
 
         try {
-            const sketchUrl = await generateSketchFromProduct(techInputFile);
+            const sketchUrl = await generateSketchFromProduct(techInputFile, techSketchStyle);
             finishProgress();
             setGeneratedTechSketchUrl(sketchUrl);
         } catch (error) {
@@ -898,6 +899,38 @@ const ToolPage: React.FC<{
                                 <div className="flex-grow min-h-[400px]">
                                     <ImageUploader onImageUpload={handleTechUpload} imagePreviewUrl={techInputPreview} />
                                 </div>
+                                
+                                {/* Style Selector */}
+                                {techInputFile && (
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-semibold text-slate-300 mb-2">
+                                            Çizim Stili
+                                        </label>
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => setTechSketchStyle('blackwhite')}
+                                                className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
+                                                    techSketchStyle === 'blackwhite'
+                                                        ? 'bg-gradient-to-r from-slate-700 to-slate-600 text-white border-2 border-purple-400 shadow-lg'
+                                                        : 'bg-slate-800 text-slate-400 border border-slate-600 hover:border-slate-500'
+                                                }`}
+                                            >
+                                                🖤 Karakalem
+                                            </button>
+                                            <button
+                                                onClick={() => setTechSketchStyle('colored')}
+                                                className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${
+                                                    techSketchStyle === 'colored'
+                                                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-2 border-purple-400 shadow-lg'
+                                                        : 'bg-slate-800 text-slate-400 border border-slate-600 hover:border-slate-500'
+                                                }`}
+                                            >
+                                                🎨 Renkli
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                                
                                 <button
                                     onClick={handleGenerateTechSketch}
                                     disabled={!techInputFile || isTechLoading}
@@ -973,34 +1006,87 @@ const ToolPage: React.FC<{
 };
 
 const App: React.FC = () => {
-    const { user, profile, loading, signInWithGoogle, signInWithApple, signInWithEmail, signUpWithEmail, signOut, refreshProfile } = useAuth();
+    const { user, profile, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, refreshProfile } = useAuth();
     const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [showAdminLogin, setShowAdminLogin] = useState(false);
+    const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
     
-    // Admin check (old admin still works)
-    const isAdmin = user?.email === 'hikmet@example.com' || profile?.subscription_tier === 'admin';
+    // Admin check - check email contains hikmet or texmart, or subscription tier, or manual admin login
+    const isAdmin = 
+        isAdminLoggedIn || 
+        user?.email?.toLowerCase().includes('hikmet') || 
+        user?.email?.toLowerCase().includes('texmart') || 
+        profile?.subscription_tier === 'admin' || 
+        profile?.subscription_tier === 'premium';
     
     // Admin editable content state (keep for backward compatibility)
-    const [sketchUrl, setSketchUrl] = useState(localStorage.getItem('sketchUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_sketch_1.jpg');
-    const [productUrl, setProductUrl] = useState(localStorage.getItem('productUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_product_1.jpg');
-    const [modelUrl, setModelUrl] = useState(localStorage.getItem('modelUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_model_1.jpg');
-    const [videoUrl, setVideoUrl] = useState(localStorage.getItem('videoUrl') || 'https://storage.googleapis.com/aistudio-cms-assets/assets/fashion_video_1.mp4');
+    const [sketchUrl, setSketchUrl] = useState(() => {
+        const saved = localStorage.getItem('sketchUrl');
+        return saved && saved.startsWith('data:') ? saved : 'https://images.unsplash.com/photo-1610824352934-c10d87b700cc?w=600';
+    });
+    const [productUrl, setProductUrl] = useState(() => {
+        const saved = localStorage.getItem('productUrl');
+        return saved && saved.startsWith('data:') ? saved : 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600';
+    });
+    const [modelUrl, setModelUrl] = useState(() => {
+        const saved = localStorage.getItem('modelUrl');
+        return saved && saved.startsWith('data:') ? saved : 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600';
+    });
+    const [videoUrl, setVideoUrl] = useState(() => {
+        const saved = localStorage.getItem('videoUrl');
+        return saved && saved.startsWith('data:') ? saved : '';
+    });
+    const [heroVideoUrl, setHeroVideoUrl] = useState(() => {
+        const saved = localStorage.getItem('heroVideoUrl');
+        return saved && saved.startsWith('data:') ? saved : 'https://cdn.pixabay.com/video/2024/01/09/196454-904303173_large.mp4';
+    });
+    const [heroVideo1Url, setHeroVideo1Url] = useState(() => {
+        const saved = localStorage.getItem('heroVideo1Url');
+        return saved && saved.startsWith('data:') ? saved : '';
+    });
+    const [heroVideo2Url, setHeroVideo2Url] = useState(() => {
+        const saved = localStorage.getItem('heroVideo2Url');
+        return saved && saved.startsWith('data:') ? saved : '';
+    });
+    const [heroVideo3Url, setHeroVideo3Url] = useState(() => {
+        const saved = localStorage.getItem('heroVideo3Url');
+        return saved && saved.startsWith('data:') ? saved : '';
+    });
 
-    const handleFileUpload = (file: File, type: 'sketch' | 'product' | 'model' | 'video') => {
-        const url = URL.createObjectURL(file);
-        if (type === 'sketch') {
-            setSketchUrl(url);
-            localStorage.setItem('sketchUrl', url);
-        } else if (type === 'product') {
-            setProductUrl(url);
-            localStorage.setItem('productUrl', url);
-        } else if (type === 'model') {
-            setModelUrl(url);
-            localStorage.setItem('modelUrl', url);
-        } else {
-            setVideoUrl(url);
-            localStorage.setItem('videoUrl', url);
-        }
+    const handleFileUpload = (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3') => {
+        // Convert file to base64 for persistent storage
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result as string;
+            
+            if (type === 'sketch') {
+                setSketchUrl(base64String);
+                localStorage.setItem('sketchUrl', base64String);
+            } else if (type === 'product') {
+                setProductUrl(base64String);
+                localStorage.setItem('productUrl', base64String);
+            } else if (type === 'model') {
+                setModelUrl(base64String);
+                localStorage.setItem('modelUrl', base64String);
+            } else if (type === 'video') {
+                setVideoUrl(base64String);
+                localStorage.setItem('videoUrl', base64String);
+            } else if (type === 'heroVideo') {
+                setHeroVideoUrl(base64String);
+                localStorage.setItem('heroVideoUrl', base64String);
+            } else if (type === 'heroVideo1') {
+                setHeroVideo1Url(base64String);
+                localStorage.setItem('heroVideo1Url', base64String);
+            } else if (type === 'heroVideo2') {
+                setHeroVideo2Url(base64String);
+                localStorage.setItem('heroVideo2Url', base64String);
+            } else if (type === 'heroVideo3') {
+                setHeroVideo3Url(base64String);
+                localStorage.setItem('heroVideo3Url', base64String);
+            }
+        };
+        reader.readAsDataURL(file);
     };
 
     const handleGetStarted = () => {
@@ -1013,6 +1099,24 @@ const App: React.FC = () => {
 
     const handleSignIn = () => {
         setShowAuthModal(true);
+    };
+
+    const handleAdminLogin = (email: string, password: string) => {
+        if (email === 'hikmet' && password === 'Malatya4462!') {
+            setIsAdminLoggedIn(true);
+            setShowAdminLogin(false);
+            setCurrentPage('admin');
+        } else {
+            alert('Yanlış kullanıcı adı veya şifre!');
+        }
+    };
+
+    const handleAdminClick = () => {
+        if (isAdminLoggedIn) {
+            setCurrentPage('admin');
+        } else {
+            setShowAdminLogin(true);
+        }
     };
 
     if (loading) {
@@ -1032,6 +1136,14 @@ const App: React.FC = () => {
                 <LandingPage
                     onGetStarted={handleGetStarted}
                     onSignIn={handleSignIn}
+                    sketchUrl={sketchUrl}
+                    productUrl={productUrl}
+                    modelUrl={modelUrl}
+                    videoUrl={videoUrl}
+                    heroVideoUrl={heroVideoUrl}
+                    heroVideo1Url={heroVideo1Url}
+                    heroVideo2Url={heroVideo2Url}
+                    heroVideo3Url={heroVideo3Url}
                 />
             )}
             {currentPage === 'tool' && user && profile && (
@@ -1044,7 +1156,7 @@ const App: React.FC = () => {
                         signOut();
                         setCurrentPage('landing');
                     }}
-                    onAdminClick={() => setCurrentPage('admin')}
+                    onAdminClick={handleAdminClick}
                     profile={profile}
                     onRefreshProfile={refreshProfile}
                 />
@@ -1055,13 +1167,14 @@ const App: React.FC = () => {
                     onRefresh={refreshProfile}
                 />
             )}
-            {currentPage === 'admin' && user && isAdmin && (
+            {currentPage === 'admin' && isAdmin && (
                 <AdminDashboard
                     onNavigateHome={() => setCurrentPage('landing')}
-                    isLoggedIn={!!user}
+                    isLoggedIn={isAdminLoggedIn || !!user}
                     userRole="admin"
                     onLoginClick={handleSignIn}
                     onLogoutClick={() => {
+                        setIsAdminLoggedIn(false);
                         signOut();
                         setCurrentPage('landing');
                     }}
@@ -1069,10 +1182,18 @@ const App: React.FC = () => {
                     productUrl={productUrl}
                     modelUrl={modelUrl}
                     videoUrl={videoUrl}
+                    heroVideoUrl={heroVideoUrl}
+                    heroVideo1Url={heroVideo1Url}
+                    heroVideo2Url={heroVideo2Url}
+                    heroVideo3Url={heroVideo3Url}
                     onSketchUpload={(f) => handleFileUpload(f, 'sketch')}
                     onProductUpload={(f) => handleFileUpload(f, 'product')}
                     onModelUpload={(f) => handleFileUpload(f, 'model')}
                     onVideoUpload={(f) => handleFileUpload(f, 'video')}
+                    onHeroVideoUpload={(f) => handleFileUpload(f, 'heroVideo')}
+                    onHeroVideo1Upload={(f) => handleFileUpload(f, 'heroVideo1')}
+                    onHeroVideo2Upload={(f) => handleFileUpload(f, 'heroVideo2')}
+                    onHeroVideo3Upload={(f) => handleFileUpload(f, 'heroVideo3')}
                 />
             )}
 
@@ -1080,9 +1201,15 @@ const App: React.FC = () => {
                 isOpen={showAuthModal}
                 onClose={() => setShowAuthModal(false)}
                 onGoogleSignIn={signInWithGoogle}
-                onAppleSignIn={signInWithApple}
                 onEmailSignIn={signInWithEmail}
                 onEmailSignUp={signUpWithEmail}
+            />
+
+            <LoginModal
+                isOpen={showAdminLogin}
+                onClose={() => setShowAdminLogin(false)}
+                onLogin={handleAdminLogin}
+                onSwitchToRegister={() => {}}
             />
         </>
     );

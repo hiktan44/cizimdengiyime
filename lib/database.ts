@@ -12,7 +12,10 @@ export const checkAndDeductCredits = async (
       .eq('id', userId)
       .single();
 
-    if (profileError) throw profileError;
+    if (profileError) {
+      console.error('Profile error:', profileError);
+      throw profileError;
+    }
 
     const creditsNeeded = CREDIT_COSTS[
       operationType === 'sketch_to_product'
@@ -25,7 +28,7 @@ export const checkAndDeductCredits = async (
     if (profile.credits < creditsNeeded) {
       return {
         success: false,
-        message: `Yetersiz kredi. Bu işlem için ${creditsNeeded} kredi gerekli. Mevcut krediniz: ${profile.credits}`,
+        message: `Yetersiz kredi. Bu işlem için ${creditsNeeded} kredi gerekli. Mevcut krediniz: ${profile.credits}. Lütfen kredi satın alın.`,
       };
     }
 
