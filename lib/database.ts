@@ -140,3 +140,111 @@ export const uploadBase64ToStorage = async (
     return null;
   }
 };
+
+// ==========================================
+// PAYMENT & CREDITS FUNCTIONS
+// ==========================================
+
+export const addCreditsToUser = async (
+  userId: string,
+  credits: number
+): Promise<{ success: boolean; newBalance?: number; error?: string }> => {
+  try {
+    // Get current credits
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('credits')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) throw profileError;
+
+    const newBalance = profile.credits + credits;
+
+    // Update credits
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ credits: newBalance, updated_at: new Date().toISOString() })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    return { success: true, newBalance };
+  } catch (error: any) {
+    console.error('Error adding credits:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const createTransaction = async (
+  userId: string,
+  type: 'subscription' | 'credit_purchase',
+  amount: number,
+  credits: number,
+  paymentId?: string,
+  paymentMethod: string = 'paytr'
+): Promise<{ success: boolean; transactionId?: string; error?: string }> => {
+  try {
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert({
+        user_id: userId,
+        type,
+        amount,
+        credits,
+        status: 'pending',
+        stripe_payment_id: paymentId,
+        payment_method: paymentMethod,
+        created_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { success: true, transactionId: data.id };
+  } catch (error: any) {
+    console.error('Error creating transaction:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateTransactionStatus = async (
+  transactionId: string,
+  status: 'completed' | 'failed',
+  paymentId?: string
+): Promise<boolean> => {
+  try {
+    const updateData: any = { status };
+    if (paymentId) {
+      updateData.stripe_payment_id = paymentId;
+    }
+
+    const { error } = await supabase
+      .from('transactions')
+      .update(updateData)
+      .eq('id', transactionId);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error updating transaction status:', error);
+    return false;
+  }
+};
+
+export const getUserTransactions = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching user transactions:', error);
+    return [];
+  }
+};

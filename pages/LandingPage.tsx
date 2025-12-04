@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Logo } from '../components/Logo';
-import { SUBSCRIPTION_PLANS, CREDIT_PACKAGES } from '../lib/supabase';
+import { CREDIT_PACKAGES } from '../lib/supabase';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
+import { getPublicHeroVideos, getPublicShowcaseImages, getSiteSettings } from '../lib/adminService';
 
 interface LandingPageProps {
   onGetStarted: () => void;
   onSignIn: () => void;
+  isLoggedIn?: boolean;
+  userName?: string | null;
+  userRole?: 'admin' | 'user' | null;
+  credits?: number;
+  onLogout?: () => void;
+  onAdminClick?: () => void;
+  onBuyCreditsClick?: () => void;
   sketchUrl?: string;
   productUrl?: string;
   modelUrl?: string;
@@ -135,16 +143,94 @@ const detectDefaultLanguage = (): Language => {
   return 'en';
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onSignIn, sketchUrl, productUrl, modelUrl, videoUrl, heroVideoUrl, heroVideo1Url, heroVideo2Url, heroVideo3Url }) => {
-  // Demo images - replace with actual hosted images
-  const demoSketch = sketchUrl || 'https://images.unsplash.com/photo-1610824352934-c10d87b700cc?w=600';
-  const demoProduct = productUrl || 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600';
-  const demoModel = modelUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600';
-  const demoVideo = videoUrl;
-  const demoHeroVideo = heroVideoUrl || 'https://cdn.pixabay.com/video/2024/01/09/196454-904303173_large.mp4';
-  const demoHeroVideo1 = heroVideo1Url || '';
-  const demoHeroVideo2 = heroVideo2Url || '';
-  const demoHeroVideo3 = heroVideo3Url || '';
+export const LandingPage: React.FC<LandingPageProps> = ({ 
+  onGetStarted, 
+  onSignIn, 
+  isLoggedIn = false,
+  userName,
+  userRole,
+  credits,
+  onLogout,
+  onAdminClick,
+  onBuyCreditsClick,
+  sketchUrl, 
+  productUrl, 
+  modelUrl, 
+  videoUrl, 
+  heroVideoUrl, 
+  heroVideo1Url, 
+  heroVideo2Url, 
+  heroVideo3Url 
+}) => {
+  // State for DB content
+  const [heroVideos, setHeroVideos] = useState<string[]>([]);
+  const [showcaseImages, setShowcaseImages] = useState<{
+    sketch?: string;
+    product?: string;
+    model?: string;
+    video?: string;
+  }>({});
+  const [creditPackages, setCreditPackages] = useState({
+    small: { credits: 50, price: 250 },
+    medium: { credits: 100, price: 500 },
+    large: { credits: 200, price: 1000 },
+  });
+
+  // Fetch content from DB on mount
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        // Fetch hero videos
+        const videos = await getPublicHeroVideos();
+        const videoUrls = videos.map(v => v.video_url);
+        setHeroVideos(videoUrls);
+
+        // Fetch showcase images
+        const images = await getPublicShowcaseImages();
+        const imagesByType: any = {};
+        images.forEach(img => {
+          imagesByType[img.type] = img.image_url;
+        });
+        setShowcaseImages(imagesByType);
+
+        // Fetch credit packages from settings
+        const settings = await getSiteSettings();
+        if (settings) {
+          setCreditPackages({
+            small: {
+              credits: settings.credit_package_small_credits || 50,
+              price: settings.credit_package_small_price || 250,
+            },
+            medium: {
+              credits: settings.credit_package_medium_credits || 100,
+              price: settings.credit_package_medium_price || 500,
+            },
+            large: {
+              credits: settings.credit_package_large_credits || 200,
+              price: settings.credit_package_large_price || 1000,
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching content:', error);
+      }
+    };
+
+    fetchContent();
+  }, []);
+
+  // Demo images - use DB content if available, fallback to props or defaults
+  const demoSketch = showcaseImages.sketch || sketchUrl || 'https://images.unsplash.com/photo-1610824352934-c10d87b700cc?w=600';
+  const demoProduct = showcaseImages.product || productUrl || 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600';
+  const demoModel = showcaseImages.model || modelUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600';
+  const demoVideo = showcaseImages.video || videoUrl;
+  
+  // Use DB hero videos or fallback
+  const demoHeroVideo = heroVideos[0] || heroVideoUrl || 'https://cdn.pixabay.com/video/2024/01/09/196454-904303173_large.mp4';
+  const demoHeroVideo1 = heroVideos[1] || heroVideo1Url || '';
+  const demoHeroVideo2 = heroVideos[2] || heroVideo2Url || '';
+  const demoHeroVideo3 = heroVideos[3] || heroVideo3Url || '';
+
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('language') as Language;
     return saved || detectDefaultLanguage();
@@ -180,7 +266,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onSignIn
       <header className={`fixed top-0 left-0 right-0 z-40 ${theme === 'dark' ? 'bg-slate-900/95' : 'bg-white/95'} backdrop-blur-md border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} shadow-xl`}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Logo className="h-10" />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
             {/* Language Toggle */}
             <div className="flex items-center gap-2 bg-slate-700/50 rounded-full p-1">
               <button
@@ -214,18 +300,75 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onSignIn
               )}
             </button>
             
-            <button
-              onClick={onSignIn}
-              className={`${theme === 'dark' ? 'text-slate-300 hover:text-white' : 'text-slate-700 hover:text-slate-900'} transition px-4 py-2`}
-            >
-              {t.header.signIn}
-            </button>
-            <button
-              onClick={onGetStarted}
-              className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition"
-            >
-              {t.header.start}
-            </button>
+            {/* User Info - If Logged In */}
+            {isLoggedIn && userName && (
+              <div className="hidden sm:flex items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-full px-4 py-1.5">
+                <svg className="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+                <span className="text-sm font-medium text-white">{userName}</span>
+              </div>
+            )}
+
+            {/* Credits Badge - If Logged In */}
+            {isLoggedIn && credits !== undefined && (
+              <>
+                <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/50 rounded-full px-3 sm:px-4 py-1.5 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm font-bold text-white">{credits}</span>
+                  <span className="text-xs text-slate-400 hidden sm:inline">Kredi</span>
+                </div>
+                {onBuyCreditsClick && (
+                  <button
+                    onClick={onBuyCreditsClick}
+                    className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-4 py-1.5 rounded-full text-xs font-semibold transition-all shadow-lg"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    Kredi Al
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* Admin Panel Button - Only shown if user is admin */}
+            {userRole === 'admin' && onAdminClick && (
+              <button 
+                onClick={onAdminClick}
+                className="text-xs md:text-sm font-medium px-3 py-1.5 rounded-full border bg-purple-500/10 text-purple-400 border-purple-500/50 hover:bg-purple-500/20 transition-all"
+              >
+                ⚙️ Admin Panel
+              </button>
+            )}
+            
+            {/* Auth Buttons */}
+            {isLoggedIn ? (
+              <button
+                onClick={onLogout}
+                className="text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
+              >
+                Çıkış
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={onSignIn}
+                  className={`${theme === 'dark' ? 'text-slate-300 hover:text-white' : 'text-slate-700 hover:text-slate-900'} transition px-4 py-2`}
+                >
+                  {t.header.signIn}
+                </button>
+                <button
+                  onClick={onGetStarted}
+                  className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition"
+                >
+                  {t.header.start}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -306,7 +449,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onSignIn
             onClick={onGetStarted}
             className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition"
           >
-            {t.hero.cta}
+            {isLoggedIn ? (language === 'tr' ? 'Hemen Kullanmaya Devam Et' : 'Continue Using') : t.hero.cta}
           </button>
         </div>
       </section>
@@ -588,167 +731,86 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted, onSignIn
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* Pricing - Credit Packages Only */}
       <section className="py-20 px-6 bg-slate-800/80 z-10 relative" id="pricing">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-white text-center mb-4">
-            Fiyatlandırma
+            {language === 'tr' ? 'Kredi Paketleri' : 'Credit Packages'}
           </h2>
-          <p className="text-slate-400 text-center mb-16">
-            İhtiyacınıza uygun planı seçin. Her ay krediniz otomatik yenilenir.
+          <p className="text-slate-400 text-center mb-12">
+            {language === 'tr' 
+              ? 'İhtiyacınıza uygun kredi paketini seçin. Abonelik yok, sadece kullandığınız kadar ödersiniz.' 
+              : 'Choose the credit package that suits your needs. No subscription, pay only for what you use.'}
           </p>
           
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            {/* Starter Plan */}
-            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 hover:border-cyan-500 transition">
-              <h3 className="text-2xl font-bold text-white mb-2">Starter</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-black text-white">{SUBSCRIPTION_PLANS.STARTER.price}₺</span>
-                <span className="text-slate-400">/ay</span>
-              </div>
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>{SUBSCRIPTION_PLANS.STARTER.credits} Kredi/Ay</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Çizim → Ürün (1 kredi)</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Ürün → Model (1 kredi)</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Video (3 kredi)</span>
-                </div>
+          {/* Credit Packages */}
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 text-center hover:border-cyan-500 transition">
+              <div className="text-4xl font-bold text-white mb-3">{creditPackages.small.credits}</div>
+              <div className="text-sm text-slate-400 mb-4">{language === 'tr' ? 'Kredi' : 'Credits'}</div>
+              <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.small.price}₺</div>
+              <div className="text-sm text-slate-400 mb-6">
+                1 {language === 'tr' ? 'Kredi' : 'Credit'} = {(creditPackages.small.price / creditPackages.small.credits).toFixed(2)}₺
               </div>
               <button
                 onClick={onGetStarted}
                 className="w-full bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-semibold transition"
               >
-                Başla
+                {language === 'tr' ? 'Satın Al' : 'Buy Now'}
               </button>
             </div>
 
-            {/* Pro Plan - Popular */}
-            <div className="bg-gradient-to-b from-cyan-900/50 to-slate-900/50 border-2 border-cyan-500 rounded-2xl p-8 relative">
+            <div className="bg-gradient-to-b from-cyan-900/50 to-slate-900/50 border-2 border-cyan-500 rounded-2xl p-8 text-center relative">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                Popüler
+                {language === 'tr' ? 'Popüler' : 'Popular'}
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-black text-white">{SUBSCRIPTION_PLANS.PRO.price}₺</span>
-                <span className="text-slate-400">/ay</span>
-              </div>
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>{SUBSCRIPTION_PLANS.PRO.credits} Kredi/Ay</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Tüm özellikler</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Öncelikli destek</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Geçmiş arşivi (1 ay)</span>
-                </div>
+              <div className="text-4xl font-bold text-white mb-3">{creditPackages.medium.credits}</div>
+              <div className="text-sm text-slate-400 mb-4">{language === 'tr' ? 'Kredi' : 'Credits'}</div>
+              <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.medium.price}₺</div>
+              <div className="text-sm text-slate-400 mb-6">
+                1 {language === 'tr' ? 'Kredi' : 'Credit'} = {(creditPackages.medium.price / creditPackages.medium.credits).toFixed(2)}₺
               </div>
               <button
                 onClick={onGetStarted}
                 className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
               >
-                Başla
+                {language === 'tr' ? 'Satın Al' : 'Buy Now'}
               </button>
             </div>
 
-            {/* Premium Plan */}
-            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 hover:border-purple-500 transition">
-              <h3 className="text-2xl font-bold text-white mb-2">Premium</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-black text-white">{SUBSCRIPTION_PLANS.PREMIUM.price}₺</span>
-                <span className="text-slate-400">/ay</span>
-              </div>
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>{SUBSCRIPTION_PLANS.PREMIUM.credits} Kredi/Ay</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Tüm özellikler</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>7/24 Premium destek</span>
-                </div>
-                <div className="flex items-center gap-2 text-slate-300">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>API erişimi</span>
-                </div>
+            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 text-center hover:border-purple-500 transition">
+              <div className="text-4xl font-bold text-white mb-3">{creditPackages.large.credits}</div>
+              <div className="text-sm text-slate-400 mb-4">{language === 'tr' ? 'Kredi' : 'Credits'}</div>
+              <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.large.price}₺</div>
+              <div className="text-sm text-slate-400 mb-6">
+                1 {language === 'tr' ? 'Kredi' : 'Credit'} = {(creditPackages.large.price / creditPackages.large.credits).toFixed(2)}₺
               </div>
               <button
                 onClick={onGetStarted}
                 className="w-full bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-semibold transition"
               >
-                Başla
+                {language === 'tr' ? 'Satın Al' : 'Buy Now'}
               </button>
             </div>
           </div>
 
-          {/* Extra Credit Packages */}
-          <div className="border-t border-slate-700 pt-12">
-            <h3 className="text-2xl font-bold text-white text-center mb-8">
-              Ek Kredi Paketleri
-            </h3>
-            <p className="text-slate-400 text-center mb-8">
-              Aboneliğiniz devam ederken krediniz biterse, ek kredi satın alabilirsiniz.
-            </p>
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">{CREDIT_PACKAGES.SMALL.credits} Kredi</div>
-                <div className="text-2xl font-bold text-cyan-400 mb-4">{CREDIT_PACKAGES.SMALL.price}₺</div>
-                <div className="text-sm text-slate-400">1 Kredi = 5₺</div>
-              </div>
-              <div className="bg-slate-900 border border-cyan-500 rounded-xl p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">{CREDIT_PACKAGES.MEDIUM.credits} Kredi</div>
-                <div className="text-2xl font-bold text-cyan-400 mb-4">{CREDIT_PACKAGES.MEDIUM.price}₺</div>
-                <div className="text-sm text-slate-400">1 Kredi = 5₺</div>
-              </div>
-              <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">{CREDIT_PACKAGES.LARGE.credits} Kredi</div>
-                <div className="text-2xl font-bold text-cyan-400 mb-4">{CREDIT_PACKAGES.LARGE.price}₺</div>
-                <div className="text-sm text-slate-400">1 Kredi = 5₺</div>
+          {/* Info Box */}
+          <div className="mt-12 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl p-6 max-w-3xl mx-auto">
+            <div className="flex items-start gap-4">
+              <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <h4 className="text-lg font-semibold text-white mb-2">
+                  {language === 'tr' ? '💡 Nasıl Çalışır?' : '💡 How It Works?'}
+                </h4>
+                <ul className="space-y-2 text-slate-300 text-sm">
+                  <li>• {language === 'tr' ? 'Çizim → Ürün: 1 kredi' : 'Sketch → Product: 1 credit'}</li>
+                  <li>• {language === 'tr' ? 'Ürün → Model: 1 kredi' : 'Product → Model: 1 credit'}</li>
+                  <li>• {language === 'tr' ? 'Video Oluşturma: 3 kredi' : 'Video Generation: 3 credits'}</li>
+                  <li>• {language === 'tr' ? 'Yeni üyeler 10 ücretsiz kredi ile başlar' : 'New members start with 10 free credits'}</li>
+                  <li>• {language === 'tr' ? 'Krediler hiç bitmez, istediğiniz zaman kullanın' : 'Credits never expire, use them anytime'}</li>
+                </ul>
               </div>
             </div>
           </div>

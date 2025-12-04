@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, Generation, Profile, CREDIT_PACKAGES } from '../lib/supabase';
+import { supabase, Generation, Profile, CREDIT_PACKAGES, Transaction } from '../lib/supabase';
+import { BuyCreditsModal } from './BuyCreditsModal';
+import { getUserTransactions } from '../lib/database';
 
 interface DashboardProps {
   profile: Profile;
@@ -8,11 +10,14 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ profile, onRefresh }) => {
   const [generations, setGenerations] = useState<Generation[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBuyCredits, setShowBuyCredits] = useState(false);
+  const [activeTab, setActiveTab] = useState<'generations' | 'transactions'>('generations');
 
   useEffect(() => {
     fetchGenerations();
+    fetchTransactions();
   }, []);
 
   const fetchGenerations = async () => {
@@ -33,6 +38,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, onRefresh }) => {
       console.error('Error fetching generations:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const data = await getUserTransactions(profile.id);
+      setTransactions(data);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
     }
   };
 
@@ -109,9 +123,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, onRefresh }) => {
           </div>
         </div>
 
-        {/* History */}
+        {/* Tab Navigation */}
+      <div className="bg-slate-900/50 border border-slate-700 rounded-xl p-2 mb-8">
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setActiveTab('generations')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+              activeTab === 'generations'
+                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            📊 İşlemlerim
+          </button>
+          <button
+            onClick={() => setActiveTab('transactions')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+              activeTab === 'transactions'
+                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            💳 Ödeme Geçmişi
+          </button>
+        </div>
+      </div>
+
+      {/* History */}
+      {activeTab === 'generations' && (
         <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Geçmiş (Son 30 Gün)</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">İşlemlerim (Son 30 Gün)</h2>
           
           {loading ? (
             <div className="text-center py-12">
@@ -170,62 +211,88 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, onRefresh }) => {
             </div>
           )}
         </div>
+      )}
 
-        {/* Buy Credits Modal */}
-        {showBuyCredits && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-slate-900 rounded-2xl border border-slate-700 max-w-2xl w-full p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Kredi Satın Al</h2>
-                <button
-                  onClick={() => setShowBuyCredits(false)}
-                  className="text-slate-400 hover:text-white transition"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              <p className="text-slate-400 mb-8">
-                Aboneliğiniz devam ederken krediniz biterse ek kredi paketleri satın alabilirsiniz.
-              </p>
-
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 text-center hover:border-cyan-500 transition cursor-pointer">
-                  <div className="text-3xl font-bold text-white mb-2">{CREDIT_PACKAGES.SMALL.credits}</div>
-                  <div className="text-sm text-slate-400 mb-4">Kredi</div>
-                  <div className="text-2xl font-bold text-cyan-400 mb-4">{CREDIT_PACKAGES.SMALL.price}₺</div>
-                  <button className="w-full bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
-                    Satın Al
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 border-2 border-cyan-500 rounded-xl p-6 text-center hover:border-cyan-400 transition cursor-pointer">
-                  <div className="text-3xl font-bold text-white mb-2">{CREDIT_PACKAGES.MEDIUM.credits}</div>
-                  <div className="text-sm text-slate-400 mb-4">Kredi</div>
-                  <div className="text-2xl font-bold text-cyan-400 mb-4">{CREDIT_PACKAGES.MEDIUM.price}₺</div>
-                  <button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
-                    Satın Al
-                  </button>
-                </div>
-
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 text-center hover:border-purple-500 transition cursor-pointer">
-                  <div className="text-3xl font-bold text-white mb-2">{CREDIT_PACKAGES.LARGE.credits}</div>
-                  <div className="text-sm text-slate-400 mb-4">Kredi</div>
-                  <div className="text-2xl font-bold text-cyan-400 mb-4">{CREDIT_PACKAGES.LARGE.price}₺</div>
-                  <button className="w-full bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
-                    Satın Al
-                  </button>
-                </div>
-              </div>
-
-              <p className="text-xs text-slate-500 text-center mt-6">
-                Ödeme için güvenli Stripe kullanılmaktadır
-              </p>
+      {/* Transactions Tab */}
+      {activeTab === 'transactions' && (
+        <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Ödeme Geçmişi</h2>
+          
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-cyan-500"></div>
+              <p className="text-slate-400 mt-4">Yükleniyor...</p>
             </div>
-          </div>
-        )}
+          ) : transactions.length === 0 ? (
+            <div className="text-center py-12">
+              <svg className="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <p className="text-slate-400">Henüz ödeme işleminiz yok</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-900/50 border-b border-slate-700">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Tip</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">Tutar</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">Kredi</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Durum</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Tarih</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700">
+                  {transactions.map((tx) => (
+                    <tr key={tx.id} className="hover:bg-slate-700/30 transition">
+                      <td className="px-4 py-3">
+                        <span className="text-sm text-slate-300">
+                          {tx.type === 'subscription' ? 'Abonelik' : 'Kredi Paketi'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="text-sm font-bold text-green-400">{Number(tx.amount).toFixed(2)}₺</span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="text-sm font-bold text-cyan-400">{tx.credits}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${
+                            tx.status === 'completed'
+                              ? 'bg-green-500/20 text-green-400 border-green-500/50'
+                              : tx.status === 'pending'
+                              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50'
+                              : 'bg-red-500/20 text-red-400 border-red-500/50'
+                          }`}
+                        >
+                          {tx.status === 'completed' ? 'Tamamlandı' : tx.status === 'pending' ? 'Bekliyor' : 'Başarısız'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs text-slate-400">{new Date(tx.created_at).toLocaleString('tr-TR')}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Buy Credits Modal */}
+      <BuyCreditsModal
+        isOpen={showBuyCredits}
+        onClose={() => setShowBuyCredits(false)}
+        userId={profile.id}
+        userEmail={profile.email}
+        userName={profile.full_name || 'Kullanıcı'}
+        onSuccess={() => {
+          onRefresh();
+          fetchTransactions();
+        }}
+      />
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ export function useAuth() {
 
   useEffect(() => {
     let mounted = true;
+    let profileSubscription: any = null;
 
     const initAuth = async () => {
       try {
@@ -66,15 +67,46 @@ export function useAuth() {
         // Wait for session to fully propagate before fetching
         await new Promise(resolve => setTimeout(resolve, 800));
         await fetchProfile(session.user.id);
+
+        // Setup realtime subscription for profile updates
+        if (!profileSubscription && mounted) {
+          console.log('🔴 Setting up realtime subscription for profile updates');
+          profileSubscription = supabase
+            .channel('profile-changes')
+            .on(
+              'postgres_changes',
+              {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'profiles',
+                filter: `id=eq.${session.user.id}`,
+              },
+              (payload) => {
+                console.log('🔄 Profile updated via realtime:', payload.new);
+                if (mounted) {
+                  setProfile(payload.new as Profile);
+                }
+              }
+            )
+            .subscribe();
+        }
       } else if (!session) {
         setProfile(null);
         setLoading(false);
+        // Unsubscribe from realtime if user logs out
+        if (profileSubscription) {
+          profileSubscription.unsubscribe();
+          profileSubscription = null;
+        }
       }
     });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      if (profileSubscription) {
+        profileSubscription.unsubscribe();
+      }
     };
   }, []);
 
@@ -243,10 +275,14 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     try {
       console.log('Starting Google sign in...');
+      
+      // Production domain'i veya localhost'u otomatik algıla
+      const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${redirectUrl}/`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

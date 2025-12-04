@@ -1,12 +1,15 @@
-
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Header } from './Header';
 import { UploadIconSmall } from './icons/UploadIconSmall';
+import { SettingsPanel } from './admin/SettingsPanel';
+import { UserActivityPanel } from './admin/UserActivityPanel';
+import { TransactionsPanel } from './admin/TransactionsPanel';
 
 interface AdminDashboardProps {
     onNavigateHome: () => void;
     isLoggedIn: boolean;
     userRole: 'admin' | 'user' | null;
+    userName?: string | null;
     onLoginClick: () => void;
     onLogoutClick: () => void;
     sketchUrl: string;
@@ -25,6 +28,7 @@ interface AdminDashboardProps {
     onHeroVideo1Upload?: (file: File) => void;
     onHeroVideo2Upload?: (file: File) => void;
     onHeroVideo3Upload?: (file: File) => void;
+    credits?: number;
 }
 
 const ContentCard: React.FC<{
@@ -71,93 +75,153 @@ const ContentCard: React.FC<{
     );
 };
 
-
 export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
-    const { onNavigateHome, ...headerProps } = props;
+    const { 
+        onNavigateHome, 
+        sketchUrl, 
+        productUrl, 
+        modelUrl, 
+        videoUrl, 
+        heroVideoUrl, 
+        heroVideo1Url, 
+        heroVideo2Url, 
+        heroVideo3Url, 
+        onSketchUpload, 
+        onProductUpload, 
+        onModelUpload, 
+        onVideoUpload, 
+        onHeroVideoUpload, 
+        onHeroVideo1Upload, 
+        onHeroVideo2Upload, 
+        onHeroVideo3Upload, 
+        ...headerProps 
+    } = props;
+
+    const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions'>('content');
+
+    const tabs = [
+        { id: 'content' as const, label: '📸 İçerik Yönetimi', icon: '📸' },
+        { id: 'settings' as const, label: '⚙️ Ayarlar', icon: '⚙️' },
+        { id: 'users' as const, label: '👥 Kullanıcı Aktivitesi', icon: '👥' },
+        { id: 'transactions' as const, label: '💳 Ödemeler', icon: '💳' },
+    ];
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-900 text-slate-200">
             <Header {...headerProps} onHomeClick={onNavigateHome} />
             <main className="flex-grow container mx-auto p-4 md:p-8">
-                <h1 className="text-3xl font-extrabold mb-8 text-white">Admin Paneli</h1>
-                <p className="text-slate-400 mb-8 max-w-3xl">
-                    Bu panelden ana sayfada gösterilen içerikleri yönetebilirsiniz. Değişiklikleriniz tarayıcınızda saklanır. 
-                </p>
-
-                {/* Hero Gömülü Videolar Section - 4 Adet */}
-                <div className="mb-12">
-                    <h2 className="text-2xl font-bold text-white mb-4">🎬 Hero Gömülü Videolar (4 Adet)</h2>
-                    <p className="text-slate-400 mb-6">
-                        Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.
+                <div className="mb-8">
+                    <h1 className="text-3xl font-extrabold text-white mb-2">Admin Paneli</h1>
+                    <p className="text-slate-400">
+                        Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <ContentCard
-                            title="Hero Video 1"
-                            mediaUrl={props.heroVideoUrl || ''}
-                            mediaType="video"
-                            onFileSelect={props.onHeroVideoUpload || (() => {})}
-                            accept="video/*"
-                        />
-                        <ContentCard
-                            title="Hero Video 2"
-                            mediaUrl={props.heroVideo1Url || ''}
-                            mediaType="video"
-                            onFileSelect={props.onHeroVideo1Upload || (() => {})}
-                            accept="video/*"
-                        />
-                        <ContentCard
-                            title="Hero Video 3"
-                            mediaUrl={props.heroVideo2Url || ''}
-                            mediaType="video"
-                            onFileSelect={props.onHeroVideo2Upload || (() => {})}
-                            accept="video/*"
-                        />
-                        <ContentCard
-                            title="Hero Video 4"
-                            mediaUrl={props.heroVideo3Url || ''}
-                            mediaType="video"
-                            onFileSelect={props.onHeroVideo3Upload || (() => {})}
-                            accept="video/*"
-                        />
+                </div>
+
+                {/* Tab Navigation */}
+                <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-2 mb-8">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-4 py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${
+                                    activeTab === tab.id
+                                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
+                                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+                                }`}
+                            >
+                                <span className="hidden md:inline">{tab.label}</span>
+                                <span className="md:hidden">{tab.icon}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
 
-                {/* Showcase Section */}
-                <div>
-                    <h2 className="text-2xl font-bold text-white mb-4">📸 Showcase Görselleri</h2>
-                    <p className="text-slate-400 mb-6">
-                        Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <ContentCard
-                        title="1. Çizim (Sketch)"
-                        mediaUrl={props.sketchUrl}
-                        mediaType="image"
-                        onFileSelect={props.onSketchUpload}
-                        accept="image/*"
-                    />
-                    <ContentCard
-                        title="2. Ürün (Product)"
-                        mediaUrl={props.productUrl}
-                        mediaType="image"
-                        onFileSelect={props.onProductUpload}
-                        accept="image/*"
-                    />
-                    <ContentCard
-                        title="3. Model (Live)"
-                        mediaUrl={props.modelUrl}
-                        mediaType="image"
-                        onFileSelect={props.onModelUpload}
-                        accept="image/*"
-                    />
-                    <ContentCard
-                        title="4. Video"
-                        mediaUrl={props.videoUrl}
-                        mediaType="video"
-                        onFileSelect={props.onVideoUpload}
-                        accept="video/*"
-                    />
-                    </div>
+                {/* Tab Content */}
+                <div className="animate-fade-in">
+                    {activeTab === 'content' && (
+                        <div className="space-y-12">
+                            {/* Hero Gömülü Videolar Section - 4 Adet */}
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-4">🎬 Hero Gömülü Videolar (4 Adet)</h2>
+                                <p className="text-slate-400 mb-6">
+                                    Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.
+                                </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <ContentCard
+                                        title="Hero Video 1"
+                                        mediaUrl={heroVideoUrl || ''}
+                                        mediaType="video"
+                                        onFileSelect={onHeroVideoUpload || (() => {})}
+                                        accept="video/*"
+                                    />
+                                    <ContentCard
+                                        title="Hero Video 2"
+                                        mediaUrl={heroVideo1Url || ''}
+                                        mediaType="video"
+                                        onFileSelect={onHeroVideo1Upload || (() => {})}
+                                        accept="video/*"
+                                    />
+                                    <ContentCard
+                                        title="Hero Video 3"
+                                        mediaUrl={heroVideo2Url || ''}
+                                        mediaType="video"
+                                        onFileSelect={onHeroVideo2Upload || (() => {})}
+                                        accept="video/*"
+                                    />
+                                    <ContentCard
+                                        title="Hero Video 4"
+                                        mediaUrl={heroVideo3Url || ''}
+                                        mediaType="video"
+                                        onFileSelect={onHeroVideo3Upload || (() => {})}
+                                        accept="video/*"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Showcase Section */}
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-4">📸 Showcase Görselleri</h2>
+                                <p className="text-slate-400 mb-6">
+                                    Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.
+                                </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <ContentCard
+                                        title="1. Çizim (Sketch)"
+                                        mediaUrl={sketchUrl}
+                                        mediaType="image"
+                                        onFileSelect={onSketchUpload}
+                                        accept="image/*"
+                                    />
+                                    <ContentCard
+                                        title="2. Ürün (Product)"
+                                        mediaUrl={productUrl}
+                                        mediaType="image"
+                                        onFileSelect={onProductUpload}
+                                        accept="image/*"
+                                    />
+                                    <ContentCard
+                                        title="3. Model (Live)"
+                                        mediaUrl={modelUrl}
+                                        mediaType="image"
+                                        onFileSelect={onModelUpload}
+                                        accept="image/*"
+                                    />
+                                    <ContentCard
+                                        title="4. Video"
+                                        mediaUrl={videoUrl}
+                                        mediaType="video"
+                                        onFileSelect={onVideoUpload}
+                                        accept="video/*"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'settings' && <SettingsPanel />}
+                    {activeTab === 'users' && <UserActivityPanel />}
+                    {activeTab === 'transactions' && <TransactionsPanel />}
                 </div>
             </main>
         </div>

@@ -22,13 +22,16 @@ import { LandingPage } from './pages/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from './lib/database';
 import { CREDIT_COSTS } from './lib/supabase';
+import { BuyCreditsModal } from './components/BuyCreditsModal';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
     userRole: 'admin' | 'user' | null;
+    userName?: string | null;
     onLoginClick: () => void;
     onLogoutClick: () => void;
     onAdminClick?: () => void;
+    onBuyCreditsClick?: () => void;
 }
 
 const ToolPage: React.FC<{ 
@@ -37,11 +40,13 @@ const ToolPage: React.FC<{
     onRefreshProfile: () => void;
 } & PageHeaderProps> = ({ 
     onNavigateHome, 
-    isLoggedIn, 
+    isLoggedIn,
+    userName, 
     onLoginClick, 
     onLogoutClick, 
     userRole, 
     onAdminClick,
+    onBuyCreditsClick,
     profile,
     onRefreshProfile
 }) => {
@@ -436,11 +441,13 @@ const ToolPage: React.FC<{
         <div className="min-h-screen flex flex-col bg-slate-900">
             <Header 
                 isLoggedIn={isLoggedIn} 
-                userRole={userRole} 
+                userRole={userRole}
+                userName={profile.full_name}
                 onLoginClick={onLoginClick} 
                 onLogoutClick={onLogoutClick} 
                 onHomeClick={onNavigateHome} 
                 onAdminClick={onAdminClick}
+                onBuyCreditsClick={onBuyCreditsClick}
                 credits={profile.credits}
             />
 
@@ -1011,6 +1018,7 @@ const App: React.FC = () => {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+    const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
 
     // Close auth modal when user is logged in
     React.useEffect(() => {
@@ -1024,13 +1032,8 @@ const App: React.FC = () => {
         }
     }, [user, profile]);
     
-    // Admin check - check email contains hikmet or texmart, or subscription tier, or manual admin login
-    const isAdmin = 
-        isAdminLoggedIn || 
-        user?.email?.toLowerCase().includes('hikmet') || 
-        user?.email?.toLowerCase().includes('texmart') || 
-        profile?.subscription_tier === 'admin' || 
-        profile?.subscription_tier === 'premium';
+    // Admin check - use is_admin field from profile
+    const isAdmin = profile?.is_admin === true;
     
     // Admin editable content state (keep for backward compatibility)
     const [sketchUrl, setSketchUrl] = useState(() => {
@@ -1186,6 +1189,16 @@ const App: React.FC = () => {
                 <LandingPage
                     onGetStarted={handleGetStarted}
                     onSignIn={handleSignIn}
+                    isLoggedIn={!!user}
+                    userName={profile?.full_name}
+                    userRole={isAdmin ? 'admin' : (user ? 'user' : null)}
+                    credits={profile?.credits}
+                    onLogout={() => {
+                        signOut();
+                        setCurrentPage('landing');
+                    }}
+                    onAdminClick={isAdmin ? () => setCurrentPage('admin') : undefined}
+                    onBuyCreditsClick={user ? () => setShowBuyCreditsModal(true) : undefined}
                     sketchUrl={sketchUrl}
                     productUrl={productUrl}
                     modelUrl={modelUrl}
@@ -1201,12 +1214,14 @@ const App: React.FC = () => {
                     onNavigateHome={() => setCurrentPage('landing')}
                     isLoggedIn={!!user}
                     userRole={isAdmin ? 'admin' : 'user'}
+                    userName={profile.full_name}
                     onLoginClick={handleSignIn}
                     onLogoutClick={() => {
                         signOut();
                         setCurrentPage('landing');
                     }}
-                    onAdminClick={handleAdminClick}
+                    onAdminClick={isAdmin ? () => setCurrentPage('admin') : undefined}
+                    onBuyCreditsClick={() => setShowBuyCreditsModal(true)}
                     profile={profile}
                     onRefreshProfile={refreshProfile}
                 />
@@ -1217,14 +1232,14 @@ const App: React.FC = () => {
                     onRefresh={refreshProfile}
                 />
             )}
-            {currentPage === 'admin' && isAdmin && (
+            {currentPage === 'admin' && isAdmin && user && profile && (
                 <AdminDashboard
                     onNavigateHome={() => setCurrentPage('landing')}
-                    isLoggedIn={isAdminLoggedIn || !!user}
+                    isLoggedIn={!!user}
                     userRole="admin"
+                    userName={profile.full_name}
                     onLoginClick={handleSignIn}
                     onLogoutClick={() => {
-                        setIsAdminLoggedIn(false);
                         signOut();
                         setCurrentPage('landing');
                     }}
@@ -1244,6 +1259,7 @@ const App: React.FC = () => {
                     onHeroVideo1Upload={(f) => handleFileUpload(f, 'heroVideo1')}
                     onHeroVideo2Upload={(f) => handleFileUpload(f, 'heroVideo2')}
                     onHeroVideo3Upload={(f) => handleFileUpload(f, 'heroVideo3')}
+                    credits={profile.credits}
                 />
             )}
 
@@ -1261,6 +1277,21 @@ const App: React.FC = () => {
                 onLogin={handleAdminLogin}
                 onSwitchToRegister={() => {}}
             />
+
+            {/* Buy Credits Modal - Available from Header */}
+            {user && profile && (
+                <BuyCreditsModal
+                    isOpen={showBuyCreditsModal}
+                    onClose={() => setShowBuyCreditsModal(false)}
+                    userId={profile.id}
+                    userEmail={profile.email}
+                    userName={profile.full_name || 'Kullanıcı'}
+                    onSuccess={() => {
+                        refreshProfile();
+                        setShowBuyCreditsModal(false);
+                    }}
+                />
+            )}
         </>
     );
 };

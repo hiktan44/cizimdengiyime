@@ -31,6 +31,7 @@ export interface Profile {
   avatar_url: string | null;
   subscription_tier: 'free' | 'starter' | 'pro' | 'premium';
   credits: number;
+  is_admin: boolean;
   subscription_start: string | null;
   subscription_end: string | null;
   created_at: string;
