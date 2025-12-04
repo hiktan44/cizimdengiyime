@@ -1011,6 +1011,18 @@ const App: React.FC = () => {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+
+    // Close auth modal when user is logged in
+    React.useEffect(() => {
+        if (user && profile) {
+            console.log('✅ User logged in, closing auth modal');
+            setShowAuthModal(false);
+            // If on landing page, redirect to tool
+            if (currentPage === 'landing') {
+                setCurrentPage('tool');
+            }
+        }
+    }, [user, profile]);
     
     // Admin check - check email contains hikmet or texmart, or subscription tier, or manual admin login
     const isAdmin = 
@@ -1092,6 +1104,12 @@ const App: React.FC = () => {
     const handleGetStarted = () => {
         if (!user) {
             setShowAuthModal(true);
+        } else if (!profile) {
+            // User exists but profile is still loading or creating
+            alert('Hesap bilgileriniz hazırlanıyor. Lütfen birkaç saniye bekleyin ve tekrar deneyin.');
+            setTimeout(() => {
+                refreshProfile();
+            }, 2000);
         } else {
             setCurrentPage('tool');
         }
@@ -1119,12 +1137,44 @@ const App: React.FC = () => {
         }
     };
 
+    // Debug logging
+    React.useEffect(() => {
+        console.log('Auth State:', { 
+            user: !!user, 
+            profile: !!profile, 
+            loading,
+            userEmail: user?.email,
+            profileId: profile?.id,
+            credits: profile?.credits
+        });
+    }, [user, profile, loading]);
+
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mb-4"></div>
                     <p className="text-slate-400">Yükleniyor...</p>
+                    <p className="text-slate-500 text-sm mt-2">Kullanıcı bilgileri alınıyor...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // If user is logged in but profile is not loaded, show specific message
+    if (user && !profile && !loading) {
+        return (
+            <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+                <div className="text-center max-w-md p-8">
+                    <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mb-4"></div>
+                    <h2 className="text-white text-xl font-bold mb-2">Profil oluşturuluyor...</h2>
+                    <p className="text-slate-400 mb-4">İlk girişiniz için hesap bilgileriniz hazırlanıyor. Bu birkaç saniye sürebilir.</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition"
+                    >
+                        Sayfayı Yenile
+                    </button>
                 </div>
             </div>
         );

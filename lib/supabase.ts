@@ -13,6 +13,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: true,
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    flowType: 'pkce',
+    debug: true, // Geçici - debug için
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'cizimdengiyime-app',
+    },
   },
 });
 
