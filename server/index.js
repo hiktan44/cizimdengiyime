@@ -34,7 +34,32 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+// CORS - Frontend URL'lerini ekle
+const allowedOrigins = [
+  'http://localhost:5173', // Local development
+  'http://localhost:3000',
+  process.env.FRONTEND_URL, // Coolify frontend URL (environment variable)
+  // Production URL'leri buraya eklenecek (örnek aşağıda)
+  // 'https://cizimdengiyime-frontend-xxx.coolify.app',
+  // 'https://yourdomain.com',
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
