@@ -37,46 +37,62 @@ export const uploadHeroVideo = async (
   orderIndex: number = 0
 ): Promise<{ success: boolean; videoUrl?: string; error?: string }> => {
   try {
+    // Unique filename without folder path
     const fileExt = file.name.split('.').pop();
-    const fileName = `hero-${orderIndex}-${Date.now()}.${fileExt}`;
+    const uniqueFileName = `hero-${orderIndex}-${Date.now()}.${fileExt}`;
 
-    // Check if a video with this order_index already exists
+    console.log(`📤 Uploading hero video ${orderIndex}:`, uniqueFileName);
+
+    // Check if a video with this order_index already exists in DB
     const { data: existingVideos } = await supabase
       .from('hero_videos')
       .select('id, video_url')
       .eq('order_index', orderIndex)
       .limit(1);
 
-    // If exists, delete old file from storage and old record from DB
+    // If exists, delete old record from DB (storage file will be orphaned but that's ok)
     if (existingVideos && existingVideos.length > 0) {
+      console.log(`🗑️ Deleting old hero video record for index ${orderIndex}`);
       const oldVideo = existingVideos[0];
-      const oldFileName = oldVideo.video_url.split('/').pop();
       
-      // Delete old file from storage
-      if (oldFileName) {
-        await supabase.storage.from('hero-videos').remove([oldFileName]);
+      // Try to delete old file from storage (extract filename from URL)
+      try {
+        const urlParts = oldVideo.video_url.split('/object/public/hero-videos/');
+        if (urlParts.length > 1) {
+          const oldFileName = urlParts[1];
+          await supabase.storage.from('hero-videos').remove([oldFileName]);
+          console.log(`🗑️ Old storage file deleted: ${oldFileName}`);
+        }
+      } catch (storageError) {
+        console.warn('Could not delete old storage file (not critical):', storageError);
       }
 
-      // Delete old record from database
+      // Delete old database record
       await supabase.from('hero_videos').delete().eq('id', oldVideo.id);
     }
 
-    // Upload to storage
-    const { error: uploadError } = await supabase.storage
+    // Upload new file to storage (without folder path, upsert false to avoid trigger issues)
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from('hero-videos')
-      .upload(fileName, file, {
+      .upload(uniqueFileName, file, {
         contentType: file.type,
         upsert: false,
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('❌ Storage upload error:', uploadError);
+      throw uploadError;
+    }
+
+    console.log('✅ Storage upload successful:', uploadData);
 
     // Get public URL
-    const { data } = supabase.storage
+    const { data: urlData } = supabase.storage
       .from('hero-videos')
-      .getPublicUrl(fileName);
+      .getPublicUrl(uniqueFileName);
 
-    const videoUrl = data.publicUrl;
+    const videoUrl = urlData.publicUrl;
+    console.log('📍 Public URL:', videoUrl);
 
     // Save to database
     const { error: dbError } = await supabase.from('hero_videos').insert({
@@ -85,11 +101,15 @@ export const uploadHeroVideo = async (
       is_active: true,
     });
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      console.error('❌ Database insert error:', dbError);
+      throw dbError;
+    }
 
+    console.log('✅ Database record created');
     return { success: true, videoUrl };
   } catch (error: any) {
-    console.error('Error uploading hero video:', error);
+    console.error('❌ Error uploading hero video:', error);
     return { success: false, error: error.message };
   }
 };
@@ -101,46 +121,62 @@ export const uploadShowcaseImage = async (
   orderIndex: number = 0
 ): Promise<{ success: boolean; imageUrl?: string; error?: string }> => {
   try {
+    // Unique filename without folder path
     const fileExt = file.name.split('.').pop();
-    const fileName = `${type}-${Date.now()}.${fileExt}`;
+    const uniqueFileName = `${type}-${Date.now()}.${fileExt}`;
 
-    // Check if an image with this type already exists
+    console.log(`📤 Uploading showcase ${type}:`, uniqueFileName);
+
+    // Check if an image with this type already exists in DB
     const { data: existingImages } = await supabase
       .from('showcase_images')
       .select('id, image_url')
       .eq('type', type)
       .limit(1);
 
-    // If exists, delete old file from storage and old record from DB
+    // If exists, delete old record from DB
     if (existingImages && existingImages.length > 0) {
+      console.log(`🗑️ Deleting old showcase ${type} record`);
       const oldImage = existingImages[0];
-      const oldFileName = oldImage.image_url.split('/').pop();
       
-      // Delete old file from storage
-      if (oldFileName) {
-        await supabase.storage.from('showcase-images').remove([oldFileName]);
+      // Try to delete old file from storage (extract filename from URL)
+      try {
+        const urlParts = oldImage.image_url.split('/object/public/showcase-images/');
+        if (urlParts.length > 1) {
+          const oldFileName = urlParts[1];
+          await supabase.storage.from('showcase-images').remove([oldFileName]);
+          console.log(`🗑️ Old storage file deleted: ${oldFileName}`);
+        }
+      } catch (storageError) {
+        console.warn('Could not delete old storage file (not critical):', storageError);
       }
 
-      // Delete old record from database
+      // Delete old database record
       await supabase.from('showcase_images').delete().eq('id', oldImage.id);
     }
 
-    // Upload to storage
-    const { error: uploadError } = await supabase.storage
+    // Upload new file to storage (without folder path, upsert false)
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from('showcase-images')
-      .upload(fileName, file, {
+      .upload(uniqueFileName, file, {
         contentType: file.type,
         upsert: false,
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('❌ Storage upload error:', uploadError);
+      throw uploadError;
+    }
+
+    console.log('✅ Storage upload successful:', uploadData);
 
     // Get public URL
-    const { data } = supabase.storage
+    const { data: urlData } = supabase.storage
       .from('showcase-images')
-      .getPublicUrl(fileName);
+      .getPublicUrl(uniqueFileName);
 
-    const imageUrl = data.publicUrl;
+    const imageUrl = urlData.publicUrl;
+    console.log('📍 Public URL:', imageUrl);
 
     // Save to database
     const { error: dbError } = await supabase.from('showcase_images').insert({
@@ -150,11 +186,15 @@ export const uploadShowcaseImage = async (
       is_active: true,
     });
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      console.error('❌ Database insert error:', dbError);
+      throw dbError;
+    }
 
+    console.log('✅ Database record created');
     return { success: true, imageUrl };
   } catch (error: any) {
-    console.error('Error uploading showcase image:', error);
+    console.error('❌ Error uploading showcase image:', error);
     return { success: false, error: error.message };
   }
 };
