@@ -2,7 +2,7 @@ import { supabase, CREDIT_COSTS } from '../lib/supabase';
 
 export const checkAndDeductCredits = async (
   userId: string,
-  operationType: 'sketch_to_product' | 'product_to_model' | 'video'
+  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch'
 ): Promise<{ success: boolean; message?: string; remainingCredits?: number }> => {
   try {
     // Get user profile
@@ -17,13 +17,14 @@ export const checkAndDeductCredits = async (
       throw profileError;
     }
 
-    const creditsNeeded = CREDIT_COSTS[
-      operationType === 'sketch_to_product'
-        ? 'SKETCH_TO_PRODUCT'
-        : operationType === 'product_to_model'
-        ? 'PRODUCT_TO_MODEL'
-        : 'VIDEO'
-    ];
+    const creditCostMap: Record<string, keyof typeof CREDIT_COSTS> = {
+      'sketch_to_product': 'SKETCH_TO_PRODUCT',
+      'product_to_model': 'PRODUCT_TO_MODEL',
+      'video': 'VIDEO',
+      'tech_sketch': 'TECH_SKETCH',
+    };
+    
+    const creditsNeeded = CREDIT_COSTS[creditCostMap[operationType]];
 
     if (profile.credits < creditsNeeded) {
       return {
@@ -56,7 +57,7 @@ export const checkAndDeductCredits = async (
 
 export const saveGeneration = async (
   userId: string,
-  type: 'sketch_to_product' | 'product_to_model' | 'video',
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch',
   creditsUsed: number,
   inputImageUrl: string | null,
   outputImageUrl: string | null,

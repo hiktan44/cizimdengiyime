@@ -354,13 +354,21 @@ export const generateImage = async (
     fabricFinish?: string,
     shoeType?: string,
     shoeColor?: string,
-    accessories?: string
+    accessories?: string,
+    secondProductFile?: File // New: İkinci ürün görseli (Alt & Üst kombin için)
 ): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
     
     // Convert inputs to parts array
     const promptParts: any[] = [imagePart];
+    
+    // Add second product image if provided (for Alt & Üst kombin)
+    if (secondProductFile) {
+        const secondPart = await fileToGenerativePart(secondProductFile);
+        promptParts.push(secondPart);
+        console.log('📦 İkinci ürün görseli (Alt Giyim) eklendi');
+    }
     
     // Add custom background if provided
     if (customBackground) {
@@ -387,8 +395,22 @@ export const generateImage = async (
     const colorClosing = color && colorHex ?
         `\n\n*** FINAL RENK KONTROLU ***\nTEKRAR EDIYORUM: Kiyafet rengi ${color} (${colorHex}) olmalidir. Yeşil, mavi, kırmızı gibi BAŞKA RENKLER KULLANILAMAZ. Sadece ve sadece ${colorHex} kullan.` : '';
 
-    let prompt = colorOpening + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
-    Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.
+    // Special instruction for Alt & Üst (Kombin) mode with two images
+    const isKombinMode = clothingType === 'Alt & Üst' && secondProductFile;
+    const kombinInstruction = isKombinMode ? `
+    *** KOMBİN MODU - İKİ AYRI GÖRSEL ***
+    Bu istekte İKİ AYRI kıyafet görseli verilmiştir:
+    - BİRİNCİ GÖRSEL: ÜST GİYİM (gömlek, tişört, ceket vb.)
+    - İKİNCİ GÖRSEL: ALT GİYİM (pantolon, etek, şort vb.)
+    
+    Model, HER İKİ kıyafeti de AYNI ANDA giymelidir:
+    - Üst bedene BİRİNCİ görseldeki kıyafeti giydir
+    - Alt bedene İKİNCİ görseldeki kıyafeti giydir
+    - Her iki kıyafetin de orijinal tasarım detayları KORUNMALIDIR
+    ` : '';
+
+    let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
+    ${isKombinMode ? 'Girdi olarak verilen İKİ AYRI kıyafet görselini (üst ve alt), gerçekçi bir canlı modele birlikte giydir.' : 'Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.'}
     
     *** 1. RENK KONTROLU - EN YÜKSEK ÖNCELİK (Bu kurala tam uyum ZORUNLUDUR) ***
     ${color && colorHex ? `

@@ -54,15 +54,32 @@ const ToolPage: React.FC<{
     const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical'>('design');
 
     // --- STATE MANAGEMENT ---
-    // Step 1: Sketch
+    // Step 1: Sketch (for single item mode)
     const [uploadedSketchFile, setUploadedSketchFile] = useState<File | null>(null);
     const [sketchPreviewUrl, setSketchPreviewUrl] = useState<string | undefined>(undefined);
     const [isProductLoading, setIsProductLoading] = useState(false);
 
-    // Step 2: Product (Ghost Mannequin)
+    // Step 2: Product (Ghost Mannequin) - for single item mode
     const [uploadedProductFile, setUploadedProductFile] = useState<File | null>(null); // If user uploads directly
     const [generatedProductUrl, setGeneratedProductUrl] = useState<string | null>(null); // If AI generates from sketch
     const [productPreviewUrl, setProductPreviewUrl] = useState<string | undefined>(undefined); // Current visual for Step 2
+
+    // --- KOMBIN MODE (Alt & Üst) STATE ---
+    // Top garment (Üst Giyim)
+    const [topSketchFile, setTopSketchFile] = useState<File | null>(null);
+    const [topSketchPreviewUrl, setTopSketchPreviewUrl] = useState<string | undefined>(undefined);
+    const [topProductFile, setTopProductFile] = useState<File | null>(null);
+    const [generatedTopProductUrl, setGeneratedTopProductUrl] = useState<string | null>(null);
+    const [topProductPreviewUrl, setTopProductPreviewUrl] = useState<string | undefined>(undefined);
+    const [isTopProductLoading, setIsTopProductLoading] = useState(false);
+
+    // Bottom garment (Alt Giyim)
+    const [bottomSketchFile, setBottomSketchFile] = useState<File | null>(null);
+    const [bottomSketchPreviewUrl, setBottomSketchPreviewUrl] = useState<string | undefined>(undefined);
+    const [bottomProductFile, setBottomProductFile] = useState<File | null>(null);
+    const [generatedBottomProductUrl, setGeneratedBottomProductUrl] = useState<string | null>(null);
+    const [bottomProductPreviewUrl, setBottomProductPreviewUrl] = useState<string | undefined>(undefined);
+    const [isBottomProductLoading, setIsBottomProductLoading] = useState(false);
     
     const [isModelLoading, setIsModelLoading] = useState(false);
     const [loadingText, setLoadingText] = useState('Yapay zeka düşünüyor...');
@@ -212,6 +229,109 @@ const ToolPage: React.FC<{
         setGeneratedImageUrl(null);
         setGeneratedVideoUrl(null);
     };
+
+    // --- KOMBIN MODE HANDLERS ---
+    // Top Garment Handlers
+    const handleTopSketchUpload = (file: File) => {
+        setTopSketchFile(file);
+        setTopSketchPreviewUrl(URL.createObjectURL(file));
+    };
+
+    const handleTopProductUpload = (file: File) => {
+        setTopProductFile(file);
+        const url = URL.createObjectURL(file);
+        setTopProductPreviewUrl(url);
+        setGeneratedTopProductUrl(null);
+    };
+
+    const handleGenerateTopProduct = async () => {
+        if (!topSketchFile) return;
+
+        const creditCheck = await checkAndDeductCredits(profile.id, 'sketch_to_product');
+        if (!creditCheck.success) {
+            alert(creditCheck.message);
+            return;
+        }
+
+        setIsTopProductLoading(true);
+        setLoadingText('Üst giyim ürüne dönüştürülüyor...');
+        startProgressSimulation(80, 200);
+
+        try {
+            const productUrl = await generateProductFromSketch(topSketchFile, colorSuggestion || undefined);
+            finishProgress();
+            setGeneratedTopProductUrl(productUrl);
+            setTopProductPreviewUrl(productUrl);
+            setTopProductFile(null);
+
+            await saveGeneration(
+                profile.id,
+                'sketch_to_product',
+                CREDIT_COSTS.SKETCH_TO_PRODUCT,
+                null,
+                productUrl,
+                null,
+                { type: 'top_garment', productColor: colorSuggestion }
+            );
+
+            onRefreshProfile();
+        } catch (error) {
+            alert(`Üst giyim oluşturma hatası: ${error}`);
+        } finally {
+            setIsTopProductLoading(false);
+        }
+    };
+
+    // Bottom Garment Handlers
+    const handleBottomSketchUpload = (file: File) => {
+        setBottomSketchFile(file);
+        setBottomSketchPreviewUrl(URL.createObjectURL(file));
+    };
+
+    const handleBottomProductUpload = (file: File) => {
+        setBottomProductFile(file);
+        const url = URL.createObjectURL(file);
+        setBottomProductPreviewUrl(url);
+        setGeneratedBottomProductUrl(null);
+    };
+
+    const handleGenerateBottomProduct = async () => {
+        if (!bottomSketchFile) return;
+
+        const creditCheck = await checkAndDeductCredits(profile.id, 'sketch_to_product');
+        if (!creditCheck.success) {
+            alert(creditCheck.message);
+            return;
+        }
+
+        setIsBottomProductLoading(true);
+        setLoadingText('Alt giyim ürüne dönüştürülüyor...');
+        startProgressSimulation(80, 200);
+
+        try {
+            const productUrl = await generateProductFromSketch(bottomSketchFile, secondaryColor || undefined);
+            finishProgress();
+            setGeneratedBottomProductUrl(productUrl);
+            setBottomProductPreviewUrl(productUrl);
+            setBottomProductFile(null);
+
+            await saveGeneration(
+                profile.id,
+                'sketch_to_product',
+                CREDIT_COSTS.SKETCH_TO_PRODUCT,
+                null,
+                productUrl,
+                null,
+                { type: 'bottom_garment', productColor: secondaryColor }
+            );
+
+            onRefreshProfile();
+        } catch (error) {
+            alert(`Alt giyim oluşturma hatası: ${error}`);
+        } finally {
+            setIsBottomProductLoading(false);
+        }
+    };
     
     // Custom Background Upload
     const handleBackgroundUpload = (file: File) => {
@@ -221,22 +341,58 @@ const ToolPage: React.FC<{
 
     // 2b. Generate Model from Product (The main generation)
     const handleGenerateModelClick = async () => {
-        // Determine source: Manual Upload OR AI Generated
-        let sourceFile: File | null = uploadedProductFile;
+        const isKombinMode = clothingType === 'Alt & Üst';
+        
+        let sourceFile: File | null = null;
+        let secondSourceFile: File | null = null;
 
-        if (!sourceFile && generatedProductUrl) {
-             // Convert base64 url to file
-             try {
-                 sourceFile = await base64ToFile(generatedProductUrl, 'generated_product.png');
-             } catch (e) {
-                 alert("Görsel işlenirken hata oluştu.");
-                 return;
-             }
-        }
+        if (isKombinMode) {
+            // KOMBIN MODE: Need both top and bottom garments
+            // Get top garment
+            if (topProductFile) {
+                sourceFile = topProductFile;
+            } else if (generatedTopProductUrl) {
+                try {
+                    sourceFile = await base64ToFile(generatedTopProductUrl, 'top_product.png');
+                } catch (e) {
+                    alert("Üst giyim görseli işlenirken hata oluştu.");
+                    return;
+                }
+            }
 
-        if (!sourceFile) {
-            alert('Lütfen önce bir ürün görseli yükleyin veya çizimden oluşturun.');
-            return;
+            // Get bottom garment
+            if (bottomProductFile) {
+                secondSourceFile = bottomProductFile;
+            } else if (generatedBottomProductUrl) {
+                try {
+                    secondSourceFile = await base64ToFile(generatedBottomProductUrl, 'bottom_product.png');
+                } catch (e) {
+                    alert("Alt giyim görseli işlenirken hata oluştu.");
+                    return;
+                }
+            }
+
+            if (!sourceFile || !secondSourceFile) {
+                alert('Kombin modu için hem üst hem alt giyim görseli gereklidir. Lütfen her iki parçayı da yükleyin veya çizimden oluşturun.');
+                return;
+            }
+        } else {
+            // SINGLE ITEM MODE: Use standard product image
+            sourceFile = uploadedProductFile;
+
+            if (!sourceFile && generatedProductUrl) {
+                try {
+                    sourceFile = await base64ToFile(generatedProductUrl, 'generated_product.png');
+                } catch (e) {
+                    alert("Görsel işlenirken hata oluştu.");
+                    return;
+                }
+            }
+
+            if (!sourceFile) {
+                alert('Lütfen önce bir ürün görseli yükleyin veya çizimden oluşturun.');
+                return;
+            }
         }
 
         // Check credits
@@ -249,7 +405,7 @@ const ToolPage: React.FC<{
         setIsModelLoading(true);
         setGeneratedImageUrl(null);
         setGeneratedVideoUrl(null);
-        setLoadingText('Canlı model oluşturuluyor...');
+        setLoadingText(isKombinMode ? 'Kombin ile canlı model oluşturuluyor...' : 'Canlı model oluşturuluyor...');
         
         startProgressSimulation(85, 300);
 
@@ -277,7 +433,8 @@ const ToolPage: React.FC<{
                 fabricFinish,
                 shoeType,
                 shoeColor,
-                accessories
+                accessories,
+                secondSourceFile || undefined // Pass second image for Kombin mode
             );
             finishProgress();
             setTimeout(() => {
@@ -297,7 +454,8 @@ const ToolPage: React.FC<{
                     clothingType, colorSuggestion, secondaryColor, modelEthnicity, 
                     artisticStyle, location, bodyType, pose, hairColor, hairStyle,
                     customPrompt, lighting, cameraAngle, cameraZoom, aspectRatio,
-                    fabricType, fabricFinish, shoeType, shoeColor, accessories
+                    fabricType, fabricFinish, shoeType, shoeColor, accessories,
+                    isKombinMode
                 }
             );
 
@@ -320,6 +478,13 @@ const ToolPage: React.FC<{
     const handleGenerateTechSketch = async () => {
         if (!techInputFile) return;
         
+        // Check credits
+        const creditCheck = await checkAndDeductCredits(profile.id, 'tech_sketch');
+        if (!creditCheck.success) {
+            alert(creditCheck.message);
+            return;
+        }
+
         setIsTechLoading(true);
         setLoadingText('Teknik çizim hazırlanıyor...');
         startProgressSimulation(90, 200);
@@ -328,6 +493,20 @@ const ToolPage: React.FC<{
             const sketchUrl = await generateSketchFromProduct(techInputFile, techSketchStyle);
             finishProgress();
             setGeneratedTechSketchUrl(sketchUrl);
+
+            // Save to database
+            await saveGeneration(
+                profile.id,
+                'tech_sketch',
+                CREDIT_COSTS.TECH_SKETCH,
+                null,
+                sketchUrl,
+                null,
+                { techSketchStyle }
+            );
+
+            // Refresh profile to update credits
+            onRefreshProfile();
         } catch (error) {
              console.error('Teknik çizim hatası:', error);
              alert(`Hata: ${error instanceof Error ? error.message : String(error)}`);
@@ -483,75 +662,218 @@ const ToolPage: React.FC<{
                 {activeToolTab === 'design' ? (
                     /* --- DESIGN MODE (SKETCH -> MODEL) --- */
                     <div className="animate-fade-in">
-                        {/* TOP ROW: INPUTS */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                            
-                            {/* BOX 1: SKETCH INPUT */}
-                            <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col">
-                                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                    <span className="bg-slate-700 text-cyan-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
-                                    Çizim (Opsiyonel)
-                                </h2>
-                                <div className="flex-grow">
-                                    <ImageUploader onImageUpload={handleSketchUpload} imagePreviewUrl={sketchPreviewUrl} />
-                                </div>
-                                
-                                {/* Color picker for product */}
-                                {uploadedSketchFile && (
-                                    <div className="mt-4">
-                                        <ColorPicker 
-                                            label="Ürün Rengi (Opsiyonel)" 
-                                            selectedColor={productColor} 
-                                            onColorChange={setProductColor} 
-                                        />
-                                    </div>
-                                )}
-                                
-                                <button
-                                    onClick={handleGenerateProductClick}
-                                    disabled={!uploadedSketchFile || isProductLoading}
-                                    className={`w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-                                        !uploadedSketchFile || isProductLoading
-                                            ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                                            : 'bg-blue-600 text-white hover:bg-blue-500'
-                                    }`}
-                                >
-                                    {isProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür ->'}
-                                </button>
-                            </div>
-
-                            {/* BOX 2: PRODUCT INPUT */}
-                            <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col relative">
-                                {/* Arrow for visual flow on desktop */}
-                                <div className="hidden md:block absolute top-1/2 -left-5 transform -translate-y-1/2 text-slate-600 z-10">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                </div>
-
-                                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                    <span className="bg-slate-700 text-purple-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
-                                    Ürün Görseli
-                                </h2>
-                                <div className="flex-grow relative">
-                                    <ImageUploader onImageUpload={handleProductUpload} imagePreviewUrl={productPreviewUrl} />
-                                    {/* Download button for product image */}
-                                    {(generatedProductUrl || productPreviewUrl) && (
-                                        <button
-                                            onClick={() => handleDownload(generatedProductUrl || productPreviewUrl, 'urun-gorseli.png')}
-                                            className="absolute bottom-4 right-4 bg-cyan-600/90 text-white p-3 rounded-full hover:bg-cyan-500 transition-all shadow-lg backdrop-blur-sm z-10"
-                                            title="Ürün Görselini İndir"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        {/* TOP ROW: INPUTS - Changes based on clothing type */}
+                        
+                        {clothingType === 'Alt & Üst' ? (
+                            /* --- KOMBIN MODE: 4 BOXES (2 for top, 2 for bottom) --- */
+                            <div className="space-y-6 mb-8">
+                                {/* Kombin Mode Header */}
+                                <div className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-500/30 rounded-xl p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                            <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                             </svg>
-                                        </button>
-                                    )}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-white">Kombin Modu Aktif</h3>
+                                            <p className="text-sm text-slate-400">Üst ve alt giyim için ayrı görseller yükleyin</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p className="text-xs text-slate-500 mt-2 text-center">
-                                    {generatedProductUrl ? "Çizimden üretilen görsel kullanılıyor." : "Çizim yoksa, doğrudan ürün fotoğrafı yükleyin."}
-                                </p>
-                            </div>
 
-                        </div>
+                                {/* TOP GARMENT ROW */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* TOP: Sketch */}
+                                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-cyan-500/30 shadow-xl flex flex-col">
+                                        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                            <span className="bg-cyan-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                                            Üst Giyim - Çizim
+                                        </h2>
+                                        <div className="flex-grow min-h-[200px]">
+                                            <ImageUploader onImageUpload={handleTopSketchUpload} imagePreviewUrl={topSketchPreviewUrl} />
+                                        </div>
+                                        <button
+                                            onClick={handleGenerateTopProduct}
+                                            disabled={!topSketchFile || isTopProductLoading}
+                                            className={`w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                                                !topSketchFile || isTopProductLoading
+                                                    ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                                                    : 'bg-cyan-600 text-white hover:bg-cyan-500'
+                                            }`}
+                                        >
+                                            {isTopProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür →'}
+                                        </button>
+                                    </div>
+
+                                    {/* TOP: Product */}
+                                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-cyan-500/30 shadow-xl flex flex-col relative">
+                                        <div className="hidden md:block absolute top-1/2 -left-5 transform -translate-y-1/2 text-cyan-500 z-10">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                        </div>
+                                        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                            <span className="bg-cyan-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                                            Üst Giyim - Ürün
+                                        </h2>
+                                        <div className="flex-grow min-h-[200px] relative">
+                                            <ImageUploader onImageUpload={handleTopProductUpload} imagePreviewUrl={topProductPreviewUrl} />
+                                            {topProductPreviewUrl && (
+                                                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">✓ Hazır</div>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-2 text-center">
+                                            {generatedTopProductUrl ? "Çizimden üretildi" : "Çizimden üret veya doğrudan yükle"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* BOTTOM GARMENT ROW */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* BOTTOM: Sketch */}
+                                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-purple-500/30 shadow-xl flex flex-col">
+                                        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                            <span className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                                            Alt Giyim - Çizim
+                                        </h2>
+                                        <div className="flex-grow min-h-[200px]">
+                                            <ImageUploader onImageUpload={handleBottomSketchUpload} imagePreviewUrl={bottomSketchPreviewUrl} />
+                                        </div>
+                                        <button
+                                            onClick={handleGenerateBottomProduct}
+                                            disabled={!bottomSketchFile || isBottomProductLoading}
+                                            className={`w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                                                !bottomSketchFile || isBottomProductLoading
+                                                    ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                                                    : 'bg-purple-600 text-white hover:bg-purple-500'
+                                            }`}
+                                        >
+                                            {isBottomProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür →'}
+                                        </button>
+                                    </div>
+
+                                    {/* BOTTOM: Product */}
+                                    <div className="bg-slate-800/50 p-6 rounded-2xl border border-purple-500/30 shadow-xl flex flex-col relative">
+                                        <div className="hidden md:block absolute top-1/2 -left-5 transform -translate-y-1/2 text-purple-500 z-10">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                        </div>
+                                        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                            <span className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
+                                            Alt Giyim - Ürün
+                                        </h2>
+                                        <div className="flex-grow min-h-[200px] relative">
+                                            <ImageUploader onImageUpload={handleBottomProductUpload} imagePreviewUrl={bottomProductPreviewUrl} />
+                                            {bottomProductPreviewUrl && (
+                                                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">✓ Hazır</div>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-2 text-center">
+                                            {generatedBottomProductUrl ? "Çizimden üretildi" : "Çizimden üret veya doğrudan yükle"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Kombin Status */}
+                                <div className={`p-4 rounded-xl border ${
+                                    topProductPreviewUrl && bottomProductPreviewUrl 
+                                        ? 'bg-green-900/20 border-green-500/30' 
+                                        : 'bg-orange-900/20 border-orange-500/30'
+                                }`}>
+                                    <div className="flex items-center gap-3">
+                                        {topProductPreviewUrl && bottomProductPreviewUrl ? (
+                                            <>
+                                                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span className="text-green-400 font-medium">Her iki parça da hazır! Canlı model oluşturabilirsiniz.</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span className="text-orange-400 font-medium">
+                                                    {!topProductPreviewUrl && !bottomProductPreviewUrl 
+                                                        ? 'Üst ve alt giyim görselleri gerekli'
+                                                        : !topProductPreviewUrl 
+                                                            ? 'Üst giyim görseli gerekli'
+                                                            : 'Alt giyim görseli gerekli'}
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            /* --- STANDARD MODE: 2 BOXES (sketch + product) --- */
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                
+                                {/* BOX 1: SKETCH INPUT */}
+                                <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col">
+                                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                        <span className="bg-slate-700 text-cyan-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                                        Çizim (Opsiyonel)
+                                    </h2>
+                                    <div className="flex-grow">
+                                        <ImageUploader onImageUpload={handleSketchUpload} imagePreviewUrl={sketchPreviewUrl} />
+                                    </div>
+                                    
+                                    {/* Color picker for product */}
+                                    {uploadedSketchFile && (
+                                        <div className="mt-4">
+                                            <ColorPicker 
+                                                label="Ürün Rengi (Opsiyonel)" 
+                                                selectedColor={productColor} 
+                                                onColorChange={setProductColor} 
+                                            />
+                                        </div>
+                                    )}
+                                    
+                                    <button
+                                        onClick={handleGenerateProductClick}
+                                        disabled={!uploadedSketchFile || isProductLoading}
+                                        className={`w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                                            !uploadedSketchFile || isProductLoading
+                                                ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                                                : 'bg-blue-600 text-white hover:bg-blue-500'
+                                        }`}
+                                    >
+                                        {isProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür ->'}
+                                    </button>
+                                </div>
+
+                                {/* BOX 2: PRODUCT INPUT */}
+                                <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col relative">
+                                    {/* Arrow for visual flow on desktop */}
+                                    <div className="hidden md:block absolute top-1/2 -left-5 transform -translate-y-1/2 text-slate-600 z-10">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                    </div>
+
+                                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                        <span className="bg-slate-700 text-purple-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                                        Ürün Görseli
+                                    </h2>
+                                    <div className="flex-grow relative">
+                                        <ImageUploader onImageUpload={handleProductUpload} imagePreviewUrl={productPreviewUrl} />
+                                        {/* Download button for product image */}
+                                        {(generatedProductUrl || productPreviewUrl) && (
+                                            <button
+                                                onClick={() => handleDownload(generatedProductUrl || productPreviewUrl, 'urun-gorseli.png')}
+                                                className="absolute bottom-4 right-4 bg-cyan-600/90 text-white p-3 rounded-full hover:bg-cyan-500 transition-all shadow-lg backdrop-blur-sm z-10"
+                                                title="Ürün Görselini İndir"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-2 text-center">
+                                        {generatedProductUrl ? "Çizimden üretilen görsel kullanılıyor." : "Çizim yoksa, doğrudan ürün fotoğrafı yükleyin."}
+                                    </p>
+                                </div>
+
+                            </div>
+                        )}
 
                         {/* BOTTOM ROW: CONTROLS & RESULT */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">

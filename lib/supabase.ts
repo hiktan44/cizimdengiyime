@@ -41,7 +41,7 @@ export interface Profile {
 export interface Generation {
   id: string;
   user_id: string;
-  type: 'sketch_to_product' | 'product_to_model' | 'video';
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch';
   credits_used: number;
   input_image_url: string | null;
   output_image_url: string | null;
@@ -77,6 +77,7 @@ export const CREDIT_COSTS = {
   SKETCH_TO_PRODUCT: 1,
   PRODUCT_TO_MODEL: 1,
   VIDEO: 3,
+  TECH_SKETCH: 1, // Teknik çizim maliyeti
 } as const;
 
 // Subscription plans

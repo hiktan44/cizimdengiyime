@@ -498,3 +498,92 @@ export const getUserGenerations = async (userId: string) => {
   }
 };
 
+// ==========================================
+// ADMIN CREDIT MANAGEMENT FUNCTIONS
+// ==========================================
+
+export interface AddCreditsResult {
+  success: boolean;
+  newCredits?: number;
+  error?: string;
+}
+
+// Add credits to a user (admin function)
+export const addCreditsToUser = async (
+  userId: string,
+  amount: number,
+  reason: string = 'Admin tarafından eklendi'
+): Promise<AddCreditsResult> => {
+  try {
+    if (amount <= 0) {
+      return { success: false, error: 'Kredi miktarı 0\'dan büyük olmalıdır.' };
+    }
+
+    // Get current credits
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('credits')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) throw profileError;
+
+    const currentCredits = profile?.credits || 0;
+    const newCredits = currentCredits + amount;
+
+    // Update credits
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ credits: newCredits })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    // Log the transaction as admin credit grant
+    const { error: txError } = await supabase
+      .from('transactions')
+      .insert({
+        user_id: userId,
+        type: 'credit_purchase',
+        amount: 0, // Free admin grant
+        credits: amount,
+        status: 'completed',
+        payment_method: 'admin_grant',
+        metadata: { reason, granted_by: 'admin' }
+      });
+
+    if (txError) {
+      console.warn('Transaction log error (non-critical):', txError);
+    }
+
+    console.log(`✅ ${amount} kredi kullanıcıya eklendi: ${userId}`);
+    return { success: true, newCredits };
+  } catch (error: any) {
+    console.error('Error adding credits:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Get all generations for admin (bypasses RLS for admin view)
+export const getAllGenerationsForAdmin = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('generations')
+      .select(`
+        *,
+        profiles:user_id (
+          email,
+          full_name
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching all generations:', error);
+    return [];
+  }
+};
+

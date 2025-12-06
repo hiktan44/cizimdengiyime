@@ -907,10 +907,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="py-20 px-6 bg-slate-800/80 z-10 relative">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-4xl font-bold text-white text-center mb-4">
-            {language === 'tr' ? 'NEDEN BEST FASHION?' : 'WHY BEST FASHION?'}
+            {language === 'tr' ? 'NEDEN FASHEONE?' : 'WHY FASHEONE?'}
           </h2>
           <p className="text-slate-400 text-center mb-16">
-            {language === 'tr' ? 'Best Fashion ile farkı hisset' : 'Feel the difference with Best Fashion'}
+            {language === 'tr' ? 'Fasheone ile farkı hisset' : 'Feel the difference with Fasheone'}
           </p>
           
           <div className="space-y-4">
@@ -1005,7 +1005,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="space-y-4">
             <details className="bg-slate-900/50 border border-slate-700 rounded-xl p-6 group">
               <summary className="text-xl font-semibold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>{language === 'tr' ? 'Best Fashion ile neler yapabilirim?' : 'What can I do with Best Fashion?'}</span>
+                <span>{language === 'tr' ? 'Fasheone ile neler yapabilirim?' : 'What can I do with Fasheone?'}</span>
                 <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -1088,7 +1088,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <Logo className="h-12" />
             
             {/* Copyright */}
-            <p className="text-slate-400 text-center">&copy; 2024 Best Fashion. Tüm hakları saklıdır.</p>
+            <p className="text-slate-400 text-center">&copy; 2024 Fasheone. Tüm hakları saklıdır.</p>
           </div>
         </div>
       </footer>
