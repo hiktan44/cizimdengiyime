@@ -1198,9 +1198,15 @@ const ToolPage: React.FC<{
 
                                 <button
                                     onClick={handleGenerateModelClick}
-                                    disabled={(!uploadedProductFile && !generatedProductUrl) || isModelLoading}
+                                    disabled={
+                                        clothingType === 'Alt & Üst'
+                                            ? (!topProductPreviewUrl || !bottomProductPreviewUrl) || isModelLoading
+                                            : (!uploadedProductFile && !generatedProductUrl) || isModelLoading
+                                    }
                                     className={`w-full py-4 px-6 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all transform hover:scale-105 ${
-                                        (!uploadedProductFile && !generatedProductUrl) || isModelLoading
+                                        (clothingType === 'Alt & Üst'
+                                            ? (!topProductPreviewUrl || !bottomProductPreviewUrl) || isModelLoading
+                                            : (!uploadedProductFile && !generatedProductUrl) || isModelLoading)
                                             ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
                                             : 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50'
                                     }`}
