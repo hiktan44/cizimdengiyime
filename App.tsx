@@ -24,6 +24,8 @@ import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from './
 import { CREDIT_COSTS } from './lib/supabase';
 import { BuyCreditsModal } from './components/BuyCreditsModal';
 import { uploadHeroVideo, uploadShowcaseImage, getPublicHeroVideos, getPublicShowcaseImages } from './lib/adminService';
+import { PixshopPage } from './pages/PixshopPage';
+import { FotomatikPage } from './pages/FotomatikPage';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -51,7 +53,7 @@ const ToolPage: React.FC<{
     profile,
     onRefreshProfile
 }) => {
-    const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical'>('design');
+    const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical' | 'pixshop' | 'fotomatik'>('design');
 
     // --- STATE MANAGEMENT ---
     // Step 1: Sketch (for single item mode)
@@ -634,28 +636,56 @@ const ToolPage: React.FC<{
             <main className="flex-grow container mx-auto p-4 md:p-8">
                 
                 {/* TOOL TABS */}
-                <div className="flex justify-center mb-8 gap-4">
+                <div className="flex flex-wrap justify-center mb-8 gap-3">
                     <button
                         onClick={() => setActiveToolTab('design')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${
+                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
                             activeToolTab === 'design'
                                 ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
                         }`}
                     >
                         <SparklesIcon />
-                        Canlı Model & Video
+                        <span className="hidden sm:inline">Canlı Model & Video</span>
+                        <span className="sm:hidden">Model</span>
                     </button>
                     <button
                         onClick={() => setActiveToolTab('technical')}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${
+                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
                             activeToolTab === 'technical'
                                 ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
                         }`}
                     >
                         <PencilIcon />
-                        Teknik Çizim (Tech Pack)
+                        <span className="hidden sm:inline">Teknik Çizim (Tech Pack)</span>
+                        <span className="sm:hidden">Tech Pack</span>
+                    </button>
+                    <button
+                        onClick={() => setActiveToolTab('pixshop')}
+                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
+                            activeToolTab === 'pixshop'
+                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                        }`}
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Pixshop
+                    </button>
+                    <button
+                        onClick={() => setActiveToolTab('fotomatik')}
+                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
+                            activeToolTab === 'fotomatik'
+                                ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/30'
+                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                        }`}
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        Fotomatik
                     </button>
                 </div>
 
@@ -1212,7 +1242,7 @@ const ToolPage: React.FC<{
                             </div>
                         </div>
                     </div>
-                ) : (
+                ) : activeToolTab === 'technical' ? (
                     /* --- TECHNICAL DRAWING MODE (PRODUCT -> SKETCH) --- */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in max-w-6xl mx-auto">
                         
@@ -1322,6 +1352,20 @@ const ToolPage: React.FC<{
                         </div>
 
                     </div>
+                ) : activeToolTab === 'pixshop' ? (
+                    /* --- PIXSHOP MODE (Photo Editing) --- */
+                    <PixshopPage 
+                        profile={profile} 
+                        onRefreshProfile={onRefreshProfile}
+                        onShowBuyCredits={onBuyCreditsClick}
+                    />
+                ) : (
+                    /* --- FOTOMATIK MODE (Transform & Describe) --- */
+                    <FotomatikPage 
+                        profile={profile} 
+                        onRefreshProfile={onRefreshProfile}
+                        onShowBuyCredits={onBuyCreditsClick}
+                    />
                 )}
             </main>
 

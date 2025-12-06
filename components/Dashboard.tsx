@@ -58,6 +58,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, onRefresh }) => {
         return 'Ürün → Model';
       case 'video':
         return 'Video';
+      case 'tech_sketch':
+        return 'Teknik Çizim';
+      case 'pixshop':
+        return 'Pixshop';
+      case 'fotomatik_transform':
+        return 'Fotomatik (Dönüştür)';
+      case 'fotomatik_describe':
+        return 'Fotomatik (Açıkla)';
       default:
         return type;
     }
@@ -71,6 +79,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ profile, onRefresh }) => {
         return 'bg-purple-500/10 text-purple-400 border-purple-500/50';
       case 'video':
         return 'bg-orange-500/10 text-orange-400 border-orange-500/50';
+      case 'tech_sketch':
+        return 'bg-pink-500/10 text-pink-400 border-pink-500/50';
+      case 'pixshop':
+        return 'bg-blue-500/10 text-blue-400 border-blue-500/50';
+      case 'fotomatik_transform':
+        return 'bg-teal-500/10 text-teal-400 border-teal-500/50';
+      case 'fotomatik_describe':
+        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/50';
       default:
         return 'bg-slate-500/10 text-slate-400 border-slate-500/50';
     }

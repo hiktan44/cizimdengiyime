@@ -2,7 +2,7 @@ import { supabase, CREDIT_COSTS } from '../lib/supabase';
 
 export const checkAndDeductCredits = async (
   userId: string,
-  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch'
+  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe'
 ): Promise<{ success: boolean; message?: string; remainingCredits?: number }> => {
   try {
     // Get user profile
@@ -22,6 +22,9 @@ export const checkAndDeductCredits = async (
       'product_to_model': 'PRODUCT_TO_MODEL',
       'video': 'VIDEO',
       'tech_sketch': 'TECH_SKETCH',
+      'pixshop': 'PIXSHOP',
+      'fotomatik_transform': 'FOTOMATIK_TRANSFORM',
+      'fotomatik_describe': 'FOTOMATIK_DESCRIBE',
     };
     
     const creditsNeeded = CREDIT_COSTS[creditCostMap[operationType]];
@@ -57,7 +60,7 @@ export const checkAndDeductCredits = async (
 
 export const saveGeneration = async (
   userId: string,
-  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch',
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe',
   creditsUsed: number,
   inputImageUrl: string | null,
   outputImageUrl: string | null,

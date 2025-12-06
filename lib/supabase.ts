@@ -41,7 +41,7 @@ export interface Profile {
 export interface Generation {
   id: string;
   user_id: string;
-  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch';
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe';
   credits_used: number;
   input_image_url: string | null;
   output_image_url: string | null;
@@ -78,6 +78,9 @@ export const CREDIT_COSTS = {
   PRODUCT_TO_MODEL: 1,
   VIDEO: 3,
   TECH_SKETCH: 1, // Teknik çizim maliyeti
+  PIXSHOP: 1, // Pixshop fotoğraf düzenleme maliyeti
+  FOTOMATIK_TRANSFORM: 1, // Fotomatik görüntü dönüştürme maliyeti
+  FOTOMATIK_DESCRIBE: 1, // Fotomatik prompt üretme maliyeti
 } as const;
 
 // Subscription plans
