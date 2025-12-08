@@ -639,53 +639,73 @@ const ToolPage: React.FC<{
                 <div className="flex flex-wrap justify-center mb-8 gap-3">
                     <button
                         onClick={() => setActiveToolTab('design')}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
+                        className={`flex flex-col items-center gap-1 px-5 py-3 rounded-xl text-sm font-bold transition-all ${
                             activeToolTab === 'design'
                                 ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
                         }`}
                     >
-                        <SparklesIcon />
-                        <span className="hidden sm:inline">Canlı Model & Video</span>
-                        <span className="sm:hidden">Model</span>
+                        <div className="flex items-center gap-2">
+                            <SparklesIcon />
+                            <span className="hidden sm:inline">Canlı Model & Video</span>
+                            <span className="sm:hidden">Model</span>
+                        </div>
+                        <span className={`text-xs ${activeToolTab === 'design' ? 'text-cyan-200' : 'text-slate-500'}`}>
+                            Model: 1₺ • Video: 3₺
+                        </span>
                     </button>
                     <button
                         onClick={() => setActiveToolTab('technical')}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
+                        className={`flex flex-col items-center gap-1 px-5 py-3 rounded-xl text-sm font-bold transition-all ${
                             activeToolTab === 'technical'
                                 ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
                         }`}
                     >
-                        <PencilIcon />
-                        <span className="hidden sm:inline">Teknik Çizim (Tech Pack)</span>
-                        <span className="sm:hidden">Tech Pack</span>
+                        <div className="flex items-center gap-2">
+                            <PencilIcon />
+                            <span className="hidden sm:inline">Teknik Çizim (Tech Pack)</span>
+                            <span className="sm:hidden">Tech Pack</span>
+                        </div>
+                        <span className={`text-xs ${activeToolTab === 'technical' ? 'text-purple-200' : 'text-slate-500'}`}>
+                            1 kredi/işlem
+                        </span>
                     </button>
                     <button
                         onClick={() => setActiveToolTab('pixshop')}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
+                        className={`flex flex-col items-center gap-1 px-5 py-3 rounded-xl text-sm font-bold transition-all ${
                             activeToolTab === 'pixshop'
                                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
                         }`}
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        Pixshop
+                        <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Pixshop
+                        </div>
+                        <span className={`text-xs ${activeToolTab === 'pixshop' ? 'text-blue-200' : 'text-slate-500'}`}>
+                            1 kredi/işlem
+                        </span>
                     </button>
                     <button
                         onClick={() => setActiveToolTab('fotomatik')}
-                        className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold transition-all ${
+                        className={`flex flex-col items-center gap-1 px-5 py-3 rounded-xl text-sm font-bold transition-all ${
                             activeToolTab === 'fotomatik'
                                 ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/30'
                                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
                         }`}
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                        </svg>
-                        Fotomatik
+                        <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                            Fotomatik
+                        </div>
+                        <span className={`text-xs ${activeToolTab === 'fotomatik' ? 'text-teal-200' : 'text-slate-500'}`}>
+                            1 kredi/işlem
+                        </span>
                     </button>
                 </div>
 
@@ -723,10 +743,13 @@ const ToolPage: React.FC<{
                                         <div className="flex-grow min-h-[200px]">
                                             <ImageUploader onImageUpload={handleTopSketchUpload} imagePreviewUrl={topSketchPreviewUrl} />
                                         </div>
+                                        <div className="mt-2 text-xs text-center text-slate-400">
+                                            Bu işlem <span className="text-cyan-400 font-bold">1 kredi</span> harcar
+                                        </div>
                                         <button
                                             onClick={handleGenerateTopProduct}
                                             disabled={!topSketchFile || isTopProductLoading}
-                                            className={`w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                                            className={`w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                                                 !topSketchFile || isTopProductLoading
                                                     ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
                                                     : 'bg-cyan-600 text-white hover:bg-cyan-500'
@@ -768,10 +791,13 @@ const ToolPage: React.FC<{
                                         <div className="flex-grow min-h-[200px]">
                                             <ImageUploader onImageUpload={handleBottomSketchUpload} imagePreviewUrl={bottomSketchPreviewUrl} />
                                         </div>
+                                        <div className="mt-2 text-xs text-center text-slate-400">
+                                            Bu işlem <span className="text-cyan-400 font-bold">1 kredi</span> harcar
+                                        </div>
                                         <button
                                             onClick={handleGenerateBottomProduct}
                                             disabled={!bottomSketchFile || isBottomProductLoading}
-                                            className={`w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                                            className={`w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                                                 !bottomSketchFile || isBottomProductLoading
                                                     ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
                                                     : 'bg-purple-600 text-white hover:bg-purple-500'
@@ -858,16 +884,19 @@ const ToolPage: React.FC<{
                                         </div>
                                     )}
                                     
+                                    <div className="mt-2 text-xs text-center text-slate-400">
+                                        Bu işlem <span className="text-cyan-400 font-bold">1 kredi</span> harcar
+                                    </div>
                                     <button
                                         onClick={handleGenerateProductClick}
                                         disabled={!uploadedSketchFile || isProductLoading}
-                                        className={`w-full mt-4 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                                        className={`w-full mt-2 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                                             !uploadedSketchFile || isProductLoading
                                                 ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
                                                 : 'bg-blue-600 text-white hover:bg-blue-500'
                                         }`}
                                     >
-                                        {isProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür ->'}
+                                        {isProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür →'}
                                     </button>
                                 </div>
 
@@ -1196,6 +1225,15 @@ const ToolPage: React.FC<{
                                     </div>
                                 </div>
 
+                                <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 text-center">
+                                    <span className="text-sm text-slate-300">
+                                        Canlı Model: <span className="text-cyan-400 font-bold text-lg">1 kredi</span>
+                                    </span>
+                                    <span className="text-xs text-slate-400 block mt-1">
+                                        Mevcut krediniz: <span className="text-cyan-400 font-semibold">{profile.credits}</span>
+                                    </span>
+                                </div>
+
                                 <button
                                     onClick={handleGenerateModelClick}
                                     disabled={
@@ -1297,10 +1335,19 @@ const ToolPage: React.FC<{
                                     </div>
                                 )}
                                 
+                                <div className="mt-4 bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 text-center">
+                                    <span className="text-sm text-slate-300">
+                                        Bu işlem <span className="text-purple-400 font-bold text-lg">1 kredi</span> harcar
+                                    </span>
+                                    <span className="text-xs text-slate-400 block mt-1">
+                                        Mevcut krediniz: <span className="text-purple-400 font-semibold">{profile.credits}</span>
+                                    </span>
+                                </div>
+
                                 <button
                                     onClick={handleGenerateTechSketch}
                                     disabled={!techInputFile || isTechLoading}
-                                    className={`w-full mt-6 py-4 px-6 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all transform hover:scale-105 ${
+                                    className={`w-full mt-2 py-4 px-6 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all transform hover:scale-105 ${
                                         !techInputFile || isTechLoading
                                             ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
                                             : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'

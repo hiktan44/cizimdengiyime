@@ -805,22 +805,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
 
           {/* Info Box */}
-          <div className="mt-12 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl p-6 max-w-3xl mx-auto">
+          <div className="mt-12 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl p-6 max-w-4xl mx-auto">
             <div className="flex items-start gap-4">
               <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="flex-1">
-                <h4 className="text-lg font-semibold text-white mb-2">
-                  {language === 'tr' ? '💡 Nasıl Çalışır?' : '💡 How It Works?'}
+                <h4 className="text-lg font-semibold text-white mb-3">
+                  {language === 'tr' ? '💡 Kredi Kullanımı' : '💡 Credit Usage'}
                 </h4>
-                <ul className="space-y-2 text-slate-300 text-sm">
-                  <li>• {language === 'tr' ? 'Çizim → Ürün: 1 kredi' : 'Sketch → Product: 1 credit'}</li>
-                  <li>• {language === 'tr' ? 'Ürün → Model: 1 kredi' : 'Product → Model: 1 credit'}</li>
-                  <li>• {language === 'tr' ? 'Video Oluşturma: 3 kredi' : 'Video Generation: 3 credits'}</li>
-                  <li>• {language === 'tr' ? 'Yeni üyeler 10 ücretsiz kredi ile başlar' : 'New members start with 10 free credits'}</li>
-                  <li>• {language === 'tr' ? 'Krediler hiç bitmez, istediğiniz zaman kullanın' : 'Credits never expire, use them anytime'}</li>
-                </ul>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="text-cyan-400 font-semibold text-sm mb-2">
+                      {language === 'tr' ? '🎨 Canlı Model & Video' : '🎨 Live Model & Video'}
+                    </h5>
+                    <ul className="space-y-1 text-slate-300 text-sm">
+                      <li>• {language === 'tr' ? 'Çizim → Ürün: 1 kredi' : 'Sketch → Product: 1 credit'}</li>
+                      <li>• {language === 'tr' ? 'Ürün → Model: 1 kredi' : 'Product → Model: 1 credit'}</li>
+                      <li>• {language === 'tr' ? 'Video Oluşturma: 3 kredi' : 'Video Generation: 3 credits'}</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 className="text-cyan-400 font-semibold text-sm mb-2">
+                      {language === 'tr' ? '⚡ Diğer Modüller' : '⚡ Other Modules'}
+                    </h5>
+                    <ul className="space-y-1 text-slate-300 text-sm">
+                      <li>• {language === 'tr' ? 'Teknik Çizim: 1 kredi' : 'Tech Drawing: 1 credit'}</li>
+                      <li>• {language === 'tr' ? 'Pixshop (Düzenleme): 1 kredi' : 'Pixshop (Edit): 1 credit'}</li>
+                      <li>• {language === 'tr' ? 'Fotomatik: 1 kredi' : 'Fotomatik: 1 credit'}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-cyan-500/20">
+                  <ul className="space-y-1 text-slate-300 text-sm">
+                    <li>✨ {language === 'tr' ? 'Yeni üyeler 10 ücretsiz kredi ile başlar' : 'New members start with 10 free credits'}</li>
+                    <li>♾️ {language === 'tr' ? 'Krediler hiç bitmez, istediğiniz zaman kullanın' : 'Credits never expire, use them anytime'}</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
