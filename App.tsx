@@ -1386,7 +1386,7 @@ const ToolPage: React.FC<{
 };
 
 const App: React.FC = () => {
-    const { user, profile, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, refreshProfile } = useAuth();
+    const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, refreshProfile, retryAuth } = useAuth();
     const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
@@ -1650,32 +1650,69 @@ const App: React.FC = () => {
         });
     }, [user, profile, loading]);
 
+    // Auto-retry effect when user exists but profile is missing
+    // IMPORTANT: This hook must be defined BEFORE any conditional returns
+    React.useEffect(() => {
+        if (user && !profile && !loading) {
+            const timer = setTimeout(() => {
+                console.log('🔄 Profile otomatik retry...');
+                retryAuth();
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [user, profile, loading, retryAuth]);
+
+    // Loading state - show spinner
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-                <div className="text-center">
+                <div className="text-center max-w-sm px-4">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mb-4"></div>
                     <p className="text-slate-400">Yükleniyor...</p>
-                    <p className="text-slate-500 text-sm mt-2">Kullanıcı bilgileri alınıyor...</p>
+                    <p className="text-slate-500 text-sm mt-2">
+                        {authError ? authError : 'Kullanıcı bilgileri alınıyor...'}
+                    </p>
+                    {authError && (
+                        <button
+                            onClick={retryAuth}
+                            className="mt-4 px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition text-sm"
+                        >
+                            Tekrar Dene
+                        </button>
+                    )}
+                    <p className="text-slate-600 text-xs mt-4">
+                        Bağlantı yavaşsa otomatik olarak yeniden denenecek
+                    </p>
                 </div>
             </div>
         );
     }
 
-    // If user is logged in but profile is not loaded, show specific message
+    // If user is logged in but profile is not loaded, show specific message with auto-retry
     if (user && !profile && !loading) {
         return (
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center max-w-md p-8">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mb-4"></div>
                     <h2 className="text-white text-xl font-bold mb-2">Profil oluşturuluyor...</h2>
-                    <p className="text-slate-400 mb-4">İlk girişiniz için hesap bilgileriniz hazırlanıyor. Bu birkaç saniye sürebilir.</p>
-                    <button 
-                        onClick={() => window.location.reload()} 
-                        className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition"
-                    >
-                        Sayfayı Yenile
-                    </button>
+                    <p className="text-slate-400 mb-4">
+                        {authError ? authError : 'İlk girişiniz için hesap bilgileriniz hazırlanıyor. Bu birkaç saniye sürebilir.'}
+                    </p>
+                    <p className="text-slate-500 text-sm mb-4">Otomatik olarak yeniden deneniyor...</p>
+                    <div className="flex gap-3 justify-center">
+                        <button 
+                            onClick={retryAuth} 
+                            className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition"
+                        >
+                            Tekrar Dene
+                        </button>
+                        <button 
+                            onClick={() => window.location.reload()} 
+                            className="px-6 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+                        >
+                            Sayfayı Yenile
+                        </button>
+                    </div>
                 </div>
             </div>
         );

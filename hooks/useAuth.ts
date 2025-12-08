@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase, Profile } from '../lib/supabase';
 
@@ -7,279 +7,275 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  
+  const mountedRef = useRef(true);
+  const initializingRef = useRef(false);
+  const profileSubscriptionRef = useRef<any>(null);
 
-  useEffect(() => {
-    let mounted = true;
-    let profileSubscription: any = null;
+  // Timeout ile Supabase sorgusu
+  const queryWithTimeout = async <T>(
+    queryFn: () => Promise<{ data: T | null; error: any }>,
+    timeoutMs: number = 8000
+  ): Promise<{ data: T | null; error: any }> => {
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        console.log(`⏰ Sorgu ${timeoutMs}ms içinde tamamlanamadı`);
+        resolve({ data: null, error: { code: 'TIMEOUT', message: 'Sorgu zaman aşımına uğradı' } });
+      }, timeoutMs);
 
-    const initAuth = async () => {
-      try {
-        console.log('🔐 Initializing auth...');
-        console.log('⏳ Waiting for auth state change events...');
+      queryFn()
+        .then((result) => {
+          clearTimeout(timer);
+          resolve(result);
+        })
+        .catch((err) => {
+          clearTimeout(timer);
+          resolve({ data: null, error: err });
+        });
+    });
+  };
 
-        // Don't call getSession here - let onAuthStateChange handle it
-        // This avoids lock conflicts
+  // Profile'ı getir veya oluştur
+  const fetchOrCreateProfile = useCallback(async (userId: string, userEmail?: string, userMetadata?: any): Promise<Profile | null> => {
+    if (!mountedRef.current) return null;
+    
+    console.log('👤 Profile getiriliyor:', userId);
+    
+    try {
+      // Önce mevcut profile'ı kontrol et (timeout ile)
+      console.log('🔍 Veritabanı sorgusu başlatılıyor...');
+      const { data: existingProfile, error: fetchError } = await queryWithTimeout(() =>
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle()
+      );
 
-        // Clean up OAuth hash from URL
-        if (window.location.hash && window.location.hash.includes('access_token')) {
-          console.log('🔗 Cleaning OAuth hash from URL...');
-          window.history.replaceState({}, document.title, window.location.pathname);
+      console.log('📦 Sorgu sonucu:', { hasData: !!existingProfile, error: fetchError?.code });
+
+      if (fetchError) {
+        if (fetchError.code === 'TIMEOUT') {
+          console.error('❌ Veritabanı bağlantısı zaman aşımına uğradı');
+          return null;
         }
-
-        // Set a timeout to handle cases where no auth event fires
-        setTimeout(() => {
-          if (mounted && loading && !user) {
-            console.log('⏰ No auth event received, stopping loading...');
-            setLoading(false);
-          }
-        }, 3000);
-      } catch (error) {
-        console.error('Init auth error:', error);
-        if (mounted) {
-          setLoading(false);
+        if (fetchError.code !== 'PGRST116') {
+          console.error('❌ Profile fetch hatası:', fetchError);
+          throw fetchError;
         }
       }
-    };
 
-    initAuth();
+      if (existingProfile) {
+        console.log('✅ Mevcut profile bulundu:', existingProfile.email);
+        return existingProfile;
+      }
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔔 Auth event:', event, session?.user?.email);
+      // Profile yoksa oluştur
+      console.log('🆕 Profile oluşturuluyor...');
+      const newProfile = {
+        id: userId,
+        email: userEmail || '',
+        full_name: userMetadata?.full_name || userMetadata?.name || '',
+        avatar_url: userMetadata?.avatar_url || userMetadata?.picture || null,
+        subscription_tier: 'free' as const,
+        credits: 10,
+      };
 
-      if (!mounted) return;
+      const { data: createdProfile, error: createError } = await queryWithTimeout(() =>
+        supabase
+          .from('profiles')
+          .insert([newProfile])
+          .select()
+          .single()
+      );
 
-      // Ignore SIGNED_IN during initialization (handled by initAuth)
-      // Only handle INITIAL_SESSION after page reload
-      if (event === 'SIGNED_IN' && !session) {
-        console.log('⏭️ Skipping SIGNED_IN without session');
+      if (createError) {
+        // Profile zaten varsa tekrar dene
+        if (createError.code === '23505') {
+          console.log('⚠️ Profile zaten var, tekrar getiriliyor...');
+          const { data: retryProfile } = await queryWithTimeout(() =>
+            supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', userId)
+              .single()
+          );
+          return retryProfile;
+        }
+        console.error('❌ Profile oluşturma hatası:', createError);
+        return null;
+      }
+
+      console.log('✅ Yeni profile oluşturuldu');
+      return createdProfile;
+    } catch (error) {
+      console.error('❌ Profile işlemi hatası:', error);
+      return null;
+    }
+  }, []);
+
+  // Ana başlatma fonksiyonu
+  const initialize = useCallback(async () => {
+    if (initializingRef.current) {
+      console.log('⏭️ Zaten başlatılıyor, atlanıyor...');
+      return;
+    }
+    
+    initializingRef.current = true;
+    console.log('🔐 Auth başlatılıyor...');
+    
+    try {
+      // URL'den OAuth hash'i temizle
+      if (window.location.hash?.includes('access_token')) {
+        console.log('🔗 OAuth hash temizleniyor...');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      // Session'ı al
+      console.log('📡 Session alınıyor...');
+      const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+      console.log('📡 Session sonucu:', { hasSession: !!currentSession, error: sessionError?.message });
+      
+      if (sessionError) {
+        console.error('❌ Session hatası:', sessionError);
+        setAuthError('Oturum bilgisi alınamadı');
+        setLoading(false);
+        initializingRef.current = false;
         return;
       }
 
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      // Only fetch profile on specific events
-      if (session?.user && (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED')) {
-        console.log('✅ Valid event for profile fetch:', event);
-        // Wait for session to fully propagate before fetching
-        await new Promise(resolve => setTimeout(resolve, 800));
-        await fetchProfile(session.user.id);
-
-        // Setup realtime subscription for profile updates
-        if (!profileSubscription && mounted) {
-          console.log('🔴 Setting up realtime subscription for profile updates');
-          profileSubscription = supabase
-            .channel('profile-changes')
-            .on(
-              'postgres_changes',
-              {
-                event: 'UPDATE',
-                schema: 'public',
-                table: 'profiles',
-                filter: `id=eq.${session.user.id}`,
-              },
-              (payload) => {
-                console.log('🔄 Profile updated via realtime:', payload.new);
-                if (mounted) {
-                  setProfile(payload.new as Profile);
-                }
-              }
-            )
-            .subscribe();
-        }
-      } else if (!session) {
+      if (!currentSession) {
+        console.log('ℹ️ Aktif oturum yok');
+        setUser(null);
+        setSession(null);
         setProfile(null);
         setLoading(false);
-        // Unsubscribe from realtime if user logs out
-        if (profileSubscription) {
-          profileSubscription.unsubscribe();
-          profileSubscription = null;
+        initializingRef.current = false;
+        return;
+      }
+
+      console.log('✅ Session bulundu:', currentSession.user.email);
+      setUser(currentSession.user);
+      setSession(currentSession);
+
+      // Küçük bir bekleme - session'ın Supabase tarafında kaydedilmesi için
+      console.log('⏳ Session stabilizasyonu için 500ms bekleniyor...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Profile'ı getir
+      console.log('🚀 Profile sorgusu başlatılıyor...');
+      const userProfile = await fetchOrCreateProfile(
+        currentSession.user.id,
+        currentSession.user.email,
+        currentSession.user.user_metadata
+      );
+      console.log('🏁 Profile sorgusu tamamlandı:', !!userProfile);
+
+      if (mountedRef.current) {
+        if (userProfile) {
+          setProfile(userProfile);
+          setAuthError(null);
+          console.log('✅ Auth tamamlandı:', userProfile.email, 'Kredi:', userProfile.credits);
+        } else {
+          setAuthError('Profil yüklenemedi. Lütfen tekrar deneyin.');
+        }
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('❌ Auth başlatma hatası:', error);
+      if (mountedRef.current) {
+        setAuthError('Bağlantı hatası oluştu');
+        setLoading(false);
+      }
+    } finally {
+      initializingRef.current = false;
+    }
+  }, [fetchOrCreateProfile]);
+
+  // Component mount
+  useEffect(() => {
+    mountedRef.current = true;
+    
+    // İlk başlatma
+    initialize();
+
+    // Auth state değişikliklerini dinle
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      console.log('🔔 Auth event:', event, newSession?.user?.email);
+      
+      if (!mountedRef.current) return;
+
+      // INITIAL_SESSION ve SIGNED_IN - initialize() zaten hallediyor, atla
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        console.log('⏭️ Event atlanıyor, initialize() hallediyor:', event);
+        return;
+      }
+
+      // Çıkış yapıldı
+      if (event === 'SIGNED_OUT' || !newSession) {
+        console.log('👋 Çıkış yapıldı');
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+        setAuthError(null);
+        
+        // Realtime subscription'ı kaldır
+        if (profileSubscriptionRef.current) {
+          profileSubscriptionRef.current.unsubscribe();
+          profileSubscriptionRef.current = null;
+        }
+        return;
+      }
+
+      // Token yenileme - sadece bu durumda profile güncelle
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('🔄 Token yenilendi');
+        setUser(newSession.user);
+        setSession(newSession);
+        // Profile zaten var, sadece refresh et
+        if (profile) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', newSession.user.id)
+            .single();
+          if (data && mountedRef.current) {
+            setProfile(data);
+          }
         }
       }
     });
 
     return () => {
-      mounted = false;
+      console.log('🧹 Auth cleanup...');
+      mountedRef.current = false;
+      initializingRef.current = false; // Reset for Strict Mode remount
       subscription.unsubscribe();
-      if (profileSubscription) {
-        profileSubscription.unsubscribe();
+      if (profileSubscriptionRef.current) {
+        profileSubscriptionRef.current.unsubscribe();
+        profileSubscriptionRef.current = null;
       }
     };
-  }, []);
+  }, [initialize, fetchOrCreateProfile]);
 
-  const fetchProfile = async (userId: string, retryCount = 0) => {
-    const maxRetries = 3;
-    const retryDelay = 1500;
+  // Manuel yeniden deneme
+  const retryAuth = useCallback(async () => {
+    console.log('🔄 Manuel retry başlatıldı...');
+    setLoading(true);
+    setAuthError(null);
+    initializingRef.current = false; // Reset flag
+    await initialize();
+  }, [initialize]);
 
-    try {
-      console.log(`👤 Fetching profile for user: ${userId} (attempt ${retryCount + 1}/${maxRetries + 1})`);
-
-      // Wait before retry to let session settle
-      if (retryCount > 0) {
-        console.log(`⏳ Waiting ${retryDelay}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, retryDelay));
-      }
-
-      console.log('🔑 Fetching profile from database...');
-
-      // Add timeout to prevent infinite hanging
-      const fetchPromise = supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      const timeoutPromise = new Promise<{ data: null, error: any }>((resolve) =>
-        setTimeout(() => {
-          console.log('⏰ Profile fetch timeout after 5s');
-          resolve({ data: null, error: { code: 'TIMEOUT', message: 'Request timeout' } });
-        }, 5000)
-      );
-
-      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
-
-      console.log('📦 Profile fetch result:', {
-        hasData: !!data,
-        errorCode: error?.code,
-        errorMessage: error?.message,
-        errorDetails: error?.details
-      });
-
-      // If profile doesn't exist, create it
-      if (error) {
-        if (error.code === 'PGRST116') {
-          console.log('🆕 Profile not found (PGRST116), creating...');
-          await createProfile(userId);
-          return;
-        }
-
-        // If it's a timeout, retry
-        if (error.code === 'TIMEOUT') {
-          if (retryCount < maxRetries) {
-            console.log(`⏰ Timeout occurred, retrying (${retryCount + 1}/${maxRetries})...`);
-            return fetchProfile(userId, retryCount + 1);
-          } else {
-            console.error('❌ Profile fetch timeout after all retries, creating profile...');
-            await createProfile(userId);
-            return;
-          }
-        }
-
-        // If it's a network error, retry
-        if (retryCount < maxRetries) {
-          console.log(`⏳ Retrying profile fetch after error (${retryCount + 1}/${maxRetries})...`);
-          return fetchProfile(userId, retryCount + 1);
-        }
-
-        console.error('❌ Profile fetch error after retries:', error);
-        await createProfile(userId);
-        return;
-      }
-
-      if (!data) {
-        console.log('❌ No profile data returned, creating...');
-        await createProfile(userId);
-        return;
-      }
-
-      console.log('✅ Profile loaded:', data.email, 'Credits:', data.credits);
-      setProfile(data);
-      setLoading(false);
-    } catch (error: any) {
-      console.error('❌ Unexpected error fetching profile:', error.message, error);
-
-      // Retry on unexpected errors
-      if (retryCount < maxRetries) {
-        console.log(`⏳ Retrying after unexpected error (${retryCount + 1}/${maxRetries})...`);
-        return fetchProfile(userId, retryCount + 1);
-      }
-
-      console.log('🆕 Creating profile after all retries failed...');
-      await createProfile(userId);
-    }
-  };
-
-  const createProfile = async (userId: string) => {
-    try {
-      console.log('🔨 Creating profile for user:', userId);
-
-      // Get user data from auth
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        console.error('❌ User not found when creating profile:', userError);
-        setLoading(false);
-        return;
-      }
-
-      console.log('📝 User email:', user.email);
-      console.log('📝 User metadata:', user.user_metadata);
-
-      const newProfile = {
-        id: userId,
-        email: user.email || '',
-        full_name: user.user_metadata?.full_name || user.user_metadata?.name || '',
-        avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
-        subscription_tier: 'free' as const,
-        credits: 10,
-      };
-
-      console.log('📤 Inserting profile:', newProfile);
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert([newProfile])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('❌ Error creating profile:', error);
-        console.error('Error details:', JSON.stringify(error, null, 2));
-
-        // Check if profile already exists
-        if (error.code === '23505') {
-          console.log('⚠️ Profile already exists, fetching it...');
-          const { data: existingProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
-
-          if (existingProfile) {
-            console.log('✅ Found existing profile:', existingProfile);
-            setProfile(existingProfile);
-            setLoading(false);
-            return;
-          }
-        }
-
-        setLoading(false);
-        alert('Profil oluşturulamadı. Lütfen sayfayı yenileyin veya tekrar giriş yapın.');
-        return;
-      }
-
-      console.log('✅ Profile created successfully:', data);
-      setProfile(data);
-      setLoading(false);
-
-    } catch (error) {
-      console.error('❌ Unexpected error in createProfile:', error);
-      setLoading(false);
-      alert('Beklenmeyen bir hata oluştu. Lütfen sayfayı yenileyin.');
-    }
-  };
-
+  // Google ile giriş
   const signInWithGoogle = async () => {
     try {
-      console.log('Starting Google sign in...');
-
-      // Production domain'i veya localhost'u otomatik algıla
+      console.log('🔵 Google ile giriş başlatılıyor...');
       const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
 
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${redirectUrl}/`,
@@ -290,61 +286,65 @@ export function useAuth() {
         },
       });
 
-      if (error) {
-        console.error('Error signing in with Google:', error);
-        throw error;
-      }
-
-      console.log('Google OAuth initiated:', data);
+      if (error) throw error;
     } catch (error) {
-      console.error('Google sign in failed:', error);
+      console.error('❌ Google giriş hatası:', error);
       alert('Google ile giriş yapılamadı. Lütfen tekrar deneyin.');
     }
   };
 
+  // Email ile giriş
   const signInWithEmail = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
   };
 
+  // Email ile kayıt
   const signUpWithEmail = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: {
-          full_name: fullName,
-        },
+        data: { full_name: fullName },
       },
     });
     if (error) throw error;
     return data;
   };
 
+  // Çıkış
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) console.error('Error signing out:', error);
+    if (error) console.error('❌ Çıkış hatası:', error);
   };
 
-  const refreshProfile = () => {
-    if (user) {
-      fetchProfile(user.id);
+  // Profile'ı yenile
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    if (data && mountedRef.current) {
+      setProfile(data);
     }
-  };
+  }, [user]);
 
   return {
     user,
     session,
     profile,
     loading,
+    authError,
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,
     signOut,
     refreshProfile,
+    retryAuth,
   };
 }
