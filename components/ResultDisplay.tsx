@@ -25,7 +25,7 @@ const LoadingState: React.FC<{text: string, progress: number}> = ({text, progres
         <div className="relative">
              <div className="w-20 h-20 border-4 border-slate-700 border-t-cyan-400 rounded-full animate-spin"></div>
              <div className="absolute inset-0 flex items-center justify-center font-bold text-cyan-400 text-sm">
-                 {progress}%
+                 {Math.round(progress)}%
              </div>
         </div>
        
@@ -34,7 +34,7 @@ const LoadingState: React.FC<{text: string, progress: number}> = ({text, progres
             <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden border border-slate-600">
                 <div 
                     className="bg-gradient-to-r from-cyan-500 to-purple-500 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(6,182,212,0.5)]"
-                    style={{ width: `${Math.max(5, progress)}%` }}
+                    style={{ width: `${Math.max(5, Math.round(progress))}%` }}
                 />
             </div>
             <p className="text-xs text-slate-500">İşlem yoğunluğuna göre süre değişebilir.</p>

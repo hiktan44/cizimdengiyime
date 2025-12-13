@@ -23,12 +23,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
     setLoading(true);
 
     try {
@@ -37,10 +39,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       } else {
         await onEmailSignUp(email, password, fullName);
       }
-      onClose();
+      
+      // Başarılı! Kısa bir başarı mesajı göster
+      setSuccess(true);
+      
+      // 1 saniye sonra modal'ı kapat
+      setTimeout(() => {
+        onClose();
+        // Modal kapandığında state'i sıfırla
+        setTimeout(() => {
+          setSuccess(false);
+          setEmail('');
+          setPassword('');
+          setFullName('');
+        }, 300);
+      }, 1000);
     } catch (err: any) {
-      setError(err.message || 'Bir hata oluştu');
-    } finally {
+      // Hata mesajını göster (zaten Türkçeleştirilmiş olarak gelecek)
+      setError(err.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
       setLoading(false);
     }
   };
@@ -60,8 +76,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </h2>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg mb-4 text-sm">
-            {error}
+          <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg mb-4 text-sm flex items-start gap-2">
+            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
+
+        {success && (
+          <div className="bg-green-500/10 border border-green-500/50 text-green-400 px-4 py-3 rounded-lg mb-4 text-sm flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            {mode === 'signin' ? 'Giriş başarılı! Yönlendiriliyorsunuz...' : 'Hesap başarıyla oluşturuldu! Giriş yapılıyor...'}
           </div>
         )}
 
@@ -136,10 +164,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-cyan-500 hover:to-blue-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || success}
+            className={`w-full px-6 py-3 rounded-lg font-semibold transition disabled:cursor-not-allowed ${
+              success 
+                ? 'bg-green-600 text-white' 
+                : 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50'
+            }`}
           >
-            {loading ? 'İşleniyor...' : mode === 'signin' ? 'Giriş Yap' : 'Hesap Oluştur'}
+            {success ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Başarılı!
+              </span>
+            ) : loading ? (
+              'İşleniyor...'
+            ) : mode === 'signin' ? (
+              'Giriş Yap'
+            ) : (
+              'Hesap Oluştur'
+            )}
           </button>
         </form>
 

@@ -286,30 +286,129 @@ export function useAuth() {
         },
       });
 
-      if (error) throw error;
-    } catch (error) {
+      if (error) {
+        const translatedError = translateAuthError(error);
+        throw new Error(translatedError);
+      }
+    } catch (error: any) {
       console.error('❌ Google giriş hatası:', error);
-      alert('Google ile giriş yapılamadı. Lütfen tekrar deneyin.');
+      alert(error.message || 'Google ile giriş yapılamadı. Lütfen tekrar deneyin.');
     }
+  };
+
+  // Hata mesajlarını Türkçeleştir
+  const translateAuthError = (error: any): string => {
+    const errorMessage = error.message || '';
+    
+    // Supabase auth hatalarını Türkçeye çevir
+    if (errorMessage.includes('Invalid login credentials')) {
+      return 'Geçersiz giriş bilgileri. E-posta veya şifrenizi kontrol edin.';
+    }
+    if (errorMessage.includes('User already registered')) {
+      return 'Bu e-posta adresi zaten kayıtlı. Giriş yapmayı deneyin.';
+    }
+    if (errorMessage.includes('Email not confirmed')) {
+      return 'E-posta adresiniz doğrulanmamış. Lütfen e-postanızı kontrol edin.';
+    }
+    if (errorMessage.includes('Password should be at least')) {
+      return 'Şifreniz en az 6 karakter olmalıdır.';
+    }
+    if (errorMessage.includes('Unable to validate email address')) {
+      return 'E-posta adresi doğrulanamadı. Geçerli bir e-posta girin.';
+    }
+    if (errorMessage.includes('Invalid email')) {
+      return 'Geçersiz e-posta adresi.';
+    }
+    if (errorMessage.includes('Signup requires a valid password')) {
+      return 'Lütfen geçerli bir şifre girin.';
+    }
+    if (errorMessage.includes('User not found')) {
+      return 'Kullanıcı bulunamadı.';
+    }
+    if (errorMessage.includes('Email rate limit exceeded')) {
+      return 'Çok fazla deneme yaptınız. Lütfen bir süre bekleyin.';
+    }
+    
+    // Genel hata mesajı
+    return errorMessage || 'Bir hata oluştu. Lütfen tekrar deneyin.';
   };
 
   // Email ile giriş
   const signInWithEmail = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    console.log('📧 Email ile giriş yapılıyor...');
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      const translatedError = new Error(translateAuthError(error));
+      throw translatedError;
+    }
+    
+    // Session oluştu, profile'ı yükle
+    console.log('✅ Giriş başarılı, profile yükleniyor...');
+    setLoading(true);
+    
+    if (data.session && data.user) {
+      setUser(data.user);
+      setSession(data.session);
+      
+      // Küçük bir gecikme ekle - session'ın stabilize olması için
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const userProfile = await fetchOrCreateProfile(
+        data.user.id,
+        data.user.email,
+        data.user.user_metadata
+      );
+      
+      if (mountedRef.current && userProfile) {
+        setProfile(userProfile);
+        setAuthError(null);
+        console.log('✅ Profile yüklendi:', userProfile.email);
+      }
+    }
+    setLoading(false);
   };
 
   // Email ile kayıt
   const signUpWithEmail = async (email: string, password: string, fullName: string) => {
+    console.log('📧 Email ile kayıt yapılıyor...');
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { full_name: fullName },
       },
     });
-    if (error) throw error;
+    if (error) {
+      const translatedError = new Error(translateAuthError(error));
+      throw translatedError;
+    }
+    
+    // Email doğrulama kapalı olduğu için direkt giriş yapılabilir
+    // Session otomatik olarak oluşturulacak
+    console.log('✅ Kayıt başarılı, profile yükleniyor...');
+    setLoading(true);
+    
+    if (data.session && data.user) {
+      setUser(data.user);
+      setSession(data.session);
+      
+      // Küçük bir gecikme ekle - session'ın stabilize olması için
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const userProfile = await fetchOrCreateProfile(
+        data.user.id,
+        data.user.email,
+        data.user.user_metadata
+      );
+      
+      if (mountedRef.current && userProfile) {
+        setProfile(userProfile);
+        setAuthError(null);
+        console.log('✅ Profile oluşturuldu:', userProfile.email);
+      }
+    }
+    setLoading(false);
+    
     return data;
   };
 
