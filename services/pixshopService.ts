@@ -182,7 +182,10 @@ export const pixshopRemoveBackground = async (
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     
     const originalImagePart = await fileToPart(originalImage);
-    const prompt = `Remove the background from this image. Return a PNG with a transparent background. Preserve the main subject perfectly.`;
+    const prompt = `Remove the background from this image. 
+Return ONLY the main subject with a fully transparent background (alpha channel). 
+Ensure there are no background artifacts or white outlines. 
+The output MUST be a transparent PNG.`;
     
     const textPart = { text: prompt };
 

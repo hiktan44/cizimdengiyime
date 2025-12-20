@@ -85,16 +85,28 @@ export const fotomatikGenerateEditedImage = async (
   }
 };
 
+export interface PromptAnalysisResponse {
+  tr: string;
+  en: string;
+  midjourney: string;
+  stableDiffusion: {
+    positive: string;
+    negative: string;
+    params: string;
+  };
+  tips: string[];
+}
+
 /**
- * Görüntüden prompt üretir (Describe modu)
+ * Görüntüden gelişmiş prompt üretir (Describe modu)
  * @param imageBase64 Base64 formatında görüntü verisi
  * @param mimeType Görüntü MIME tipi
- * @returns Türkçe ve İngilizce prompt'lar
+ * @returns Türkçe/İngilizce prompt'lar + Midjourney + Stable Diffusion optimizasyonları
  */
 export const fotomatikGenerateImagePrompt = async (
   imageBase64: string,
   mimeType: string
-): Promise<{ tr: string; en: string }> => {
+): Promise<PromptAnalysisResponse> => {
   if (!API_KEY) {
     throw new Error("API Key is missing.");
   }
@@ -103,7 +115,7 @@ export const fotomatikGenerateImagePrompt = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: {
         parts: [
           {
@@ -113,19 +125,22 @@ export const fotomatikGenerateImagePrompt = async (
             },
           },
           {
-            text: `Analyze this image in extreme technical and artistic detail to create a prompt for an AI image generator. 
-            Focus on:
-            1. Camera angle and shot type (e.g., wide angle, close-up, low angle).
-            2. Lighting (e.g., natural, studio, cinematic, golden hour, shadows).
-            3. Environment and background details.
-            4. Art style (e.g., photorealistic, oil painting, cyberpunk).
-            5. Subject details (pose, expression, clothing).
+            text: `Analyze this image in extreme technical and artistic detail to create high-end prompts for AI image generators. 
             
-            Return a JSON object with two keys:
-            - "tr": A detailed prompt in Turkish.
-            - "en": A detailed prompt in English.
+            Return a JSON object with the following structure:
+            {
+              "tr": "Detailed artistic analysis in Turkish",
+              "en": "Standard technical prompt in English",
+              "midjourney": "Optimized Midjourney V6 prompt including relevant parameters like --ar, --stylize, --chaos based on image analysis",
+              "stableDiffusion": {
+                "positive": "Masterpiece level positive prompt for SDXL/Pony/Flux",
+                "negative": "Standard negative prompt to avoid artifacts",
+                "params": "Recommended Sampler, CFG Scale and Steps"
+              },
+              "tips": ["3 expert tips to improve this specific style of image (e.g., lens choice, lighting setup, keyword emphasis)"]
+            }
             
-            Do not include markdown formatting or code blocks, just the raw JSON.`
+            Ensure the response is ONLY the JSON object, no markdown, no conversational text.`
           }
         ],
       },
@@ -137,11 +152,7 @@ export const fotomatikGenerateImagePrompt = async (
     const text = response.text;
     if (!text) throw new Error("No text returned from Gemini");
 
-    const json = JSON.parse(text);
-    return {
-      tr: json.tr || "Türkçe açıklama oluşturulamadı.",
-      en: json.en || "Could not generate English description."
-    };
+    return JSON.parse(text);
 
   } catch (error: any) {
     console.error("Prompt Generation Error:", error);
@@ -150,14 +161,16 @@ export const fotomatikGenerateImagePrompt = async (
 };
 
 /**
- * Görüntü için iyileştirme önerileri üretir
+ * Görüntü için iyileştirme önerileri üretir (Mode seçenekleriyle)
  * @param imageBase64 Base64 formatında görüntü verisi
  * @param mimeType Görüntü MIME tipi
+ * @param mode İyileştirme modu: balanced/vibrant/crisp/cinematic
  * @returns İyileştirme parametreleri
  */
 export const fotomatikSuggestEnhancements = async (
   imageBase64: string,
-  mimeType: string
+  mimeType: string,
+  mode: 'balanced' | 'vibrant' | 'crisp' | 'cinematic' = 'balanced'
 ): Promise<{ 
   brightness: number; 
   contrast: number; 
@@ -172,9 +185,16 @@ export const fotomatikSuggestEnhancements = async (
 
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
+  const modeInstructions = {
+    balanced: "Aims for a natural, professional look with balanced exposure and color.",
+    vibrant: "Focuses on boosting color saturation, pop, and lively tones. Make it look energetic.",
+    crisp: "Prioritizes sharpness, micro-contrast, and clarity of fine details and textures.",
+    cinematic: "Targets a film-like quality with deeper shadows, controlled highlights, and dramatic contrast."
+  };
+
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: {
         parts: [
           {
@@ -184,19 +204,19 @@ export const fotomatikSuggestEnhancements = async (
             },
           },
           {
-            text: `You are a professional photo editor. Analyze the provided image to determine the optimal settings to improve its visual appeal, correcting exposure, color balance, and dynamic range.
+            text: `You are a professional photo editor using the "${mode.toUpperCase()}" model strategy. 
+            Strategy Details: ${modeInstructions[mode]}
             
-            Return a JSON object with exactly these keys and integer values based on the following scales:
+            Analyze the image and return a JSON object with these keys and integer values:
             
-            - "brightness": Range 50 to 150. Default is 100. (e.g., 110 brightens, 90 darkens)
-            - "contrast": Range 50 to 150. Default is 100. (e.g., 120 adds contrast)
-            - "saturation": Range 0 to 200. Default is 100. (e.g., 120 boosts color)
-            - "sharpness": Range 0 to 100. Default is 0. (e.g., 20 adds crispness)
-            - "highlights": Range -100 to 100. Default is 0. (Negative values recover blown-out highlights)
-            - "shadows": Range -100 to 100. Default is 0. (Positive values lift dark shadows)
+            - "brightness": 50 to 150 (100 default)
+            - "contrast": 50 to 150 (100 default)
+            - "saturation": 0 to 200 (100 default)
+            - "sharpness": 0 to 100 (0 default)
+            - "highlights": -100 to 100 (0 default)
+            - "shadows": -100 to 100 (0 default)
             
-            Example: { "brightness": 105, "contrast": 110, "saturation": 115, "sharpness": 15, "highlights": -25, "shadows": 20 }
-            `
+            Example: { "brightness": 105, "contrast": 110, "saturation": 115, "sharpness": 15, "highlights": -25, "shadows": 20 }`
           }
         ],
       },

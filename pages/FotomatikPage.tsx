@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { fotomatikGenerateEditedImage, fotomatikGenerateImagePrompt } from '../services/fotomatikService';
+import { fotomatikGenerateEditedImage, fotomatikGenerateImagePrompt, PromptAnalysisResponse } from '../services/fotomatikService';
 import { UploadArea } from '../components/fotomatik/UploadArea';
 import { ResultArea } from '../components/fotomatik/ResultArea';
 import { ImageEditor } from '../components/fotomatik/ImageEditor';
@@ -35,7 +35,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   
   // Describe Mode States
-  const [generatedPrompts, setGeneratedPrompts] = useState<{ tr: string; en: string } | null>(null);
+  const [generatedPrompts, setGeneratedPrompts] = useState<PromptAnalysisResponse | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const aspectRatios = [
@@ -139,7 +139,13 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
           null,
           null,
           null,
-          { promptTr: result.tr, promptEn: result.en }
+          { 
+            promptTr: result.tr, 
+            promptEn: result.en,
+            midjourney: result.midjourney,
+            stableDiffusion: result.stableDiffusion,
+            tips: result.tips
+          }
         );
       }
     } catch (error: any) {
@@ -349,42 +355,122 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
 
                 {/* Generated Prompts */}
                 {generatedPrompts && (
-                  <div className="grid md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4">
-                    {/* Turkish Prompt */}
-                    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-slate-200">🇹🇷 Türkçe</span>
-                        <button
-                          onClick={() => handleCopyPrompt('tr', generatedPrompts.tr)}
-                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                            copiedKey === 'tr'
-                              ? 'bg-green-600 text-white'
-                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                          }`}
-                        >
-                          {copiedKey === 'tr' ? '✓ Kopyalandı' : 'Kopyala'}
-                        </button>
+                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Turkish Prompt */}
+                      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold text-slate-200">🇹🇷 Türkçe</span>
+                          <button
+                            onClick={() => handleCopyPrompt('tr', generatedPrompts.tr)}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                              copiedKey === 'tr'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            }`}
+                          >
+                            {copiedKey === 'tr' ? '✓ Kopyalandı' : 'Kopyala'}
+                          </button>
+                        </div>
+                        <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.tr}</p>
                       </div>
-                      <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.tr}</p>
+
+                      {/* English Prompt */}
+                      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold text-slate-200">🇬🇧 English</span>
+                          <button
+                            onClick={() => handleCopyPrompt('en', generatedPrompts.en)}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                              copiedKey === 'en'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            }`}
+                          >
+                            {copiedKey === 'en' ? '✓ Copied' : 'Copy'}
+                          </button>
+                        </div>
+                        <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.en}</p>
+                      </div>
                     </div>
 
-                    {/* English Prompt */}
-                    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+                    {/* Midjourney Prompt */}
+                    <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-slate-200">🇬🇧 English</span>
+                        <span className="font-semibold text-purple-300">🎨 Midjourney V6</span>
                         <button
-                          onClick={() => handleCopyPrompt('en', generatedPrompts.en)}
+                          onClick={() => handleCopyPrompt('midjourney', generatedPrompts.midjourney)}
                           className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                            copiedKey === 'en'
+                            copiedKey === 'midjourney'
                               ? 'bg-green-600 text-white'
-                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                              : 'bg-purple-700 text-purple-200 hover:bg-purple-600'
                           }`}
                         >
-                          {copiedKey === 'en' ? '✓ Copied' : 'Copy'}
+                          {copiedKey === 'midjourney' ? '✓ Kopyalandı' : 'Kopyala'}
                         </button>
                       </div>
-                      <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.en}</p>
+                      <p className="text-purple-100 text-sm leading-relaxed font-mono">{generatedPrompts.midjourney}</p>
                     </div>
+
+                    {/* Stable Diffusion Prompt */}
+                    <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-semibold text-cyan-300">⚡ Stable Diffusion (SDXL/Flux)</span>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-semibold text-cyan-400">Positive Prompt:</span>
+                            <button
+                              onClick={() => handleCopyPrompt('sd-positive', generatedPrompts.stableDiffusion.positive)}
+                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                                copiedKey === 'sd-positive'
+                                  ? 'bg-green-600 text-white'
+                                  : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
+                              }`}
+                            >
+                              {copiedKey === 'sd-positive' ? '✓' : 'Copy'}
+                            </button>
+                          </div>
+                          <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.positive}</p>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-semibold text-cyan-400">Negative Prompt:</span>
+                            <button
+                              onClick={() => handleCopyPrompt('sd-negative', generatedPrompts.stableDiffusion.negative)}
+                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+                                copiedKey === 'sd-negative'
+                                  ? 'bg-green-600 text-white'
+                                  : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
+                              }`}
+                            >
+                              {copiedKey === 'sd-negative' ? '✓' : 'Copy'}
+                            </button>
+                          </div>
+                          <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.negative}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs font-semibold text-cyan-400">Önerilen Parametreler:</span>
+                          <p className="text-cyan-100 text-xs mt-1">{generatedPrompts.stableDiffusion.params}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expert Tips */}
+                    {generatedPrompts.tips && generatedPrompts.tips.length > 0 && (
+                      <div className="bg-orange-900/20 border border-orange-500/30 rounded-xl p-4">
+                        <span className="font-semibold text-orange-300 mb-3 block">💡 Uzman İpuçları</span>
+                        <ul className="space-y-2">
+                          {generatedPrompts.tips.map((tip, idx) => (
+                            <li key={idx} className="text-orange-100 text-sm flex items-start gap-2">
+                              <span className="text-orange-400 font-bold">{idx + 1}.</span>
+                              <span>{tip}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
