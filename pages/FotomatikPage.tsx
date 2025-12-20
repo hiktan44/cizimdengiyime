@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { fotomatikGenerateEditedImage, fotomatikGenerateImagePrompt, PromptAnalysisResponse } from '../services/fotomatikService';
+import { fotomatikGenerateEditedImage, fotomatikGenerateImagePrompt, fotomatikSuggestEnhancements, PromptAnalysisResponse } from '../services/fotomatikService';
 import { UploadArea } from '../components/fotomatik/UploadArea';
 import { ResultArea } from '../components/fotomatik/ResultArea';
 import { ImageEditor } from '../components/fotomatik/ImageEditor';
@@ -19,7 +19,15 @@ interface FotomatikPageProps {
   onShowBuyCredits?: () => void;
 }
 
-type FotomatikMode = 'transform' | 'describe';
+type FotomatikMode = 'transform' | 'describe' | 'enhance';
+type EnhanceMode = 'balanced' | 'vibrant' | 'crisp' | 'cinematic';
+
+const ENHANCE_MODES: { id: EnhanceMode; label: string; desc: string; icon: string; color: string }[] = [
+  { id: 'balanced', label: 'DENGELİ', desc: 'Standart profesyonel görünüm', icon: '✅', color: 'text-blue-400' },
+  { id: 'vibrant', label: 'CANLI', desc: 'Renkleri ve tonları canlandırır', icon: '🎨', color: 'text-pink-400' },
+  { id: 'crisp', label: 'KESKİN', desc: 'Detayları ve dokuyu belirginleştirir', icon: '🔺', color: 'text-orange-400' },
+  { id: 'cinematic', label: 'SİNEMATİK', desc: 'Dramatik ışık ve gölge dengesi', icon: '🎬', color: 'text-purple-400' },
+];
 
 export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
   const [mode, setMode] = useState<FotomatikMode>('transform');
@@ -37,6 +45,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Describe Mode States
   const [generatedPrompts, setGeneratedPrompts] = useState<PromptAnalysisResponse | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Enhance Mode States
+  const [selectedEnhanceMode, setSelectedEnhanceMode] = useState<EnhanceMode>('balanced');
+  const [enhancedImageUrl, setEnhancedImageUrl] = useState<string | null>(null);
 
   const aspectRatios = [
     { label: 'Kare (1:1)', value: '1:1' },
@@ -155,11 +167,70 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
     }
   }, [selectedImage, profile]);
 
-  const handleCopyPrompt = (key: 'tr' | 'en', text: string) => {
+  const handleCopyPrompt = (key: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
+
+  // Enhance Mode - Apply Enhancements
+  const handleEnhance = useCallback(async () => {
+    if (!selectedImage) {
+      setErrorMessage('Lütfen önce bir görüntü seçin.');
+      return;
+    }
+
+    if (!await checkCredits('fotomatik_transform')) return;
+
+    setStatus(FotomatikAppStatus.LOADING);
+    setErrorMessage(null);
+    setEnhancedImageUrl(null);
+
+    try {
+      // Get AI suggested enhancements
+      const suggestions = await fotomatikSuggestEnhancements(
+        selectedImage.base64,
+        selectedImage.mimeType,
+        selectedEnhanceMode
+      );
+
+      // Apply enhancements using canvas
+      const img = new Image();
+      img.src = selectedImage.previewUrl;
+      await new Promise((resolve) => { img.onload = resolve; });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        throw new Error('Canvas context not available');
+      }
+
+      // Apply filters
+      const brightnessVal = suggestions.brightness / 100;
+      const contrastVal = suggestions.contrast / 100;
+      const saturateVal = suggestions.saturation / 100;
+      
+      ctx.filter = `brightness(${brightnessVal}) contrast(${contrastVal}) saturate(${saturateVal})`;
+      ctx.drawImage(img, 0, 0);
+
+      const resultUrl = canvas.toDataURL('image/png');
+      setEnhancedImageUrl(resultUrl);
+      setStatus(FotomatikAppStatus.SUCCESS);
+
+      await saveToHistory(resultUrl, 'fotomatik_transform', { 
+        mode: 'enhance', 
+        enhanceMode: selectedEnhanceMode,
+        suggestions 
+      });
+    } catch (error: any) {
+      console.error('Enhance Error:', error);
+      setErrorMessage(error.message || 'İyileştirme sırasında bir hata oluştu.');
+      setStatus(FotomatikAppStatus.ERROR);
+    }
+  }, [selectedImage, selectedEnhanceMode, profile]);
 
   const handleEditorSave = (newBase64: string) => {
     if (selectedImage) {
@@ -177,6 +248,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
     setPrompt('');
     setGeneratedImageUrl(null);
     setGeneratedPrompts(null);
+    setEnhancedImageUrl(null);
     setErrorMessage(null);
     setStatus(FotomatikAppStatus.IDLE);
   };
@@ -197,10 +269,20 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
         </div>
 
         {/* Mode Tabs */}
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex justify-center gap-2 md:gap-4 mb-8 flex-wrap">
+          <button
+            onClick={() => { setMode('describe'); handleReset(); }}
+            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
+              mode === 'describe'
+                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+            }`}
+          >
+            📝 Prompt Üret
+          </button>
           <button
             onClick={() => { setMode('transform'); handleReset(); }}
-            className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 ${
+            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
               mode === 'transform'
                 ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
                 : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
@@ -209,14 +291,14 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
             🎨 Dönüştür
           </button>
           <button
-            onClick={() => { setMode('describe'); handleReset(); }}
-            className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 ${
-              mode === 'describe'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+            onClick={() => { setMode('enhance'); handleReset(); }}
+            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
+              mode === 'enhance'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
                 : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
             }`}
           >
-            📝 Açıkla
+            ⚡ İyileştir
           </button>
         </div>
 
@@ -475,6 +557,91 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Enhance Mode */}
+        {mode === 'enhance' && (
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+            {/* Left Column - Input */}
+            <div className="space-y-6">
+              <UploadArea 
+                selectedImage={selectedImage}
+                onImageSelected={setSelectedImage}
+                onEditStart={() => setIsEditorOpen(true)}
+              />
+              
+              {selectedImage && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                  {/* Enhance Mode Selection */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-3">
+                      İyileştirme Modu
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {ENHANCE_MODES.map((modeOption) => (
+                        <button
+                          key={modeOption.id}
+                          onClick={() => setSelectedEnhanceMode(modeOption.id)}
+                          className={`p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 ${
+                            selectedEnhanceMode === modeOption.id 
+                              ? 'bg-emerald-600/20 border-emerald-500/50 shadow-lg shadow-emerald-500/20' 
+                              : 'bg-slate-900/40 border-slate-700 hover:border-slate-600'
+                          }`}
+                        >
+                          <span className="text-2xl">{modeOption.icon}</span>
+                          <div className={`text-xs font-black uppercase tracking-widest ${
+                            selectedEnhanceMode === modeOption.id ? modeOption.color : 'text-slate-400'
+                          }`}>
+                            {modeOption.label}
+                          </div>
+                          <p className="text-[10px] text-slate-500">{modeOption.desc}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Enhance Button */}
+                  <button
+                    onClick={handleEnhance}
+                    disabled={status === FotomatikAppStatus.LOADING}
+                    className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                  >
+                    {status === FotomatikAppStatus.LOADING ? 'İyileştiriliyor...' : '⚡ Otomatik İyileştir'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column - Result */}
+            <div className="bg-slate-800/30 border border-slate-700 rounded-2xl p-6 min-h-[400px] flex items-center justify-center">
+              {status === FotomatikAppStatus.LOADING ? (
+                <div className="text-center">
+                  <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-slate-400">AI analiz ediyor...</p>
+                </div>
+              ) : enhancedImageUrl ? (
+                <div className="w-full space-y-4">
+                  <img 
+                    src={enhancedImageUrl} 
+                    alt="İyileştirilmiş" 
+                    className="w-full h-auto rounded-xl shadow-2xl"
+                  />
+                  <a
+                    href={enhancedImageUrl}
+                    download={`enhanced-${Date.now()}.png`}
+                    className="block w-full py-3 bg-emerald-600 text-white text-center font-bold rounded-xl hover:bg-emerald-500 transition-all"
+                  >
+                    📥 İndir
+                  </a>
+                </div>
+              ) : (
+                <div className="text-center text-slate-600">
+                  <span className="text-4xl mb-4 block">⚡</span>
+                  <p className="text-sm font-medium">İyileştirilmiş görsel burada görünecek</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

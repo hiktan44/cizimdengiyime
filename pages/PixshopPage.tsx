@@ -58,9 +58,10 @@ function centerAspectCrop(
   )
 }
 
-type Tab = 'retouch' | 'adjust' | 'filters' | 'crop' | 'upscale';
+type Tab = 'upload' | 'retouch' | 'adjust' | 'filters' | 'crop' | 'upscale';
 
 const TABS: { id: Tab, name: string }[] = [
+    { id: 'upload', name: 'Yükle' },
     { id: 'retouch', name: 'Rötuş' },
     { id: 'crop', name: 'Kırp' },
     { id: 'adjust', name: 'Ayarla' },
@@ -875,7 +876,13 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
             {TABS.map(tab => (
                  <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => {
+                      if (tab.id === 'upload') {
+                        handleUploadNew();
+                      } else {
+                        setActiveTab(tab.id);
+                      }
+                    }}
                     className={`min-w-fit capitalize font-semibold py-3 px-5 rounded-md transition-all duration-200 text-base whitespace-nowrap ${
                         activeTab === tab.id 
                         ? 'bg-gradient-to-br from-blue-500 to-cyan-400 text-white shadow-lg shadow-cyan-500/40' 
