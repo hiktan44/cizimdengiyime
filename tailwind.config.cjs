@@ -4,6 +4,7 @@ module.exports = {
     "./index.html",
     "./App.tsx",
     "./components/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
     "./utils/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
@@ -13,8 +14,8 @@ module.exports = {
       },
       keyframes: {
         fadeInOut: {
-          '0%, 100%': { opacity: '0' },
-          '25%, 50%': { opacity: '0.2' },
+          '0%, 25%, 100%': { opacity: '0' },
+          '2%, 23%': { opacity: '0.8' },
         },
       },
     },
