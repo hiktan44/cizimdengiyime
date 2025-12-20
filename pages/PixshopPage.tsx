@@ -59,14 +59,108 @@ function centerAspectCrop(
 }
 
 type Tab = 'upload' | 'retouch' | 'adjust' | 'filters' | 'crop' | 'upscale';
+type Language = 'tr' | 'en';
 
-const TABS: { id: Tab, name: string }[] = [
-    { id: 'upload', name: 'Yükle' },
-    { id: 'retouch', name: 'Rötuş' },
-    { id: 'crop', name: 'Kırp' },
-    { id: 'adjust', name: 'Ayarla' },
-    { id: 'filters', name: 'Filtreler' },
-    { id: 'upscale', name: 'Yükselt' },
+const translations = {
+  tr: {
+    tabs: {
+      upload: 'Yükle',
+      retouch: 'Rötuş',
+      crop: 'Kırp',
+      adjust: 'Ayarla',
+      filters: 'Filtreler',
+      upscale: 'Yükselt',
+    },
+    buttons: {
+      removeBackground: 'Arka Planı Kaldır',
+      smartErase: 'Nesneyi Sil',
+      generate: 'Oluştur',
+      download: 'İndir',
+      reset: 'Sıfırla',
+      apply: 'Uygula',
+      cancel: 'İptal',
+      undo: 'Geri Al',
+      redo: 'İleri Al',
+    },
+    placeholders: {
+      retouchPrompt: "ör., 'gömleğimi mavi yap'",
+      selectPoint: 'Önce resimde bir nokta seçin',
+    },
+    messages: {
+      creditCheck: 'Kredi kontrol ediliyor...',
+      processing: 'İşleniyor...',
+      noCredits: 'Yeterli krediniz yok',
+      success: 'İşlem başarılı!',
+      error: 'Bir hata oluştu',
+      uploadFirst: 'Önce bir görsel yükleyin',
+      selectArea: 'Silmek için bir alan seçin',
+    },
+    comparison: {
+      peek: 'Orijinali Göster',
+      sideBySide: 'Yan Yana',
+      split: 'Bölünmüş',
+    },
+    zoom: {
+      zoomIn: 'Yakınlaştır',
+      zoomOut: 'Uzaklaştır',
+      fit: 'Sığdır',
+      magnifier: 'Büyüteç',
+    },
+  },
+  en: {
+    tabs: {
+      upload: 'Upload',
+      retouch: 'Retouch',
+      crop: 'Crop',
+      adjust: 'Adjust',
+      filters: 'Filters',
+      upscale: 'Upscale',
+    },
+    buttons: {
+      removeBackground: 'Remove Background',
+      smartErase: 'Smart Erase',
+      generate: 'Generate',
+      download: 'Download',
+      reset: 'Reset',
+      apply: 'Apply',
+      cancel: 'Cancel',
+      undo: 'Undo',
+      redo: 'Redo',
+    },
+    placeholders: {
+      retouchPrompt: "e.g., 'make my shirt blue'",
+      selectPoint: 'Select a point on the image first',
+    },
+    messages: {
+      creditCheck: 'Checking credits...',
+      processing: 'Processing...',
+      noCredits: 'Insufficient credits',
+      success: 'Operation successful!',
+      error: 'An error occurred',
+      uploadFirst: 'Upload an image first',
+      selectArea: 'Select an area to erase',
+    },
+    comparison: {
+      peek: 'Show Original',
+      sideBySide: 'Side by Side',
+      split: 'Split',
+    },
+    zoom: {
+      zoomIn: 'Zoom In',
+      zoomOut: 'Zoom Out',
+      fit: 'Fit',
+      magnifier: 'Magnifier',
+    },
+  },
+};
+
+const getTabs = (lang: Language): { id: Tab, name: string }[] => [
+    { id: 'upload', name: translations[lang].tabs.upload },
+    { id: 'retouch', name: translations[lang].tabs.retouch },
+    { id: 'crop', name: translations[lang].tabs.crop },
+    { id: 'adjust', name: translations[lang].tabs.adjust },
+    { id: 'filters', name: translations[lang].tabs.filters },
+    { id: 'upscale', name: translations[lang].tabs.upscale },
 ];
 
 export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
@@ -75,6 +169,16 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const [prompt, setPrompt] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [language, setLanguage] = useState<Language>('tr');
+  
+  // Load language preference
+  useEffect(() => {
+    const savedLang = localStorage.getItem('fasheone_language') as Language;
+    if (savedLang) setLanguage(savedLang);
+  }, []);
+
+  const t = translations[language];
+  const TABS = getTabs(language);
   
   // Hotspot for API
   const [editHotspot, setEditHotspot] = useState<{ x: number, y: number } | null>(null);
@@ -898,7 +1002,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         <div className="w-full">
             {activeTab === 'retouch' && (
                 <div className="flex flex-col items-center gap-4 animate-fade-in">
-                    {/* Arka Planı Kaldır ve Nesneyi Sil Butonları */}
+                    {/* Remove Background & Smart Erase Buttons */}
                     <div className="flex items-center gap-3 w-full max-w-2xl">
                       <button 
                         onClick={handleRemoveBackground} 
@@ -906,7 +1010,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                         className="flex-1 bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 font-bold py-4 px-6 rounded-2xl hover:bg-indigo-600/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
                       >
                         <MagicWandIcon className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                        Arka Planı Kaldır
+                        {t.buttons.removeBackground}
                       </button>
                       
                       <button 
@@ -915,20 +1019,22 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                         className="flex-1 bg-red-600/20 border border-red-500/30 text-red-300 font-bold py-4 px-6 rounded-2xl hover:bg-red-600/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
                       >
                         <EraserIcon className="w-5 h-5 group-hover:-rotate-12 transition-transform" />
-                        Nesneyi Sil
+                        {t.buttons.smartErase}
                       </button>
                     </div>
 
                     <div className="w-full border-t border-white/5 pt-4">
                       <p className="text-md text-gray-400 text-center mb-4">
-                          {editHotspot ? 'Harika! Şimdi yapmak istediğiniz düzenlemeyi aşağıya yazın.' : 'Hassas düzenleme için resimde bir noktaya tıklayın.'}
+                          {editHotspot 
+                            ? (language === 'tr' ? 'Harika! Şimdi yapmak istediğiniz düzenlemeyi aşağıya yazın.' : 'Great! Now type the edit you want to make below.') 
+                            : (language === 'tr' ? 'Hassas düzenleme için resimde bir noktaya tıklayın.' : 'Click on a point in the image for precise editing.')}
                       </p>
                       <form onSubmit={(e) => { e.preventDefault(); handleGenerate(); }} className="w-full flex items-center gap-3">
                           <input
                               type="text"
                               value={prompt}
                               onChange={e => setPrompt(e.target.value)}
-                              placeholder={editHotspot ? "ör., 'gömleğimin rengini mavi yap'" : "Önce resimde bir nokta seçin"}
+                              placeholder={editHotspot ? t.placeholders.retouchPrompt : t.placeholders.selectPoint}
                               className="flex-grow bg-gray-900/50 border border-gray-700 text-gray-200 rounded-2xl p-5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition w-full disabled:cursor-not-allowed disabled:opacity-60"
                               disabled={isLoading || !editHotspot}
                           />
@@ -937,7 +1043,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                               className="bg-blue-600 text-white font-bold py-5 px-10 text-lg rounded-2xl shadow-xl hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                               disabled={isLoading || !prompt.trim() || !editHotspot}
                           >
-                              Oluştur
+                              {t.buttons.generate}
                           </button>
                       </form>
                     </div>

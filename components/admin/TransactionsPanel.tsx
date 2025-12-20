@@ -1,14 +1,94 @@
 import React, { useState, useEffect } from 'react';
 import { getAllTransactions, AdminTransaction } from '../../lib/adminService';
 
+type Language = 'tr' | 'en';
+
+const translations = {
+  tr: {
+    stats: {
+      totalTransactions: 'Toplam İşlem',
+      totalRevenue: 'Toplam Gelir',
+      creditsGiven: 'Verilen Kredi',
+      successRate: 'Başarı Oranı',
+    },
+    filter: {
+      label: 'Durum Filtrele:',
+      all: 'Tümü',
+      completed: 'Tamamlanan',
+      pending: 'Bekleyen',
+      failed: 'Başarısız',
+    },
+    table: {
+      user: 'Kullanıcı',
+      type: 'Tip',
+      amount: 'Tutar',
+      credits: 'Kredi',
+      status: 'Durum',
+      paymentMethod: 'Ödeme Yöntemi',
+      date: 'Tarih',
+      noTransactions: 'İşlem bulunamadı',
+      unnamed: 'İsimsiz',
+    },
+    status: {
+      completed: 'Tamamlandı',
+      pending: 'Bekliyor',
+      failed: 'Başarısız',
+    },
+    type: {
+      subscription: 'Abonelik',
+      creditPackage: 'Kredi Paketi',
+    },
+  },
+  en: {
+    stats: {
+      totalTransactions: 'Total Transactions',
+      totalRevenue: 'Total Revenue',
+      creditsGiven: 'Credits Given',
+      successRate: 'Success Rate',
+    },
+    filter: {
+      label: 'Filter Status:',
+      all: 'All',
+      completed: 'Completed',
+      pending: 'Pending',
+      failed: 'Failed',
+    },
+    table: {
+      user: 'User',
+      type: 'Type',
+      amount: 'Amount',
+      credits: 'Credits',
+      status: 'Status',
+      paymentMethod: 'Payment Method',
+      date: 'Date',
+      noTransactions: 'No transactions found',
+      unnamed: 'Unnamed',
+    },
+    status: {
+      completed: 'Completed',
+      pending: 'Pending',
+      failed: 'Failed',
+    },
+    type: {
+      subscription: 'Subscription',
+      creditPackage: 'Credit Package',
+    },
+  },
+};
+
 export const TransactionsPanel: React.FC = () => {
   const [transactions, setTransactions] = useState<AdminTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
+  const [language, setLanguage] = useState<Language>('tr');
 
   useEffect(() => {
     loadTransactions();
+    const savedLang = localStorage.getItem('fasheone_language') as Language;
+    if (savedLang) setLanguage(savedLang);
   }, []);
+
+  const t = translations[language];
 
   const loadTransactions = async () => {
     try {
@@ -50,18 +130,18 @@ export const TransactionsPanel: React.FC = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'Tamamlandı';
+        return t.status.completed;
       case 'pending':
-        return 'Bekliyor';
+        return t.status.pending;
       case 'failed':
-        return 'Başarısız';
+        return t.status.failed;
       default:
         return status;
     }
   };
 
   const getTypeText = (type: string) => {
-    return type === 'subscription' ? 'Abonelik' : 'Kredi Paketi';
+    return type === 'subscription' ? t.type.subscription : t.type.creditPackage;
   };
 
   if (loading) {
@@ -77,21 +157,21 @@ export const TransactionsPanel: React.FC = () => {
       {/* Stats */}
       <div className="grid md:grid-cols-4 gap-4">
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <div className="text-slate-400 text-sm mb-1">Toplam İşlem</div>
+          <div className="text-slate-400 text-sm mb-1">{t.stats.totalTransactions}</div>
           <div className="text-3xl font-bold text-white">{transactions.length}</div>
         </div>
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <div className="text-slate-400 text-sm mb-1">Toplam Gelir</div>
+          <div className="text-slate-400 text-sm mb-1">{t.stats.totalRevenue}</div>
           <div className="text-3xl font-bold text-green-400">{totalRevenue.toFixed(2)}₺</div>
         </div>
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <div className="text-slate-400 text-sm mb-1">Verilen Kredi</div>
+          <div className="text-slate-400 text-sm mb-1">{t.stats.creditsGiven}</div>
           <div className="text-3xl font-bold text-cyan-400">{totalCreditsGiven}</div>
         </div>
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-          <div className="text-slate-400 text-sm mb-1">Başarı Oranı</div>
+          <div className="text-slate-400 text-sm mb-1">{t.stats.successRate}</div>
           <div className="text-3xl font-bold text-purple-400">
-            {transactions.length > 0 ? Math.round((transactions.filter((t) => t.status === 'completed').length / transactions.length) * 100) : 0}%
+            {transactions.length > 0 ? Math.round((transactions.filter((tx) => tx.status === 'completed').length / transactions.length) * 100) : 0}%
           </div>
         </div>
       </div>
@@ -99,7 +179,7 @@ export const TransactionsPanel: React.FC = () => {
       {/* Filters */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-sm text-slate-400">Durum Filtrele:</span>
+          <span className="text-sm text-slate-400">{t.filter.label}</span>
           {(['all', 'completed', 'pending', 'failed'] as const).map((status) => (
             <button
               key={status}
@@ -111,12 +191,12 @@ export const TransactionsPanel: React.FC = () => {
               }`}
             >
               {status === 'all'
-                ? 'Tümü'
+                ? t.filter.all
                 : status === 'completed'
-                ? 'Tamamlanan'
+                ? t.filter.completed
                 : status === 'pending'
-                ? 'Bekleyen'
-                : 'Başarısız'}
+                ? t.filter.pending
+                : t.filter.failed}
             </button>
           ))}
         </div>
@@ -128,27 +208,27 @@ export const TransactionsPanel: React.FC = () => {
           <table className="w-full">
             <thead className="bg-slate-900/50 border-b border-slate-700">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Kullanıcı</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Tip</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">Tutar</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">Kredi</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Durum</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Ödeme Yöntemi</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">Tarih</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.user}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.type}</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">{t.table.amount}</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">{t.table.credits}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.status}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.paymentMethod}</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.date}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
               {filteredTransactions.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
-                    İşlem bulunamadı
+                    {t.table.noTransactions}
                   </td>
                 </tr>
               ) : (
                 filteredTransactions.map((tx) => (
                   <tr key={tx.id} className="hover:bg-slate-700/30 transition">
                     <td className="px-4 py-3">
-                      <div className="text-sm font-medium text-white">{tx.user_name || 'İsimsiz'}</div>
+                      <div className="text-sm font-medium text-white">{tx.user_name || t.table.unnamed}</div>
                       <div className="text-xs text-slate-400">{tx.user_email}</div>
                     </td>
                     <td className="px-4 py-3">
@@ -169,7 +249,7 @@ export const TransactionsPanel: React.FC = () => {
                       <span className="text-xs text-slate-400">{tx.payment_method || 'N/A'}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-xs text-slate-400">{new Date(tx.created_at).toLocaleString('tr-TR')}</span>
+                      <span className="text-xs text-slate-400">{new Date(tx.created_at).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
                     </td>
                   </tr>
                 ))

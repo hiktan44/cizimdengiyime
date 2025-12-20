@@ -32,6 +32,19 @@ const translations = {
     header: {
       signIn: 'Giriş Yap',
       start: 'Başla',
+      buyCredits: 'Kredi Al',
+      signOut: 'Çıkış',
+      continueUsing: 'Hemen Kullanmaya Devam Et',
+    },
+    howItWorks: {
+      title: 'Nasıl Çalışır?',
+      subtitle: '3 Adımda AI ile Profesyonel Görsel',
+      step1Title: 'Görseli Yükle',
+      step1Desc: 'Ürün çizimini veya fotoğrafını platforma yükle, AI otomatik analiz eder',
+      step2Title: 'Detayları Seç',
+      step2Desc: 'Hazır şablonlar ve seçeneklerle istediğin stili belirle, prompt kullanmana gerek yok',
+      step3Title: 'Oluştur & İndir',
+      step3Desc: 'Profesyonel sonuçları hemen indir, video oluştur, sosyal medyada paylaş',
     },
     hero: {
       title: 'Çizimden Gerçeğe,',
@@ -45,8 +58,16 @@ const translations = {
       before: 'ÖNCE',
       after: 'SONRA',
       step1: '1. Çizim → Ürün (Hayalet Manken)',
+      step1Desc: 'Basit karakalem veya dijital teknik çizimlerinizi yükleyin. Yapay zeka, kumaş, dikiş ve detayları algılayarak çiziminizi birebir yansıtan gerçekçi bir ürün fotoğrafına dönüştürür.',
+      step1Before: 'ÇİZİM',
+      step1After: 'ÜRÜN',
       step2: '2. Ürün → Canlı Model',
+      step2Desc: 'Oluşturulan veya yüklenen ürün fotoğrafını dilediğiniz manken üzerinde görün. Farklı ten rengi, saç stili ve poz tipleriyle sahip yapay zeka modelleriyle stüdyo çekimi kalitesinde sonuçlar alın.',
+      step2Before: 'ÜRÜN',
+      step2After: 'MODEL',
       step3: '3. Görsel → Video',
+      step3Desc: 'Statik görsellerle sınırlı kalmayın. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
+      professionalVideo: 'Profesyonel Video',
       tryNow: 'Şimdi Deneyin',
     },
     features: {
@@ -77,6 +98,66 @@ const translations = {
       start: 'Başla',
       extraCreditsTitle: 'Ek Kredi Paketleri',
       extraCreditsSubtitle: 'Aboneliğiniz devam ederken krediniz biterse, ek kredi satın alabilirsiniz.',
+      creditPackagesTitle: 'Kredi Paketleri',
+      creditPackagesSubtitle: 'İhtiyacınıza uygun kredi paketini seçin. Abonelik yok, sadece kullandığınız kadar ödersiniz.',
+      credits: 'Kredi',
+      credit: 'Kredi',
+      buyNow: 'Satın Al',
+      creditUsage: '💡 Kredi Kullanımı',
+      liveModelVideo: '🎨 Canlı Model & Video',
+      sketchToProduct: 'Çizim → Ürün: 1 kredi',
+      productToModel: 'Ürün → Model: 1 kredi',
+      videoGeneration: 'Video Oluşturma: 3 kredi',
+      otherModules: '⚡ Diğer Modüller',
+      techDrawing: 'Teknik Çizim: 1 kredi',
+      pixshopEdit: 'Pixshop (Düzenleme): 1 kredi',
+      fotomatik: 'Fotomatik: 1 kredi',
+      freeCredits: 'Yeni üyeler 10 ücretsiz kredi ile başlar',
+      creditsNeverExpire: 'Krediler hiç bitmez, istediğiniz zaman kullanın',
+    },
+    testimonials: {
+      title: 'Kullanıcı Yorumları',
+      quote1: '"Bu platform sayesinde koleksiyonumu birkaç saat içinde görselleştirebildim. İnanılmaz hızlı ve kaliteli!"',
+      name1: 'Ayşe Yılmaz',
+      quote2: '"Müşterilerime ürünleri göstermek artık çok kolay. Video özelliği harika, sosyal medyada çok beğeniliyor!"',
+      name2: 'Mehmet Kaya',
+      quote3: '"Fotoğraf çekimi maliyetlerinden kurtuldum. AI görseller gerçekten profesyonel görünüyor!"',
+      name3: 'Zeynep Demir',
+    },
+    comparison: {
+      title: 'NEDEN FASHEONE?',
+      subtitle: 'Fasheone ile farkı hisset',
+      needPrompts: 'Prompt yazmana gerek var',
+      readyOptions: 'Hazır seçimlerle içerik üretilir',
+      multipleTools: 'Bir sürü farklı tool',
+      onePlatform: 'Tek platformda katalogdan reklama her şey',
+      expensive: 'Pahalı stüdyo çekimleri',
+      lowCost: 'Dakikalar içinde düşük maliyet',
+      incorrectPlacement: 'Ürünü hatalı giydirme ve aktarma',
+      allDetails: 'Ürünü tüm detayları ile oluşturmak',
+      faster: 'Geleneksel yöntemlerden 10x daha hızlı',
+    },
+    stats: {
+      videosCreated: 'Oluşturulan Video',
+      imagesCreated: 'Oluşturulan Görsel',
+      satisfiedUsers: 'Memnun Kullanıcı',
+      platformAccess: 'Platform Erişimi',
+    },
+    faq: {
+      title: 'Sık Sorulan Sorular',
+      q1: 'Fasheone ile neler yapabilirim?',
+      a1: 'Moda çizimlerinizi profesyonel ürün fotoğraflarına, canlı model görsellerine ve videolara dönüştürebilirsiniz. Ayrıca AI ile özel arka planlar, renkler ve stiller seçebilirsiniz.',
+      q2: 'Yüklediğim görseller güvende mi?',
+      a2: 'Evet, tüm görselleriniz şifreli olarak saklanır ve sadece siz erişebilirsiniz. Verileriniz 3. şahıslarla paylaşılmaz.',
+      q3: 'Kaç krediye ihtiyacım olur?',
+      a3: 'Çizimden ürün 1 kredi, üründen model 1 kredi, video oluşturma 3 kredi harcar. Ortalama bir koleksiyon için Starter plan yeterlidir.',
+      q4: 'Ürettiğim içeriklerin telif hakkı kime ait?',
+      a4: 'Oluşturduğunuz tüm içerikler size aittir. Ticari amaçlarla kullanabilir, paylaşabilir ve satabilirsiniz.',
+    },
+    cta: {
+      title: 'Hemen Başlayın',
+      subtitle: 'İlk tasarımınızı ücretsiz deneyin. Kredi kartı gerekmez.',
+      button: 'Ücretsiz Başla',
     },
     pixshop: {
       heroTitle: 'Fotoğraf Düzenlemenin Geleceğiyle Tanışın: Pixshop',
@@ -99,6 +180,7 @@ const translations = {
       why4: 'Esnek Kırpma: Sosyal medya standartlarına (9:16, 1:1, 4:3) uygun akıllı kırpma ve döndürme araçlarını kullanın.',
       cta: 'Hemen Denemeye Başlayın!',
       ctaSubtitle: 'Yaratıcılığınızı serbest bırakın. İlk fotoğrafınızı yükleyin ve yapay zekanın gücünü keşfedin.',
+      tryButton: 'Pixshop\'u Dene',
     },
     fotomatik: {
       heroTitle: 'Fotomatik Neleri Yapabilir? (Teknik Kapasite)',
@@ -130,6 +212,19 @@ const translations = {
     header: {
       signIn: 'Sign In',
       start: 'Get Started',
+      buyCredits: 'Buy Credits',
+      signOut: 'Sign Out',
+      continueUsing: 'Continue Using',
+    },
+    howItWorks: {
+      title: 'How It Works?',
+      subtitle: '3 Steps to Professional Visuals with AI',
+      step1Title: 'Upload Image',
+      step1Desc: 'Upload your product sketch or photo, AI analyzes automatically',
+      step2Title: 'Select Details',
+      step2Desc: 'Choose your style with ready templates and options, no prompts needed',
+      step3Title: 'Generate & Download',
+      step3Desc: 'Download professional results instantly, create videos, share on social media',
     },
     hero: {
       title: 'From Sketch to Reality,',
@@ -143,8 +238,16 @@ const translations = {
       before: 'BEFORE',
       after: 'AFTER',
       step1: '1. Sketch → Product (Ghost Mannequin)',
+      step1Desc: 'Upload simple pencil or digital technical drawings. AI analyzes fabric, stitching, and details to transform your sketch into a realistic product photo.',
+      step1Before: 'SKETCH',
+      step1After: 'PRODUCT',
       step2: '2. Product → Live Model',
+      step2Desc: 'See your product photo on your desired model. Get studio-quality results with AI models featuring different skin tones, hairstyles, and poses.',
+      step2Before: 'PRODUCT',
+      step2After: 'MODEL',
       step3: '3. Image → Video',
+      step3Desc: 'Don\'t limit yourself to static images. Create cinematic videos of your model walking, turning, or posing. Perfect content for social media and e-commerce.',
+      professionalVideo: 'Professional Video',
       tryNow: 'Try Now',
     },
     features: {
@@ -175,6 +278,66 @@ const translations = {
       start: 'Get Started',
       extraCreditsTitle: 'Extra Credit Packages',
       extraCreditsSubtitle: 'If your credits run out while your subscription continues, you can purchase additional credits.',
+      creditPackagesTitle: 'Credit Packages',
+      creditPackagesSubtitle: 'Choose the credit package that suits your needs. No subscription, pay only for what you use.',
+      credits: 'Credits',
+      credit: 'Credit',
+      buyNow: 'Buy Now',
+      creditUsage: '💡 Credit Usage',
+      liveModelVideo: '🎨 Live Model & Video',
+      sketchToProduct: 'Sketch → Product: 1 credit',
+      productToModel: 'Product → Model: 1 credit',
+      videoGeneration: 'Video Generation: 3 credits',
+      otherModules: '⚡ Other Modules',
+      techDrawing: 'Tech Drawing: 1 credit',
+      pixshopEdit: 'Pixshop (Edit): 1 credit',
+      fotomatik: 'Fotomatik: 1 credit',
+      freeCredits: 'New members start with 10 free credits',
+      creditsNeverExpire: 'Credits never expire, use them anytime',
+    },
+    testimonials: {
+      title: 'Testimonials',
+      quote1: '"I was able to visualize my collection in just a few hours thanks to this platform. Incredibly fast and high quality!"',
+      name1: 'Sarah Johnson',
+      quote2: '"Showing products to my customers is now so easy. The video feature is amazing, very popular on social media!"',
+      name2: 'Michael Smith',
+      quote3: '"I got rid of photo shoot costs. AI images really look professional!"',
+      name3: 'Emma Wilson',
+    },
+    comparison: {
+      title: 'WHY FASHEONE?',
+      subtitle: 'Feel the difference with Fasheone',
+      needPrompts: 'Need to write prompts',
+      readyOptions: 'Create content with ready options',
+      multipleTools: 'Multiple different tools',
+      onePlatform: 'Everything from catalog to ads in one platform',
+      expensive: 'Expensive studio shoots',
+      lowCost: 'Low cost in minutes',
+      incorrectPlacement: 'Incorrect product placement',
+      allDetails: 'Create product with all details',
+      faster: '10x faster than traditional methods',
+    },
+    stats: {
+      videosCreated: 'Videos Created',
+      imagesCreated: 'Images Created',
+      satisfiedUsers: 'Satisfied Users',
+      platformAccess: 'Platform Access',
+    },
+    faq: {
+      title: 'Frequently Asked Questions',
+      q1: 'What can I do with Fasheone?',
+      a1: 'You can transform your fashion sketches into professional product photos, live model visuals, and videos. You can also choose custom backgrounds, colors, and styles with AI.',
+      q2: 'Are my uploaded images safe?',
+      a2: 'Yes, all your images are stored encrypted and only you can access them. Your data is not shared with third parties.',
+      q3: 'How many credits do I need?',
+      a3: 'Sketch to product costs 1 credit, product to model costs 1 credit, video creation costs 3 credits. The Starter plan is sufficient for an average collection.',
+      q4: 'Who owns the copyright of the content I create?',
+      a4: 'All content you create belongs to you. You can use, share, and sell it for commercial purposes.',
+    },
+    cta: {
+      title: 'Get Started Now',
+      subtitle: 'Try your first design for free. No credit card required.',
+      button: 'Start for Free',
     },
     pixshop: {
       heroTitle: 'Meet the Future of Photo Editing: Pixshop',
@@ -197,6 +360,7 @@ const translations = {
       why4: 'Flexible Cropping: Use smart cropping and rotation tools suitable for social media standards (9:16, 1:1, 4:3).',
       cta: 'Start Trying Now!',
       ctaSubtitle: 'Unleash your creativity. Upload your first photo and discover the power of AI.',
+      tryButton: 'Try Pixshop',
     },
     fotomatik: {
       heroTitle: 'What Can Fotomatik Do? (Technical Capacity)',
@@ -435,7 +599,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Kredi Al
+                    {t.header.buyCredits}
                   </button>
                 )}
               </>
@@ -457,7 +621,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={onLogout}
                 className="text-sm font-medium text-red-400 hover:text-red-300 transition-colors"
               >
-                Çıkış
+                {t.header.signOut}
               </button>
             ) : (
               <>
@@ -556,7 +720,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             onClick={onGetStarted}
             className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105 relative z-40"
           >
-            {isLoggedIn ? (language === 'tr' ? 'Hemen Kullanmaya Devam Et' : 'Continue Using') : t.hero.cta}
+            {isLoggedIn ? t.header.continueUsing : t.hero.cta}
           </button>
         </div>
       </section>
@@ -565,10 +729,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
         <div className="max-w-7xl mx-auto relative z-10">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
-            {language === 'tr' ? 'Nasıl Çalışır?' : 'How It Works?'}
+            {t.howItWorks.title}
           </h2>
           <p className={`${secondaryTextClass} text-center mb-16`}>
-            {language === 'tr' ? '3 Adımda AI ile Profesyonel Görsel' : '3 Steps to Professional Visuals with AI'}
+            {t.howItWorks.subtitle}
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -578,12 +742,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-4xl font-black text-white">01</span>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {language === 'tr' ? 'Görseli Yükle' : 'Upload Image'}
+                {t.howItWorks.step1Title}
               </h3>
               <p className={secondaryTextClass}>
-                {language === 'tr' 
-                  ? 'Ürün çizimini veya fotoğrafını platforma yükle, AI otomatik analiz eder'
-                  : 'Upload your product sketch or photo, AI analyzes automatically'}
+                {t.howItWorks.step1Desc}
               </p>
             </div>
 
@@ -593,12 +755,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-4xl font-black text-white">02</span>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {language === 'tr' ? 'Detayları Seç' : 'Select Details'}
+                {t.howItWorks.step2Title}
               </h3>
               <p className={secondaryTextClass}>
-                {language === 'tr'
-                  ? 'Hazır şablonlar ve seçeneklerle istediğin stili belirle, prompt kullanmana gerek yok'
-                  : 'Choose your style with ready templates and options, no prompts needed'}
+                {t.howItWorks.step2Desc}
               </p>
             </div>
 
@@ -608,12 +768,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <span className="text-4xl font-black text-white">03</span>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {language === 'tr' ? 'Oluştur & İndir' : 'Generate & Download'}
+                {t.howItWorks.step3Title}
               </h3>
               <p className={secondaryTextClass}>
-                {language === 'tr'
-                  ? 'Profesyonel sonuçları hemen indir, video oluştur, sosyal medyada paylaş'
-                  : 'Download professional results instantly, create videos, share on social media'}
+                {t.howItWorks.step3Desc}
               </p>
             </div>
           </div>
@@ -642,16 +800,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <h3 className={`text-2xl font-bold ${textClass}`}>{t.showcase.step1}</h3>
               </div>
               <p className={`${secondaryTextClass} mb-6`}>
-                {language === 'tr' 
-                  ? 'Basit karakalem veya dijital teknik çizimlerinizi yükleyin. Yapay zeka, kumaş, dikiş ve detayları algılayarak çiziminizi birebir yansıtan gerçekçi bir ürün fotoğrafına dönüştürür.'
-                  : 'Upload simple pencil or digital technical drawings. AI analyzes fabric, stitching, and details to transform your sketch into a realistic product photo.'}
+                {t.showcase.step1Desc}
               </p>
               <div className="aspect-[3/4] rounded-xl overflow-hidden">
                 <BeforeAfterSlider
                   beforeImage={demoSketch}
                   afterImage={demoProduct}
-                  beforeLabel={language === 'tr' ? 'ÇİZİM' : 'SKETCH'}
-                  afterLabel={language === 'tr' ? 'ÜRÜN' : 'PRODUCT'}
+                  beforeLabel={t.showcase.step1Before}
+                  afterLabel={t.showcase.step1After}
                 />
               </div>
             </div>
@@ -667,16 +823,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <h3 className={`text-2xl font-bold ${textClass}`}>{t.showcase.step2}</h3>
               </div>
               <p className={`${secondaryTextClass} mb-6`}>
-                {language === 'tr'
-                  ? 'Oluşturulan veya yüklenen ürün fotoğrafını dilediğiniz manken üzerinde görün. Farklı ten rengi, saç stili ve poz tipleriyle sahip yapay zeka modelleriyle stüdyo çekimi kalitesinde sonuçlar alın.'
-                  : 'See your product photo on your desired model. Get studio-quality results with AI models featuring different skin tones, hairstyles, and poses.'}
+                {t.showcase.step2Desc}
               </p>
               <div className="aspect-[3/4] rounded-xl overflow-hidden">
                 <BeforeAfterSlider
                   beforeImage={demoProduct}
                   afterImage={demoModel}
-                  beforeLabel={language === 'tr' ? 'ÜRÜN' : 'PRODUCT'}
-                  afterLabel={language === 'tr' ? 'MODEL' : 'MODEL'}
+                  beforeLabel={t.showcase.step2Before}
+                  afterLabel={t.showcase.step2After}
                 />
               </div>
             </div>
@@ -692,9 +846,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <h3 className={`text-2xl font-bold ${textClass}`}>{t.showcase.step3}</h3>
               </div>
               <p className={`${secondaryTextClass} mb-6`}>
-                {language === 'tr'
-                  ? 'Statik görsellerle sınırlı kalmayın. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.'
-                  : 'Don\'t limit yourself to static images. Create cinematic videos of your model walking, turning, or posing. Perfect content for social media and e-commerce.'}
+                {t.showcase.step3Desc}
               </p>
               <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-br from-orange-900/30 to-red-900/30 border-2 border-orange-500/50 flex items-center justify-center">
                 {demoVideo ? (
@@ -705,7 +857,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                     <p className="text-orange-400 text-sm font-semibold">
-                      {language === 'tr' ? 'Profesyonel Video' : 'Professional Video'}
+                      {t.showcase.professionalVideo}
                     </p>
                   </div>
                 )}
@@ -728,7 +880,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-slate-50'} z-10 relative`}>
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
-            Güçlü Özellikler
+            {t.features.title}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition`}>
@@ -737,9 +889,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className={`text-xl font-bold ${textClass} mb-3`}>Çizimden Ürüne</h3>
+              <h3 className={`text-xl font-bold ${textClass} mb-3`}>{t.features.feature1Title}</h3>
               <p className={secondaryTextClass}>
-                Moda çizimlerinizi ultra-gerçekçi hayalet manken ürün fotoğraflarına dönüştürün.
+                {t.features.feature1Desc}
               </p>
             </div>
 
@@ -749,9 +901,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h3 className={`text-xl font-bold ${textClass} mb-3`}>Canlı Model</h3>
+              <h3 className={`text-xl font-bold ${textClass} mb-3`}>{t.features.feature2Title}</h3>
               <p className={secondaryTextClass}>
-                Ürünlerinizi gerçek modeller üzerinde görün. Etnik köken, poz, stil seçenekleriyle.
+                {t.features.feature2Desc}
               </p>
             </div>
 
@@ -761,9 +913,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className={`text-xl font-bold ${textClass} mb-3`}>Video Oluşturma</h3>
+              <h3 className={`text-xl font-bold ${textClass} mb-3`}>{t.features.feature3Title}</h3>
               <p className={secondaryTextClass}>
-                Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün.
+                {t.features.feature3Desc}
               </p>
             </div>
 
@@ -773,9 +925,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className={`text-xl font-bold ${textClass} mb-3`}>Teknik Çizim (Tech Pack)</h3>
+              <h3 className={`text-xl font-bold ${textClass} mb-3`}>{t.features.feature4Title}</h3>
               <p className={secondaryTextClass}>
-                Ürün fotoğraflarınızı üretim için detaylı teknik çizimlere dönüştürün.
+                {t.features.feature4Desc}
               </p>
             </div>
           </div>
@@ -789,30 +941,30 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </svg>
               </div>
               <div className="flex-grow">
-                <h3 className={`text-2xl font-bold ${textClass} mb-4`}>AI Prompt ile Sınırsız Özelleştirme</h3>
+                <h3 className={`text-2xl font-bold ${textClass} mb-4`}>{t.features.aiPromptTitle}</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="text-lg font-semibold text-cyan-400 mb-2">📍 Özel Arka Plan & Mekan</h4>
+                    <h4 className="text-lg font-semibold text-cyan-400 mb-2">📍 {t.features.customBg}</h4>
                     <p className={`${descriptionTextClass} text-sm`}>
-                      Hazır lokasyonların yanı sıra, kendi arka plan görselinizi yükleyin veya AI'a prompt verin: "Eiffel Kulesi önünde", "Sahilde gün batımı", "Lüks otel lobisinde" gibi detaylı mekan tanımları yapın.
+                      {t.features.customBgDesc}
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-purple-400 mb-2">🏷️ Marka Yerleştirme</h4>
+                    <h4 className="text-lg font-semibold text-purple-400 mb-2">🏷️ {t.features.brandPlacement}</h4>
                     <p className={`${descriptionTextClass} text-sm`}>
-                      Promptta belirterek markanızı arka plana yerleştirin: "Arka planda [MarkaAdı] logosu", "Duvarda marka afişi" gibi özel isteklerde bulunun. AI görseli markanızla uyumlu oluşturur.
+                      {t.features.brandPlacementDesc}
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-cyan-400 mb-2">✨ Detaylı Sahne Kurgusu</h4>
+                    <h4 className="text-lg font-semibold text-cyan-400 mb-2">✨ {t.features.sceneSetup}</h4>
                     <p className={`${descriptionTextClass} text-sm`}>
-                      "Parkta bankta oturan, elinde kahve tutan model", "Köprü üzerinde rüzgarda savrulan saçlar" gibi ayrıntılı senaryolar yazın. AI tüm detayları anlayıp uygular.
+                      {t.features.sceneSetupDesc}
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-lg font-semibold text-purple-400 mb-2">🎨 Stil & Atmosfer Kontrolü</h4>
+                    <h4 className="text-lg font-semibold text-purple-400 mb-2">🎨 {t.features.styleControl}</h4>
                     <p className={`${descriptionTextClass} text-sm`}>
-                      100+ hazır seçenek (ışık, açı, poz, renk) ile birlikte prompt ile daha da özelleştirin: "Vintage hava", "Minimalist estetik", "Renkli ve enerjik" gibi genel atmosfer tanımları ekleyin.
+                      {t.features.styleControlDesc}
                     </p>
                   </div>
                 </div>
@@ -951,7 +1103,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onGetStarted}
               className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition"
             >
-              {language === 'tr' ? 'Pixshop\'u Dene' : 'Try Pixshop'}
+              {t.pixshop.tryButton}
             </button>
           </div>
         </div>
@@ -1154,61 +1306,59 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-cyan-50/40'} z-10 relative`} id="pricing">
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
-            {language === 'tr' ? 'Kredi Paketleri' : 'Credit Packages'}
+            {t.pricing.creditPackagesTitle}
           </h2>
           <p className={`${secondaryTextClass} text-center mb-12`}>
-            {language === 'tr' 
-              ? 'İhtiyacınıza uygun kredi paketini seçin. Abonelik yok, sadece kullandığınız kadar ödersiniz.' 
-              : 'Choose the credit package that suits your needs. No subscription, pay only for what you use.'}
+            {t.pricing.creditPackagesSubtitle}
           </p>
           
           {/* Credit Packages */}
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
               <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.small.credits}</div>
-              <div className={`text-sm ${secondaryTextClass} mb-4`}>{language === 'tr' ? 'Kredi' : 'Credits'}</div>
+              <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
               <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.small.price}₺</div>
               <div className={`text-sm ${secondaryTextClass} mb-6`}>
-                1 {language === 'tr' ? 'Kredi' : 'Credit'} = {(creditPackages.small.price / creditPackages.small.credits).toFixed(2)}₺
+                1 {t.pricing.credit} = {(creditPackages.small.price / creditPackages.small.credits).toFixed(2)}₺
               </div>
               <button
                 onClick={onGetStarted}
                 className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
               >
-                {language === 'tr' ? 'Satın Al' : 'Buy Now'}
+                {t.pricing.buyNow}
               </button>
             </div>
 
             <div className={`bg-gradient-to-b ${theme === 'dark' ? 'from-cyan-900/50 to-slate-900/50' : 'from-cyan-100 to-white'} border-2 border-cyan-500 rounded-2xl p-8 text-center relative`}>
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                {language === 'tr' ? 'Popüler' : 'Popular'}
+                {t.pricing.popular}
               </div>
               <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.medium.credits}</div>
-              <div className={`text-sm ${secondaryTextClass} mb-4`}>{language === 'tr' ? 'Kredi' : 'Credits'}</div>
+              <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
               <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.medium.price}₺</div>
               <div className={`text-sm ${secondaryTextClass} mb-6`}>
-                1 {language === 'tr' ? 'Kredi' : 'Credit'} = {(creditPackages.medium.price / creditPackages.medium.credits).toFixed(2)}₺
+                1 {t.pricing.credit} = {(creditPackages.medium.price / creditPackages.medium.credits).toFixed(2)}₺
               </div>
               <button
                 onClick={onGetStarted}
                 className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
               >
-                {language === 'tr' ? 'Satın Al' : 'Buy Now'}
+                {t.pricing.buyNow}
               </button>
             </div>
 
             <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
               <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.large.credits}</div>
-              <div className={`text-sm ${secondaryTextClass} mb-4`}>{language === 'tr' ? 'Kredi' : 'Credits'}</div>
+              <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
               <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.large.price}₺</div>
               <div className={`text-sm ${secondaryTextClass} mb-6`}>
-                1 {language === 'tr' ? 'Kredi' : 'Credit'} = {(creditPackages.large.price / creditPackages.large.credits).toFixed(2)}₺
+                1 {t.pricing.credit} = {(creditPackages.large.price / creditPackages.large.credits).toFixed(2)}₺
               </div>
               <button
                 onClick={onGetStarted}
                 className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
               >
-                {language === 'tr' ? 'Satın Al' : 'Buy Now'}
+                {t.pricing.buyNow}
               </button>
             </div>
           </div>
@@ -1221,34 +1371,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </svg>
               <div className="flex-1">
                 <h4 className={`text-lg font-semibold ${textClass} mb-3`}>
-                  {language === 'tr' ? '💡 Kredi Kullanımı' : '💡 Credit Usage'}
+                  {t.pricing.creditUsage}
                 </h4>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <h5 className="text-cyan-400 font-semibold text-sm mb-2">
-                      {language === 'tr' ? '🎨 Canlı Model & Video' : '🎨 Live Model & Video'}
+                      {t.pricing.liveModelVideo}
                     </h5>
                     <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
-                      <li>• {language === 'tr' ? 'Çizim → Ürün: 1 kredi' : 'Sketch → Product: 1 credit'}</li>
-                      <li>• {language === 'tr' ? 'Ürün → Model: 1 kredi' : 'Product → Model: 1 credit'}</li>
-                      <li>• {language === 'tr' ? 'Video Oluşturma: 3 kredi' : 'Video Generation: 3 credits'}</li>
+                      <li>• {t.pricing.sketchToProduct}</li>
+                      <li>• {t.pricing.productToModel}</li>
+                      <li>• {t.pricing.videoGeneration}</li>
                     </ul>
                   </div>
                   <div>
                     <h5 className="text-cyan-400 font-semibold text-sm mb-2">
-                      {language === 'tr' ? '⚡ Diğer Modüller' : '⚡ Other Modules'}
+                      {t.pricing.otherModules}
                     </h5>
                     <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
-                      <li>• {language === 'tr' ? 'Teknik Çizim: 1 kredi' : 'Tech Drawing: 1 credit'}</li>
-                      <li>• {language === 'tr' ? 'Pixshop (Düzenleme): 1 kredi' : 'Pixshop (Edit): 1 credit'}</li>
-                      <li>• {language === 'tr' ? 'Fotomatik: 1 kredi' : 'Fotomatik: 1 credit'}</li>
+                      <li>• {t.pricing.techDrawing}</li>
+                      <li>• {t.pricing.pixshopEdit}</li>
+                      <li>• {t.pricing.fotomatik}</li>
                     </ul>
                   </div>
                 </div>
                 <div className={`mt-4 pt-4 border-t ${theme === 'dark' ? 'border-cyan-500/20' : 'border-cyan-200'}`}>
                   <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
-                    <li>✨ {language === 'tr' ? 'Yeni üyeler 10 ücretsiz kredi ile başlar' : 'New members start with 10 free credits'}</li>
-                    <li>♾️ {language === 'tr' ? 'Krediler hiç bitmez, istediğiniz zaman kullanın' : 'Credits never expire, use them anytime'}</li>
+                    <li>✨ {t.pricing.freeCredits}</li>
+                    <li>♾️ {t.pricing.creditsNeverExpire}</li>
                   </ul>
                 </div>
               </div>
@@ -1261,7 +1411,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className="py-20 px-6 z-10 relative">
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
-            {language === 'tr' ? 'Kullanıcı Yorumları' : 'Testimonials'}
+            {t.testimonials.title}
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className={`${cardBg} rounded-2xl p-8`}>
@@ -1273,14 +1423,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ))}
               </div>
               <p className={`${descriptionTextClass} mb-6`}>
-                {language === 'tr'
-                  ? '"Bu platform sayesinde koleksiyonumu birkaç saat içinde görselleştirebildim. İnanılmaz hızlı ve kaliteli!"'
-                  : '"This platform helped me visualize my collection in hours. Incredibly fast and high quality!"'}
+                {t.testimonials.quote1}
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full"></div>
                 <div>
-                  <div className={`font-semibold ${textClass}`}>{language === 'tr' ? 'Ayşe Yılmaz' : 'Sarah Johnson'}</div>
+                  <div className={`font-semibold ${textClass}`}>{t.testimonials.name1}</div>
                   <div className={`text-sm ${secondaryTextClass}`}>Fashion Designer</div>
                 </div>
               </div>
@@ -1295,14 +1443,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ))}
               </div>
               <p className={`${descriptionTextClass} mb-6`}>
-                {language === 'tr'
-                  ? '"Müşterilerime ürünleri göstermek artık çok kolay. Video özelliği harika, sosyal medyada çok beğeniliyor!"'
-                  : '"Showing products to customers is so easy now. Video feature is amazing, very popular on social media!"'}
+                {t.testimonials.quote2}
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full"></div>
                 <div>
-                  <div className={`font-semibold ${textClass}`}>{language === 'tr' ? 'Mehmet Kaya' : 'Michael Smith'}</div>
+                  <div className={`font-semibold ${textClass}`}>{t.testimonials.name2}</div>
                   <div className={`text-sm ${secondaryTextClass}`}>Brand Owner</div>
                 </div>
               </div>
@@ -1317,14 +1463,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 ))}
               </div>
               <p className={`${descriptionTextClass} mb-6`}>
-                {language === 'tr'
-                  ? '"Fotoğraf çekimi maliyetlerinden kurtuldum. AI görseller gerçekten profesyonel görünüyor!"'
-                  : '"Got rid of photography costs. AI visuals look truly professional!"'}
+                {t.testimonials.quote3}
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-600 rounded-full"></div>
                 <div>
-                  <div className={`font-semibold ${textClass}`}>{language === 'tr' ? 'Zeynep Demir' : 'Emma Wilson'}</div>
+                  <div className={`font-semibold ${textClass}`}>{t.testimonials.name3}</div>
                   <div className={`text-sm ${secondaryTextClass}`}>E-commerce Manager</div>
                 </div>
               </div>
@@ -1337,10 +1481,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-purple-50/40'} z-10 relative`}>
         <div className="max-w-5xl mx-auto">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
-            {language === 'tr' ? 'NEDEN FASHEONE?' : 'WHY FASHEONE?'}
+            {t.comparison.title}
           </h2>
           <p className={`${secondaryTextClass} text-center mb-16`}>
-            {language === 'tr' ? 'Fasheone ile farkı hisset' : 'Feel the difference with Fasheone'}
+            {t.comparison.subtitle}
           </p>
           
           <div className="space-y-4">
@@ -1348,11 +1492,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="grid md:grid-cols-2 gap-4">
               <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-red-400 mb-2">❌</div>
-                <p className={descriptionTextClass}>{language === 'tr' ? 'Prompt yazmana gerek var' : 'Need to write prompts'}</p>
+                <p className={descriptionTextClass}>{t.comparison.needPrompts}</p>
               </div>
               <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-green-400 mb-2">✅</div>
-                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{language === 'tr' ? 'Hazır seçimlerle içerik üretilir' : 'Create content with ready options'}</p>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.readyOptions}</p>
               </div>
             </div>
 
@@ -1360,11 +1504,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="grid md:grid-cols-2 gap-4">
               <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-red-400 mb-2">❌</div>
-                <p className={descriptionTextClass}>{language === 'tr' ? 'Bir sürü farklı tool' : 'Multiple different tools'}</p>
+                <p className={descriptionTextClass}>{t.comparison.multipleTools}</p>
               </div>
               <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-green-400 mb-2">✅</div>
-                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{language === 'tr' ? 'Tek platformda katalogdan reklama her şey' : 'Everything from catalog to ads in one platform'}</p>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.onePlatform}</p>
               </div>
             </div>
 
@@ -1372,11 +1516,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="grid md:grid-cols-2 gap-4">
               <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-red-400 mb-2">❌</div>
-                <p className={descriptionTextClass}>{language === 'tr' ? 'Pahalı stüdyo çekimleri' : 'Expensive studio shoots'}</p>
+                <p className={descriptionTextClass}>{t.comparison.expensive}</p>
               </div>
               <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-green-400 mb-2">✅</div>
-                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{language === 'tr' ? 'Dakikalar içinde düşük maliyet' : 'Low cost in minutes'}</p>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.lowCost}</p>
               </div>
             </div>
 
@@ -1384,11 +1528,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="grid md:grid-cols-2 gap-4">
               <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-red-400 mb-2">❌</div>
-                <p className={descriptionTextClass}>{language === 'tr' ? 'Ürünü hatalı giydirme ve aktarma' : 'Incorrect product placement'}</p>
+                <p className={descriptionTextClass}>{t.comparison.incorrectPlacement}</p>
               </div>
               <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
                 <div className="text-green-400 mb-2">✅</div>
-                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{language === 'tr' ? 'Ürünü tüm detayları ile oluşturmak' : 'Create product with all details'}</p>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.allDetails}</p>
               </div>
             </div>
           </div>
@@ -1396,7 +1540,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="mt-12 text-center">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-3 rounded-full font-bold text-lg">
               <span>🚀</span>
-              <span>{language === 'tr' ? 'Geleneksel yöntemlerden 10x daha hızlı' : '10x faster than traditional methods'}</span>
+              <span>{t.comparison.faster}</span>
             </div>
           </div>
         </div>
@@ -1408,19 +1552,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className={`${cardBg} rounded-2xl p-8`}>
               <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-2">10K+</div>
-              <div className={secondaryTextClass}>{language === 'tr' ? 'Oluşturulan Video' : 'Videos Created'}</div>
+              <div className={secondaryTextClass}>{t.stats.videosCreated}</div>
             </div>
             <div className={`${cardBg} rounded-2xl p-8`}>
               <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2">50K+</div>
-              <div className={secondaryTextClass}>{language === 'tr' ? 'Oluşturulan Görsel' : 'Images Created'}</div>
+              <div className={secondaryTextClass}>{t.stats.imagesCreated}</div>
             </div>
             <div className={`${cardBg} rounded-2xl p-8`}>
               <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600 mb-2">98%</div>
-              <div className={secondaryTextClass}>{language === 'tr' ? 'Müşteri Memnuniyeti' : 'Customer Satisfaction'}</div>
+              <div className={secondaryTextClass}>{t.stats.satisfiedUsers}</div>
             </div>
             <div className={`${cardBg} rounded-2xl p-8`}>
               <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600 mb-2">24/7</div>
-              <div className={secondaryTextClass}>{language === 'tr' ? 'Platform Erişimi' : 'Platform Access'}</div>
+              <div className={secondaryTextClass}>{t.stats.platformAccess}</div>
             </div>
           </div>
         </div>
@@ -1430,62 +1574,54 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-rose-50/40'} z-10 relative`}>
         <div className="max-w-4xl mx-auto">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
-            {language === 'tr' ? 'Sık Sorulan Sorular' : 'Frequently Asked Questions'}
+            {t.faq.title}
           </h2>
           <div className="space-y-4">
             <details className={`${cardBg} rounded-xl p-6 group`}>
               <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-                <span>{language === 'tr' ? 'Fasheone ile neler yapabilirim?' : 'What can I do with Fasheone?'}</span>
+                <span>{t.faq.q1}</span>
                 <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <p className={`mt-4 ${secondaryTextClass}`}>
-                {language === 'tr'
-                  ? 'Moda çizimlerinizi profesyonel ürün fotoğraflarına, canlı model görsellerine ve videolara dönüştürebilirsiniz. Ayrıca AI ile özel arka planlar, renkler ve stiller seçebilirsiniz.'
-                  : 'You can transform your fashion sketches into professional product photos, live model visuals, and videos. You can also choose custom backgrounds, colors, and styles with AI.'}
+                {t.faq.a1}
               </p>
             </details>
 
             <details className={`${cardBg} rounded-xl p-6 group`}>
               <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-                <span>{language === 'tr' ? 'Yüklediğim görseller güvende mi?' : 'Are my uploaded images safe?'}</span>
+                <span>{t.faq.q2}</span>
                 <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <p className={`mt-4 ${secondaryTextClass}`}>
-                {language === 'tr'
-                  ? 'Evet, tüm görselleriniz şifreli olarak saklanır ve sadece siz erişebilirsiniz. Verileriniz 3. şahıslarla paylaşılmaz.'
-                  : 'Yes, all your images are stored encrypted and only you can access them. Your data is not shared with third parties.'}
+                {t.faq.a2}
               </p>
             </details>
 
             <details className={`${cardBg} rounded-xl p-6 group`}>
               <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-                <span>{language === 'tr' ? 'Kaç krediye ihtiyacım olur?' : 'How many credits do I need?'}</span>
+                <span>{t.faq.q3}</span>
                 <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <p className={`mt-4 ${secondaryTextClass}`}>
-                {language === 'tr'
-                  ? 'Çizimden ürün 1 kredi, üründen model 1 kredi, video oluşturma 3 kredi harcar. Ortalama bir koleksiyon için Starter plan yeterlidir.'
-                  : 'Sketch to product uses 1 credit, product to model uses 1 credit, video creation uses 3 credits. For an average collection, the Starter plan is sufficient.'}
+                {t.faq.a3}
               </p>
             </details>
 
             <details className={`${cardBg} rounded-xl p-6 group`}>
               <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-                <span>{language === 'tr' ? 'Ürettiğim içeriklerin telif hakkı kime ait?' : 'Who owns the copyright of the content I create?'}</span>
+                <span>{t.faq.q4}</span>
                 <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
               <p className={`mt-4 ${secondaryTextClass}`}>
-                {language === 'tr'
-                  ? 'Oluşturduğunuz tüm içerikler size aittir. Ticari amaçlarla kullanabilir, paylaşabilir ve satabilirsiniz.'
-                  : 'All content you create belongs to you. You can use it for commercial purposes, share it, and sell it.'}
+                {t.faq.a4}
               </p>
             </details>
           </div>
@@ -1496,16 +1632,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-r from-cyan-900/80 to-blue-900/80' : 'bg-gradient-to-r from-cyan-100 to-blue-100'} z-10 relative`}>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-6`}>
-            {language === 'tr' ? 'Hemen Başlayın' : 'Get Started Now'}
+            {t.cta.title}
           </h2>
           <p className={`text-xl ${descriptionTextClass} mb-8`}>
-            {language === 'tr' ? 'İlk tasarımınızı ücretsiz deneyin. Kredi kartı gerekmez.' : 'Try your first design for free. No credit card required.'}
+            {t.cta.subtitle}
           </p>
           <button
             onClick={onGetStarted}
             className={`${theme === 'dark' ? 'bg-white text-slate-900' : 'bg-cyan-600 text-white'} px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition`}
           >
-            {language === 'tr' ? 'Ücretsiz Başla' : 'Start for Free'}
+            {t.cta.button}
           </button>
         </div>
       </section>

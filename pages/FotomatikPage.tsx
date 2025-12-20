@@ -21,12 +21,126 @@ interface FotomatikPageProps {
 
 type FotomatikMode = 'transform' | 'describe' | 'enhance';
 type EnhanceMode = 'balanced' | 'vibrant' | 'crisp' | 'cinematic';
+type Language = 'tr' | 'en';
 
-const ENHANCE_MODES: { id: EnhanceMode; label: string; desc: string; icon: string; color: string }[] = [
-  { id: 'balanced', label: 'DENGELİ', desc: 'Standart profesyonel görünüm', icon: '✅', color: 'text-blue-400' },
-  { id: 'vibrant', label: 'CANLI', desc: 'Renkleri ve tonları canlandırır', icon: '🎨', color: 'text-pink-400' },
-  { id: 'crisp', label: 'KESKİN', desc: 'Detayları ve dokuyu belirginleştirir', icon: '🔺', color: 'text-orange-400' },
-  { id: 'cinematic', label: 'SİNEMATİK', desc: 'Dramatik ışık ve gölge dengesi', icon: '🎬', color: 'text-purple-400' },
+const translations = {
+  tr: {
+    modes: {
+      transform: '🎨 Dönüştür',
+      describe: '📝 Açıkla',
+      enhance: '✨ İyileştir',
+    },
+    enhanceModes: {
+      balanced: { label: 'DENGELİ', desc: 'Standart profesyonel görünüm' },
+      vibrant: { label: 'CANLI', desc: 'Renkleri ve tonları canlandırır' },
+      crisp: { label: 'KESKİN', desc: 'Detayları ve dokuyu belirginleştirir' },
+      cinematic: { label: 'SİNEMATİK', desc: 'Dramatik ışık ve gölge dengesi' },
+    },
+    aspectRatios: {
+      square: 'Kare (1:1)',
+      portrait: 'Portre (9:16)',
+      landscape: 'Manzara (16:9)',
+      vertical: 'Dikey (3:4)',
+      horizontal: 'Yatay (4:3)',
+    },
+    buttons: {
+      generate: 'Dönüştür',
+      describe: 'Açıkla',
+      autoEnhance: 'Otomatik İyileştir',
+      download: 'İndir',
+      copy: 'Kopyala',
+      copied: 'Kopyalandı!',
+    },
+    labels: {
+      prompt: 'Dönüşüm Promptu',
+      promptPlaceholder: 'Ne yapmak istiyorsunuz? Örn: Arka planı sahil manzarası yap...',
+      aspectRatio: 'En-Boy Oranı',
+      imageSize: 'Görüntü Boyutu',
+      enhanceMode: 'İyileştirme Modu',
+    },
+    prompts: {
+      turkish: 'Türkçe Prompt',
+      english: 'İngilizce Prompt',
+      midjourney: 'Midjourney Prompt',
+      stableDiffusion: 'Stable Diffusion Prompt',
+      positive: 'Pozitif',
+      negative: 'Negatif',
+      parameters: 'Parametreler',
+      expertTips: 'Uzman Önerileri',
+    },
+    messages: {
+      loginRequired: 'İşlem yapmak için giriş yapmalısınız.',
+      insufficientCredits: 'Yetersiz kredi.',
+      processing: 'İşleniyor...',
+      enhancing: 'İyileştiriliyor...',
+      describing: 'Analiz ediliyor...',
+      generating: 'Oluşturuluyor...',
+      success: 'İşlem başarılı!',
+      error: 'Bir hata oluştu',
+    },
+  },
+  en: {
+    modes: {
+      transform: '🎨 Transform',
+      describe: '📝 Describe',
+      enhance: '✨ Enhance',
+    },
+    enhanceModes: {
+      balanced: { label: 'BALANCED', desc: 'Standard professional look' },
+      vibrant: { label: 'VIBRANT', desc: 'Boosts colors and tones' },
+      crisp: { label: 'CRISP', desc: 'Sharpens details and textures' },
+      cinematic: { label: 'CINEMATIC', desc: 'Dramatic light and shadow balance' },
+    },
+    aspectRatios: {
+      square: 'Square (1:1)',
+      portrait: 'Portrait (9:16)',
+      landscape: 'Landscape (16:9)',
+      vertical: 'Vertical (3:4)',
+      horizontal: 'Horizontal (4:3)',
+    },
+    buttons: {
+      generate: 'Transform',
+      describe: 'Describe',
+      autoEnhance: 'Auto Enhance',
+      download: 'Download',
+      copy: 'Copy',
+      copied: 'Copied!',
+    },
+    labels: {
+      prompt: 'Transform Prompt',
+      promptPlaceholder: 'What do you want to do? E.g., Change background to beach...',
+      aspectRatio: 'Aspect Ratio',
+      imageSize: 'Image Size',
+      enhanceMode: 'Enhancement Mode',
+    },
+    prompts: {
+      turkish: 'Turkish Prompt',
+      english: 'English Prompt',
+      midjourney: 'Midjourney Prompt',
+      stableDiffusion: 'Stable Diffusion Prompt',
+      positive: 'Positive',
+      negative: 'Negative',
+      parameters: 'Parameters',
+      expertTips: 'Expert Tips',
+    },
+    messages: {
+      loginRequired: 'Please login to perform this action.',
+      insufficientCredits: 'Insufficient credits.',
+      processing: 'Processing...',
+      enhancing: 'Enhancing...',
+      describing: 'Analyzing...',
+      generating: 'Generating...',
+      success: 'Operation successful!',
+      error: 'An error occurred',
+    },
+  },
+};
+
+const getEnhanceModes = (lang: Language) => [
+  { id: 'balanced' as EnhanceMode, label: translations[lang].enhanceModes.balanced.label, desc: translations[lang].enhanceModes.balanced.desc, icon: '✅', color: 'text-blue-400' },
+  { id: 'vibrant' as EnhanceMode, label: translations[lang].enhanceModes.vibrant.label, desc: translations[lang].enhanceModes.vibrant.desc, icon: '🎨', color: 'text-pink-400' },
+  { id: 'crisp' as EnhanceMode, label: translations[lang].enhanceModes.crisp.label, desc: translations[lang].enhanceModes.crisp.desc, icon: '🔺', color: 'text-orange-400' },
+  { id: 'cinematic' as EnhanceMode, label: translations[lang].enhanceModes.cinematic.label, desc: translations[lang].enhanceModes.cinematic.desc, icon: '🎬', color: 'text-purple-400' },
 ];
 
 export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
@@ -49,13 +163,24 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Enhance Mode States
   const [selectedEnhanceMode, setSelectedEnhanceMode] = useState<EnhanceMode>('balanced');
   const [enhancedImageUrl, setEnhancedImageUrl] = useState<string | null>(null);
+  
+  // Language
+  const [language, setLanguage] = useState<Language>('tr');
+  
+  useEffect(() => {
+    const savedLang = localStorage.getItem('fasheone_language') as Language;
+    if (savedLang) setLanguage(savedLang);
+  }, []);
+
+  const t = translations[language];
+  const ENHANCE_MODES = getEnhanceModes(language);
 
   const aspectRatios = [
-    { label: 'Kare (1:1)', value: '1:1' },
-    { label: 'Portre (9:16)', value: '9:16' },
-    { label: 'Manzara (16:9)', value: '16:9' },
-    { label: 'Dikey (3:4)', value: '3:4' },
-    { label: 'Yatay (4:3)', value: '4:3' },
+    { label: t.aspectRatios.square, value: '1:1' },
+    { label: t.aspectRatios.portrait, value: '9:16' },
+    { label: t.aspectRatios.landscape, value: '16:9' },
+    { label: t.aspectRatios.vertical, value: '3:4' },
+    { label: t.aspectRatios.horizontal, value: '4:3' },
   ];
 
   const imageSizes = ['1K', '2K', '4K'];
@@ -63,12 +188,12 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Check credits before operation
   const checkCredits = async (operationType: 'fotomatik_transform' | 'fotomatik_describe'): Promise<boolean> => {
     if (!profile) {
-      setErrorMessage('İşlem yapmak için giriş yapmalısınız.');
+      setErrorMessage(t.messages.loginRequired);
       return false;
     }
     const result = await checkAndDeductCredits(profile.id, operationType);
     if (!result.success) {
-      setErrorMessage(result.message || 'Yetersiz kredi.');
+      setErrorMessage(result.message || t.messages.insufficientCredits);
       if (onShowBuyCredits) onShowBuyCredits();
       return false;
     }
@@ -227,7 +352,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       });
     } catch (error: any) {
       console.error('Enhance Error:', error);
-      setErrorMessage(error.message || 'İyileştirme sırasında bir hata oluştu.');
+      setErrorMessage(error.message || (language === 'tr' ? 'İyileştirme sırasında bir hata oluştu.' : 'An error occurred during enhancement.'));
       setStatus(FotomatikAppStatus.ERROR);
     }
   }, [selectedImage, selectedEnhanceMode, profile]);
@@ -288,7 +413,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
             }`}
           >
-            🎨 Dönüştür
+            {t.modes.transform}
           </button>
           <button
             onClick={() => { setMode('enhance'); handleReset(); }}
@@ -298,7 +423,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
             }`}
           >
-            ⚡ İyileştir
+            {t.modes.enhance}
           </button>
         </div>
 
@@ -306,10 +431,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
         {profile && (
           <div className="max-w-4xl mx-auto flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 mb-6">
             <span className="text-sm text-slate-400">
-              Bu işlem <span className="text-cyan-400 font-bold">{creditCost} kredi</span> harcar
+              {language === 'tr' ? 'Bu işlem' : 'This operation costs'} <span className="text-cyan-400 font-bold">{creditCost} {language === 'tr' ? 'kredi' : 'credits'}</span> {language === 'tr' ? 'harcar' : ''}
             </span>
             <span className="text-sm text-slate-300">
-              Mevcut: <span className="text-cyan-400 font-bold">{profile.credits}</span> kredi
+              {language === 'tr' ? 'Mevcut:' : 'Available:'} <span className="text-cyan-400 font-bold">{profile.credits}</span> {language === 'tr' ? 'kredi' : 'credits'}
             </span>
           </div>
         )}
@@ -403,7 +528,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                     disabled={status === FotomatikAppStatus.LOADING || !prompt.trim()}
                     className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                   >
-                    {status === FotomatikAppStatus.LOADING ? 'Dönüştürülüyor...' : '✨ Dönüştür'}
+                    {status === FotomatikAppStatus.LOADING ? t.messages.generating : `✨ ${t.buttons.generate}`}
                   </button>
                 </div>
               )}
@@ -432,7 +557,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                   disabled={status === FotomatikAppStatus.LOADING}
                   className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                 >
-                  {status === FotomatikAppStatus.LOADING ? 'Analiz Ediliyor...' : '📝 Prompt Oluştur'}
+                  {status === FotomatikAppStatus.LOADING ? t.messages.describing : `📝 ${t.buttons.describe}`}
                 </button>
 
                 {/* Generated Prompts */}
@@ -442,7 +567,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                       {/* Turkish Prompt */}
                       <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
                         <div className="flex items-center justify-between mb-3">
-                          <span className="font-semibold text-slate-200">🇹🇷 Türkçe</span>
+                          <span className="font-semibold text-slate-200">🇹🇷 {t.prompts.turkish}</span>
                           <button
                             onClick={() => handleCopyPrompt('tr', generatedPrompts.tr)}
                             className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
@@ -451,7 +576,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                                 : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                             }`}
                           >
-                            {copiedKey === 'tr' ? '✓ Kopyalandı' : 'Kopyala'}
+                            {copiedKey === 'tr' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
                           </button>
                         </div>
                         <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.tr}</p>
@@ -479,7 +604,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                     {/* Midjourney Prompt */}
                     <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-purple-300">🎨 Midjourney V6</span>
+                        <span className="font-semibold text-purple-300">🎨 {t.prompts.midjourney}</span>
                         <button
                           onClick={() => handleCopyPrompt('midjourney', generatedPrompts.midjourney)}
                           className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
@@ -488,7 +613,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                               : 'bg-purple-700 text-purple-200 hover:bg-purple-600'
                           }`}
                         >
-                          {copiedKey === 'midjourney' ? '✓ Kopyalandı' : 'Kopyala'}
+                          {copiedKey === 'midjourney' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
                         </button>
                       </div>
                       <p className="text-purple-100 text-sm leading-relaxed font-mono">{generatedPrompts.midjourney}</p>
@@ -576,7 +701,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                   {/* Enhance Mode Selection */}
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-3">
-                      İyileştirme Modu
+                      {t.labels.enhanceMode}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {ENHANCE_MODES.map((modeOption) => (
@@ -607,7 +732,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                     disabled={status === FotomatikAppStatus.LOADING}
                     className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                   >
-                    {status === FotomatikAppStatus.LOADING ? 'İyileştiriliyor...' : '⚡ Otomatik İyileştir'}
+                    {status === FotomatikAppStatus.LOADING ? t.messages.enhancing : `⚡ ${t.buttons.autoEnhance}`}
                   </button>
                 </div>
               )}
@@ -618,13 +743,13 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
               {status === FotomatikAppStatus.LOADING ? (
                 <div className="text-center">
                   <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-slate-400">AI analiz ediyor...</p>
+                  <p className="text-slate-400">{language === 'tr' ? 'AI analiz ediyor...' : 'AI analyzing...'}</p>
                 </div>
               ) : enhancedImageUrl ? (
                 <div className="w-full space-y-4">
                   <img 
                     src={enhancedImageUrl} 
-                    alt="İyileştirilmiş" 
+                    alt={language === 'tr' ? 'İyileştirilmiş' : 'Enhanced'} 
                     className="w-full h-auto rounded-xl shadow-2xl"
                   />
                   <a
@@ -632,13 +757,13 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                     download={`enhanced-${Date.now()}.png`}
                     className="block w-full py-3 bg-emerald-600 text-white text-center font-bold rounded-xl hover:bg-emerald-500 transition-all"
                   >
-                    📥 İndir
+                    📥 {t.buttons.download}
                   </a>
                 </div>
               ) : (
                 <div className="text-center text-slate-600">
                   <span className="text-4xl mb-4 block">⚡</span>
-                  <p className="text-sm font-medium">İyileştirilmiş görsel burada görünecek</p>
+                  <p className="text-sm font-medium">{language === 'tr' ? 'İyileştirilmiş görsel burada görünecek' : 'Enhanced image will appear here'}</p>
                 </div>
               )}
             </div>

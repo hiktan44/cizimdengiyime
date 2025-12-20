@@ -1,9 +1,60 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Header } from './Header';
 import { UploadIconSmall } from './icons/UploadIconSmall';
 import { SettingsPanel } from './admin/SettingsPanel';
 import { UserActivityPanel } from './admin/UserActivityPanel';
 import { TransactionsPanel } from './admin/TransactionsPanel';
+
+type Language = 'tr' | 'en';
+
+const adminTranslations = {
+  tr: {
+    title: 'Admin Paneli',
+    subtitle: 'Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.',
+    tabs: {
+      content: '📸 İçerik Yönetimi',
+      settings: '⚙️ Ayarlar',
+      users: '👥 Kullanıcı Aktivitesi',
+      transactions: '💳 Ödemeler',
+    },
+    heroVideos: {
+      title: '🎬 Hero Gömülü Videolar (4 Adet)',
+      subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.',
+    },
+    showcase: {
+      title: '📸 Showcase Görselleri',
+      subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.',
+      sketch: '1. Çizim (Sketch)',
+      product: '2. Ürün (Product)',
+      model: '3. Model (Live)',
+      video: '4. Video',
+    },
+    change: 'Değiştir',
+  },
+  en: {
+    title: 'Admin Panel',
+    subtitle: 'Access all system management functions from here.',
+    tabs: {
+      content: '📸 Content Management',
+      settings: '⚙️ Settings',
+      users: '👥 User Activity',
+      transactions: '💳 Payments',
+    },
+    heroVideos: {
+      title: '🎬 Hero Background Videos (4)',
+      subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.',
+    },
+    showcase: {
+      title: '📸 Showcase Images',
+      subtitle: 'Upload images for sketch-to-reality transformation examples.',
+      sketch: '1. Sketch',
+      product: '2. Product',
+      model: '3. Model (Live)',
+      video: '4. Video',
+    },
+    change: 'Change',
+  },
+};
 
 interface AdminDashboardProps {
     onNavigateHome: () => void;
@@ -37,7 +88,8 @@ const ContentCard: React.FC<{
     mediaType: 'image' | 'video';
     onFileSelect: (file: File) => void;
     accept: string;
-}> = ({ title, mediaUrl, mediaType, onFileSelect, accept }) => {
+    changeLabel: string;
+}> = ({ title, mediaUrl, mediaType, onFileSelect, accept, changeLabel }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +121,7 @@ const ContentCard: React.FC<{
                 className="w-full bg-slate-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-slate-500 transition-colors flex items-center justify-center gap-2 mt-auto"
             >
                 <UploadIconSmall />
-                Değiştir
+                {changeLabel}
             </button>
         </div>
     );
@@ -98,12 +150,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
     } = props;
 
     const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions'>('content');
+    const [language, setLanguage] = useState<Language>('tr');
+
+    // Load language from localStorage
+    useEffect(() => {
+        const savedLang = localStorage.getItem('fasheone_language') as Language;
+        if (savedLang) setLanguage(savedLang);
+    }, []);
+
+    const t = adminTranslations[language];
 
     const tabs = [
-        { id: 'content' as const, label: '📸 İçerik Yönetimi', icon: '📸' },
-        { id: 'settings' as const, label: '⚙️ Ayarlar', icon: '⚙️' },
-        { id: 'users' as const, label: '👥 Kullanıcı Aktivitesi', icon: '👥' },
-        { id: 'transactions' as const, label: '💳 Ödemeler', icon: '💳' },
+        { id: 'content' as const, label: t.tabs.content, icon: '📸' },
+        { id: 'settings' as const, label: t.tabs.settings, icon: '⚙️' },
+        { id: 'users' as const, label: t.tabs.users, icon: '👥' },
+        { id: 'transactions' as const, label: t.tabs.transactions, icon: '💳' },
     ];
 
     return (
@@ -111,9 +172,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
             <Header {...headerProps} onHomeClick={onNavigateHome} />
             <main className="flex-grow container mx-auto p-4 md:p-8">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-extrabold text-white mb-2">Admin Paneli</h1>
+                    <h1 className="text-3xl font-extrabold text-white mb-2">{t.title}</h1>
                     <p className="text-slate-400">
-                        Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.
+                        {t.subtitle}
                     </p>
                 </div>
 
@@ -143,9 +204,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                         <div className="space-y-12">
                             {/* Hero Gömülü Videolar Section - 4 Adet */}
                             <div>
-                                <h2 className="text-2xl font-bold text-white mb-4">🎬 Hero Gömülü Videolar (4 Adet)</h2>
+                                <h2 className="text-2xl font-bold text-white mb-4">{t.heroVideos.title}</h2>
                                 <p className="text-slate-400 mb-6">
-                                    Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.
+                                    {t.heroVideos.subtitle}
                                 </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     <ContentCard
@@ -154,6 +215,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         mediaType="video"
                                         onFileSelect={onHeroVideoUpload || (() => {})}
                                         accept="video/*"
+                                        changeLabel={t.change}
                                     />
                                     <ContentCard
                                         title="Hero Video 2"
@@ -161,6 +223,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         mediaType="video"
                                         onFileSelect={onHeroVideo1Upload || (() => {})}
                                         accept="video/*"
+                                        changeLabel={t.change}
                                     />
                                     <ContentCard
                                         title="Hero Video 3"
@@ -168,6 +231,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         mediaType="video"
                                         onFileSelect={onHeroVideo2Upload || (() => {})}
                                         accept="video/*"
+                                        changeLabel={t.change}
                                     />
                                     <ContentCard
                                         title="Hero Video 4"
@@ -175,44 +239,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         mediaType="video"
                                         onFileSelect={onHeroVideo3Upload || (() => {})}
                                         accept="video/*"
+                                        changeLabel={t.change}
                                     />
                                 </div>
                             </div>
 
                             {/* Showcase Section */}
                             <div>
-                                <h2 className="text-2xl font-bold text-white mb-4">📸 Showcase Görselleri</h2>
+                                <h2 className="text-2xl font-bold text-white mb-4">{t.showcase.title}</h2>
                                 <p className="text-slate-400 mb-6">
-                                    Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.
+                                    {t.showcase.subtitle}
                                 </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     <ContentCard
-                                        title="1. Çizim (Sketch)"
+                                        title={t.showcase.sketch}
                                         mediaUrl={sketchUrl}
                                         mediaType="image"
                                         onFileSelect={onSketchUpload}
                                         accept="image/*"
+                                        changeLabel={t.change}
                                     />
                                     <ContentCard
-                                        title="2. Ürün (Product)"
+                                        title={t.showcase.product}
                                         mediaUrl={productUrl}
                                         mediaType="image"
                                         onFileSelect={onProductUpload}
                                         accept="image/*"
+                                        changeLabel={t.change}
                                     />
                                     <ContentCard
-                                        title="3. Model (Live)"
+                                        title={t.showcase.model}
                                         mediaUrl={modelUrl}
                                         mediaType="image"
                                         onFileSelect={onModelUpload}
                                         accept="image/*"
+                                        changeLabel={t.change}
                                     />
                                     <ContentCard
-                                        title="4. Video"
+                                        title={t.showcase.video}
                                         mediaUrl={videoUrl}
                                         mediaType="video"
                                         onFileSelect={onVideoUpload}
                                         accept="video/*"
+                                        changeLabel={t.change}
                                     />
                                 </div>
                             </div>

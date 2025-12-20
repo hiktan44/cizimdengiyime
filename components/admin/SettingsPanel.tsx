@@ -1,15 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { getSiteSettings, updateSiteSetting } from '../../lib/adminService';
 
+type Language = 'tr' | 'en';
+
+const translations = {
+  tr: {
+    initialCredits: {
+      title: 'İlk Üyelik Kredisi',
+      subtitle: 'Yeni kayıt olan kullanıcılara verilen kredi miktarı',
+      credits: 'Kredi',
+    },
+    packages: {
+      title: 'Kredi Paketleri',
+      small: 'Küçük Paket',
+      medium: 'Orta Paket',
+      large: 'Büyük Paket',
+      creditAmount: 'Kredi Miktarı',
+      price: 'Fiyat (TL)',
+    },
+    save: {
+      saving: 'Kaydediliyor...',
+      button: 'Ayarları Kaydet',
+      success: 'Ayarlar başarıyla kaydedildi!',
+      error: 'Ayarlar kaydedilirken hata oluştu!',
+    },
+  },
+  en: {
+    initialCredits: {
+      title: 'Initial Membership Credits',
+      subtitle: 'Credits given to newly registered users',
+      credits: 'Credits',
+    },
+    packages: {
+      title: 'Credit Packages',
+      small: 'Small Package',
+      medium: 'Medium Package',
+      large: 'Large Package',
+      creditAmount: 'Credit Amount',
+      price: 'Price (TL)',
+    },
+    save: {
+      saving: 'Saving...',
+      button: 'Save Settings',
+      success: 'Settings saved successfully!',
+      error: 'Error saving settings!',
+    },
+  },
+};
+
 export const SettingsPanel: React.FC = () => {
   const [settings, setSettings] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [language, setLanguage] = useState<Language>('tr');
 
   useEffect(() => {
     loadSettings();
+    const savedLang = localStorage.getItem('fasheone_language') as Language;
+    if (savedLang) setLanguage(savedLang);
   }, []);
+
+  const t = translations[language];
 
   const loadSettings = async () => {
     try {
@@ -41,10 +93,10 @@ export const SettingsPanel: React.FC = () => {
         await updateSiteSetting(update.key, update.value, update.type);
       }
 
-      setMessage({ type: 'success', text: 'Ayarlar başarıyla kaydedildi!' });
+      setMessage({ type: 'success', text: t.save.success });
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Ayarlar kaydedilirken hata oluştu!' });
+      setMessage({ type: 'error', text: t.save.error });
     } finally {
       setSaving(false);
     }
@@ -68,8 +120,8 @@ export const SettingsPanel: React.FC = () => {
 
       {/* Initial Credits */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-white mb-4">İlk Üyelik Kredisi</h3>
-        <p className="text-slate-400 text-sm mb-4">Yeni kayıt olan kullanıcılara verilen kredi miktarı</p>
+        <h3 className="text-xl font-bold text-white mb-4">{t.initialCredits.title}</h3>
+        <p className="text-slate-400 text-sm mb-4">{t.initialCredits.subtitle}</p>
         <div className="flex items-center gap-4">
           <input
             type="number"
@@ -78,20 +130,20 @@ export const SettingsPanel: React.FC = () => {
             className="w-32 bg-slate-700 border border-slate-600 rounded-lg p-3 text-white"
             min="0"
           />
-          <span className="text-slate-400">Kredi</span>
+          <span className="text-slate-400">{t.initialCredits.credits}</span>
         </div>
       </div>
 
       {/* Credit Packages */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-        <h3 className="text-xl font-bold text-white mb-4">Kredi Paketleri</h3>
+        <h3 className="text-xl font-bold text-white mb-4">{t.packages.title}</h3>
         <div className="grid md:grid-cols-3 gap-6">
           {/* Small Package */}
           <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
-            <h4 className="text-lg font-semibold text-cyan-400 mb-4">Küçük Paket</h4>
+            <h4 className="text-lg font-semibold text-cyan-400 mb-4">{t.packages.small}</h4>
             <div className="space-y-3">
               <div>
-                <label className="text-sm text-slate-400 block mb-1">Kredi Miktarı</label>
+                <label className="text-sm text-slate-400 block mb-1">{t.packages.creditAmount}</label>
                 <input
                   type="number"
                   value={settings.credit_package_small_credits || 50}
@@ -101,7 +153,7 @@ export const SettingsPanel: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-slate-400 block mb-1">Fiyat (TL)</label>
+                <label className="text-sm text-slate-400 block mb-1">{t.packages.price}</label>
                 <input
                   type="number"
                   value={settings.credit_package_small_price || 250}
@@ -115,10 +167,10 @@ export const SettingsPanel: React.FC = () => {
 
           {/* Medium Package */}
           <div className="bg-slate-900/50 border-2 border-cyan-500 rounded-lg p-4">
-            <h4 className="text-lg font-semibold text-cyan-400 mb-4">Orta Paket</h4>
+            <h4 className="text-lg font-semibold text-cyan-400 mb-4">{t.packages.medium}</h4>
             <div className="space-y-3">
               <div>
-                <label className="text-sm text-slate-400 block mb-1">Kredi Miktarı</label>
+                <label className="text-sm text-slate-400 block mb-1">{t.packages.creditAmount}</label>
                 <input
                   type="number"
                   value={settings.credit_package_medium_credits || 100}
@@ -128,7 +180,7 @@ export const SettingsPanel: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-slate-400 block mb-1">Fiyat (TL)</label>
+                <label className="text-sm text-slate-400 block mb-1">{t.packages.price}</label>
                 <input
                   type="number"
                   value={settings.credit_package_medium_price || 500}
@@ -142,10 +194,10 @@ export const SettingsPanel: React.FC = () => {
 
           {/* Large Package */}
           <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
-            <h4 className="text-lg font-semibold text-purple-400 mb-4">Büyük Paket</h4>
+            <h4 className="text-lg font-semibold text-purple-400 mb-4">{t.packages.large}</h4>
             <div className="space-y-3">
               <div>
-                <label className="text-sm text-slate-400 block mb-1">Kredi Miktarı</label>
+                <label className="text-sm text-slate-400 block mb-1">{t.packages.creditAmount}</label>
                 <input
                   type="number"
                   value={settings.credit_package_large_credits || 200}
@@ -155,7 +207,7 @@ export const SettingsPanel: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="text-sm text-slate-400 block mb-1">Fiyat (TL)</label>
+                <label className="text-sm text-slate-400 block mb-1">{t.packages.price}</label>
                 <input
                   type="number"
                   value={settings.credit_package_large_price || 1000}
@@ -176,7 +228,7 @@ export const SettingsPanel: React.FC = () => {
           disabled={saving}
           className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-600 disabled:to-slate-600 text-white px-8 py-3 rounded-lg font-semibold transition"
         >
-          {saving ? 'Kaydediliyor...' : 'Ayarları Kaydet'}
+          {saving ? t.save.saving : t.save.button}
         </button>
       </div>
     </div>
