@@ -13,7 +13,7 @@ import AdjustmentPanel from '../components/pixshop/AdjustmentPanel';
 import CropPanel from '../components/pixshop/CropPanel';
 import UpscalePanel from '../components/pixshop/UpscalePanel';
 import StartScreen from '../components/pixshop/StartScreen';
-import { UndoIcon, RedoIcon, EyeIcon, ZoomInIcon, ZoomOutIcon, ArrowsPointingOutIcon, DownloadIcon } from '../components/pixshop/icons';
+import { UndoIcon, RedoIcon, EyeIcon, ZoomInIcon, ZoomOutIcon, ArrowsPointingOutIcon, DownloadIcon, MagicWandIcon, EraserIcon, SplitIcon } from '../components/pixshop/icons';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
 
@@ -89,6 +89,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const [flipV, setFlipV] = useState<boolean>(false);
   const [isComparing, setIsComparing] = useState<boolean>(false);
   const [cropPreviewUrl, setCropPreviewUrl] = useState<string | null>(null);
+  
+  // Split Mode & Magnifier states
+  const [isSplitMode, setIsSplitMode] = useState<boolean>(false);
+  const [splitPos, setSplitPos] = useState<number>(50);
+  const [isHovering, setIsHovering] = useState<boolean>(false);
+  const [magnifierPos, setMagnifierPos] = useState({ x: 0, y: 0, relX: 0, relY: 0 });
   
   // Zoom & Pan state
   const [scale, setScale] = useState(1);
@@ -354,6 +360,53 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     }
   }, [currentImage, addImageToHistory, profile]);
 
+  // Smart Erase - Nesneyi Sil fonksiyonu
+  const handleSmartErase = useCallback(async () => {
+    if (!currentImage || !editHotspot) return;
+    
+    if (!await checkCredits()) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+        const erasePrompt = "Remove the object at this location and fill the background naturally with the surrounding texture (inpainting).";
+        const erasedImageUrl = await pixshopGenerateEditedImage(currentImage, erasePrompt, editHotspot);
+        const newImageFile = dataURLtoFile(erasedImageUrl, `erased-${Date.now()}.png`);
+        addImageToHistory(newImageFile);
+        await saveToHistory(erasedImageUrl);
+        setEditHotspot(null);
+        setDisplayHotspot(null);
+    } catch (err) {
+        setError('Nesne silinemedi. Lütfen tekrar deneyin.');
+        console.error(err);
+    } finally {
+        setIsLoading(false);
+    }
+  }, [currentImage, editHotspot, addImageToHistory, profile]);
+
+  // Arka Planı Kaldır (Galeri'ye ekle versiyonu)
+  const handleRemoveBackground = useCallback(async () => {
+    if (!currentImage) return;
+    
+    if (!await checkCredits()) return;
+    
+    setIsLoading(true);
+    setError(null);
+
+    try {
+        const transparentImageUrl = await pixshopRemoveBackground(currentImage);
+        const newImageFile = dataURLtoFile(transparentImageUrl, `nobg-${Date.now()}.png`);
+        addImageToHistory(newImageFile);
+        await saveToHistory(transparentImageUrl);
+    } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Arka plan kaldırılamadı.';
+        setError(`Hata: ${errorMessage}`);
+    } finally {
+        setIsLoading(false);
+    }
+  }, [currentImage, addImageToHistory, profile]);
+
   const handleApplyCrop = useCallback(() => {
     if (!completedCrop?.width || !completedCrop?.height || !imgRef.current) {
         setError('Lütfen kırpmak için geçerli bir alan seçin.');
@@ -527,11 +580,26 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   };
   
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!isPanning) return;
-      setPosition({
-          x: e.clientX - panStart.x,
-          y: e.clientY - panStart.y,
-      });
+      if (isPanning) {
+        setPosition({
+            x: e.clientX - panStart.x,
+            y: e.clientY - panStart.y,
+        });
+      }
+
+      // Magnifier position update
+      if (imgRef.current && !isPanning) {
+          const rect = imgRef.current.getBoundingClientRect();
+          const relX = (e.clientX - rect.left) / rect.width;
+          const relY = (e.clientY - rect.top) / rect.height;
+          
+          setMagnifierPos({ 
+              x: e.clientX - rect.left, 
+              y: e.clientY - rect.top,
+              relX: relX * 100,
+              relY: relY * 100
+          });
+      }
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -662,7 +730,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         )}
 
         {/* Main Image Container */}
-        <div ref={imageContainerRef} className="relative w-full shadow-2xl rounded-xl overflow-hidden bg-black/20 flex items-center justify-center min-h-[400px]">
+        <div 
+          ref={imageContainerRef} 
+          className="relative w-full shadow-2xl rounded-xl overflow-hidden bg-black/20 flex items-center justify-center min-h-[400px]"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
             {isLoading && (
                 <div className="absolute inset-0 bg-black/70 z-30 flex flex-col items-center justify-center gap-4 animate-fade-in">
                     <Spinner />
@@ -702,7 +775,18 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
-                  {originalImageUrl && (
+                  {/* Split Mode Base Layer */}
+                  {isSplitMode && originalImageUrl && (
+                      <img
+                          src={originalImageUrl}
+                          alt="Original Base"
+                          className="absolute max-w-full max-h-full object-contain m-auto"
+                          draggable={false}
+                      />
+                  )}
+
+                  {/* Original Image (for normal view or peek mode) */}
+                  {!isSplitMode && originalImageUrl && (
                       <img
                           key={originalImageUrl}
                           src={originalImageUrl}
@@ -716,11 +800,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                       key={currentImageUrl}
                       src={currentImageUrl}
                       alt="Mevcut"
-                      className={`absolute inset-0 max-w-full max-h-full object-contain m-auto transition-opacity duration-200 ease-in-out ${isComparing ? 'opacity-0' : 'opacity-100'}`}
+                      className={`absolute inset-0 max-w-full max-h-full object-contain m-auto transition-opacity duration-200 ease-in-out ${isComparing && !isSplitMode ? 'opacity-0' : 'opacity-100'}`}
+                      style={isSplitMode ? { clipPath: `inset(0 0 0 ${splitPos}%)` } : undefined}
                       draggable={false}
                   />
                   
-                  {displayHotspot && !isLoading && activeTab === 'retouch' && (
+                  {displayHotspot && !isLoading && activeTab === 'retouch' && !isSplitMode && (
                     <div 
                         className="absolute rounded-full w-6 h-6 bg-blue-500/50 border-2 border-white pointer-events-none z-10"
                         style={{ 
@@ -733,11 +818,58 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                     </div>
                   )}
 
+                  {/* Magnifier */}
+                  {isHovering && !isPanning && activeTab !== 'crop' && !isLoading && !isSplitMode && imgRef.current && (
+                      <div 
+                        className="absolute z-50 pointer-events-none rounded-full border-4 border-white shadow-2xl overflow-hidden bg-gray-900"
+                        style={{
+                            left: magnifierPos.x,
+                            top: magnifierPos.y,
+                            width: '160px',
+                            height: '160px',
+                            transform: `translate(-50%, -50%) scale(${1 / scale})`,
+                            boxShadow: '0 0 0 2px rgba(0,0,0,0.3), 0 25px 50px -12px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div 
+                            className="absolute inset-0 w-full h-full"
+                            style={{
+                                backgroundImage: `url(${isComparing ? (originalImageUrl || currentImageUrl) : currentImageUrl})`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundSize: `${imgRef.current.width * 2.5}px ${imgRef.current.height * 2.5}px`,
+                                backgroundPosition: `${-magnifierPos.x * 2.5 + 80}px ${-magnifierPos.y * 2.5 + 80}px`
+                            }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-4 h-[1px] bg-white/50"></div>
+                            <div className="h-4 w-[1px] bg-white/50 absolute"></div>
+                        </div>
+                      </div>
+                  )}
+
                 </div>
               </div>
             )}
         </div>
         
+        {/* Split Mode Slider */}
+        {isSplitMode && activeTab !== 'crop' && (
+          <div className="w-full max-w-lg px-4">
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={splitPos} 
+                onChange={(e) => setSplitPos(Number(e.target.value))}
+                className="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              />
+              <div className="flex justify-between text-[10px] text-gray-500 font-bold mt-1">
+                  <span>ORİJİNAL</span>
+                  <span>DÜZENLENMİŞ</span>
+              </div>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="w-full bg-gray-800/80 border border-gray-700/80 rounded-lg p-2 flex items-center justify-center gap-2 backdrop-blur-sm overflow-x-auto">
             {TABS.map(tab => (
@@ -758,27 +890,50 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         {/* Tab Content */}
         <div className="w-full">
             {activeTab === 'retouch' && (
-                <div className="flex flex-col items-center gap-4">
-                    <p className="text-md text-gray-400">
-                        {editHotspot ? 'Harika! Şimdi yapmak istediğiniz düzenlemeyi aşağıya yazın.' : 'Hassas düzenleme için resimde bir noktaya tıklayın.'}
-                    </p>
-                    <form onSubmit={(e) => { e.preventDefault(); handleGenerate(); }} className="w-full flex items-center gap-2">
-                        <input
-                            type="text"
-                            value={prompt}
-                            onChange={e => setPrompt(e.target.value)}
-                            placeholder={editHotspot ? "ör., 'gömleğimin rengini mavi yap'" : "Önce resimde bir nokta seçin"}
-                            className="flex-grow bg-gray-800 border border-gray-700 text-gray-200 rounded-lg p-5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition w-full disabled:cursor-not-allowed disabled:opacity-60"
-                            disabled={isLoading || !editHotspot}
-                        />
-                        <button 
-                            type="submit"
-                            className="bg-gradient-to-br from-blue-600 to-blue-500 text-white font-bold py-5 px-8 text-lg rounded-lg transition-all duration-300 ease-in-out shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-px active:scale-95 active:shadow-inner disabled:from-blue-800 disabled:to-blue-700 disabled:shadow-none disabled:cursor-not-allowed disabled:transform-none"
-                            disabled={isLoading || !prompt.trim() || !editHotspot}
-                        >
-                            Oluştur
-                        </button>
-                    </form>
+                <div className="flex flex-col items-center gap-4 animate-fade-in">
+                    {/* Arka Planı Kaldır ve Nesneyi Sil Butonları */}
+                    <div className="flex items-center gap-3 w-full max-w-2xl">
+                      <button 
+                        onClick={handleRemoveBackground} 
+                        disabled={isLoading}
+                        className="flex-1 bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 font-bold py-4 px-6 rounded-2xl hover:bg-indigo-600/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
+                      >
+                        <MagicWandIcon className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                        Arka Planı Kaldır
+                      </button>
+                      
+                      <button 
+                        onClick={handleSmartErase} 
+                        disabled={isLoading || !editHotspot}
+                        className="flex-1 bg-red-600/20 border border-red-500/30 text-red-300 font-bold py-4 px-6 rounded-2xl hover:bg-red-600/30 transition-all flex items-center justify-center gap-2 group disabled:opacity-50"
+                      >
+                        <EraserIcon className="w-5 h-5 group-hover:-rotate-12 transition-transform" />
+                        Nesneyi Sil
+                      </button>
+                    </div>
+
+                    <div className="w-full border-t border-white/5 pt-4">
+                      <p className="text-md text-gray-400 text-center mb-4">
+                          {editHotspot ? 'Harika! Şimdi yapmak istediğiniz düzenlemeyi aşağıya yazın.' : 'Hassas düzenleme için resimde bir noktaya tıklayın.'}
+                      </p>
+                      <form onSubmit={(e) => { e.preventDefault(); handleGenerate(); }} className="w-full flex items-center gap-3">
+                          <input
+                              type="text"
+                              value={prompt}
+                              onChange={e => setPrompt(e.target.value)}
+                              placeholder={editHotspot ? "ör., 'gömleğimin rengini mavi yap'" : "Önce resimde bir nokta seçin"}
+                              className="flex-grow bg-gray-900/50 border border-gray-700 text-gray-200 rounded-2xl p-5 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition w-full disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={isLoading || !editHotspot}
+                          />
+                          <button 
+                              type="submit"
+                              className="bg-blue-600 text-white font-bold py-5 px-10 text-lg rounded-2xl shadow-xl hover:bg-blue-500 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={isLoading || !prompt.trim() || !editHotspot}
+                          >
+                              Oluştur
+                          </button>
+                      </form>
+                    </div>
                 </div>
             )}
             {activeTab === 'crop' && (
@@ -821,17 +976,26 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
             <div className="h-6 w-px bg-gray-600 mx-1 hidden sm:block"></div>
 
             {canUndo && (
-              <button 
-                  onMouseDown={() => setIsComparing(true)}
-                  onMouseUp={() => setIsComparing(false)}
-                  onMouseLeave={() => setIsComparing(false)}
-                  onTouchStart={() => setIsComparing(true)}
-                  onTouchEnd={() => setIsComparing(false)}
-                  className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base"
-              >
-                  <EyeIcon className="w-5 h-5 mr-2" />
-                  Karşılaştır
-              </button>
+              <>
+                <button 
+                    onMouseDown={() => { setIsSplitMode(false); setIsComparing(true); }}
+                    onMouseUp={() => setIsComparing(false)}
+                    onMouseLeave={() => setIsComparing(false)}
+                    onTouchStart={() => { setIsSplitMode(false); setIsComparing(true); }}
+                    onTouchEnd={() => setIsComparing(false)}
+                    className={`flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base ${isComparing ? 'bg-blue-500 text-white' : ''}`}
+                >
+                    <EyeIcon className="w-5 h-5 mr-2" />
+                    Orijinali Gör
+                </button>
+                <button 
+                    onClick={() => setIsSplitMode(!isSplitMode)}
+                    className={`p-3 rounded-md transition-all border ${isSplitMode ? 'bg-blue-500 text-white border-blue-500' : 'bg-white/10 border-white/20 text-gray-400 hover:bg-white/20'}`}
+                    title="Bölünmüş Görünüm"
+                >
+                    <SplitIcon className="w-5 h-5" />
+                </button>
+              </>
             )}
 
             <div className="h-6 w-px bg-gray-600 mx-1 hidden sm:block"></div>
