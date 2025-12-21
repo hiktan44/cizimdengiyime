@@ -32,7 +32,7 @@ services:
     buildCommand: npm install && npm run build
     publishDirectory: dist
     port: 80
-    healthCheckPath: /
+    healthCheckPath: /health
     healthCheckMethod: GET
     healthCheckInterval: 30
     domains:

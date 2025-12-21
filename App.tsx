@@ -26,6 +26,7 @@ import { BuyCreditsModal } from './components/BuyCreditsModal';
 import { uploadHeroVideo, uploadShowcaseImage, getPublicHeroVideos, getPublicShowcaseImages } from './lib/adminService';
 import { PixshopPage } from './pages/PixshopPage';
 import { FotomatikPage } from './pages/FotomatikPage';
+import { WhatsAppPanel } from './components/WhatsAppPanel';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -621,6 +622,12 @@ const ToolPage: React.FC<{
 
     return (
         <div className="min-h-screen flex flex-col bg-slate-900">
+            <WhatsAppPanel
+                phoneNumber={import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined}
+                message="Merhaba, Canli Model ve Teknik Cizim konusunda destek almak istiyorum."
+                title="WhatsApp"
+                subtitle="Hemen yazin"
+            />
             <Header 
                 isLoggedIn={isLoggedIn} 
                 userRole={userRole}
