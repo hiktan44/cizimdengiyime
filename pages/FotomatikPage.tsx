@@ -12,6 +12,7 @@ import { FotomatikAppStatus, FotomatikImageFile } from '../types/fotomatik';
 import { processFile } from '../components/fotomatik/fileUtils';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
+import { WhatsAppPanel } from '../components/WhatsAppPanel';
 
 interface FotomatikPageProps {
   profile: Profile | null;
@@ -174,6 +175,11 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
 
   const t = translations[language];
   const ENHANCE_MODES = getEnhanceModes(language);
+  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined;
+  const whatsappMessage = language === 'tr'
+    ? 'Merhaba, Fotomatik konusunda destek almak istiyorum.'
+    : 'Hi, I would like help with Fotomatik.';
+  const whatsappSubtitle = language === 'tr' ? 'Hemen yazin' : 'Message now';
 
   const aspectRatios = [
     { label: t.aspectRatios.square, value: '1:1' },
@@ -779,9 +785,14 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
           />
         )}
       </div>
+      <WhatsAppPanel
+        phoneNumber={whatsappNumber}
+        message={whatsappMessage}
+        title="WhatsApp"
+        subtitle={whatsappSubtitle}
+      />
     </div>
   );
 };
 
 export default FotomatikPage;
-

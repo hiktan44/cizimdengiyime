@@ -3,6 +3,7 @@ import { Logo } from '../components/Logo';
 import { CREDIT_PACKAGES } from '../lib/supabase';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { getPublicHeroVideos, getPublicShowcaseImages, getSiteSettings } from '../lib/adminService';
+import { WhatsAppPanel } from '../components/WhatsAppPanel';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -526,6 +527,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const secondaryTextClass = theme === 'dark' ? 'text-slate-400' : 'text-slate-700';
   const descriptionTextClass = theme === 'dark' ? 'text-slate-300' : 'text-slate-800';
   const cardBg = theme === 'dark' ? 'bg-slate-900/50 border-slate-700' : 'bg-white/80 border-slate-200';
+  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined;
+  const whatsappMessage = language === 'tr'
+    ? 'Merhaba, Fasheone hakkinda bilgi almak istiyorum.'
+    : 'Hi, I would like more information about Fasheone.';
+  const whatsappSubtitle = language === 'tr' ? 'Hemen yazin' : 'Message now';
   
   return (
     <div className={`min-h-screen ${bgClass} relative overflow-hidden`}>
@@ -1658,6 +1664,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         </div>
       </footer>
+      <WhatsAppPanel
+        phoneNumber={whatsappNumber}
+        message={whatsappMessage}
+        title="WhatsApp"
+        subtitle={whatsappSubtitle}
+      />
     </div>
   );
 };
