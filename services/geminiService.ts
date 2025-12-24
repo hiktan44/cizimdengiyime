@@ -473,11 +473,12 @@ export const generateImage = async (
     ${clothingType === 'Genel' && color ? `Kıyafet rengi: ${color}` : ''}
 
     ${patternImageFile ? `
-    *** DESEN / BASKı TALİMATI (ÖNEMLİ) ***
-    Girdi olarak sağlanan "Desen Görseli"ni analiz et ve bu deseni modelin giydiği kıyafete uygula.
-    - Deseni, kumaşın kıvrımlarına ve ışık gölgelerine uygun şekilde, gerçekçi bir dokuyla yerleştir (texture mapping).
-    - Desen, kıyafetin tamamını kaplamalı veya tasarımın gerektirdiği şekilde bölgesel uygulanmalıdır.
-    - Kıyafetin temel rengi ile desenin renklerini harmonik bir şekilde birleştir.
+    *** KRİTİK: DESEN / DOKU CIKARTMA VE UYGULAMA TALİMATI ***
+    Girdi olarak (sonda) sağlanan "Desen Görseli"ni analiz et. Bu görselde bir insan, manken veya kıyafet fotoğrafı olabilir.
+    - GÖREV: Desen görselindeki FORMU, KİŞİYİ veya KIYAFETİN ŞEKLİNİ GÖRMEZDEN GEL. Sadece üzerindeki DESENİ (PATTERN), DOKUYU ve RENK BASKISINI klonla.
+    - UYGULAMA: Çıkardığın bu saf deseni, oluşturduğun yeni modelin üzerindeki kıyafete "Wrap" (sarma) yöntemiyle uygula.
+    - Kumaşın kıvrımlarına, ışık ve gölgelerine uyumlu şekilde, deseni gerçekçi bir doku olarak yerleştir (Professional Texture Mapping).
+    - Desen görselindeki mankeni veya arka planı ASLA yeni görsele taşıma. Sadece deseni al.
     ` : ''}
 
     ${getStylePromptFragment(style)}`;
