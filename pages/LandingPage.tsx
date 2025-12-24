@@ -402,9 +402,9 @@ const detectDefaultLanguage = (): Language => {
   return 'en';
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({ 
-  onGetStarted, 
-  onSignIn, 
+export const LandingPage: React.FC<LandingPageProps> = ({
+  onGetStarted,
+  onSignIn,
   isLoggedIn = false,
   userName,
   userRole,
@@ -412,14 +412,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onLogout,
   onAdminClick,
   onBuyCreditsClick,
-  sketchUrl, 
-  productUrl, 
-  modelUrl, 
-  videoUrl, 
-  heroVideoUrl, 
-  heroVideo1Url, 
-  heroVideo2Url, 
-  heroVideo3Url 
+  sketchUrl,
+  productUrl,
+  modelUrl,
+  videoUrl,
+  heroVideoUrl,
+  heroVideo1Url,
+  heroVideo2Url,
+  heroVideo3Url
 }) => {
   // State for DB content
   const [heroVideos, setHeroVideos] = useState<string[]>([]);
@@ -440,7 +440,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     const fetchContent = async () => {
       try {
         console.log('🔄 Ana sayfa içeriği Supabase\'den çekiliyor...');
-        
+
         // Fetch hero videos
         const videos = await getPublicHeroVideos();
         const videoUrls = videos.map(v => v.video_url);
@@ -493,7 +493,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const demoProduct = showcaseImages.product || productUrl || 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600';
   const demoModel = showcaseImages.model || modelUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600';
   const demoVideo = showcaseImages.video || videoUrl;
-  
+
   // Use DB hero videos or fallback
   const demoHeroVideo = heroVideos[0] || heroVideoUrl || 'https://cdn.pixabay.com/video/2024/01/09/196454-904303173_large.mp4';
   const demoHeroVideo1 = heroVideos[1] || heroVideo1Url || '';
@@ -518,11 +518,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   }, [theme]);
 
   const t = translations[language];
-  
+
   const bgClass = theme === 'dark'
     ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900'
     : 'bg-gradient-to-br from-blue-100 via-white via-purple-50 to-orange-100';
-  
+
   const textClass = theme === 'dark' ? 'text-white' : 'text-slate-900';
   const secondaryTextClass = theme === 'dark' ? 'text-slate-400' : 'text-slate-700';
   const descriptionTextClass = theme === 'dark' ? 'text-slate-300' : 'text-slate-800';
@@ -532,17 +532,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     ? 'Merhaba, Fasheone hakkinda bilgi almak istiyorum.'
     : 'Hi, I would like more information about Fasheone.';
   const whatsappSubtitle = language === 'tr' ? 'Hemen yazin' : 'Message now';
-  
+
   return (
     <div className={`min-h-screen ${bgClass} relative overflow-hidden`}>
       {/* Animated gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-green-500/5 via-blue-500/5 to-indigo-500/5 animate-pulse pointer-events-none z-0"></div>
-      
+
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-[100] w-full ${theme === 'dark' ? 'bg-slate-900/95' : 'bg-white/95'} backdrop-blur-md border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} shadow-xl`}>
-        <div className="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Logo className="h-[80px]" theme={theme} />
-          <div className="flex items-center gap-3 md:gap-4">
+      <header className={`fixed top-0 left-0 right-0 z-[100] w-full ${theme === 'dark' ? 'bg-slate-900/95' : 'bg-white/95'} backdrop-blur-md border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} shadow-xl transition-all duration-300`}>
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+          <Logo className="h-10 md:h-[80px]" theme={theme} />
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-3 md:gap-4">
             {/* Language Toggle */}
             <div className={`flex items-center gap-2 ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-slate-200'} rounded-full p-1`}>
               <button
@@ -558,7 +560,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 EN
               </button>
             </div>
-            
+
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -575,7 +577,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </svg>
               )}
             </button>
-            
+
             {/* User Info - If Logged In */}
             {isLoggedIn && userName && (
               <div className="hidden sm:flex items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-full px-4 py-1.5">
@@ -591,8 +593,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <>
                 <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/50 rounded-full px-3 sm:px-4 py-1.5 flex items-center gap-2">
                   <svg className="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
+                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                   </svg>
                   <span className="text-sm font-bold text-white">{credits}</span>
                   <span className="text-xs text-slate-400 hidden sm:inline">Kredi</span>
@@ -611,16 +613,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </>
             )}
 
-            {/* Admin Panel Button - Only shown if user is admin */}
+            {/* Admin Panel Button */}
             {userRole === 'admin' && onAdminClick && (
-              <button 
+              <button
                 onClick={onAdminClick}
                 className="text-xs md:text-sm font-medium px-3 py-1.5 rounded-full border bg-purple-500/10 text-purple-400 border-purple-500/50 hover:bg-purple-500/20 transition-all"
               >
                 ⚙️ Admin Panel
               </button>
             )}
-            
+
             {/* Auth Buttons */}
             {isLoggedIn ? (
               <button
@@ -646,69 +648,122 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-4">
+            {/* Mobile Credits */}
+            {isLoggedIn && credits !== undefined && (
+              <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/50 rounded-full px-3 py-1 flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
+                </svg>
+                <span className="text-xs font-bold text-white">{credits}</span>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                const menu = document.getElementById('mobile-menu');
+                menu?.classList.toggle('hidden');
+              }}
+              className="p-2 text-slate-300 hover:text-white"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        <div id="mobile-menu" className="hidden md:hidden bg-slate-900 border-t border-slate-800 p-4 absolute w-full left-0 animate-fadeIn">
+          <div className="flex flex-col space-y-4">
+            {/* User Info */}
+            {isLoggedIn && userName && (
+              <div className="flex items-center gap-3 pb-3 border-b border-slate-800">
+                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
+                  <span className="text-lg">👤</span>
+                </div>
+                <div>
+                  <div className="font-medium text-white">{userName}</div>
+                  {credits !== undefined && <div className="text-xs text-slate-400">{credits} Krediniz var</div>}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Actions */}
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400 text-sm">Dil / Language</span>
+              <div className="flex bg-slate-800 rounded-lg p-1">
+                <button onClick={() => setLanguage('tr')} className={`px-3 py-1 rounded text-xs ${language === 'tr' ? 'bg-slate-600 text-white' : 'text-slate-400'}`}>TR</button>
+                <button onClick={() => setLanguage('en')} className={`px-3 py-1 rounded text-xs ${language === 'en' ? 'bg-slate-600 text-white' : 'text-slate-400'}`}>EN</button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400 text-sm">Tema / Theme</span>
+              <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 bg-slate-800 rounded-lg">
+                {theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
+              </button>
+            </div>
+
+            {userRole === 'admin' && onAdminClick && (
+              <button onClick={onAdminClick} className="w-full py-3 bg-purple-900/30 text-purple-300 rounded-lg border border-purple-500/20 text-center text-sm">
+                Admin Paneli
+              </button>
+            )}
+
+            {isLoggedIn ? (
+              <>
+                {onBuyCreditsClick && (
+                  <button onClick={onBuyCreditsClick} className="w-full py-3 bg-green-600/20 text-green-400 rounded-lg border border-green-500/20 text-center text-sm font-medium">
+                    {t.header.buyCredits}
+                  </button>
+                )}
+                <button onClick={onLogout} className="w-full py-3 bg-red-900/20 text-red-400 rounded-lg border border-red-500/20 text-center text-sm">
+                  {t.header.signOut}
+                </button>
+              </>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button onClick={onSignIn} className="py-3 bg-slate-800 text-slate-300 rounded-lg text-sm text-center">
+                  {t.header.signIn}
+                </button>
+                <button onClick={onGetStarted} className="py-3 bg-cyan-600 text-white rounded-lg text-sm font-bold text-center">
+                  {t.header.start}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
       {/* Hero Section - Genişletilmiş */}
       <section className="relative pt-64 pb-32 px-6 z-10 min-h-screen flex items-center justify-center overflow-hidden">
         {/* Hero Arka Plan Videoları - 4 adet sırayla dönen */}
-        {(demoHeroVideo || demoHeroVideo1 || demoHeroVideo2 || demoHeroVideo3) && (
-          <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-            {/* Video 1 */}
-            {demoHeroVideo && (
-              <video 
-                key="hero-video-main"
-                src={demoHeroVideo} 
-                className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fadeInOut" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                style={{ animationDelay: '0s' }}
-              />
-            )}
-            {/* Video 2 - 8 saniye sonra başlar */}
-            {demoHeroVideo1 && (
-              <video 
-                key="hero-video-1"
-                src={demoHeroVideo1} 
-                className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fadeInOut" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                style={{ animationDelay: '8s' }}
-              />
-            )}
-            {/* Video 3 - 16 saniye sonra başlar */}
-            {demoHeroVideo2 && (
-              <video 
-                key="hero-video-2"
-                src={demoHeroVideo2} 
-                className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fadeInOut" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                style={{ animationDelay: '16s' }}
-              />
-            )}
-            {/* Video 4 - 24 saniye sonra başlar */}
-            {demoHeroVideo3 && (
-              <video 
-                key="hero-video-3"
-                src={demoHeroVideo3} 
-                className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fadeInOut" 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                style={{ animationDelay: '24s' }}
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-transparent to-slate-900"></div>
-          </div>
-        )}
+        {/* Hero Arka Plan Videoları - Güvenilir Oynatma */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+          {/* Tek bir ana video kullanıyoruz mobil için, complexity'i düşürmek ve autoplay'i garanti etmek için */}
+          {(demoHeroVideo || demoHeroVideo1) && (
+            <video
+              key={demoHeroVideo}
+              src={demoHeroVideo}
+              className="absolute inset-0 w-full h-full object-cover opacity-80"
+              autoPlay
+              loop
+              muted
+              playsInline={true}
+              webkit-playsinline="true"
+              poster="https://images.unsplash.com/photo-1558769132-cb1f16413c80?q=80&w=2574&auto=format&fit=crop"
+            >
+              <source src={demoHeroVideo} type="video/mp4" />
+              Tarayıcınız video oynatmayı desteklemiyor.
+            </video>
+          )}
+
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-transparent to-slate-900"></div>
+        </div>
 
         <div className="max-w-7xl mx-auto text-center relative z-30 w-full mt-24">
           <h1 className={`text-5xl md:text-7xl font-black ${textClass} mb-6 leading-tight drop-shadow-2xl`}>
@@ -740,7 +795,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className={`${secondaryTextClass} text-center mb-16`}>
             {t.howItWorks.subtitle}
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
@@ -793,7 +848,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className={`${secondaryTextClass} text-center mb-16`}>
             {t.showcase.subtitle}
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1: Çizimden Ürüne */}
             <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition`}>
@@ -1317,7 +1372,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className={`${secondaryTextClass} text-center mb-12`}>
             {t.pricing.creditPackagesSubtitle}
           </p>
-          
+
           {/* Credit Packages */}
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
@@ -1492,7 +1547,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className={`${secondaryTextClass} text-center mb-16`}>
             {t.comparison.subtitle}
           </p>
-          
+
           <div className="space-y-4">
             {/* Row 1 */}
             <div className="grid md:grid-cols-2 gap-4">
@@ -1657,8 +1712,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col items-center gap-6">
             {/* Logo */}
-            <Logo className="h-[120px]" theme={theme} />
-            
+            <Logo className="h-16 md:h-[120px]" theme={theme} />
+
             {/* Copyright */}
             <p className={`${secondaryTextClass} text-center`}>&copy; 2024 Fasheone. Tüm hakları saklıdır.</p>
           </div>
