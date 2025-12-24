@@ -497,20 +497,29 @@ export const generateImage = async (
     ${clothingType === 'Genel' && color ? `Kıyafet rengi: ${color}` : ''}
 
     ${patternImageFile ? `
-    *** MUTLAK KURAL: DESEN GÖRSELİ AYRIŞTIRMA ***
-    Sistemde "Desen Görseli" olarak işaretlenen görsel, SADECE BİR DOKU/YÜZEY ÖRNEĞİ (TEXTURE SWATCH) OLARAK KULLANILMALIDIR.
+    *** MUTLAK KURAL: GÖRSEL GÖREV DAĞILIMI (ROLE ASSIGNMENT) ***
     
-    1. İÇERİK YASAĞI: Desen görselinin içindeki insanları, mankenleri, kıyafetin kesimini, arka planı veya herhangi bir nesneyi ASLA çizimine dahil etme. Bunları GÖRMEZDEN GEL.
-    2. DESEN ÇIKARMA: O görselden sadece "tekrarlayan deseni" (repeating pattern) veya "kumaş dokusunu" kopyala.
-    3. DÖŞEME (TILING): Bu deseni alıp, sanki bir kumaş topundan kesilmiş gibi, benim ana çizimimdeki kıyafetin üzerine DÖŞE.
+    BU ISTEKTE EN AZ İKİ FARKLI GÖRSEL VARDIR. GÖREVLERİ KARIŞTIRMA!
     
+    GÖRSEL 1 (KIYAFET REFERANSI):
+    - ROL: PATRON, KESİM ve TASARIM KAYNAĞI.
+    - GÖREV: Modelin giyeceği kıyafetin ŞEKLİ, KALIBI, YAKASI, KOLLARI ve ETEK BOYU %100 BURADAN ALINACAKTIR.
+    - KISITLAMA: Bu kıyafetin rengini veya desenini YOKSAY (Desen Görseli baskındır).
+    
+    GÖRSEL 2 (DESEN GÖRSELİ - SONDAKİ GÖRSEL):
+    - ROL: KAPLAMA ve DOKU KAYNAĞI (TEXTURE MATERIAL).
+    - GÖREV: Bu görseldeki renkleri ve desenleri al.
+    - İŞLEM: Görsel 1'deki kıyafetin şeklini BOZMADAN, bu deseni üzerine YENİ BİR KUMAŞ GİBİ KAPLA.
+    - YASAK: Görsel 2'deki kıyafetin ŞEKLİNİ veya KESİMİNİ KOPYALAMA. Sadece desenini al.
+    
+    SONUÇ: GÖRSEL 1'in ŞEKLİ + GÖRSEL 2'nin DESENİ.
     ` : ''}
     
-    ${getStylePromptFragment(style)}`;
+    ${getStylePromptFragment(style)} `;
 
     // Kullanıcı Özel İsteği (En yüksek öncelik)
     if (customPrompt && customPrompt.trim().length > 0) {
-        prompt += ` \nKULLANICI ÖZEL İSTEĞİ (Buna kesinlikle uy): ${customPrompt}.`;
+        prompt += ` \nKULLANICI ÖZEL İSTEĞİ(Buna kesinlikle uy): ${customPrompt}.`;
     }
 
     // Explicit Identity Instruction Block
@@ -520,10 +529,10 @@ export const generateImage = async (
 
     prompt += `
     *** MODEL KİMLİĞİ TALİMATI ***
-    - Cinsiyet: ${gen === 'Female' ? 'Kadın (Female)' : 'Erkek (Male)'}
-    - Yaş Grubu: ${age}
-    - Etnik Köken: ${eth}
-    - YÜZ ÖZELLİKLERİ: Bu seed ('${seed || 'random'}') için benzersiz ve tutarlı bir yüz yapısı oluştur. Referans resimdeki insan yüzünü KESİNLİKLE KOPYALAMA.
+        - Cinsiyet: ${gen === 'Female' ? 'Kadın (Female)' : 'Erkek (Male)'}
+- Yaş Grubu: ${age}
+- Etnik Köken: ${eth}
+- YÜZ ÖZELLİKLERİ: Bu seed('${seed || 'random'}') için benzersiz ve tutarlı bir yüz yapısı oluştur.Referans resimdeki insan yüzünü KESİNLİKLE KOPYALAMA.
     `;
 
     if (bodyType && bodyType !== 'Standart') {
@@ -556,27 +565,27 @@ export const generateImage = async (
         if (shoeColor && shoeColor.trim()) {
             prompt += ` Ayakkabı rengi: ${shoeColor}.`;
         }
-        prompt += ` Ayakkabılar çerçevede NET görünmelidir (tam vücut çekiminde).`;
+        prompt += ` Ayakkabılar çerçevede NET görünmelidir(tam vücut çekiminde).`;
     }
 
     // Accessories
     if (accessories && accessories.trim()) {
-        prompt += ` *** AKSESUAR TALİMATI ***: Model ${accessories} kullanmalıdır. Aksesuar doğal ve estetik bir şekilde modelin üzerinde/elinde olmalıdır.`;
+        prompt += ` *** AKSESUAR TALİMATI ***: Model ${accessories} kullanmalıdır.Aksesuar doğal ve estetik bir şekilde modelin üzerinde / elinde olmalıdır.`;
     }
 
     if (customBackground) {
-        prompt += ` *** ARKA PLAN TALİMATI ***: Modeli, sağlanan İKİNCİ görseldeki (arka plan görseli) mekana yerleştir. Işıklandırmayı bu arka planla uyumlu hale getir.`;
+        prompt += ` *** ARKA PLAN TALİMATI ***: Modeli, sağlanan İKİNCİ görseldeki(arka plan görseli) mekana yerleştir.Işıklandırmayı bu arka planla uyumlu hale getir.`;
         if (customBackgroundPrompt && customBackgroundPrompt.trim()) {
             prompt += ` Arka plan detayı: ${customBackgroundPrompt}.`;
         }
     } else {
-        prompt += ` ${getLocationPromptFragment(location)}`;
+        prompt += ` ${getLocationPromptFragment(location)} `;
         if (customBackgroundPrompt && customBackgroundPrompt.trim()) {
             prompt += ` Arka plan ek detay: ${customBackgroundPrompt}.`;
         }
     }
 
-    prompt += ` Model doğrudan kameraya (veya promptta belirtilen yöne), kendine güvenen, profesyonel bir model ifadesiyle bakmalıdır.`;
+    prompt += ` Model doğrudan kameraya(veya promptta belirtilen yöne), kendine güvenen, profesyonel bir model ifadesiyle bakmalıdır.`;
 
     // Add final color reminder at the end
     prompt += colorClosing;
@@ -610,7 +619,7 @@ export const generateImage = async (
 
         if (candidate.finishReason && candidate.finishReason !== 'STOP') {
             if (!candidate.content?.parts) {
-                throw new Error(`Görsel oluşturulamadı. Sebep: ${candidate.finishReason}`);
+                throw new Error(`Görsel oluşturulamadı.Sebep: ${candidate.finishReason} `);
             }
         }
 
@@ -622,7 +631,7 @@ export const generateImage = async (
         for (const part of parts) {
             if (part.inlineData) {
                 const base64ImageBytes: string = part.inlineData.data;
-                return `data:${part.inlineData.mimeType};base64,${base64ImageBytes}`;
+                return `data:${part.inlineData.mimeType}; base64, ${base64ImageBytes} `;
             }
         }
         throw new Error("Görsel yanıtı işlenemedi.");
@@ -649,7 +658,7 @@ export const upscaleImage = async (imageFile: File): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
 
-    const prompt = `Upscale this image to 4K resolution. Enhance details, sharpness, and textures while strictly preserving the original colors, composition, and identity of the subject.`;
+    const prompt = `Upscale this image to 4K resolution.Enhance details, sharpness, and textures while strictly preserving the original colors, composition, and identity of the subject.`;
 
     try {
         const response = await ai.models.generateContent({
@@ -675,7 +684,7 @@ export const upscaleImage = async (imageFile: File): Promise<string> => {
         if (parts) {
             for (const part of parts) {
                 if (part.inlineData) {
-                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    return `data:${part.inlineData.mimeType}; base64, ${part.inlineData.data} `;
                 }
             }
         }
