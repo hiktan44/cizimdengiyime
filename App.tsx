@@ -111,9 +111,9 @@ const ToolPage: React.FC<{
         const [loadingText, setLoadingText] = useState('Yapay zeka düşünüyor...');
         const [progress, setProgress] = useState(0);
 
-        // Step 3: Result (Model & Video)
-        const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
-        const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+        // Step 3: Result (Model & Video) - Persisted
+        const [generatedImageUrl, setGeneratedImageUrl] = useStickyState<string | null>(null, 'fasheone_generatedImageUrl');
+        const [generatedVideoUrl, setGeneratedVideoUrl] = useStickyState<string | null>(null, 'fasheone_generatedVideoUrl');
 
         // -- Technical Drawing State --
         const [techInputFile, setTechInputFile] = useState<File | null>(null);
@@ -441,8 +441,6 @@ const ToolPage: React.FC<{
             setIsModelLoading(true);
             setGeneratedImageUrl(null);
             setGeneratedVideoUrl(null);
-            setLoadingText(isKombinMode ? 'Kombin ile canlı model oluşturuluyor...' : 'Canlı model oluşturuluyor...');
-
             setLoadingText(isKombinMode ? 'Kombin ile canlı model oluşturuluyor...' : 'Canlı model oluşturuluyor...');
 
             startProgressSimulation(85, 300);
