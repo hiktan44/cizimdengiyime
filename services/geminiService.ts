@@ -449,6 +449,12 @@ export const generateImage = async (
     - LOGO VE YAZI KORUMASI: Kıyafetin üzerindeki marka isimleri, logolar, grafik baskılar ve metinler PİKSELİ PİKSELİNE KORUNMALIDIR.
     - TASARIM SADAKATİ: Kıyafetin kesimi, dikiş detayları, yaka şekli ve kalıbı referans görselle tıpatıp aynı olmalıdır.
     
+    *** 3. KRİTİK: MODEL KİMLİĞİ VE YÜZ AYRIMI ***
+    - GÖREV: Referans görseldeki KIYAFETİ al, yeni bir insan modele giydir.
+    - DİKKAT: Referans görselde bir insan veya manken resmi varsa, onun YÜZÜNÜ ve KİMLİĞİNİ KESİNLİKLE KULLANMA. O sadece bir mankendir.
+    - HEDEF: Aşağıdaki fiziksel özelliklere sahip YENİ ve ÖZGÜN bir model oluştur ve kıyafeti ona giydir.
+    
+    
     *** 3. GÖRSEL KALİTESİ VE GERÇEKÇİLİK ***:
     1. Kumaş Simülasyonu: Kumaşın fiziksel özellikleri (ağırlık, döküm, parlaklık, doku) mükemmel şekilde yansıtılmalı.${fabricType ? ` Kumaş tipi: ${fabricType}.` : ''}${fabricFinish ? ` Kumaş yüzey bitişi: ${fabricFinish}.` : ''}
     2. Işık ve Atmosfer: Sahneye derinlik katan, ${lighting} tarzında profesyonel aydınlatma. Cilt üzerinde gerçekçi ışık kırılımları (subsurface scattering).
@@ -474,9 +480,18 @@ export const generateImage = async (
         prompt += ` \nKULLANICI ÖZEL İSTEĞİ (Buna kesinlikle uy): ${customPrompt}.`;
     }
 
-    if (ethnicity && ethnicity !== 'Farklı') {
-        prompt += ` Model ${ethnicity} kökenli bir görünüme sahip olmalıdır.`;
-    }
+    // Explicit Identity Instruction Block
+    const gen = gender || 'Female';
+    const age = ageRange || 'Adult';
+    const eth = ethnicity && ethnicity !== 'Genel Dünya Karması' ? ethnicity : 'diverse/international model look';
+
+    prompt += `
+    *** MODEL KİMLİĞİ TALİMATI ***
+    - Cinsiyet: ${gen === 'Female' ? 'Kadın (Female)' : 'Erkek (Male)'}
+    - Yaş Grubu: ${age}
+    - Etnik Köken: ${eth}
+    - YÜZ ÖZELLİKLERİ: Bu seed ('${seed || 'random'}') için benzersiz ve tutarlı bir yüz yapısı oluştur. Referans resimdeki insan yüzünü KESİNLİKLE KOPYALAMA.
+    `;
 
     if (bodyType && bodyType !== 'Standart') {
         prompt += ` Modelin vücut tipi: ${bodyType}.`;
