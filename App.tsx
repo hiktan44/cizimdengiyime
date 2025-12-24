@@ -129,6 +129,10 @@ const ToolPage: React.FC<{
         const [cameraAngle, setCameraAngle] = useState('Normal');
         const [cameraZoom, setCameraZoom] = useState('Normal'); // Yeni: Çekim mesafesi
 
+        // Pattern State
+        const [patternFile, setPatternFile] = useState<File | null>(null);
+        const [patternPreview, setPatternPreview] = useState<string | null>(null);
+
         // Aspect Ratio
         const [aspectRatio, setAspectRatio] = useState<'9:16' | '3:4' | '4:5' | '1:1' | '16:9'>('3:4');
 
@@ -441,7 +445,8 @@ const ToolPage: React.FC<{
                     accessories,
                     ageRange,
                     gender,
-                    secondSourceFile || undefined // Pass second image for Kombin mode
+                    secondSourceFile || undefined, // Pass second image for Kombin mode
+                    patternFile || undefined // Pass pattern file
                 );
                 finishProgress();
                 setTimeout(() => {
@@ -463,7 +468,7 @@ const ToolPage: React.FC<{
                         customPrompt, lighting, cameraAngle, cameraZoom, aspectRatio,
                         fabricType, fabricFinish, shoeType, shoeColor, accessories,
                         ageRange, gender,
-                        isKombinMode
+                        isKombinMode, hasPattern: !!patternFile
                     }
                 );
 
@@ -973,6 +978,58 @@ const ToolPage: React.FC<{
                                                 selectedColor={colorSuggestion}
                                                 onColorChange={setColorSuggestion}
                                             />
+
+                                            {/* Pattern Upload */}
+                                            <div className="bg-slate-800/50 p-3 rounded-xl border border-dashed border-slate-600">
+                                                <label className="block text-xs font-medium text-slate-400 mb-2">
+                                                    Desen / Baskı Ekle (İsteğe Bağlı)
+                                                </label>
+
+                                                {patternPreview ? (
+                                                    <div className="relative group">
+                                                        <img
+                                                            src={patternPreview}
+                                                            alt="Desen"
+                                                            className="w-full h-20 object-cover rounded-lg"
+                                                        />
+                                                        <button
+                                                            onClick={() => {
+                                                                setPatternFile(null);
+                                                                setPatternPreview(null);
+                                                            }}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="relative">
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    setPatternFile(file);
+                                                                    setPatternPreview(URL.createObjectURL(file));
+                                                                }
+                                                            }}
+                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                        />
+                                                        <div className="flex items-center gap-2 text-slate-400 text-xs py-2 px-3 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors border border-slate-600">
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+                                                            <span>Desen görseli seçin...</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <p className="text-[10px] text-slate-500 mt-1 pl-1">
+                                                    Eklenen desen kıyafete uygulanır.
+                                                </p>
+                                            </div>
 
                                             {(clothingType === 'Alt & Üst' || clothingType === 'Takım Elbise') && (
                                                 <div className="pt-2 border-t border-slate-700/50">

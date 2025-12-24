@@ -357,7 +357,8 @@ export const generateImage = async (
     accessories?: string,
     ageRange?: string, // New: Yaş Aralığı (Child, Teen, Adult, Elderly)
     gender?: string,   // New: Cinsiyet
-    secondProductFile?: File // New: İkinci ürün görseli (Alt & Üst kombin için)
+    secondProductFile?: File, // New: İkinci ürün görseli (Alt & Üst kombin için)
+    patternImageFile?: File // New: Desen/Baskı görseli
 ): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
@@ -370,6 +371,13 @@ export const generateImage = async (
         const secondPart = await fileToGenerativePart(secondProductFile);
         promptParts.push(secondPart);
         console.log('📦 İkinci ürün görseli (Alt Giyim) eklendi');
+    }
+
+    // Add pattern image if provided
+    if (patternImageFile) {
+        const patternPart = await fileToGenerativePart(patternImageFile);
+        promptParts.push(patternPart);
+        console.log('📦 Desen görseli eklendi');
     }
 
     // Add custom background if provided
@@ -449,6 +457,14 @@ export const generateImage = async (
     *** 4. KIYAFET YAPILANDIRMASI ***:
     Kıyafet Türü: ${clothingType}
     ${clothingType === 'Genel' && color ? `Kıyafet rengi: ${color}` : ''}
+
+    ${patternImageFile ? `
+    *** DESEN / BASKı TALİMATI (ÖNEMLİ) ***
+    Girdi olarak sağlanan "Desen Görseli"ni analiz et ve bu deseni modelin giydiği kıyafete uygula.
+    - Deseni, kumaşın kıvrımlarına ve ışık gölgelerine uygun şekilde, gerçekçi bir dokuyla yerleştir (texture mapping).
+    - Desen, kıyafetin tamamını kaplamalı veya tasarımın gerektirdiği şekilde bölgesel uygulanmalıdır.
+    - Kıyafetin temel rengi ile desenin renklerini harmonik bir şekilde birleştir.
+    ` : ''}
 
     ${getStylePromptFragment(style)}`;
 
