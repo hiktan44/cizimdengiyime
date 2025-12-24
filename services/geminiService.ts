@@ -587,6 +587,16 @@ export const generateImage = async (
 
     prompt += ` Model doğrudan kameraya(veya promptta belirtilen yöne), kendine güvenen, profesyonel bir model ifadesiyle bakmalıdır.`;
 
+    // FINAL CHECKLIST (Recency Bias Leverage)
+    prompt += `
+    
+    *** FİNAL KONTROL LİSTESİ (BUNLARI ONAYLAMADAN ÇİZİME BAŞLAMA) ***
+    1. KIYAFET: Şekil, kesim ve dikişler GÖRSEL 1 (Kıyafet) ile AYNI MI? -> EVET.
+    ${patternImageFile ? '2. DESEN: Kıyafetin üzerindeki doku GÖRSEL 2 (Desen) ile AYNI MI? -> EVET (Ama şekli görsel 2 den ALMA!)' : ''}
+    ${modelIdentityFile ? '3. YÜZ: Yüz hatları, "Kimlik Görseli"ndeki kişiyle AYNI MI? -> EVET (Face Swap Yapıldı).' : '3. YÜZ: Referans resimdeki yüz SİLİNDİ Mİ? -> EVET (Yeni yüz yaratıldı).'}
+    4. RENK: İstenilen renk TAM OTURDU MU? -> EVET.
+    `;
+
     // Add final color reminder at the end
     prompt += colorClosing;
 
