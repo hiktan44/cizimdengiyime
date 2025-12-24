@@ -155,6 +155,7 @@ const ToolPage: React.FC<{
         // Model Consistency (Seed)
         const [modelSeed, setModelSeed] = useStickyState<number | null>(null, 'fasheone_modelSeed');
         const [isModelLocked, setIsModelLocked] = useStickyState<boolean>(false, 'fasheone_isModelLocked');
+        const [lockedModelReference, setLockedModelReference] = useStickyState<string | null>(null, 'fasheone_lockedModelReference');
 
         // Pattern State
         const [patternFile, setPatternFile] = useState<File | null>(null);
@@ -461,11 +462,20 @@ const ToolPage: React.FC<{
 
             // Model Identity Logic (for Locking)
             let modelIdentityFile: File | undefined = undefined;
-            if (isModelLocked && generatedImageUrl) {
+
+            // LOGIC: If locked, prefer the PERMANENT reference. If not available, fallback to current image.
+            const identitySourceUrl = isModelLocked ? (lockedModelReference || generatedImageUrl) : null;
+
+            if (identitySourceUrl) {
                 try {
                     // Convert the stored URL (base64 or remote) to a File
-                    modelIdentityFile = await base64ToFile(generatedImageUrl, "identity_ref.jpg");
-                    console.log('🔒 Locked Model Identity image prepared');
+                    modelIdentityFile = await base64ToFile(identitySourceUrl, "identity_ref.jpg");
+                    console.log('🔒 Locked Model Identity image prepared from:', isModelLocked && lockedModelReference ? 'SAVED REFERENCE' : 'CURRENT IMAGE');
+
+                    // Auto-fix: If locked but no reference saved yet, save it now
+                    if (isModelLocked && !lockedModelReference) {
+                        setLockedModelReference(identitySourceUrl);
+                    }
                 } catch (e) {
                     console.error('Failed to prepare locked model image:', e);
                 }
@@ -1183,7 +1193,21 @@ const ToolPage: React.FC<{
                                                         alert("Henüz bir model oluşturulmadı. Önce bir kez görsel oluşturun, sonra kilitleyebilirsiniz.");
                                                         return;
                                                     }
-                                                    setIsModelLocked(!isModelLocked);
+
+                                                    // State Update Logic
+                                                    if (!isModelLocked) {
+                                                        // Locking ON: Save current image as permanent reference
+                                                        if (generatedImageUrl) {
+                                                            setLockedModelReference(generatedImageUrl);
+                                                            console.log("🔒 Model Identity LOCKED: Saved reference image.");
+                                                        }
+                                                        setIsModelLocked(true);
+                                                    } else {
+                                                        // Locking OFF: Clear reference
+                                                        setLockedModelReference(null);
+                                                        console.log("🔓 Model Identity UNLOCKED: Cleared reference image.");
+                                                        setIsModelLocked(false);
+                                                    }
                                                 }}
                                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${isModelLocked
                                                     ? 'bg-green-500/20 text-green-400 border border-green-500/50'
