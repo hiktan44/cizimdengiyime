@@ -1,5 +1,28 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+
+// Hook for persistent state
+function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
+    const [value, setValue] = useState<T>(() => {
+        try {
+            const stickyValue = window.localStorage.getItem(key);
+            return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
+        } catch (error) {
+            console.warn(`Error parsing localStorage key "${key}":`, error);
+            return defaultValue;
+        }
+    });
+
+    useEffect(() => {
+        try {
+            window.localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            console.warn(`Error setting localStorage key "${key}":`, error);
+        }
+    }, [key, value]);
+
+    return [value, setValue];
+}
 import { Header } from './components/Header';
 import { ImageUploader } from './components/ImageUploader';
 import { ResultDisplay } from './components/ResultDisplay';
@@ -97,44 +120,44 @@ const ToolPage: React.FC<{
         const [techInputPreview, setTechInputPreview] = useState<string | undefined>(undefined);
         const [generatedTechSketchUrl, setGeneratedTechSketchUrl] = useState<string | null>(null);
         const [isTechLoading, setIsTechLoading] = useState(false);
-        const [techSketchStyle, setTechSketchStyle] = useState<'colored' | 'blackwhite'>('blackwhite'); // New: Renkli veya Karakalem
+        const [techSketchStyle, setTechSketchStyle] = useStickyState<'colored' | 'blackwhite'>('blackwhite', 'fasheone_techSketchStyle'); // New: Renkli veya Karakalem
 
         // Product color for sketch-to-product
-        const [productColor, setProductColor] = useState('');
+        const [productColor, setProductColor] = useStickyState('', 'fasheone_productColor');
 
         // Options
-        const [clothingType, setClothingType] = useState('Genel'); // New
-        const [colorSuggestion, setColorSuggestion] = useState('');
-        const [secondaryColor, setSecondaryColor] = useState(''); // New for dual color
+        const [clothingType, setClothingType] = useStickyState('Genel', 'fasheone_clothingType'); // New
+        const [colorSuggestion, setColorSuggestion] = useStickyState('', 'fasheone_colorSuggestion');
+        const [secondaryColor, setSecondaryColor] = useStickyState('', 'fasheone_secondaryColor'); // New for dual color
 
-        const [modelEthnicity, setModelEthnicity] = useState('Farklı');
-        const [bodyType, setBodyType] = useState('Standart');
-        const [pose, setPose] = useState('Rastgele');
-        const [artisticStyle, setArtisticStyle] = useState('Gerçekçi');
-        const [location, setLocation] = useState('Podyum');
+        const [modelEthnicity, setModelEthnicity] = useStickyState('Farklı', 'fasheone_modelEthnicity');
+        const [bodyType, setBodyType] = useStickyState('Standart', 'fasheone_bodyType');
+        const [pose, setPose] = useStickyState('Rastgele', 'fasheone_pose');
+        const [artisticStyle, setArtisticStyle] = useStickyState('Gerçekçi', 'fasheone_artisticStyle');
+        const [location, setLocation] = useStickyState('Podyum', 'fasheone_location');
 
         // New Options
-        const [ageRange, setAgeRange] = useState('Adult'); // New: Child, Teen, Adult, Elderly
-        const [gender, setGender] = useState('Female'); // New: Male, Female
-        const [hairColor, setHairColor] = useState('Doğal');
-        const [hairStyle, setHairStyle] = useState('Doğal');
-        const [customPrompt, setCustomPrompt] = useState('');
-        const [customBackgroundPrompt, setCustomBackgroundPrompt] = useState(''); // New: Custom background description
-        const [fabricType, setFabricType] = useState(''); // New: Dokuma/Örme
-        const [fabricFinish, setFabricFinish] = useState(''); // New: Soft/Parlak/Mat/Pastel
-        const [shoeType, setShoeType] = useState(''); // New: Ayakkabı tipi
-        const [shoeColor, setShoeColor] = useState(''); // New: Ayakkabı rengi
-        const [accessories, setAccessories] = useState(''); // New: Aksesuar
-        const [lighting, setLighting] = useState('Doğal');
-        const [cameraAngle, setCameraAngle] = useState('Normal');
-        const [cameraZoom, setCameraZoom] = useState('Normal'); // Yeni: Çekim mesafesi
+        const [ageRange, setAgeRange] = useStickyState('Adult', 'fasheone_ageRange'); // New: Child, Teen, Adult, Elderly
+        const [gender, setGender] = useStickyState('Female', 'fasheone_gender'); // New: Male, Female
+        const [hairColor, setHairColor] = useStickyState('Doğal', 'fasheone_hairColor');
+        const [hairStyle, setHairStyle] = useStickyState('Doğal', 'fasheone_hairStyle');
+        const [customPrompt, setCustomPrompt] = useStickyState('', 'fasheone_customPrompt');
+        const [customBackgroundPrompt, setCustomBackgroundPrompt] = useStickyState('', 'fasheone_customBackgroundPrompt'); // New: Custom background description
+        const [fabricType, setFabricType] = useStickyState('', 'fasheone_fabricType'); // New: Dokuma/Örme
+        const [fabricFinish, setFabricFinish] = useStickyState('', 'fasheone_fabricFinish'); // New: Soft/Parlak/Mat/Pastel
+        const [shoeType, setShoeType] = useStickyState('', 'fasheone_shoeType'); // New: Ayakkabı tipi
+        const [shoeColor, setShoeColor] = useStickyState('', 'fasheone_shoeColor'); // New: Ayakkabı rengi
+        const [accessories, setAccessories] = useStickyState('', 'fasheone_accessories'); // New: Aksesuar
+        const [lighting, setLighting] = useStickyState('Doğal', 'fasheone_lighting');
+        const [cameraAngle, setCameraAngle] = useStickyState('Normal', 'fasheone_cameraAngle');
+        const [cameraZoom, setCameraZoom] = useStickyState('Uzak', 'fasheone_cameraZoom'); // Yeni: Çekim mesafesi - Default: Uzak
 
         // Pattern State
         const [patternFile, setPatternFile] = useState<File | null>(null);
         const [patternPreview, setPatternPreview] = useState<string | null>(null);
 
         // Aspect Ratio
-        const [aspectRatio, setAspectRatio] = useState<'9:16' | '3:4' | '4:5' | '1:1' | '16:9'>('3:4');
+        const [aspectRatio, setAspectRatio] = useStickyState<'9:16' | '3:4' | '4:5' | '1:1' | '16:9'>('3:4', 'fasheone_aspectRatio');
 
         // Custom Background
         const [customBackgroundFile, setCustomBackgroundFile] = useState<File | undefined>(undefined);
