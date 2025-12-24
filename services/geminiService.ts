@@ -422,11 +422,17 @@ export const generateImage = async (
 
     let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
     
-    *** KRİTİK: REFERANS GÖRSEL KULLANIMI ***
-    - Girdi olarak verilen görseller SADECE ve SADECE KIYAFET REFERANSIDIR.
-    - Referans görseldeki MANKENİ, KİŞİYİ veya YÜZÜ ASLA KULLANMA.
-    - Referans görseldeki yüzü, saçı ve vücut yapısını TAMAMEN UNUT.
-    - SIFIRDAN, aşağıda belirtilen özelliklere (seed, etnik köken, yaş) sahip YENİ BİR MODEL OLUŞTUR.
+    *** MUTLAK YASAK: REFERANS YÜZ KULLANIMI (FORBIDDEN FACE PROTOCOL) ***
+    1. Girdi görselindeki yüz, ASLA ve ASLA çıktıya taşınmamalıdır.
+    2. Girdi görseli bir "Başsız Manken" (Headless Mannequin) olarak kabul et. Üzerindeki kafayı ve yüzü "GEÇERSİZ VERİ" olarak işaretle ve SİL.
+    3. HEDEF: Aşağıda tanımlanan "Hedef Model Kimliği"ne göre SIFIRDAN bir kafa ve yüz oluştur.
+    4. KİMLİK SIFIRLAMA: Eğer Seed tanımlanmışsa, bu Seed'i REFERANS GÖRSELDEN BAĞIMSIZ olarak, sadece YENİ YÜZÜ oluşturmak için kullan.
+    
+    ALGORİTMA:
+    Adım 1: Referans görseldeki kıyafeti (ve varsa deseni) analiz et.
+    Adım 2: Referans görseldeki "İnsan/Manken" katmanını tamamen çöpe at.
+    Adım 3: Seed ve Prompt özelliklerine göre (Etnik köken, yaş, saç) YENİ BİR İNSAN yarat.
+    Adım 4: Analiz ettiğin kıyafeti bu YENİ İNSANA giydir.
     
     ${isKombinMode ? 'Girdi olarak verilen İKİ AYRI kıyafet görselini (üst ve alt), gerçekçi bir canlı modele birlikte giydir.' : 'Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.'}
     
