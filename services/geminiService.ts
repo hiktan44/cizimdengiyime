@@ -473,14 +473,15 @@ export const generateImage = async (
     ${clothingType === 'Genel' && color ? `Kıyafet rengi: ${color}` : ''}
 
     ${patternImageFile ? `
-    *** KRİTİK: DESEN / DOKU CIKARTMA VE UYGULAMA TALİMATI ***
-    Girdi olarak (sonda) sağlanan "Desen Görseli"ni analiz et. Bu görselde bir insan, manken veya kıyafet fotoğrafı olabilir.
-    - GÖREV: Desen görselindeki FORMU, KİŞİYİ veya KIYAFETİN ŞEKLİNİ GÖRMEZDEN GEL. Sadece üzerindeki DESENİ (PATTERN), DOKUYU ve RENK BASKISINI klonla.
-    - UYGULAMA: Çıkardığın bu saf deseni, oluşturduğun yeni modelin üzerindeki kıyafete "Wrap" (sarma) yöntemiyle uygula.
-    - Kumaşın kıvrımlarına, ışık ve gölgelerine uyumlu şekilde, deseni gerçekçi bir doku olarak yerleştir (Professional Texture Mapping).
-    - Desen görselindeki mankeni veya arka planı ASLA yeni görsele taşıma. Sadece deseni al.
+    *** MUTLAK KURAL: DESEN GÖRSELİ AYRIŞTIRMA ***
+    Sistemde "Desen Görseli" olarak işaretlenen görsel, SADECE BİR DOKU/YÜZEY ÖRNEĞİ (TEXTURE SWATCH) OLARAK KULLANILMALIDIR.
+    
+    1. İÇERİK YASAĞI: Desen görselinin içindeki insanları, mankenleri, kıyafetin kesimini, arka planı veya herhangi bir nesneyi ASLA çizimine dahil etme. Bunları GÖRMEZDEN GEL.
+    2. DESEN ÇIKARMA: O görselden sadece "tekrarlayan deseni" (repeating pattern) veya "kumaş dokusunu" kopyala.
+    3. DÖŞEME (TILING): Bu deseni alıp, sanki bir kumaş topundan kesilmiş gibi, benim ana çizimimdeki kıyafetin üzerine DÖŞE.
+    
     ` : ''}
-
+    
     ${getStylePromptFragment(style)}`;
 
     // Kullanıcı Özel İsteği (En yüksek öncelik)
