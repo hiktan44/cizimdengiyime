@@ -459,6 +459,18 @@ const ToolPage: React.FC<{
                 console.log('🎲 Using NEW seed:', activeSeed);
             }
 
+            // Model Identity Logic (for Locking)
+            let modelIdentityFile: File | undefined = undefined;
+            if (isModelLocked && generatedImageUrl) {
+                try {
+                    // Convert the stored URL (base64 or remote) to a File
+                    modelIdentityFile = await base64ToFile(generatedImageUrl, "identity_ref.jpg");
+                    console.log('🔒 Locked Model Identity image prepared');
+                } catch (e) {
+                    console.error('Failed to prepare locked model image:', e);
+                }
+            }
+
             try {
                 const imageUrl = await generateImage(
                     sourceFile,
@@ -488,7 +500,8 @@ const ToolPage: React.FC<{
                     gender,
                     secondSourceFile || undefined, // Pass second image for Kombin mode
                     patternFile || undefined, // Pass pattern file
-                    activeSeed // Pass seed
+                    activeSeed, // Pass seed
+                    modelIdentityFile // Pass identity file
                 );
                 finishProgress();
                 setTimeout(() => {

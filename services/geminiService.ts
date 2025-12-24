@@ -359,7 +359,8 @@ export const generateImage = async (
     gender?: string,   // New: Cinsiyet
     secondProductFile?: File, // New: İkinci ürün görseli (Alt & Üst kombin için)
     patternImageFile?: File, // New: Desen/Baskı görseli
-    seed?: number // New: Seed for consistency
+    seed?: number, // New: Seed for consistency
+    modelIdentityFile?: File // New: Previous generation result for identity locking
 ): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
@@ -372,6 +373,13 @@ export const generateImage = async (
         const secondPart = await fileToGenerativePart(secondProductFile);
         promptParts.push(secondPart);
         console.log('📦 İkinci ürün görseli (Alt Giyim) eklendi');
+    }
+
+    // Add model identity image if provided (Highest priority for face)
+    if (modelIdentityFile) {
+        const identityPart = await fileToGenerativePart(modelIdentityFile);
+        promptParts.push(identityPart);
+        console.log('🔒 Referans Model Kimlik görseli eklendi');
     }
 
     // Add pattern image if provided
@@ -420,8 +428,13 @@ export const generateImage = async (
     - Her iki kıyafetin de orijinal tasarım detayları KORUNMALIDIR
     ` : '';
 
-    let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
-    
+    const identityInstruction = modelIdentityFile ? `
+    *** MÜKEMMEL YÜZ EŞLEŞTİRME KURALI (FACE SWAP) ***
+    - Referans olarak verilen "Model Kimlik Görseli"ni analiz et. Bu görseldeki kişinin yüzünü, saçını ve ifadesini KOPYALA.
+    - Ana girdi görselindeki (kıyafet referansı) mankeni YOKSAY.
+    - HEDEF: Ana görseldeki KIYAFETİ al, "Model Kimlik Görseli"ndeki KİŞİYE giydir.
+    - SONUÇ: Tıpatıp aynı yüz, aynı kimlik, yeni kıyafet.
+    ` : `
     *** MUTLAK YASAK: REFERANS YÜZ KULLANIMI (FORBIDDEN FACE PROTOCOL) ***
     1. Girdi görselindeki yüz, ASLA ve ASLA çıktıya taşınmamalıdır.
     2. Girdi görseli bir "Başsız Manken" (Headless Mannequin) olarak kabul et. Üzerindeki kafayı ve yüzü "GEÇERSİZ VERİ" olarak işaretle ve SİL.
@@ -433,6 +446,11 @@ export const generateImage = async (
     Adım 2: Referans görseldeki "İnsan/Manken" katmanını tamamen çöpe at.
     Adım 3: Seed ve Prompt özelliklerine göre (Etnik köken, yaş, saç) YENİ BİR İNSAN yarat.
     Adım 4: Analiz ettiğin kıyafeti bu YENİ İNSANA giydir.
+    `;
+
+    let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
+    
+    ${identityInstruction}
     
     ${isKombinMode ? 'Girdi olarak verilen İKİ AYRI kıyafet görselini (üst ve alt), gerçekçi bir canlı modele birlikte giydir.' : 'Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.'}
     
