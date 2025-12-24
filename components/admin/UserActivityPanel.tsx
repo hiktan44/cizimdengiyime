@@ -123,12 +123,16 @@ export const UserActivityPanel: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<UserActivity | null>(null);
   const [userGenerations, setUserGenerations] = useState<any[]>([]);
   const [language, setLanguage] = useState<Language>('tr');
-  
+
   // Credit addition state
   const [showAddCredit, setShowAddCredit] = useState(false);
   const [creditAmount, setCreditAmount] = useState<number>(10);
   const [creditReason, setCreditReason] = useState('');
   const [isAddingCredit, setIsAddingCredit] = useState(false);
+
+  // Sorting state
+  const [sortKey, setSortKey] = useState<keyof UserActivity>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     loadUsers();
@@ -161,7 +165,7 @@ export const UserActivityPanel: React.FC = () => {
     setGenerationsLoading(true);
     setGenerationsError(null);
     setUserGenerations([]);
-    
+
     try {
       const generations = await getUserGenerations(user.id);
       setUserGenerations(generations);
@@ -178,15 +182,15 @@ export const UserActivityPanel: React.FC = () => {
 
   const handleAddCredits = async () => {
     if (!selectedUser || creditAmount <= 0) return;
-    
+
     setIsAddingCredit(true);
     try {
       const result = await addCreditsToUser(
-        selectedUser.id, 
-        creditAmount, 
+        selectedUser.id,
+        creditAmount,
         creditReason || t.modal.addedByAdmin
       );
-      
+
       if (result.success) {
         alert(`✅ ${creditAmount} ${t.modal.successMsg}`);
         // Update local state
@@ -210,11 +214,56 @@ export const UserActivityPanel: React.FC = () => {
     }
   };
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const handleSort = (key: keyof UserActivity) => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortOrder('desc'); // Default to descending for new sorts
+    }
+  };
+
+  const sortedUsers = users
+    .filter(
+      (user) =>
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.full_name && user.full_name.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      let aValue = a[sortKey];
+      let bValue = b[sortKey];
+
+      // Handle specific cases
+      if (sortKey === 'full_name') {
+        aValue = a.full_name || a.email; // Fallback to email if name is empty
+        bValue = b.full_name || b.email;
+      }
+
+      // Handle null dates
+      if (sortKey === 'last_activity') {
+        if (!aValue) return sortOrder === 'asc' ? -1 : 1;
+        if (!bValue) return sortOrder === 'asc' ? 1 : -1;
+      }
+
+      if (aValue === bValue) return 0;
+
+      // Compare
+      const comparison = aValue > bValue ? 1 : -1;
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+  const SortIcon = ({ active, order }: { active: boolean; order: 'asc' | 'desc' }) => {
+    return (
+      <svg
+        className={`w-4 h-4 transition-transform ${active ? 'text-cyan-400 opacity-100' : 'text-slate-600 opacity-50 group-hover:opacity-100'} ${active && order === 'desc' ? 'transform rotate-180' : ''}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+      </svg>
+    );
+  };
 
   if (loading) {
     return (
@@ -263,17 +312,73 @@ export const UserActivityPanel: React.FC = () => {
           <table className="w-full">
             <thead className="bg-slate-900/50 border-b border-slate-700">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.user}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.role}</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">{t.table.credits}</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">{t.table.operations}</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase">{t.table.spent}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.lastActivity}</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase">{t.table.registrationDate}</th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                  onClick={() => handleSort('full_name')}
+                >
+                  <div className="flex items-center gap-2">
+                    {t.table.user}
+                    <SortIcon active={sortKey === 'full_name'} order={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                  onClick={() => handleSort('is_admin')}
+                >
+                  <div className="flex items-center gap-2">
+                    {t.table.role}
+                    <SortIcon active={sortKey === 'is_admin'} order={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                  onClick={() => handleSort('credits')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    {t.table.credits}
+                    <SortIcon active={sortKey === 'credits'} order={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                  onClick={() => handleSort('total_generations')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    {t.table.operations}
+                    <SortIcon active={sortKey === 'total_generations'} order={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                  onClick={() => handleSort('total_credits_used')}
+                >
+                  <div className="flex items-center justify-end gap-2">
+                    {t.table.spent}
+                    <SortIcon active={sortKey === 'total_credits_used'} order={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                  onClick={() => handleSort('last_activity')}
+                >
+                  <div className="flex items-center gap-2">
+                    {t.table.lastActivity}
+                    <SortIcon active={sortKey === 'last_activity'} order={sortOrder} />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                  onClick={() => handleSort('created_at')}
+                >
+                  <div className="flex items-center gap-2">
+                    {t.table.registrationDate}
+                    <SortIcon active={sortKey === 'created_at'} order={sortOrder} />
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
-              {filteredUsers.map((user) => (
+              {sortedUsers.map((user) => (
                 <tr
                   key={user.id}
                   onClick={() => handleUserClick(user)}
@@ -406,11 +511,10 @@ export const UserActivityPanel: React.FC = () => {
                         <button
                           key={amount}
                           onClick={() => setCreditAmount(amount)}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-                            creditAmount === amount
+                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${creditAmount === amount
                               ? 'bg-green-600 text-white'
                               : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                          }`}
+                            }`}
                         >
                           +{amount}
                         </button>
@@ -483,9 +587,9 @@ export const UserActivityPanel: React.FC = () => {
                         <div className="flex items-center justify-between">
                           <div>
                             <span className="text-sm font-semibold text-cyan-400">
-                              {gen.type === 'sketch_to_product' ? t.modal.sketchToProduct : 
-                               gen.type === 'product_to_model' ? t.modal.productToModel : 
-                               gen.type === 'tech_sketch' ? t.modal.techSketch : t.modal.video}
+                              {gen.type === 'sketch_to_product' ? t.modal.sketchToProduct :
+                                gen.type === 'product_to_model' ? t.modal.productToModel :
+                                  gen.type === 'tech_sketch' ? t.modal.techSketch : t.modal.video}
                             </span>
                             <span className="text-xs text-slate-400 ml-3">{new Date(gen.created_at).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
                           </div>

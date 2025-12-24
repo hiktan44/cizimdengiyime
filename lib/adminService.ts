@@ -378,50 +378,71 @@ export interface UserActivity {
 
 export const getAllUsersActivity = async (): Promise<UserActivity[]> => {
   try {
-    // Get all profiles
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Call the optimized database function
+    const { data, error } = await supabase.rpc('get_admin_active_users');
 
-    if (profilesError) throw profilesError;
-
-    // Get generation stats for each user
-    const userActivities: UserActivity[] = [];
-    
-    for (const profile of profiles || []) {
-      const { data: generations, error: genError } = await supabase
-        .from('generations')
-        .select('credits_used, created_at')
-        .eq('user_id', profile.id);
-
-      if (genError) {
-        console.error('Error fetching generations for user:', profile.id, genError);
-        continue;
-      }
-
-      const totalCreditsUsed = generations?.reduce((sum, gen) => sum + gen.credits_used, 0) || 0;
-      const lastActivity = generations && generations.length > 0
-        ? generations.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
-        : null;
-
-      userActivities.push({
-        id: profile.id,
-        email: profile.email,
-        full_name: profile.full_name,
-        credits: profile.credits,
-        is_admin: profile.is_admin || false,
-        total_generations: generations?.length || 0,
-        total_credits_used: totalCreditsUsed,
-        created_at: profile.created_at,
-        last_activity: lastActivity,
-      });
+    if (error) {
+      console.error('RPC Error:', error);
+      // Fallback to old method if RPC fails (e.g. not created yet)
+      throw error;
     }
 
-    return userActivities;
+    return (data || []).map((user: any) => ({
+      ...user,
+      // Ensure specific types
+      total_generations: Number(user.total_generations),
+      total_credits_used: Number(user.total_credits_used)
+    }));
   } catch (error) {
-    console.error('Error fetching user activities:', error);
-    return [];
+    console.warn('Falling back to client-side aggregation due to:', error);
+    
+    // Fallback Code (Original Implementation)
+    try {
+      // Get all profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+  
+      if (profilesError) throw profilesError;
+  
+      // Get generation stats for each user
+      const userActivities: UserActivity[] = [];
+      
+      for (const profile of profiles || []) {
+        const { data: generations, error: genError } = await supabase
+          .from('generations')
+          .select('credits_used, created_at')
+          .eq('user_id', profile.id);
+  
+        if (genError) {
+          console.error('Error fetching generations for user:', profile.id, genError);
+          continue;
+        }
+  
+        const totalCreditsUsed = generations?.reduce((sum, gen) => sum + gen.credits_used, 0) || 0;
+        const lastActivity = generations && generations.length > 0
+          ? generations.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
+          : null;
+  
+        userActivities.push({
+          id: profile.id,
+          email: profile.email,
+          full_name: profile.full_name,
+          credits: profile.credits,
+          is_admin: profile.is_admin || false,
+          total_generations: generations?.length || 0,
+          total_credits_used: totalCreditsUsed,
+          created_at: profile.created_at,
+          last_activity: lastActivity,
+        });
+      }
+  
+      return userActivities;
+    } catch (fallbackError) {
+      console.error('Error fetching user activities:', fallbackError);
+      return [];
+    }
   }
 };
 

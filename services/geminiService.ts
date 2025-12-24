@@ -14,26 +14,26 @@ if (!API_KEY) {
 // Helper function to get hex code from color name
 const getColorHex = (colorName: string): string => {
     if (!colorName) return '';
-    
+
     console.log('getColorHex called with:', colorName);
-    
+
     // Check if it's a custom color with hex format: "Özel Renk (#XXXXXX)"
     const customColorMatch = colorName.match(/Özel Renk \((#[0-9a-fA-F]{6})\)/);
     if (customColorMatch) {
         console.log('Found custom color hex:', customColorMatch[1]);
         return customColorMatch[1];
     }
-    
+
     console.log('Available colors:', colors.map(c => c.name));
-    
+
     const colorObj = colors.find(c => c.name === colorName);
-    
+
     if (colorObj) {
         console.log('Found color:', colorObj.name, '=', colorObj.value);
     } else {
         console.warn('Color NOT found:', colorName);
     }
-    
+
     return colorObj?.value || '';
 };
 
@@ -67,7 +67,7 @@ const getLocationPromptFragment = (location: string): string => {
         case 'Doğal Mekan':
             return 'Model, gün ışığı alan doğal bir mekanda (orman, sahil, bahçe) durmalıdır.';
         case 'Lüks Mağaza':
-             return 'Model, lüks bir moda mağazasının şık ve modern iç mekanında durmalıdır.';
+            return 'Model, lüks bir moda mağazasının şık ve modern iç mekanında durmalıdır.';
         case 'Podyum':
         default:
             return 'Model, spot ışıkları altında profesyonel bir moda podyumunda durmalıdır.';
@@ -80,7 +80,7 @@ export const generateProductFromSketch = async (sketchFile: File, color?: string
 
     // Get hex code if color is provided
     const colorHex = color ? getColorHex(color) : '';
-    
+
     // Debug log
     if (color) {
         console.log('=== ÜRÜN RENK DEBUG ===');
@@ -89,7 +89,7 @@ export const generateProductFromSketch = async (sketchFile: File, color?: string
         console.log('====================');
     }
 
-    const colorInstruction = color && colorHex ? 
+    const colorInstruction = color && colorHex ?
         `
 
 *** RENK TALİMATI (EN YÜKSEK ÖNCELİK) ***
@@ -97,7 +97,7 @@ export const generateProductFromSketch = async (sketchFile: File, color?: string
 Bu RGB/HEX değerini KULLAN: ${colorHex}
 Referans çizimdeki rengi YOKSAY ve ${colorHex} rengini uygula.
 BAŞKA RENK KULLANMA.` : '';
-    
+
     const colorClosing = color && colorHex ?
         `\n\n*** FİNAL RENK KONTROLU ***\nTEKRAR EDİYORUM: Ürün rengi ${color} (${colorHex}) olmalidir. Yeşil, mavi, kırmızı gibi BAŞKA RENKLER KULLANILAMAZ. Sadece ve sadece ${colorHex} kullan.` : '';
 
@@ -145,7 +145,7 @@ BAŞKA RENK KULLANMA.` : '';
 
         const candidate = response.candidates?.[0];
         const parts = candidate?.content?.parts;
-        
+
         if (parts) {
             for (const part of parts) {
                 if (part.inlineData) {
@@ -199,7 +199,7 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
 
         const candidate = response.candidates?.[0];
         const parts = candidate?.content?.parts;
-        
+
         if (parts) {
             for (const part of parts) {
                 if (part.inlineData) {
@@ -233,7 +233,7 @@ export const generateVideoFromImage = async (
 
     // Use the variable defined at the top
     const ai = new GoogleGenAI({ apiKey: API_KEY });
-    
+
     let imageBytes = '';
     let mimeType = '';
 
@@ -247,7 +247,7 @@ export const generateVideoFromImage = async (
             mimeType = match[1];
             imageBytes = match[2];
         } else {
-             throw new Error("Invalid image format provided for video generation.");
+            throw new Error("Invalid image format provided for video generation.");
         }
     } else {
         throw new Error("Invalid image input.");
@@ -256,7 +256,7 @@ export const generateVideoFromImage = async (
     const modelName = settings.quality === 'high' ? 'veo-3.1-generate-preview' : 'veo-3.1-fast-generate-preview';
 
     console.log('Starting video generation with model:', modelName);
-    
+
     let operation = await ai.models.generateVideos({
         model: modelName,
         prompt: settings.prompt,
@@ -272,30 +272,30 @@ export const generateVideoFromImage = async (
     });
 
     console.log('Initial operation response:', operation);
-    
+
     // Poll for completion with timeout
     let pollCount = 0;
     const maxPolls = 60; // 10 minutes max (60 * 10 seconds)
-    
+
     while (!operation.done && pollCount < maxPolls) {
         await new Promise(resolve => setTimeout(resolve, 10000));
         pollCount++;
         console.log(`Polling attempt ${pollCount}/${maxPolls}...`);
-        
+
         try {
-             operation = await ai.operations.getVideosOperation({operation: operation});
-             console.log('Operation status:', { done: operation.done, pollCount });
+            operation = await ai.operations.getVideosOperation({ operation: operation });
+            console.log('Operation status:', { done: operation.done, pollCount });
         } catch (e: any) {
-             // Handle "Requested entity was not found" error during polling (common Veo issue)
-             if (e.message && e.message.includes('404')) {
-                 console.warn("Polling 404 received.");
-                 throw new Error("Video işlenirken bağlantı koptu (404). Lütfen tekrar deneyin.");
-             }
-             console.error('Polling error:', e);
-             throw e;
+            // Handle "Requested entity was not found" error during polling (common Veo issue)
+            if (e.message && e.message.includes('404')) {
+                console.warn("Polling 404 received.");
+                throw new Error("Video işlenirken bağlantı koptu (404). Lütfen tekrar deneyin.");
+            }
+            console.error('Polling error:', e);
+            throw e;
         }
     }
-    
+
     if (pollCount >= maxPolls) {
         throw new Error('Video oluşturma zaman aşımına uğradı. Lütfen daha kısa bir video deneyin veya tekrar deneyin.');
     }
@@ -305,10 +305,10 @@ export const generateVideoFromImage = async (
     if (operation.response?.generatedVideos?.[0]?.video?.uri) {
         const downloadLink = operation.response.generatedVideos[0].video.uri;
         console.log('Video URI found:', downloadLink);
-        
+
         // Append API key strictly from the variable
         const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
-        
+
         if (!videoRes.ok) {
             const err = await videoRes.text();
             console.warn("Video download failed:", err);
@@ -318,7 +318,7 @@ export const generateVideoFromImage = async (
         const blob = await videoRes.blob();
         return URL.createObjectURL(blob);
     }
-    
+
     // More detailed error message
     const errorDetails = {
         done: operation.done,
@@ -326,7 +326,7 @@ export const generateVideoFromImage = async (
         hasVideos: !!operation.response?.generatedVideos,
         videoCount: operation.response?.generatedVideos?.length || 0,
     };
-    
+
     console.error('Video generation failed. Operation details:', errorDetails);
     throw new Error(`Video oluşturulamadı. API'den video URI alınamadı. Lütfen tekrar deneyin veya farklı ayarlar kullanın.`);
 };
@@ -355,21 +355,23 @@ export const generateImage = async (
     shoeType?: string,
     shoeColor?: string,
     accessories?: string,
+    ageRange?: string, // New: Yaş Aralığı (Child, Teen, Adult, Elderly)
+    gender?: string,   // New: Cinsiyet
     secondProductFile?: File // New: İkinci ürün görseli (Alt & Üst kombin için)
 ): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
-    
+
     // Convert inputs to parts array
     const promptParts: any[] = [imagePart];
-    
+
     // Add second product image if provided (for Alt & Üst kombin)
     if (secondProductFile) {
         const secondPart = await fileToGenerativePart(secondProductFile);
         promptParts.push(secondPart);
         console.log('📦 İkinci ürün görseli (Alt Giyim) eklendi');
     }
-    
+
     // Add custom background if provided
     if (customBackground) {
         const bgPart = await fileToGenerativePart(customBackground);
@@ -379,7 +381,7 @@ export const generateImage = async (
     // Get hex codes for colors
     const colorHex = getColorHex(color);
     const secondaryColorHex = getColorHex(secondaryColor);
-    
+
     // Debug: Log color information  
     if (color) {
         console.log('=== RENK DEBUG ===');
@@ -389,9 +391,9 @@ export const generateImage = async (
     }
 
     // Create color-focused prompt opening
-    const colorOpening = color && colorHex ? 
+    const colorOpening = color && colorHex ?
         `KRITIK RENK TALIMAT: Kiyafet rengi MUTLAKA ${color} (${colorHex}) olmalidir. Bu renk ZORUNLUDUR.\n\n` : '';
-    
+
     const colorClosing = color && colorHex ?
         `\n\n*** FINAL RENK KONTROLU ***\nTEKRAR EDIYORUM: Kiyafet rengi ${color} (${colorHex}) olmalidir. Yeşil, mavi, kırmızı gibi BAŞKA RENKLER KULLANILAMAZ. Sadece ve sadece ${colorHex} kullan.` : '';
 
@@ -458,9 +460,17 @@ export const generateImage = async (
     if (ethnicity && ethnicity !== 'Farklı') {
         prompt += ` Model ${ethnicity} kökenli bir görünüme sahip olmalıdır.`;
     }
-    
+
     if (bodyType && bodyType !== 'Standart') {
         prompt += ` Modelin vücut tipi: ${bodyType}.`;
+    }
+
+    if (ageRange && ageRange !== 'Adult') {
+        prompt += ` Modelin yaş grubu: ${ageRange} (Child: çocuk, Teen: genç, Adult: yetişkin, Elderly: yaşlı). Model kesinlikle bu yaş grubunda görünmelidir.`;
+    }
+
+    if (gender && gender !== 'Female') { // Varsayılan genellikle kadın modeldir, belirtilmişse ekle
+        prompt += ` Modelin cinsiyeti: ${gender === 'Male' ? 'Erkek' : 'Kadın'}.`;
     }
 
     if (pose && pose !== 'Rastgele') {
@@ -490,22 +500,22 @@ export const generateImage = async (
     }
 
     if (customBackground) {
-         prompt += ` *** ARKA PLAN TALİMATI ***: Modeli, sağlanan İKİNCİ görseldeki (arka plan görseli) mekana yerleştir. Işıklandırmayı bu arka planla uyumlu hale getir.`;
-         if (customBackgroundPrompt && customBackgroundPrompt.trim()) {
-             prompt += ` Arka plan detayı: ${customBackgroundPrompt}.`;
-         }
+        prompt += ` *** ARKA PLAN TALİMATI ***: Modeli, sağlanan İKİNCİ görseldeki (arka plan görseli) mekana yerleştir. Işıklandırmayı bu arka planla uyumlu hale getir.`;
+        if (customBackgroundPrompt && customBackgroundPrompt.trim()) {
+            prompt += ` Arka plan detayı: ${customBackgroundPrompt}.`;
+        }
     } else {
-         prompt += ` ${getLocationPromptFragment(location)}`;
-         if (customBackgroundPrompt && customBackgroundPrompt.trim()) {
-             prompt += ` Arka plan ek detay: ${customBackgroundPrompt}.`;
-         }
+        prompt += ` ${getLocationPromptFragment(location)}`;
+        if (customBackgroundPrompt && customBackgroundPrompt.trim()) {
+            prompt += ` Arka plan ek detay: ${customBackgroundPrompt}.`;
+        }
     }
 
     prompt += ` Model doğrudan kameraya (veya promptta belirtilen yöne), kendine güvenen, profesyonel bir model ifadesiyle bakmalıdır.`;
-    
+
     // Add final color reminder at the end
     prompt += colorClosing;
-    
+
     // Add text prompt to parts
     promptParts.push({ text: prompt });
 
@@ -518,10 +528,10 @@ export const generateImage = async (
             config: {
                 responseModalities: [Modality.IMAGE],
                 imageConfig: {
-                    aspectRatio: aspectRatio === '16:9' ? '16:9' : 
-                                 aspectRatio === '9:16' ? '9:16' : 
-                                 aspectRatio === '1:1' ? '1:1' : 
-                                 '3:4' // Default/Fallback for others
+                    aspectRatio: aspectRatio === '16:9' ? '16:9' :
+                        aspectRatio === '9:16' ? '9:16' :
+                            aspectRatio === '1:1' ? '1:1' :
+                                '3:4' // Default/Fallback for others
                 }
             },
         });
@@ -533,11 +543,11 @@ export const generateImage = async (
         }
 
         if (candidate.finishReason && candidate.finishReason !== 'STOP') {
-             if (!candidate.content?.parts) {
-                 throw new Error(`Görsel oluşturulamadı. Sebep: ${candidate.finishReason}`);
-             }
+            if (!candidate.content?.parts) {
+                throw new Error(`Görsel oluşturulamadı. Sebep: ${candidate.finishReason}`);
+            }
         }
-        
+
         const parts = candidate.content?.parts;
         if (!parts) {
             throw new Error("Görsel içeriği bulunamadı.");
@@ -588,14 +598,14 @@ export const upscaleImage = async (imageFile: File): Promise<string> => {
                 responseModalities: [Modality.IMAGE],
                 imageConfig: {
                     imageSize: "4K",
-                    aspectRatio: "3:4" 
+                    aspectRatio: "3:4"
                 }
             },
         });
 
         const candidate = response.candidates?.[0];
         const parts = candidate?.content?.parts;
-        
+
         if (parts) {
             for (const part of parts) {
                 if (part.inlineData) {
