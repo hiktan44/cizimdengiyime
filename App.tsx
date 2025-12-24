@@ -152,6 +152,10 @@ const ToolPage: React.FC<{
         const [cameraAngle, setCameraAngle] = useStickyState('Normal', 'fasheone_cameraAngle');
         const [cameraZoom, setCameraZoom] = useStickyState('Uzak', 'fasheone_cameraZoom'); // Yeni: Çekim mesafesi - Default: Uzak
 
+        // Model Consistency (Seed)
+        const [modelSeed, setModelSeed] = useStickyState<number | null>(null, 'fasheone_modelSeed');
+        const [isModelLocked, setIsModelLocked] = useStickyState<boolean>(false, 'fasheone_isModelLocked');
+
         // Pattern State
         const [patternFile, setPatternFile] = useState<File | null>(null);
         const [patternPreview, setPatternPreview] = useState<string | null>(null);
@@ -439,7 +443,23 @@ const ToolPage: React.FC<{
             setGeneratedVideoUrl(null);
             setLoadingText(isKombinMode ? 'Kombin ile canlı model oluşturuluyor...' : 'Canlı model oluşturuluyor...');
 
+            setLoadingText(isKombinMode ? 'Kombin ile canlı model oluşturuluyor...' : 'Canlı model oluşturuluyor...');
+
             startProgressSimulation(85, 300);
+
+            // Seed Logic
+            let activeSeed: number;
+            if (isModelLocked && modelSeed) {
+                // Use existing frozen seed
+                activeSeed = modelSeed;
+                console.log('🔒 Using LOCKED seed:', activeSeed);
+            } else {
+                // Generate new seed
+                activeSeed = Math.floor(Math.random() * 1000000000);
+                // Only update state if not locked (so user can lock this new one later if they like it)
+                setModelSeed(activeSeed);
+                console.log('🎲 Using NEW seed:', activeSeed);
+            }
 
             try {
                 const imageUrl = await generateImage(
@@ -469,7 +489,8 @@ const ToolPage: React.FC<{
                     ageRange,
                     gender,
                     secondSourceFile || undefined, // Pass second image for Kombin mode
-                    patternFile || undefined // Pass pattern file
+                    patternFile || undefined, // Pass pattern file
+                    activeSeed // Pass seed
                 );
                 finishProgress();
                 setTimeout(() => {
@@ -1135,6 +1156,41 @@ const ToolPage: React.FC<{
                                                 <option value="Normal">Normal Çekim (Medium Shot) - Bel üstü</option>
                                                 <option value="Yakın">Yakın Çekim (Close-Up) - Yüz ve detaylar</option>
                                             </select>
+                                        </div>
+
+                                        {/* Model Consistency (Lock) */}
+                                        <div className="bg-slate-800/50 p-3 rounded-xl border border-dashed border-slate-600 flex items-center justify-between">
+                                            <div>
+                                                <label className="block text-sm font-medium text-slate-300">Model Sürekliliği</label>
+                                                <p className="text-[10px] text-slate-500">
+                                                    Beğendiğiniz modeli sonraki üretimlerde koruyun.
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    if (!modelSeed && !isModelLocked) {
+                                                        alert("Henüz bir model oluşturulmadı. Önce bir kez görsel oluşturun, sonra kilitleyebilirsiniz.");
+                                                        return;
+                                                    }
+                                                    setIsModelLocked(!isModelLocked);
+                                                }}
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${isModelLocked
+                                                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                                                        : 'bg-slate-700 text-slate-400 border border-slate-600 hover:bg-slate-600 hover:text-white'
+                                                    }`}
+                                            >
+                                                {isModelLocked ? (
+                                                    <>
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                                        Model Kilitli
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
+                                                        Modeli Kilitle
+                                                    </>
+                                                )}
+                                            </button>
                                         </div>
 
                                         {/* Age and Gender Settings */}

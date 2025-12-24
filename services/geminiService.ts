@@ -358,7 +358,8 @@ export const generateImage = async (
     ageRange?: string, // New: Yaş Aralığı (Child, Teen, Adult, Elderly)
     gender?: string,   // New: Cinsiyet
     secondProductFile?: File, // New: İkinci ürün görseli (Alt & Üst kombin için)
-    patternImageFile?: File // New: Desen/Baskı görseli
+    patternImageFile?: File, // New: Desen/Baskı görseli
+    seed?: number // New: Seed for consistency
 ): Promise<string> => {
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
@@ -543,6 +544,7 @@ export const generateImage = async (
             },
             config: {
                 responseModalities: [Modality.IMAGE],
+                ...(seed ? { seed: seed } : {}), // Pass seed if provided
                 imageConfig: {
                     aspectRatio: aspectRatio === '16:9' ? '16:9' :
                         aspectRatio === '9:16' ? '9:16' :
