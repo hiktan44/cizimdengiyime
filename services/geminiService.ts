@@ -421,6 +421,13 @@ export const generateImage = async (
     ` : '';
 
     let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
+    
+    *** KRİTİK: REFERANS GÖRSEL KULLANIMI ***
+    - Girdi olarak verilen görseller SADECE ve SADECE KIYAFET REFERANSIDIR.
+    - Referans görseldeki MANKENİ, KİŞİYİ veya YÜZÜ ASLA KULLANMA.
+    - Referans görseldeki yüzü, saçı ve vücut yapısını TAMAMEN UNUT.
+    - SIFIRDAN, aşağıda belirtilen özelliklere (seed, etnik köken, yaş) sahip YENİ BİR MODEL OLUŞTUR.
+    
     ${isKombinMode ? 'Girdi olarak verilen İKİ AYRI kıyafet görselini (üst ve alt), gerçekçi bir canlı modele birlikte giydir.' : 'Girdi olarak verilen kıyafet görselini, gerçekçi bir canlı modele giydir.'}
     
     *** 1. RENK KONTROLU - EN YÜKSEK ÖNCELİK (Bu kurala tam uyum ZORUNLUDUR) ***
