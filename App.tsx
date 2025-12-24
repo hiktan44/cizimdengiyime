@@ -1175,8 +1175,8 @@ const ToolPage: React.FC<{
                                                     setIsModelLocked(!isModelLocked);
                                                 }}
                                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${isModelLocked
-                                                        ? 'bg-green-500/20 text-green-400 border border-green-500/50'
-                                                        : 'bg-slate-700 text-slate-400 border border-slate-600 hover:bg-slate-600 hover:text-white'
+                                                    ? 'bg-green-500/20 text-green-400 border border-green-500/50'
+                                                    : 'bg-slate-700 text-slate-400 border border-slate-600 hover:bg-slate-600 hover:text-white'
                                                     }`}
                                             >
                                                 {isModelLocked ? (
@@ -1425,7 +1425,7 @@ const ToolPage: React.FC<{
                                 {/* Right Column: Result */}
                                 <div className="lg:col-span-8">
                                     <div className="h-full min-h-[600px] bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden relative">
-                                        <div className="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur px-3 py-1 rounded-full text-xs text-cyan-400 border border-cyan-500/30">
+                                        <div className="absolute top-4 right-4 z-10 bg-slate-900/80 backdrop-blur px-3 py-1 rounded-full text-xs text-cyan-400 border border-cyan-500/30">
                                             3. Sonuç (Model & Video)
                                         </div>
                                         <ResultDisplay
