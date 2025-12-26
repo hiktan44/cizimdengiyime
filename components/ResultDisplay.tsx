@@ -23,17 +23,22 @@ interface ResultDisplayProps {
 const LoadingState: React.FC<{ text: string, progress: number }> = ({ text, progress }) => (
     <div className="flex flex-col items-center justify-center gap-6 text-center w-full max-w-md px-6">
         <div className="relative">
-            <div className="w-20 h-20 border-4 border-slate-700 border-t-cyan-400 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 flex items-center justify-center font-bold text-cyan-400 text-sm">
+            <div className="spinner-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center font-bold text-cyan-400 text-sm animate-fade-in">
                 {Math.round(progress)}%
             </div>
         </div>
 
         <div className="w-full space-y-2">
             <p className="text-slate-300 font-medium animate-pulse">{text}</p>
-            <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden border border-slate-600">
+            <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden border border-slate-600 animate-fade-in-up">
                 <div
-                    className="bg-gradient-to-r from-cyan-500 to-purple-500 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                    className="progress-gradient h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_15px_rgba(6,182,212,0.6)]"
                     style={{ width: `${Math.max(5, Math.round(progress))}%` }}
                 />
             </div>
