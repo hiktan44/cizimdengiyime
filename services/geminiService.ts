@@ -41,8 +41,8 @@ const fileToBase64 = async (file: File): Promise<string> => {
             reject(new Error('File to base64 conversion failed'));
         };
         reader.readAsDataURL(file); // ✅ File için readAsDataURL kullanılıyor
-    };
     });
+};
 };
 
 // Helper function to generate stable seed from file
