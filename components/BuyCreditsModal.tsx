@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CREDIT_PACKAGES } from '../lib/supabase';
+import { supabase, CREDIT_PACKAGES } from '../lib/supabase';
 import { createPaymentToken, getTestCardInfo, TEST_CARDS } from '../lib/paytrService';
 import { createTransaction, addCreditsToUser, updateTransactionStatus } from '../lib/database';
 import { getSiteSettings } from '../lib/adminService';
@@ -25,6 +25,8 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [showTestCards, setShowTestCards] = useState(false);
   const [paymentIframe, setPaymentIframe] = useState<string | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [packages, setPackages] = useState({
     SMALL: CREDIT_PACKAGES.SMALL,
     MEDIUM: CREDIT_PACKAGES.MEDIUM,
@@ -65,17 +67,66 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
+    const fetchUserPhone = async () => {
+      if (!isOpen || !userId) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('phone_number')
+          .eq('id', userId)
+          .single();
+
+        if (data?.phone_number) {
+          setPhoneNumber(data.phone_number);
+        }
+      } catch (error) {
+        console.error('Error fetching phone:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchUserPhone();
+    }
+  }, [isOpen, userId]);
+
+  useEffect(() => {
     if (!isOpen) {
       setPaymentIframe(null);
       setShowTestCards(false);
+      setPhoneError('');
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleBuyCredits = async () => {
+    // Validate phone
+    if (!phoneNumber.trim()) {
+      setPhoneError('Lütfen telefon numaranızı giriniz.');
+      return;
+    }
+    if (phoneNumber.length < 10) {
+      setPhoneError('Geçerli bir telefon numarası giriniz.');
+      return;
+    }
+
     setLoading(true);
+    setPhoneError('');
+
     try {
+      // Save phone number first
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ phone_number: phoneNumber })
+        .eq('id', userId);
+
+      if (updateError) {
+        console.error('Phone update error:', updateError);
+        // Continue anyway or block? Let's assume we block to ensure data is collected
+        throw new Error('Telefon numarası kaydedilemedi. Lütfen tekrar deneyin.');
+      }
+
       const pkg = packages[selectedPackage];
       // PayTR merchant_oid alfanumerik olmalı (tire veya özel karakter yok)
       const orderId = `ORDER${Date.now()}${userId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8)}`;
@@ -195,6 +246,38 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
                 </div>
               )}
 
+              {/* Phone Number Input */}
+              <div className="mb-6 bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+                <label className="block text-slate-300 text-sm font-bold mb-2">
+                  Telefon Numarası <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-slate-500">📞</span>
+                  </div>
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      // Allow numbers, spaces, plus, dash, parentheses
+                      if (/^[\d\s+\-()]*$/.test(val)) {
+                        setPhoneNumber(val);
+                        setPhoneError('');
+                      }
+                    }}
+                    placeholder="05XX XXX XX XX"
+                    className={`w-full bg-slate-900 border ${phoneError ? 'border-red-500' : 'border-slate-600'} rounded-lg py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition`}
+                  />
+                </div>
+                {phoneError && (
+                  <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                )}
+                <p className="text-xs text-slate-500 mt-2">
+                  Satın alma işleminizle ilgili bilgilendirmeler için gereklidir.
+                </p>
+              </div>
+
               {/* Package Selection */}
               <div className="grid md:grid-cols-3 gap-4 mb-6">
                 {(Object.keys(packages) as Array<keyof typeof packages>).map((key) => {
@@ -204,11 +287,10 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
                     <button
                       key={key}
                       onClick={() => setSelectedPackage(key)}
-                      className={`border-2 rounded-xl p-6 text-center transition-all ${
-                        isSelected
-                          ? 'border-cyan-500 bg-cyan-500/10'
-                          : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
-                      }`}
+                      className={`border-2 rounded-xl p-6 text-center transition-all ${isSelected
+                        ? 'border-cyan-500 bg-cyan-500/10'
+                        : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
+                        }`}
                     >
                       <div className="text-3xl font-bold text-white mb-2">{pkg.credits}</div>
                       <div className="text-sm text-slate-400 mb-4">Kredi</div>

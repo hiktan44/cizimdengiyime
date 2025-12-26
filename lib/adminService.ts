@@ -54,7 +54,7 @@ export const uploadHeroVideo = async (
     if (existingVideos && existingVideos.length > 0) {
       console.log(`🗑️ Deleting old hero video record for index ${orderIndex}`);
       const oldVideo = existingVideos[0];
-      
+
       // Try to delete old file from storage (extract filename from URL)
       try {
         const urlParts = oldVideo.video_url.split('/object/public/hero-videos/');
@@ -138,7 +138,7 @@ export const uploadShowcaseImage = async (
     if (existingImages && existingImages.length > 0) {
       console.log(`🗑️ Deleting old showcase ${type} record`);
       const oldImage = existingImages[0];
-      
+
       // Try to delete old file from storage (extract filename from URL)
       try {
         const urlParts = oldImage.image_url.split('/object/public/showcase-images/');
@@ -368,6 +368,7 @@ export interface UserActivity {
   id: string;
   email: string;
   full_name: string | null;
+  phone_number: string | null;
   credits: number;
   is_admin: boolean;
   total_generations: number;
@@ -395,7 +396,7 @@ export const getAllUsersActivity = async (): Promise<UserActivity[]> => {
     }));
   } catch (error) {
     console.warn('Falling back to client-side aggregation due to:', error);
-    
+
     // Fallback Code (Original Implementation)
     try {
       // Get all profiles
@@ -403,32 +404,33 @@ export const getAllUsersActivity = async (): Promise<UserActivity[]> => {
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
-  
+
       if (profilesError) throw profilesError;
-  
+
       // Get generation stats for each user
       const userActivities: UserActivity[] = [];
-      
+
       for (const profile of profiles || []) {
         const { data: generations, error: genError } = await supabase
           .from('generations')
           .select('credits_used, created_at')
           .eq('user_id', profile.id);
-  
+
         if (genError) {
           console.error('Error fetching generations for user:', profile.id, genError);
           continue;
         }
-  
+
         const totalCreditsUsed = generations?.reduce((sum, gen) => sum + gen.credits_used, 0) || 0;
         const lastActivity = generations && generations.length > 0
           ? generations.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
           : null;
-  
+
         userActivities.push({
           id: profile.id,
           email: profile.email,
           full_name: profile.full_name,
+          phone_number: profile.phone_number || null,
           credits: profile.credits,
           is_admin: profile.is_admin || false,
           total_generations: generations?.length || 0,
@@ -437,7 +439,7 @@ export const getAllUsersActivity = async (): Promise<UserActivity[]> => {
           last_activity: lastActivity,
         });
       }
-  
+
       return userActivities;
     } catch (fallbackError) {
       console.error('Error fetching user activities:', fallbackError);

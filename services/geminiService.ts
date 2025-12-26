@@ -434,39 +434,57 @@ export const generateImage = async (
 
     // Add second product image if provided (for Alt & Üst kombin)
     if (secondProductFile) {
-        const secondPart = await fileToGenerativePart(secondProductFile);
-        promptParts.push(secondPart);
-        console.log('📦 İkinci ürün görseli (Alt Giyim) eklendi');
+        if (secondProductFile instanceof Blob) {
+            const secondPart = await fileToGenerativePart(secondProductFile);
+            promptParts.push(secondPart);
+            console.log('📦 İkinci ürün görseli (Alt Giyim) eklendi');
+        } else {
+            console.warn('⚠️ İkinci ürün görseli (Alt Giyim) geçersiz format (Blob değil), atlanıyor:', typeof secondProductFile);
+        }
     }
 
     // Add model identity image if provided (Highest priority for face)
     // If reference image is provided, generate stable seed from it to lock the model
     let effectiveSeed = seed;
     if (modelIdentityFile) {
-        const referenceSeed = await generateStableSeed(modelIdentityFile);
-        effectiveSeed = referenceSeed;
-        console.log('🔒 Model Identity Locked - Using stable seed from reference image:', referenceSeed);
+        if (modelIdentityFile instanceof Blob) {
+            // 1. Generate Seed (HEAD logic)
+            const referenceSeed = await generateStableSeed(modelIdentityFile);
+            effectiveSeed = referenceSeed;
+            console.log('🔒 Model Identity Locked - Using stable seed from reference image:', referenceSeed);
+
+            // 2. Add to prompt parts (Local fix)
+            const identityPart = await fileToGenerativePart(modelIdentityFile);
+            promptParts.push(identityPart);
+            console.log('🔒 Referans Model Kimlik görseli eklendi');
+        } else {
+            console.warn('⚠️ Referans Model Kimlik görseli geçersiz format (Blob değil), atlanıyor:', typeof modelIdentityFile);
+        }
     } else if (seed) {
         console.log('🔓 User-provided seed:', seed);
     } else {
         console.log('🎲 Random seed will be generated');
     }
 
-    const identityPart = await fileToGenerativePart(modelIdentityFile);
-    promptParts.push(identityPart);
-    console.log('🔒 Referans Model Kimlik görseli eklendi');
-
     // Add pattern image if provided
     if (patternImageFile) {
-        const patternPart = await fileToGenerativePart(patternImageFile);
-        promptParts.push(patternPart);
-        console.log('📦 Desen görseli eklendi');
+        if (patternImageFile instanceof Blob) {
+            const patternPart = await fileToGenerativePart(patternImageFile);
+            promptParts.push(patternPart);
+            console.log('📦 Desen görseli eklendi');
+        } else {
+            console.warn('⚠️ Desen görseli geçersiz format (Blob değil), atlanıyor:', typeof patternImageFile);
+        }
     }
 
     // Add custom background if provided
     if (customBackground) {
-        const bgPart = await fileToGenerativePart(customBackground);
-        promptParts.push(bgPart);
+        if (customBackground instanceof Blob) {
+            const bgPart = await fileToGenerativePart(customBackground);
+            promptParts.push(bgPart);
+        } else {
+            console.warn('⚠️ Özel arka plan görseli geçersiz format (Blob değil), atlanıyor:', typeof customBackground);
+        }
     }
 
     // Get hex codes for colors

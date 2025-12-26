@@ -69,7 +69,13 @@ export const blobToBase64 = async (blob: Blob): Promise<string> => {
 
 // Helper function to convert File to GenerativePart (for Gemini API)
 export const fileToGenerativePart = async (file: File) => {
-  const base64EncodedDataPromise = new Promise<string>((resolve) => {
+  const base64EncodedDataPromise = new Promise<string>((resolve, reject) => {
+    if (!file || !(file instanceof Blob)) {
+      console.error("fileToGenerativePart received invalid file:", file);
+      reject(new Error(`Dosya işlenirken hata: Geçersiz dosya formatı. (Alınan tip: ${typeof file})`));
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       if (typeof reader.result === 'string') {
@@ -81,7 +87,12 @@ export const fileToGenerativePart = async (file: File) => {
         resolve(''); // Or handle error appropriately
       }
     };
-    reader.readAsDataURL(file);
+    reader.onerror = (error) => reject(error);
+    try {
+      reader.readAsDataURL(file);
+    } catch (e) {
+      reject(e);
+    }
   });
 
   return {
@@ -93,7 +104,7 @@ export const fileToGenerativePart = async (file: File) => {
 };
 
 export const base64ToFile = async (base64String: string, fileName: string): Promise<File> => {
-    const res = await fetch(base64String);
-    const blob = await res.blob();
-    return new File([blob], fileName, { type: blob.type });
+  const res = await fetch(base64String);
+  const blob = await res.blob();
+  return new File([blob], fileName, { type: blob.type });
 };

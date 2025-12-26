@@ -14,6 +14,7 @@ const translations = {
     },
     table: {
       user: 'Kullanıcı',
+      phone: 'Telefon',
       role: 'Rol',
       credits: 'Kredi',
       operations: 'İşlemler',
@@ -25,10 +26,15 @@ const translations = {
       unnamed: 'İsimsiz',
       never: 'Hiç',
     },
+    actions: {
+      exportCSV: 'Dışa Aktar (CSV)',
+      columns: 'Sütunlar',
+    },
     modal: {
       title: 'Kullanıcı Detayları',
       email: 'Email',
       name: 'İsim',
+      phone: 'Telefon Numarası',
       notSpecified: 'Belirtilmemiş',
       currentCredits: 'Mevcut Kredi',
       totalSpent: 'Toplam Harcanan',
@@ -69,6 +75,7 @@ const translations = {
     },
     table: {
       user: 'User',
+      phone: 'Phone',
       role: 'Role',
       credits: 'Credits',
       operations: 'Operations',
@@ -80,10 +87,15 @@ const translations = {
       unnamed: 'Unnamed',
       never: 'Never',
     },
+    actions: {
+      exportCSV: 'Export (CSV)',
+      columns: 'Columns',
+    },
     modal: {
       title: 'User Details',
       email: 'Email',
       name: 'Name',
+      phone: 'Phone Number',
       notSpecified: 'Not specified',
       currentCredits: 'Current Credits',
       totalSpent: 'Total Spent',
@@ -133,6 +145,72 @@ export const UserActivityPanel: React.FC = () => {
   // Sorting state
   const [sortKey, setSortKey] = useState<keyof UserActivity>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // Column visibility state
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
+    user: true,
+    phone: true,
+    role: true,
+    credits: true,
+    operations: true,
+    spent: true,
+    lastActivity: true,
+    registrationDate: true,
+  });
+  const [showColumnMenu, setShowColumnMenu] = useState(false);
+
+  // CSV Export
+  const handleExportCSV = () => {
+    const headers = [
+      t.table.user,
+      t.table.phone,
+      t.table.role,
+      t.table.credits,
+      t.table.operations,
+      t.table.spent,
+      t.table.lastActivity,
+      t.table.registrationDate
+    ];
+
+    const csvContent = [
+      headers.join(','),
+      ...users.map(user => {
+        const name = user.full_name || t.table.unnamed;
+        const phone = user.phone_number || '';
+        const role = user.is_admin ? t.table.admin : t.table.userRole;
+        const lastActive = user.last_activity ? new Date(user.last_activity).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US') : t.table.never;
+        const regDate = new Date(user.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US');
+
+        return [
+          `"${name} (${user.email})"`,
+          `"${phone}"`,
+          `"${role}"`,
+          user.credits,
+          user.total_generations,
+          user.total_credits_used,
+          `"${lastActive}"`,
+          `"${regDate}"`
+        ].join(',');
+      })
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'users_export.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const toggleColumn = (key: string) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   useEffect(() => {
     loadUsers();
@@ -276,14 +354,63 @@ export const UserActivityPanel: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Search */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-        <input
-          type="text"
-          placeholder={t.search}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-        />
+      {/* Actions and Search */}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+        <div className="w-full md:w-1/3">
+          <input
+            type="text"
+            placeholder={t.search}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+          />
+        </div>
+
+        <div className="flex gap-3 w-full md:w-auto relative">
+          {/* Column Toggle Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowColumnMenu(!showColumnMenu)}
+              className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition flex items-center gap-2 whitespace-nowrap"
+            >
+              <svg className="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+              </svg>
+              {t.actions.columns}
+            </button>
+
+            {showColumnMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 p-2 space-y-1">
+                {Object.keys(visibleColumns).map((col) => (
+                  <label key={col} className="flex items-center gap-2 px-3 py-2 hover:bg-slate-700 rounded-lg cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={visibleColumns[col]}
+                      onChange={() => toggleColumn(col)}
+                      className="rounded bg-slate-600 border-slate-500 text-cyan-500 focus:ring-cyan-500"
+                    />
+                    <span className="text-sm text-white capitalize">{t.table[col as keyof typeof t.table]}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {/* Click outside to close */}
+            {showColumnMenu && (
+              <div className="fixed inset-0 z-40" onClick={() => setShowColumnMenu(false)} />
+            )}
+          </div>
+
+          <button
+            onClick={handleExportCSV}
+            className="px-4 py-3 bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-500/30 rounded-lg font-semibold transition flex items-center gap-2 whitespace-nowrap"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            {t.actions.exportCSV}
+          </button>
+        </div>
       </div>
 
       {/* Stats Overview */}
@@ -312,69 +439,88 @@ export const UserActivityPanel: React.FC = () => {
           <table className="w-full">
             <thead className="bg-slate-900/50 border-b border-slate-700">
               <tr>
-                <th
-                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
-                  onClick={() => handleSort('full_name')}
-                >
-                  <div className="flex items-center gap-2">
-                    {t.table.user}
-                    <SortIcon active={sortKey === 'full_name'} order={sortOrder} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
-                  onClick={() => handleSort('is_admin')}
-                >
-                  <div className="flex items-center gap-2">
-                    {t.table.role}
-                    <SortIcon active={sortKey === 'is_admin'} order={sortOrder} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
-                  onClick={() => handleSort('credits')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    {t.table.credits}
-                    <SortIcon active={sortKey === 'credits'} order={sortOrder} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
-                  onClick={() => handleSort('total_generations')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    {t.table.operations}
-                    <SortIcon active={sortKey === 'total_generations'} order={sortOrder} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
-                  onClick={() => handleSort('total_credits_used')}
-                >
-                  <div className="flex items-center justify-end gap-2">
-                    {t.table.spent}
-                    <SortIcon active={sortKey === 'total_credits_used'} order={sortOrder} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
-                  onClick={() => handleSort('last_activity')}
-                >
-                  <div className="flex items-center gap-2">
-                    {t.table.lastActivity}
-                    <SortIcon active={sortKey === 'last_activity'} order={sortOrder} />
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
-                  onClick={() => handleSort('created_at')}
-                >
-                  <div className="flex items-center gap-2">
-                    {t.table.registrationDate}
-                    <SortIcon active={sortKey === 'created_at'} order={sortOrder} />
-                  </div>
-                </th>
+                {visibleColumns.user && (
+                  <th
+                    className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                    onClick={() => handleSort('full_name')}
+                  >
+                    <div className="flex items-center gap-2">
+                      {t.table.user}
+                      <SortIcon active={sortKey === 'full_name'} order={sortOrder} />
+                    </div>
+                  </th>
+                )}
+                {visibleColumns.phone && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase select-none">
+                    {t.table.phone}
+                  </th>
+                )}
+                {visibleColumns.role && (
+                  <th
+                    className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                    onClick={() => handleSort('is_admin')}
+                  >
+                    <div className="flex items-center gap-2">
+                      {t.table.role}
+                      <SortIcon active={sortKey === 'is_admin'} order={sortOrder} />
+                    </div>
+                  </th>
+                )}
+                {visibleColumns.credits && (
+                  <th
+                    className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                    onClick={() => handleSort('credits')}
+                  >
+                    <div className="flex items-center justify-end gap-2">
+                      {t.table.credits}
+                      <SortIcon active={sortKey === 'credits'} order={sortOrder} />
+                    </div>
+                  </th>
+                )}
+                {visibleColumns.operations && (
+                  <th
+                    className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                    onClick={() => handleSort('total_generations')}
+                  >
+                    <div className="flex items-center justify-end gap-2">
+                      {t.table.operations}
+                      <SortIcon active={sortKey === 'total_generations'} order={sortOrder} />
+                    </div>
+                  </th>
+                )}
+                {visibleColumns.spent && (
+                  <th
+                    className="px-4 py-3 text-right text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                    onClick={() => handleSort('total_credits_used')}
+                  >
+                    <div className="flex items-center justify-end gap-2">
+                      {t.table.spent}
+                      <SortIcon active={sortKey === 'total_credits_used'} order={sortOrder} />
+                    </div>
+                  </th>
+                )}
+                {visibleColumns.lastActivity && (
+                  <th
+                    className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                    onClick={() => handleSort('last_activity')}
+                  >
+                    <div className="flex items-center gap-2">
+                      {t.table.lastActivity}
+                      <SortIcon active={sortKey === 'last_activity'} order={sortOrder} />
+                    </div>
+                  </th>
+                )}
+                {visibleColumns.registrationDate && (
+                  <th
+                    className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase cursor-pointer group hover:bg-slate-800/50 transition select-none"
+                    onClick={() => handleSort('created_at')}
+                  >
+                    <div className="flex items-center gap-2">
+                      {t.table.registrationDate}
+                      <SortIcon active={sortKey === 'created_at'} order={sortOrder} />
+                    </div>
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
@@ -384,38 +530,57 @@ export const UserActivityPanel: React.FC = () => {
                   onClick={() => handleUserClick(user)}
                   className="hover:bg-slate-700/30 cursor-pointer transition"
                 >
-                  <td className="px-4 py-3">
-                    <div className="text-sm font-medium text-white">{user.full_name || t.table.unnamed}</div>
-                    <div className="text-xs text-slate-400">{user.email}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {user.is_admin ? (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/50">
-                        {t.table.admin}
+                  {visibleColumns.user && (
+                    <td className="px-4 py-3">
+                      <div className="text-sm font-medium text-white">{user.full_name || t.table.unnamed}</div>
+                      <div className="text-xs text-slate-400">{user.email}</div>
+                    </td>
+                  )}
+                  {visibleColumns.phone && (
+                    <td className="px-4 py-3 text-sm text-slate-300">
+                      {user.phone_number || '-'}
+                    </td>
+                  )}
+                  {visibleColumns.role && (
+                    <td className="px-4 py-3">
+                      {user.is_admin ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/50">
+                          {t.table.admin}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-slate-700 text-slate-400">
+                          {t.table.userRole}
+                        </span>
+                      )}
+                    </td>
+                  )}
+                  {visibleColumns.credits && (
+                    <td className="px-4 py-3 text-right">
+                      <span className="text-sm font-bold text-cyan-400">{user.credits}</span>
+                    </td>
+                  )}
+                  {visibleColumns.operations && (
+                    <td className="px-4 py-3 text-right">
+                      <span className="text-sm text-white">{user.total_generations}</span>
+                    </td>
+                  )}
+                  {visibleColumns.spent && (
+                    <td className="px-4 py-3 text-right">
+                      <span className="text-sm text-orange-400">{user.total_credits_used}</span>
+                    </td>
+                  )}
+                  {visibleColumns.lastActivity && (
+                    <td className="px-4 py-3">
+                      <span className="text-xs text-slate-400">
+                        {user.last_activity ? new Date(user.last_activity).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US') : t.table.never}
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-slate-700 text-slate-400">
-                        {t.table.userRole}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <span className="text-sm font-bold text-cyan-400">{user.credits}</span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <span className="text-sm text-white">{user.total_generations}</span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <span className="text-sm text-orange-400">{user.total_credits_used}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs text-slate-400">
-                      {user.last_activity ? new Date(user.last_activity).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US') : t.table.never}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs text-slate-400">{new Date(user.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
-                  </td>
+                    </td>
+                  )}
+                  {visibleColumns.registrationDate && (
+                    <td className="px-4 py-3">
+                      <span className="text-xs text-slate-400">{new Date(user.created_at).toLocaleDateString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -512,8 +677,8 @@ export const UserActivityPanel: React.FC = () => {
                           key={amount}
                           onClick={() => setCreditAmount(amount)}
                           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${creditAmount === amount
-                              ? 'bg-green-600 text-white'
-                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                             }`}
                         >
                           +{amount}
