@@ -28,6 +28,41 @@ const blobToBase64 = async (blob: Blob): Promise<string> => {
     });
 };
 
+// Helper function to generate stable seed from file
+const generateStableSeed = async (file: File): Promise<number> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const base64 = reader.result as string;
+                // Base64'dan hash oluştur
+                const hash = hashString(base64);
+                // Hash'i seed olarak kullan (0-1M aralığı)
+                const seed = Math.abs(hash) % 1000000000;
+                console.log('🔒 Stable seed generated from image hash:', seed);
+                resolve(seed);
+            } catch (error) {
+                reject(new Error(`Seed generation failed: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`));
+            }
+        };
+        reader.onerror = () => {
+            reject(new Error('File reading failed for seed generation'));
+        };
+        reader.readAsDataURL(file);
+    });
+};
+
+// Simple hash function (djb2 algorithm)
+const hashString = (str: string): number => {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash;
+};
+
 // Helper function to get hex code from color name
 const getColorHex = (colorName: string): string => {
     if (!colorName) return '';
@@ -422,11 +457,21 @@ export const generateImage = async (
     }
 
     // Add model identity image if provided (Highest priority for face)
+    // If reference image is provided, generate stable seed from it to lock the model
+    let effectiveSeed = seed;
     if (modelIdentityFile) {
-        const identityPart = await fileToGenerativePart(modelIdentityFile);
-        promptParts.push(identityPart);
-        console.log('🔒 Referans Model Kimlik görseli eklendi');
+        const referenceSeed = await generateStableSeed(modelIdentityFile);
+        effectiveSeed = referenceSeed;
+        console.log('🔒 Model Identity Locked - Using stable seed from reference image:', referenceSeed);
+    } else if (seed) {
+        console.log('🔓 User-provided seed:', seed);
+    } else {
+        console.log('🎲 Random seed will be generated');
     }
+
+    const identityPart = await fileToGenerativePart(modelIdentityFile);
+    promptParts.push(identityPart);
+    console.log('🔒 Referans Model Kimlik görseli eklendi');
 
     // Add pattern image if provided
     if (patternImageFile) {
@@ -657,7 +702,7 @@ export const generateImage = async (
             },
             config: {
                 responseModalities: [Modality.IMAGE],
-                ...(seed ? { seed: seed } : {}), // Pass seed if provided
+                ...(effectiveSeed ? { seed: effectiveSeed } : {}), // Use effectiveSeed (from reference image or user input)
                 imageConfig: {
                     aspectRatio: aspectRatio === '16:9' ? '16:9' :
                         aspectRatio === '9:16' ? '9:16' :
