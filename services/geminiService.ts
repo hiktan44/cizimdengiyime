@@ -11,6 +11,23 @@ if (!API_KEY) {
     console.error('Please add VITE_GEMINI_API_KEY to your Netlify environment variables.');
 }
 
+// Helper function to convert Blob to base64
+const blobToBase64 = async (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result as string;
+            // Add data URL prefix
+            const mimeType = blob.type || 'image/jpeg';
+            resolve(`data:${mimeType};base64,${base64.split(',')[1]}`);
+        };
+        reader.onerror = () => {
+            reject(new Error('Blob to base64 conversion failed'));
+        };
+        reader.readAsDataURL(blob);
+    });
+};
+
 // Helper function to get hex code from color name
 const getColorHex = (colorName: string): string => {
     if (!colorName) return '';
@@ -242,15 +259,36 @@ export const generateVideoFromImage = async (
         imageBytes = part.inlineData.data;
         mimeType = part.inlineData.mimeType;
     } else if (typeof imageInput === 'string') {
+        // Base64 format control (data:image/xxx;base64,xxx)
         const match = imageInput.match(/^data:(.*?);base64,(.*)$/);
         if (match) {
             mimeType = match[1];
             imageBytes = match[2];
-        } else {
-            throw new Error("Invalid image format provided for video generation.");
+        }
+        // URL format control (http:// or https://)
+        else if (imageInput.match(/^https?:\/\//i)) {
+            console.log('Converting image URL to base64 for video generation...');
+            try {
+                const response = await fetch(imageInput);
+                if (!response.ok) {
+                    throw new Error(`Görsel indirilemedi: ${response.status} ${response.statusText}`);
+                }
+                const blob = await response.blob();
+                mimeType = blob.type || 'image/jpeg';
+                imageBytes = await blobToBase64(blob);
+                console.log('Image converted to base64 successfully, size:', imageBytes.length, 'chars');
+            } catch (error) {
+                console.error('Error converting URL to base64:', error);
+                throw new Error(`Görsel URL'si base64'e çevrilemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
+            }
+        }
+        // Invalid format
+        else {
+            console.error('Invalid image format provided:', imageInput.substring(0, 100));
+            throw new Error(`Geçersiz görsel formatı. Lütfen base64 formatında (data:image/...) veya geçerli bir URL kullanın. Sağlanan: ${imageInput.substring(0, 50)}...`);
         }
     } else {
-        throw new Error("Invalid image input.");
+        throw new Error("Geçersiz görsel girişi. Lütfen File, Base64 string veya URL kullanın.");
     }
 
     const modelName = settings.quality === 'high' ? 'veo-3.1-generate-preview' : 'veo-3.1-fast-generate-preview';
