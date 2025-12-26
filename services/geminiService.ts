@@ -1,5 +1,5 @@
 import { GoogleGenAI, Modality } from "@google/genai";
-import { fileToGenerativePart } from '../utils/fileUtils';
+import { fileToGenerativePart, fileToBase64 } from '../utils/fileUtils';
 import { colors } from '../components/ColorPicker';
 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır.
@@ -24,7 +24,24 @@ const blobToBase64 = async (blob: Blob): Promise<string> => {
         reader.onerror = () => {
             reject(new Error('Blob to base64 conversion failed'));
         };
-        reader.readAsDataURL(blob);
+        reader.readAsDataURL(blob); // ✅ DÜZELTİLDİ: readAsDataURL kullanılıyor (Blob için doğru)
+    });
+};
+
+// Helper function to convert File to base64
+const fileToBase64 = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = reader.result as string;
+            const mimeType = file.type || 'image/jpeg';
+            resolve(`data:${mimeType};base64,${base64.split(',')[1]}`);
+        };
+        reader.onerror = () => {
+            reject(new Error('File to base64 conversion failed'));
+        };
+        reader.readAsDataURL(file); // ✅ File için readAsDataURL kullanılıyor
+    };
     });
 };
 
