@@ -1,5 +1,5 @@
 import { GoogleGenAI, Modality } from "@google/genai";
-import { fileToGenerativePart, fileToBase64 } from '../utils/fileUtils';
+import { fileToGenerativePart, blobToBase64 } from '../utils/fileUtils';
 import { colors } from '../components/ColorPicker';
 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır.
@@ -11,44 +11,22 @@ if (!API_KEY) {
     console.error('Please add VITE_GEMINI_API_KEY to your Netlify environment variables.');
 }
 
-// Helper function to convert Blob to base64
-const blobToBase64 = async (blob: Blob): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64 = reader.result as string;
-            // Add data URL prefix
-            const mimeType = blob.type || 'image/jpeg';
-            resolve(`data:${mimeType};base64,${base64.split(',')[1]}`);
-        };
-        reader.onerror = () => {
-            reject(new Error('Blob to base64 conversion failed'));
-        };
-        reader.readAsDataURL(blob); // ✅ DÜZELTİLDİ: readAsDataURL kullanılıyor (Blob için doğru)
-    });
-};
-
-// Helper function to convert File to base64
-const fileToBase64 = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64 = reader.result as string;
-            const mimeType = file.type || 'image/jpeg';
-            resolve(`data:${mimeType};base64,${base64.split(',')[1]}`);
-        };
-        reader.onerror = () => {
-            reject(new Error('File to base64 conversion failed'));
-        };
-        reader.readAsDataURL(file); // ✅ File için readAsDataURL kullanılıyor
-    });
+// Simple hash function (djb2 algorithm)
+const hashString = (str: string): number => {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash;
 };
 
 // Helper function to generate stable seed from file
 const generateStableSeed = async (file: File): Promise<number> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onloadend = () => { // ✅ DÜZELTİLDİ: onloadend kullanılıyor
             try {
                 const base64 = reader.result as string;
                 // Base64'dan hash oluştur
@@ -66,17 +44,6 @@ const generateStableSeed = async (file: File): Promise<number> => {
         };
         reader.readAsDataURL(file);
     });
-};
-
-// Simple hash function (djb2 algorithm)
-const hashString = (str: string): number => {
-    let hash = 5381;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-    }
-    return hash;
 };
 
 // Helper function to get hex code from color name
