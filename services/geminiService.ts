@@ -259,11 +259,12 @@ export const generateVideoFromImage = async (
         imageBytes = part.inlineData.data;
         mimeType = part.inlineData.mimeType;
     } else if (typeof imageInput === 'string') {
-        // Base64 format control (data:image/xxx;base64,xxx)
-        const match = imageInput.match(/^data:(.*?);base64,(.*)$/);
+        // Base64 format control (data:image/xxx;base64,xxx) - Boşluk toleranslı
+        const match = imageInput.match(/^data:(.*?);\s*base64,\s*(.*)$/);
         if (match) {
             mimeType = match[1];
             imageBytes = match[2];
+            console.log('Valid base64 image detected, MIME type:', mimeType, 'Data size:', imageBytes.length, 'chars');
         }
         // URL format control (http:// or https://)
         else if (imageInput.match(/^https?:\/\//i)) {
@@ -282,10 +283,17 @@ export const generateVideoFromImage = async (
                 throw new Error(`Görsel URL'si base64'e çevrilemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
             }
         }
-        // Invalid format
+        // Invalid format - Detaylı debugging ile
         else {
-            console.error('Invalid image format provided:', imageInput.substring(0, 100));
-            throw new Error(`Geçersiz görsel formatı. Lütfen base64 formatında (data:image/...) veya geçerli bir URL kullanın. Sağlanan: ${imageInput.substring(0, 50)}...`);
+            console.error('Invalid image format provided!');
+            console.error('Full input:', imageInput);
+            console.error('Full input length:', imageInput.length);
+            console.error('First 200 chars:', imageInput.substring(0, 200));
+            console.error('Does it start with data:? :', imageInput.startsWith('data:'));
+            console.error('Contains base64?', imageInput.includes('base64'));
+            console.error('Contains semicolon?', imageInput.includes(';'));
+            console.error('Base64 position:', imageInput.indexOf('base64'));
+            throw new Error(`Geçersiz görsel formatı. Lütfen geçerli bir base64 (data:image/xxx;base64,xxx) formatında veya geçerli bir URL (http:// veya https://) kullanın. Görsel boyutu: ${imageInput.length} karakter. İlk 50 karakter: ${imageInput.substring(0, 50)}...`);
         }
     } else {
         throw new Error("Geçersiz görsel girişi. Lütfen File, Base64 string veya URL kullanın.");
