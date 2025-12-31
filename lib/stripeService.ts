@@ -20,18 +20,29 @@ export const getStripe = async () => {
     // 1. Try env var
     let publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-    // 2. If not in env, try to get from Site Settings (via Supabase)
-    if (!publishableKey) {
+    // Validate key format (must start with pk_ and not be the placeholder)
+    const isValidKey = (key: string | undefined) =>
+        key && key.startsWith('pk_') && key !== 'your_stripe_publishable_key_here';
+
+    if (!isValidKey(publishableKey)) {
+        console.log('Valid Stripe key not found in env, checking DB...');
+        // 2. If not in env, try to get from Site Settings (via Supabase)
         const { data } = await supabase
             .from('site_settings')
             .select('value')
             .eq('key', 'stripe_publishable_key')
             .single();
-        if (data) publishableKey = data.value;
+
+        if (data && isValidKey(data.value)) {
+            publishableKey = data.value;
+        } else {
+            // If DB also has invalid/no key, set to null but don't crash yet
+            console.warn('No valid Stripe Publishable Key found in DB either.');
+        }
     }
 
-    if (!publishableKey) {
-        console.error('Stripe Publishable Key not found');
+    if (!publishableKey || !isValidKey(publishableKey)) {
+        console.error('Stripe Publishable Key missing or invalid. Please check Admin Settings.');
         return null;
     }
 
