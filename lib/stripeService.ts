@@ -17,16 +17,14 @@ let stripePromise: Promise<any> | null = null;
 export const getStripe = async () => {
     if (stripePromise) return stripePromise;
 
-    // 1. Try env var
-    let publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    let publishableKey: string | undefined;
 
-    // Validate key format (must start with pk_ and not be the placeholder)
+    // Validate key format
     const isValidKey = (key: string | undefined) =>
         key && key.startsWith('pk_') && key !== 'your_stripe_publishable_key_here';
 
-    if (!isValidKey(publishableKey)) {
-        console.log('Valid Stripe key not found in env, checking DB...');
-        // 2. If not in env, try to get from Site Settings (via Supabase)
+    // 1. Try to get from Site Settings (via Supabase) FIRST
+    try {
         const { data } = await supabase
             .from('site_settings')
             .select('value')
@@ -35,9 +33,18 @@ export const getStripe = async () => {
 
         if (data && isValidKey(data.value)) {
             publishableKey = data.value;
-        } else {
-            // If DB also has invalid/no key, set to null but don't crash yet
-            console.warn('No valid Stripe Publishable Key found in DB either.');
+            console.log('Using Stripe key from DB settings');
+        }
+    } catch (error) {
+        console.warn('Error fetching Stripe key from DB:', error);
+    }
+
+    // 2. If not found in DB or invalid, fallback to Env Var
+    if (!publishableKey) {
+        const envKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+        if (isValidKey(envKey)) {
+            publishableKey = envKey;
+            console.log('Using Stripe key from Environment');
         }
     }
 

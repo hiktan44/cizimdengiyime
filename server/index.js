@@ -74,17 +74,25 @@ let stripe;
 const getStripe = async () => {
   if (stripe) return stripe;
 
-  // Try getting from env first
-  let secretKey = process.env.STRIPE_SECRET_KEY;
+  let secretKey;
 
-  // If not in env, get from site_settings (DB)
-  if (!secretKey) {
+  // 1. Try getting from site_settings (DB) first (Allows Admin Panel override)
+  try {
     const { data } = await supabase
       .from('site_settings')
       .select('value')
       .eq('key', 'stripe_secret_key')
       .single();
-    if (data) secretKey = data.value;
+    if (data && data.value && data.value.startsWith('sk_')) {
+      secretKey = data.value;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch stripe key from DB', err);
+  }
+
+  // 2. If not in DB, fallback to environment variable
+  if (!secretKey) {
+    secretKey = process.env.STRIPE_SECRET_KEY;
   }
 
   if (secretKey) {
