@@ -187,13 +187,25 @@ app.post('/api/stripe-webhook', async (req, res) => {
     // Here we will try to verify if secret exists, else retrieve the event to verify authenticity.
 
     // Simplest reliable way without static webhook secret: Retrieve event from API
-    const payload = req.body;
+    // req.body is a Buffer due to bodyParser.raw
+    const payloadString = req.body.toString();
+    const payload = JSON.parse(payloadString);
+
+    console.log('🔔 Webhook received:', payload.type, payload.id);
+
     if (payload.id && payload.type) {
       event = await stripeInstance.events.retrieve(payload.id);
+    } else {
+      throw new Error('Invalid payload');
     }
   } catch (err) {
     console.error('Webhook Error:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (!event) {
+    console.error('Event retrieval failed');
+    return res.status(400).send('Event retrieval failed');
   }
 
   if (event.type === 'payment_intent.succeeded') {
