@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase, CREDIT_PACKAGES } from '../lib/supabase';
-import { createPaymentToken, getTestCardInfo, TEST_CARDS } from '../lib/paytrService';
-import { createTransaction, addCreditsToUser, updateTransactionStatus } from '../lib/database';
 import { getSiteSettings } from '../lib/adminService';
+import { getStripe, createPaymentIntent } from '../lib/stripeService';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 interface BuyCreditsModalProps {
   isOpen: boolean;
@@ -12,6 +12,118 @@ interface BuyCreditsModalProps {
   userName: string;
   onSuccess: () => void;
 }
+
+const CheckoutForm: React.FC<{
+  amountEUR: string;
+  rate: number;
+  credits: number;
+  onSuccess: () => void;
+  onError: (msg: string) => void;
+}> = ({ amountEUR, rate, credits, onSuccess, onError }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [message, setMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!stripe) return;
+
+    const clientSecret = new URLSearchParams(window.location.search).get(
+      "payment_intent_client_secret"
+    );
+
+    if (!clientSecret) return;
+
+    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+      switch (paymentIntent?.status) {
+        case "succeeded":
+          setMessage("Ödeme başarılı!");
+          break;
+        case "processing":
+          setMessage("Ödeme işleniyor.");
+          break;
+        case "requires_payment_method":
+          setMessage("Ödeme başarısız oldu, lütfen tekrar deneyin.");
+          break;
+        default:
+          setMessage("Bir şeyler ters gitti.");
+          break;
+      }
+    });
+  }, [stripe]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) return;
+
+    setIsLoading(true);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.origin, // We will handle success via webhook usually, or UI redirect
+        receipt_email: undefined, // Passed in intent creation
+      },
+      redirect: "if_required", // Important to avoid redirect if not needed (e.g. card)
+    });
+
+    if (error) {
+      if (error.type === "card_error" || error.type === "validation_error") {
+        setMessage(error.message || "Bir hata oluştu");
+        onError(error.message || "Ödeme hatası");
+      } else {
+        setMessage("Beklenmedik bir hata oluştu.");
+        onError("Beklenmedik hata");
+      }
+    } else {
+      // Success!
+      setMessage("Ödeme Başarılı!");
+      // Explicitly wait a moment for webhook to process (optional) or just show success
+      // In a real app we might poll for status, but here we assume webhook works fast.
+      setTimeout(() => {
+        onSuccess();
+      }, 1500);
+    }
+
+    setIsLoading(false);
+  };
+
+  return (
+    <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
+      <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700 mb-4">
+        <p className="text-slate-300 text-sm mb-1">Ödenecek Tutar:</p>
+        <div className="flex items-end gap-2">
+          <span className="text-3xl font-bold text-white">€{amountEUR}</span>
+          <span className="text-slate-400 text-sm mb-1">(Kur: {rate.toFixed(2)})</span>
+        </div>
+      </div>
+
+      <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
+
+      {message && (
+        <div className={`p-3 rounded text-sm ${message.includes('Başarılı') ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+          {message}
+        </div>
+      )}
+
+      <button
+        disabled={isLoading || !stripe || !elements}
+        id="submit"
+        className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-600 disabled:to-slate-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg flex items-center justify-center gap-2"
+      >
+        {isLoading ? (
+          <>
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            İşleniyor...
+          </>
+        ) : (
+          "Ödemeyi Tamamla"
+        )}
+      </button>
+    </form>
+  );
+};
 
 export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
   isOpen,
@@ -23,19 +135,18 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
 }) => {
   const [selectedPackage, setSelectedPackage] = useState<'SMALL' | 'MEDIUM' | 'LARGE'>('MEDIUM');
   const [loading, setLoading] = useState(false);
-  const [showTestCards, setShowTestCards] = useState(false);
-  const [paymentIframe, setPaymentIframe] = useState<string | null>(null);
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneError, setPhoneError] = useState('');
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<{ amountEUR: string; rate: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   const [packages, setPackages] = useState({
     SMALL: CREDIT_PACKAGES.SMALL,
     MEDIUM: CREDIT_PACKAGES.MEDIUM,
     LARGE: CREDIT_PACKAGES.LARGE,
   });
 
-  const isTestMode = import.meta.env.VITE_PAYTR_TEST_MODE === '1';
-
-  // Fetch credit packages from site settings
+  // Fetch credit packages
   useEffect(() => {
     const fetchPackages = async () => {
       try {
@@ -63,116 +174,43 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
 
     if (isOpen) {
       fetchPackages();
+      // Initialize Stripe
+      getStripe().then(setStripePromise);
+    } else {
+      // Reset state on close
+      setClientSecret(null);
+      setPaymentDetails(null);
+      setError(null);
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const fetchUserPhone = async () => {
-      if (!isOpen || !userId) return;
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('phone_number')
-          .eq('id', userId)
-          .single();
-
-        if (data?.phone_number) {
-          setPhoneNumber(data.phone_number);
-        }
-      } catch (error) {
-        console.error('Error fetching phone:', error);
-      }
-    };
-
-    if (isOpen) {
-      fetchUserPhone();
-    }
-  }, [isOpen, userId]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setPaymentIframe(null);
-      setShowTestCards(false);
-      setPhoneError('');
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
-  const handleBuyCredits = async () => {
-    // Validate phone
-    if (!phoneNumber.trim()) {
-      setPhoneError('Lütfen telefon numaranızı giriniz.');
-      return;
-    }
-    if (phoneNumber.length < 10) {
-      setPhoneError('Geçerli bir telefon numarası giriniz.');
-      return;
-    }
-
+  const handleInitiatePayment = async () => {
     setLoading(true);
-    setPhoneError('');
-
+    setError(null);
     try {
-      // Save phone number first
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ phone_number: phoneNumber })
-        .eq('id', userId);
-
-      if (updateError) {
-        console.error('Phone update error:', updateError);
-        // Continue anyway or block? Let's assume we block to ensure data is collected
-        throw new Error('Telefon numarası kaydedilemedi. Lütfen tekrar deneyin.');
-      }
-
       const pkg = packages[selectedPackage];
-      // PayTR merchant_oid alfanumerik olmalı (tire veya özel karakter yok)
-      const orderId = `ORDER${Date.now()}${userId.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8)}`;
-
-      // Create transaction in DB
-      const transactionResult = await createTransaction(
-        userId,
-        'credit_purchase',
-        pkg.price,
-        pkg.credits,
-        orderId,
-        'paytr'
-      );
-
-      if (!transactionResult.success) {
-        throw new Error(transactionResult.error || 'İşlem oluşturulamadı');
-      }
-
-      // Create PayTR payment token
-      const paymentResult = await createPaymentToken({
+      const response = await createPaymentIntent({
+        amountTL: pkg.price,
+        credits: pkg.credits,
         userId,
         userEmail,
-        userName,
-        amount: pkg.price,
-        credits: pkg.credits,
-        orderId,
-        successUrl: `${window.location.origin}/payment-success`,
-        failUrl: `${window.location.origin}/payment-fail`,
       });
 
-      if (!paymentResult.success || !paymentResult.iframeUrl) {
-        throw new Error(paymentResult.error || 'Ödeme başlatılamadı');
-      }
+      setClientSecret(response.clientSecret);
+      setPaymentDetails({
+        amountEUR: response.amountEUR,
+        rate: response.rate
+      });
 
-      setPaymentIframe(paymentResult.iframeUrl);
-
-      // PayTR kendi success/fail URL'lerine yönlendirecek
-      // Backend callback çalıştığında krediler otomatik eklenecek
-      // Kullanıcı modal'ı kapatıp dashboard'a gidebilir
-    } catch (error: any) {
-      console.error('Payment error:', error);
-      alert(error.message || 'Ödeme işlemi başarısız oldu');
+    } catch (err: any) {
+      console.error("Payment init error:", err);
+      setError(err.message || "Ödeme başlatılamadı.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -181,14 +219,7 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
         <div className="sticky top-0 bg-slate-900 border-b border-slate-700 p-6 flex items-center justify-between z-10">
           <div>
             <h2 className="text-2xl font-bold text-white">💳 Kredi Satın Al</h2>
-            {isTestMode && (
-              <p className="text-amber-400 text-sm mt-1 flex items-center gap-2">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                Test modunda çalışıyorsunuz. Gerçek ödeme alınmayacaktır.
-              </p>
-            )}
+            <p className="text-slate-400 text-sm mt-1">Stripe ile güvenli ödeme</p>
           </div>
           <button
             onClick={onClose}
@@ -201,84 +232,16 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
         </div>
 
         <div className="p-6">
-          {!paymentIframe ? (
+
+          {error && (
+            <div className="mb-4 bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl">
+              {error}
+            </div>
+          )}
+
+          {!clientSecret ? (
+            /* Step 1: Package Selection */
             <>
-              {/* Test Cards Info - Sadece test modunda göster */}
-              {isTestMode && (
-                <div className="mb-6 bg-yellow-500/10 border border-yellow-500/50 rounded-xl p-4">
-                  <button
-                    onClick={() => setShowTestCards(!showTestCards)}
-                    className="w-full flex items-center justify-between text-left"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-yellow-400">⚠️</span>
-                      <span className="text-yellow-400 font-semibold">Test Kartları Bilgisi</span>
-                    </div>
-                    <svg
-                      className={`w-5 h-5 text-yellow-400 transition-transform ${showTestCards ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {showTestCards && (
-                    <div className="mt-4 space-y-3 text-sm">
-                      <div className="bg-slate-900/50 rounded-lg p-3">
-                        <div className="text-green-400 font-semibold mb-2">✅ Başarılı İşlem</div>
-                        <div className="text-slate-300 space-y-1">
-                          <div>Kart No: {TEST_CARDS.SUCCESS.cardNumber}</div>
-                          <div>Son Kullanma: {TEST_CARDS.SUCCESS.expiry}</div>
-                          <div>CVV: {TEST_CARDS.SUCCESS.cvv}</div>
-                        </div>
-                      </div>
-                      <div className="bg-slate-900/50 rounded-lg p-3">
-                        <div className="text-red-400 font-semibold mb-2">❌ Yetersiz Bakiye</div>
-                        <div className="text-slate-300 space-y-1">
-                          <div>Kart No: {TEST_CARDS.FAIL_INSUFFICIENT_FUNDS.cardNumber}</div>
-                          <div>Son Kullanma: {TEST_CARDS.FAIL_INSUFFICIENT_FUNDS.expiry}</div>
-                          <div>CVV: {TEST_CARDS.FAIL_INSUFFICIENT_FUNDS.cvv}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Phone Number Input */}
-              <div className="mb-6 bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-                <label className="block text-slate-300 text-sm font-bold mb-2">
-                  Telefon Numarası <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-slate-500">📞</span>
-                  </div>
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      // Allow numbers, spaces, plus, dash, parentheses
-                      if (/^[\d\s+\-()]*$/.test(val)) {
-                        setPhoneNumber(val);
-                        setPhoneError('');
-                      }
-                    }}
-                    placeholder="05XX XXX XX XX"
-                    className={`w-full bg-slate-900 border ${phoneError ? 'border-red-500' : 'border-slate-600'} rounded-lg py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition`}
-                  />
-                </div>
-                {phoneError && (
-                  <p className="text-red-500 text-xs mt-1">{phoneError}</p>
-                )}
-                <p className="text-xs text-slate-500 mt-2">
-                  Satın alma işleminizle ilgili bilgilendirmeler için gereklidir.
-                </p>
-              </div>
-
-              {/* Package Selection */}
               <div className="grid md:grid-cols-3 gap-4 mb-6">
                 {(Object.keys(packages) as Array<keyof typeof packages>).map((key) => {
                   const pkg = packages[key];
@@ -295,57 +258,49 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
                       <div className="text-3xl font-bold text-white mb-2">{pkg.credits}</div>
                       <div className="text-sm text-slate-400 mb-4">Kredi</div>
                       <div className="text-2xl font-bold text-cyan-400 mb-2">{pkg.price}₺</div>
-                      <div className="text-xs text-slate-500">1 Kredi = {(pkg.price / pkg.credits).toFixed(2)}₺</div>
-                      {key === 'MEDIUM' && (
-                        <div className="mt-3 bg-cyan-500 text-white text-xs font-semibold px-3 py-1 rounded-full inline-block">
-                          Popüler
-                        </div>
-                      )}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Buy Button */}
               <button
-                onClick={handleBuyCredits}
+                onClick={handleInitiatePayment}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-600 disabled:to-slate-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    İşlem Yapılıyor...
+                    Hazırlanıyor...
                   </span>
                 ) : (
-                  `${packages[selectedPackage].price}₺ Öde ve ${packages[selectedPackage].credits} Kredi Al`
+                  "Ödemeye Geç"
                 )}
               </button>
-
-              <p className="text-xs text-slate-500 text-center mt-4">
-                Ödeme için güvenli PayTR kullanılmaktadır.
-                {isTestMode && ' Test modundasınız.'}
-              </p>
             </>
           ) : (
-            /* Payment Iframe */
-            <div className="space-y-4">
-              <div className="bg-cyan-500/10 border border-cyan-500/50 rounded-xl p-4">
-                <p className="text-cyan-400 text-sm">
-                  ⏳ Ödeme sayfası yükleniyor...
-                  {isTestMode && ' Test kartı ile ödeme yapabilirsiniz.'}
-                </p>
+            /* Step 2: Stripe Elements */
+            stripePromise && clientSecret && paymentDetails ? (
+              <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
+                <CheckoutForm
+                  amountEUR={paymentDetails.amountEUR}
+                  rate={paymentDetails.rate}
+                  credits={packages[selectedPackage].credits}
+                  onSuccess={() => {
+                    onSuccess();
+                    onClose();
+                  }}
+                  onError={(msg) => setError(msg)}
+                />
+              </Elements>
+            ) : (
+              <div className="flex justify-center p-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-cyan-500"></div>
               </div>
-              <iframe
-                src={paymentIframe}
-                className="w-full h-[600px] border-0 rounded-xl"
-                title="Payment"
-              />
-            </div>
+            )
           )}
         </div>
       </div>
     </div>
   );
 };
-

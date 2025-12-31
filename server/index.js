@@ -7,8 +7,10 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import Stripe from 'stripe';
+import { parseStringPromise } from 'xml2js';
 
-// Polyfill for Node.js 14 (Headers global yoksa ekle)
+// Polyfill for Node.js 14
 if (!globalThis.fetch) {
   globalThis.fetch = fetch;
   globalThis.Headers = fetch.Headers;
@@ -16,39 +18,35 @@ if (!globalThis.fetch) {
   globalThis.Response = fetch.Response;
 }
 
-// Get current directory (ES modules için gerekli)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables
 dotenv.config({ path: join(__dirname, '.env') });
-
-// Environment variables kontrolü
-console.log('🔍 Environment Variables Check:');
-console.log('VITE_SUPABASE_URL:', process.env.VITE_SUPABASE_URL ? '✅ Set' : '❌ Missing');
-console.log('SUPABASE_SERVICE_KEY:', process.env.SUPABASE_SERVICE_KEY ? '✅ Set' : '❌ Missing');
-console.log('PAYTR_MERCHANT_KEY:', process.env.PAYTR_MERCHANT_KEY || process.env.VITE_PAYTR_MERCHANT_KEY ? '✅ Set' : '❌ Missing');
-console.log('PAYTR_MERCHANT_SALT:', process.env.PAYTR_MERCHANT_SALT || process.env.VITE_PAYTR_MERCHANT_SALT ? '✅ Set' : '❌ Missing');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-// CORS - Frontend URL'lerini ekle
+// Supabase Admin Client
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Supabase credentials missing');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// CORS
 const allowedOrigins = [
-  'http://localhost:5173', // Local development
+  'http://localhost:5173',
   'http://localhost:3000',
-  process.env.FRONTEND_URL, // Coolify frontend URL (environment variable)
-  // Production URL'leri buraya eklenecek (örnek aşağıda)
-  // 'https://cizimdengiyime-frontend-xxx.coolify.app',
-  // 'https://yourdomain.com',
+  process.env.FRONTEND_URL,
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
@@ -60,164 +58,190 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Webhook endpoint needs raw body
+app.use('/api/stripe-webhook', bodyParser.raw({ type: 'application/json' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Supabase Admin Client (RLS bypass için)
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+// Initialize Stripe (Dynamic Key Loading)
+let stripe;
 
-if (!supabaseUrl) {
-  console.error('❌ VITE_SUPABASE_URL is missing in .env file');
-  process.exit(1);
-}
+const getStripe = async () => {
+  if (stripe) return stripe;
 
-if (!supabaseServiceKey) {
-  console.error('❌ SUPABASE_SERVICE_KEY is missing in .env file');
-  process.exit(1);
-}
+  // Try getting from env first
+  let secretKey = process.env.STRIPE_SECRET_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  // If not in env, get from site_settings (DB)
+  if (!secretKey) {
+    const { data } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'stripe_secret_key')
+      .single();
+    if (data) secretKey = data.value;
+  }
 
-// PayTR Configuration
-const PAYTR_MERCHANT_KEY = process.env.PAYTR_MERCHANT_KEY || process.env.VITE_PAYTR_MERCHANT_KEY;
-const PAYTR_MERCHANT_SALT = process.env.PAYTR_MERCHANT_SALT || process.env.VITE_PAYTR_MERCHANT_SALT;
+  if (secretKey) {
+    stripe = new Stripe(secretKey);
+    return stripe;
+  }
+  return null;
+};
 
-// Health check endpoint
+// --- ROUTES ---
+
+// Health Check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend is running' });
 });
 
-// PayTR Callback Endpoint
-app.post('/api/paytr-callback', async (req, res) => {
-  console.log('📥 PayTR Callback alındı');
-  console.log('Body:', req.body);
-
+// 1. Get Currency Rate (TCMB)
+app.get('/api/get-currency-rate', async (req, res) => {
   try {
-    const {
-      merchant_oid,
-      status,
-      total_amount,
-      hash,
-      failed_reason_code,
-      failed_reason_msg,
-      test_mode,
-    } = req.body;
+    const response = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml');
+    const xml = await response.text();
+    const result = await parseStringPromise(xml);
 
-    // 1. Hash Doğrulama (GÜVENLİK - ÇOK ÖNEMLİ!)
-    const hashStr = merchant_oid + PAYTR_MERCHANT_SALT + status + total_amount;
-    const calculatedHash = crypto
-      .createHmac('sha256', PAYTR_MERCHANT_KEY)
-      .update(hashStr)
-      .digest('base64');
+    // Find Euro
+    const euro = result.Tarih_Date.Currency.find((c) => c.$.CurrencyCode === 'EUR');
+    if (!euro) throw new Error('EUR rate not found');
 
-    console.log('Hash kontrolü:');
-    console.log('Gelen hash:', hash);
-    console.log('Hesaplanan hash:', calculatedHash);
+    // BanknoteSelling or ForexSelling
+    const rate = parseFloat(euro.BanknoteSelling[0] || euro.ForexSelling[0]);
 
-    if (hash !== calculatedHash) {
-      console.error('❌ Hash doğrulama hatası!');
-      return res.status(400).send('HASH_ERROR');
-    }
-
-    console.log('✅ Hash doğrulandı');
-
-    // 2. Transaction'ı bul (merchant_oid'yi stripe_payment_id field'ına kaydettik)
-    const { data: transaction, error: txError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('stripe_payment_id', merchant_oid)
-      .single();
-
-    if (txError || !transaction) {
-      console.error('❌ Transaction bulunamadı:', merchant_oid, txError);
-      return res.status(404).send('TRANSACTION_NOT_FOUND');
-    }
-
-    console.log('📦 Transaction bulundu:', transaction.id);
-
-    // 3. Ödeme Durumuna Göre İşlem Yap
-    if (status === 'success') {
-      // ✅ BAŞARILI ÖDEME
-
-      // Transaction'ı güncelle
-      const { error: updateError } = await supabase
-        .from('transactions')
-        .update({ status: 'completed' })
-        .eq('id', transaction.id);
-
-      if (updateError) {
-        console.error('❌ Transaction güncellenemedi:', updateError);
-        return res.status(500).send('UPDATE_ERROR');
-      }
-
-      // Kullanıcıya kredi ekle
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('credits')
-        .eq('id', transaction.user_id)
-        .single();
-
-      if (profileError) {
-        console.error('❌ Profile bulunamadı:', profileError);
-        return res.status(500).send('PROFILE_ERROR');
-      }
-
-      const newCredits = (profile?.credits || 0) + transaction.credits;
-
-      const { error: creditError } = await supabase
-        .from('profiles')
-        .update({ credits: newCredits })
-        .eq('id', transaction.user_id);
-
-      if (creditError) {
-        console.error('❌ Kredi eklenemedi:', creditError);
-        return res.status(500).send('CREDIT_ERROR');
-      }
-
-      console.log(`✅ Ödeme başarılı: ${merchant_oid}`);
-      console.log(`💰 ${transaction.credits} kredi eklendi (Toplam: ${newCredits})`);
-      console.log(`👤 Kullanıcı: ${transaction.user_id}`);
-      console.log(`🧪 Test mode: ${test_mode}`);
-
-      return res.status(200).send('OK');
-    } else {
-      // ❌ BAŞARISIZ ÖDEME
-
-      const { error: updateError } = await supabase
-        .from('transactions')
-        .update({
-          status: 'failed',
-        })
-        .eq('id', transaction.id);
-
-      if (updateError) {
-        console.error('❌ Transaction güncellenemedi:', updateError);
-      }
-
-      console.log(`❌ Ödeme başarısız: ${merchant_oid}`);
-      console.log(`Sebep: ${failed_reason_msg} (Code: ${failed_reason_code})`);
-
-      return res.status(200).send('OK');
-    }
+    res.json({ currency: 'EUR', rate });
   } catch (error) {
-    console.error('💥 Callback error:', error);
-    return res.status(500).send('SERVER_ERROR');
+    console.error('Currency Fetch Error:', error);
+    res.status(500).json({ error: 'Failed to fetch currency rate' });
   }
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not Found' });
+// 2. Create Payment Intent
+app.post('/api/create-payment-intent', async (req, res) => {
+  try {
+    const { amountTL, credits, userId, userEmail } = req.body;
+
+    const stripeInstance = await getStripe();
+    if (!stripeInstance) {
+      return res.status(500).json({ error: 'Stripe not configured' });
+    }
+
+    // Get Conversion Rate
+    const tcmbResponse = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml');
+    const xml = await tcmbResponse.text();
+    const result = await parseStringPromise(xml);
+    const euro = result.Tarih_Date.Currency.find(c => c.$.CurrencyCode === 'EUR');
+    const rate = parseFloat(euro.BanknoteSelling[0] || euro.ForexSelling[0]);
+
+    // Calculate EUR amount
+    const amountEUR = amountTL / rate;
+    const amountCents = Math.round(amountEUR * 100);
+
+    // Create Payment Intent
+    const paymentIntent = await stripeInstance.paymentIntents.create({
+      amount: amountCents,
+      currency: 'eur',
+      metadata: {
+        userId,
+        credits: credits.toString(),
+        amountTL: amountTL.toString(),
+        rate: rate.toString()
+      },
+      receipt_email: userEmail,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+      amountEUR: amountEUR.toFixed(2),
+      rate
+    });
+
+  } catch (error) {
+    console.error('Payment Intent Error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
-// Start server
+// 3. Stripe Webhook
+app.post('/api/stripe-webhook', async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const stripeInstance = await getStripe();
+
+  if (!stripeInstance) return res.status(500).send('Stripe not ready');
+
+  let event;
+
+  try {
+    // If you have a webhook secret, use it here. 
+    // For simplicity/dynamic nature, we might trust the event data if verify fails, 
+    // BUT for security, you should configure a Webhook Secret in Admin Panel later.
+    // Here we will try to verify if secret exists, else retrieve the event to verify authenticity.
+
+    // Simplest reliable way without static webhook secret: Retrieve event from API
+    const payload = req.body;
+    if (payload.id && payload.type) {
+      event = await stripeInstance.events.retrieve(payload.id);
+    }
+  } catch (err) {
+    console.error('Webhook Error:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+    const { userId, credits } = paymentIntent.metadata;
+
+    console.log(`💰 Payment succeeded for User ${userId}, Credits: ${credits}`);
+
+    // Update DB
+    try {
+      // 1. Log Transaction
+      const { data: tx, error: txError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: userId,
+          type: 'credit_purchase',
+          amount: parseFloat(paymentIntent.metadata.amountTL), // Log original TL amount
+          credits: parseInt(credits),
+          status: 'completed',
+          payment_method: 'stripe',
+          stripe_payment_id: paymentIntent.id
+        })
+        .select()
+        .single();
+
+      if (txError) throw txError;
+
+      // 2. Add Credits
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('credits')
+        .eq('id', userId)
+        .single();
+
+      const newCredits = (profile?.credits || 0) + parseInt(credits);
+
+      await supabase
+        .from('profiles')
+        .update({ credits: newCredits })
+        .eq('id', userId);
+
+      console.log('✅ Credits added successfully');
+
+    } catch (dbError) {
+      console.error('Database Update Error:', dbError);
+      return res.status(500).json({ error: 'DB Error' });
+    }
+  }
+
+  res.json({ received: true });
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on port ${PORT}`);
-  console.log(`📍 Callback URL: http://localhost:${PORT}/api/paytr-callback`);
-  console.log(`🔑 PayTR Merchant Key: ${PAYTR_MERCHANT_KEY ? '✅ Set' : '❌ Missing'}`);
-  console.log(`🔑 PayTR Merchant Salt: ${PAYTR_MERCHANT_SALT ? '✅ Set' : '❌ Missing'}`);
-  console.log(`🔑 Supabase URL: ${supabaseUrl ? '✅ Set' : '❌ Missing'}`);
-  console.log(`🔑 Supabase Service Key: ${supabaseServiceKey ? '✅ Set' : '❌ Missing'}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
 

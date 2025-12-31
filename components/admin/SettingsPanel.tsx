@@ -18,6 +18,15 @@ const translations = {
       creditAmount: 'Kredi Miktarı',
       price: 'Fiyat (TL)',
     },
+    stripe: {
+      title: 'Stripe Ödeme Ayarları',
+      mode: 'Çalışma Modu',
+      publishableKey: 'Publishable Key (pk_...)',
+      secretKey: 'Secret Key (sk_...)',
+      test: 'Test Modu',
+      live: 'Canlı (Live) Mod',
+      warning: 'Bu anahtarlar ödeme almak için kritiktir. Dikkatli değiştirin.',
+    },
     save: {
       saving: 'Kaydediliyor...',
       button: 'Ayarları Kaydet',
@@ -38,6 +47,15 @@ const translations = {
       large: 'Large Package',
       creditAmount: 'Credit Amount',
       price: 'Price (TL)',
+    },
+    stripe: {
+      title: 'Stripe Payment Settings',
+      mode: 'Operation Mode',
+      publishableKey: 'Publishable Key (pk_...)',
+      secretKey: 'Secret Key (sk_...)',
+      test: 'Test Mode',
+      live: 'Live Mode',
+      warning: 'These keys are critical for payments. Change with caution.',
     },
     save: {
       saving: 'Saving...',
@@ -80,6 +98,7 @@ export const SettingsPanel: React.FC = () => {
 
     try {
       const updates = [
+        // Credit Settings
         { key: 'initial_credits', value: settings.initial_credits, type: 'number' as const },
         { key: 'credit_package_small_credits', value: settings.credit_package_small_credits, type: 'number' as const },
         { key: 'credit_package_small_price', value: settings.credit_package_small_price, type: 'number' as const },
@@ -87,13 +106,22 @@ export const SettingsPanel: React.FC = () => {
         { key: 'credit_package_medium_price', value: settings.credit_package_medium_price, type: 'number' as const },
         { key: 'credit_package_large_credits', value: settings.credit_package_large_credits, type: 'number' as const },
         { key: 'credit_package_large_price', value: settings.credit_package_large_price, type: 'number' as const },
+
+        // Stripe Settings
+        { key: 'stripe_mode', value: settings.stripe_mode || 'test', type: 'string' as const },
+        { key: 'stripe_publishable_key', value: settings.stripe_publishable_key || '', type: 'string' as const },
+        { key: 'stripe_secret_key', value: settings.stripe_secret_key || '', type: 'string' as const },
       ];
 
       for (const update of updates) {
-        await updateSiteSetting(update.key, update.value, update.type);
+        if (update.value !== undefined) {
+          await updateSiteSetting(update.key, update.value, update.type);
+        }
       }
 
       setMessage({ type: 'success', text: t.save.success });
+      // Reload to ensure everything is consistent
+      await loadSettings();
       setTimeout(() => setMessage(null), 3000);
     } catch (error) {
       setMessage({ type: 'error', text: t.save.error });
@@ -221,12 +249,73 @@ export const SettingsPanel: React.FC = () => {
         </div>
       </div>
 
+      {/* Stripe Settings */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <h3 className="text-xl font-bold text-white mb-4">{t.stripe.title}</h3>
+        <p className="text-slate-400 text-sm mb-4 bg-yellow-400/10 text-yellow-500 p-3 rounded-lg border border-yellow-500/20">
+          ⚠️ {t.stripe.warning}
+        </p>
+
+        <div className="space-y-4 max-w-2xl">
+          {/* Mode Selection */}
+          <div>
+            <label className="text-sm text-slate-400 block mb-2">{t.stripe.mode}</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="stripe_mode"
+                  checked={settings.stripe_mode === 'test'}
+                  onChange={() => setSettings({ ...settings, stripe_mode: 'test' })}
+                  className="form-radio text-cyan-500 focus:ring-cyan-500 bg-slate-700 border-slate-600"
+                />
+                <span className="text-white">{t.stripe.test}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="stripe_mode"
+                  checked={settings.stripe_mode === 'live'}
+                  onChange={() => setSettings({ ...settings, stripe_mode: 'live' })}
+                  className="form-radio text-green-500 focus:ring-green-500 bg-slate-700 border-slate-600"
+                />
+                <span className="text-white">{t.stripe.live}</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Publishable Key */}
+          <div>
+            <label className="text-sm text-slate-400 block mb-1">{t.stripe.publishableKey}</label>
+            <input
+              type="text"
+              value={settings.stripe_publishable_key || ''}
+              onChange={(e) => setSettings({ ...settings, stripe_publishable_key: e.target.value })}
+              className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm"
+              placeholder="pk_test_..."
+            />
+          </div>
+
+          {/* Secret Key */}
+          <div>
+            <label className="text-sm text-slate-400 block mb-1">{t.stripe.secretKey}</label>
+            <input
+              type="password"
+              value={settings.stripe_secret_key || ''}
+              onChange={(e) => setSettings({ ...settings, stripe_secret_key: e.target.value })}
+              className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm"
+              placeholder="sk_test_..."
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-4">
         <button
           onClick={handleSave}
           disabled={saving}
-          className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-600 disabled:to-slate-600 text-white px-8 py-3 rounded-lg font-semibold transition"
+          className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 disabled:from-slate-600 disabled:to-slate-600 text-white px-8 py-3 rounded-lg font-semibold transition shadow-lg hover:shadow-cyan-500/25"
         >
           {saving ? t.save.saving : t.save.button}
         </button>
@@ -234,4 +323,3 @@ export const SettingsPanel: React.FC = () => {
     </div>
   );
 };
-
