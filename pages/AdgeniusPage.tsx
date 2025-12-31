@@ -1,0 +1,579 @@
+/**
+ * AdGenius Page - Reklam Kampanyaları ve E-Ticaret Ürün Fotoğrafları
+ * Kredi sistemi entegrasyonuyla (Görsel = 1 kredi, Video = 2 kredi)
+ */
+
+import React, { useState, useCallback, useEffect } from 'react';
+import { UploadForm, ProcessingStep, ResultsGallery } from './adgenius';
+import { analyzeProductImage, generateAdPrompts, generateAdImage, generateAdVideo, ensureApiKey, fileToGoogleGenAIBase64 } from '../services/adgeniusService';
+import { ProductAnalysis, AdPrompt, GenerationResult, FormData, AppStep, AdStyle, ImageModel, VideoModel, GenerationMode, AspectRatio } from './adgenius';
+import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
+import { CREDIT_COSTS, Profile } from '../lib/supabase';
+import { WhatsAppPanel } from '../components/WhatsAppPanel';
+import { Sparkles, Upload, BrainCircuit, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
+
+interface AdgeniusPageProps {
+  profile: Profile | null;
+  onRefreshProfile: () => void;
+  onShowBuyCredits?: () => void;
+}
+
+type Language = 'tr' | 'en';
+
+const translations = {
+  tr: {
+    title: 'AdGenius - Yapay Zeka ile Reklam Üretimi',
+    subtitle: 'Ürün fotoğrafını yükleyin, yapay zeka profesyonel reklam kampanyaları ve e-ticaret ürün fotoğrafları üretsin',
+    modes: {
+      campaign: '🎨 Reklam Kampanyası',
+      ecommerce: '📦 E-Ticaret Paketi'
+    },
+    buttons: {
+      start: 'Üretimi Başlat',
+      downloadImage: 'Resmi İndir',
+      downloadVideo: 'Videoyu İndir',
+      copyTitle: 'Başlığı Kopyala',
+      copied: 'Kopyalandı!',
+    },
+    labels: {
+      productName: 'Elbise veya Model Adı',
+      brand: 'Ürünün Markası',
+      customPrompt: 'Özel İstekler & Sahne Detayları (Opsiyonel)',
+      productImage: 'Ürün Fotoğrafı (Zorunlu)',
+      optionalImage: 'Ürünün Arkadan Görünümü / Aksesuar Ekleme (Opsiyonel)',
+      outputPreference: 'Çıktı Tercihi',
+      style: 'Reklam Stili / E-Ticaret Mekan Teması',
+      aspectRatio: 'Görsel Boyutu / Oranı',
+      colors: 'Renk Varyasyonları',
+      pattern: 'Desen/Doku (Opsiyonel)',
+      photoCount: 'E-Ticaret Poz Sayısı',
+      campaignCount: 'Kampanya Stil Sayısı'
+    },
+    messages: {
+      loginRequired: 'İşlem yapmak için giriş yapmalısınız.',
+      insufficientCredits: 'Yetersiz kredi.',
+      processing: 'İşleniyor...',
+      generatingImage: 'Görseller üretiliyor...',
+      generatingVideo: 'Videolar üretiliyor...',
+      success: 'İşlem başarılı!',
+      error: 'Bir hata oluştu',
+      uploadProductImage: 'Lütfen önce bir ürün fotoğrafı yükleyin.',
+      productNameRequired: 'Lütfen ürün adını girin.',
+      apiKeyRequired: 'API anahtarı seçimi gereklidir.',
+    },
+    creditInfo: {
+      imageCost: 'Görsel başı',
+      videoCost: 'Video başı',
+      totalImages: 'Toplam Görsel',
+      totalVideos: 'Toplam Video',
+      totalCredits: 'Harcanan Kredi',
+      available: 'Mevcut',
+      credits: 'kredi'
+    },
+    stats: {
+      imagesGenerated: 'Oluşturulan Görsel',
+      videosGenerated: 'Oluşturulan Video',
+      creditsUsed: 'Harcanan Kredi'
+    }
+  },
+  en: {
+    title: 'AdGenius - AI-Powered Ad Generation',
+    subtitle: 'Upload your product image and let AI generate professional ad campaigns and e-commerce product photos',
+    modes: {
+      campaign: '🎨 Campaign Mode',
+      ecommerce: '📦 E-Commerce Package'
+    },
+    buttons: {
+      start: 'Start Generation',
+      downloadImage: 'Download Image',
+      downloadVideo: 'Download Video',
+      copyTitle: 'Copy Title',
+      copied: 'Copied!',
+    },
+    labels: {
+      productName: 'Garment or Model Name',
+      brand: 'Brand Name',
+      customPrompt: 'Custom Requirements & Scene Details (Optional)',
+      productImage: 'Product Photo (Required)',
+      optionalImage: 'Add Back View / Accessory (Optional)',
+      outputPreference: 'Output Preference',
+      style: 'Ad Style / E-Commerce Theme',
+      aspectRatio: 'Image Size / Ratio',
+      colors: 'Color Variations',
+      pattern: 'Pattern/Texture (Optional)',
+      photoCount: 'E-Commerce Photo Count',
+      campaignCount: 'Campaign Style Count'
+    },
+    messages: {
+      loginRequired: 'Please login to perform this action.',
+      insufficientCredits: 'Insufficient credits.',
+      processing: 'Processing...',
+      generatingImage: 'Generating images...',
+      generatingVideo: 'Generating videos...',
+      success: 'Operation successful!',
+      error: 'An error occurred',
+      uploadProductImage: 'Please upload a product image first.',
+      productNameRequired: 'Please enter product name.',
+      apiKeyRequired: 'API key selection required.',
+    },
+    creditInfo: {
+      imageCost: 'Per image',
+      videoCost: 'Per video',
+      totalImages: 'Total Images',
+      totalVideos: 'Total Videos',
+      totalCredits: 'Total Credits Used',
+      available: 'Available',
+      credits: 'credits'
+    },
+    stats: {
+      imagesGenerated: 'Images Generated',
+      videosGenerated: 'Videos Generated',
+      creditsUsed: 'Credits Used'
+    }
+  },
+};
+
+// Types for sub-components
+export type { FormData, AppStep, ProductAnalysis, GenerationResult, AdStyle, ImageModel, VideoModel, GenerationMode, AspectRatio };
+
+export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
+  const [language, setLanguage] = useState<Language>('tr');
+
+  // Load language preference
+  useEffect(() => {
+    const savedLang = localStorage.getItem('fasheone_language') as Language;
+    if (savedLang) setLanguage(savedLang);
+  }, []);
+
+  const t = translations[language];
+  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined;
+  const whatsappMessage = language === 'tr'
+    ? 'Merhaba, AdGenius konusunda destek almak istiyorum.'
+    : 'Hi, I would like help with AdGenius.';
+  const whatsappSubtitle = language === 'tr' ? 'Hemen yazın' : 'Message now';
+
+  const [step, setStep] = useState<AppStep>('upload');
+  const [formData, setFormData] = useState<FormData>({
+    productImage: null,
+    optionalImage: null,
+    productName: '',
+    brand: '',
+    customPrompt: '',
+    adStyle: 'Lüks ve Premium',
+    imageModel: 'gemini-3-pro-image-preview',
+    videoModel: 'veo-3.1-fast-generate-preview',
+    mode: 'campaign',
+    includeVideo: false,
+    aspectRatio: '1:1',
+    campaignStyleCount: 4,
+    ecommercePhotoCount: 8,
+    ecommerceColorVariations: '',
+    ecommercePatternImage: null,
+    renderTextOnImage: false,
+    imageOverlayText: ''
+  });
+
+  const [analysis, setAnalysis] = useState<ProductAnalysis | null>(null);
+  const [results, setResults] = useState<GenerationResult[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [totalImagesGenerated, setTotalImagesGenerated] = useState(0);
+  const [totalVideosGenerated, setTotalVideosGenerated] = useState(0);
+  const [totalCreditsUsed, setTotalCreditsUsed] = useState(0);
+
+  // Calculate totals
+  useEffect(() => {
+    const imagesCount = results.filter(r => r.imageUrl).length;
+    const videosCount = results.filter(r => r.videoUrl).length;
+    const credits = results.reduce((sum, r) => {
+      // Video costs 2 credits, image costs 1 credit
+      const isVideo = r.videoUrl !== undefined;
+      return sum + (isVideo ? 2 : 1);
+    }, 0);
+
+    setTotalImagesGenerated(imagesCount);
+    setTotalVideosGenerated(videosCount);
+    setTotalCreditsUsed(credits);
+  }, [results]);
+
+  // Check credits before operation
+  const checkCredits = async (
+    operationType: 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video'
+  ): Promise<boolean> => {
+    if (!profile) {
+      setError(t.messages.loginRequired);
+      return false;
+    }
+    const result = await checkAndDeductCredits(profile.id, operationType);
+    if (!result.success) {
+      setError(result.message || t.messages.insufficientCredits);
+      if (onShowBuyCredits) onShowBuyCredits();
+      return false;
+    }
+    onRefreshProfile();
+    return true;
+  };
+
+  // Save generation to history
+  const saveToHistory = async (
+    operationType: 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video',
+    outputImageUrl: string | null,
+    outputVideoUrl: string | null,
+    settings: Record<string, any>
+  ) => {
+    if (!profile) return;
+
+    const uploadedImageUrl = outputImageUrl ? await uploadBase64ToStorage(outputImageUrl, profile.id, 'output') : null;
+    const uploadedVideoUrl = outputVideoUrl ? await uploadBase64ToStorage(outputVideoUrl, profile.id, 'video') : null;
+
+    // Calculate credits used based on outputs
+    const creditsUsed = (outputVideoUrl ? 2 : 1);
+
+    await saveGeneration(
+      profile.id,
+      operationType,
+      creditsUsed,
+      formData.productImage ? await uploadBase64ToStorage(
+        `data:${formData.productImage.type};base64,${await fileToGoogleGenAIBase64(formData.productImage)}`,
+        profile.id,
+        'input'
+      ) : null,
+      uploadedImageUrl,
+      uploadedVideoUrl,
+      settings
+    );
+  };
+
+  const handleSubmit = useCallback(async () => {
+    if (!formData.productImage) {
+      setError(t.messages.uploadProductImage);
+      return;
+    }
+
+    if (!formData.productName.trim()) {
+      setError(t.messages.productNameRequired);
+      return;
+    }
+
+    setError(null);
+    setStep('analyzing');
+
+    try {
+      // 0. Ensure API Key
+      const hasKey = await ensureApiKey();
+      if (!hasKey) {
+        throw new Error(t.messages.apiKeyRequired);
+      }
+
+      // Convert images to base64
+      const originalImageB64 = await fileToGoogleGenAIBase64(formData.productImage);
+
+      // Convert optional image if exists
+      let optionalImageB64: string | null = null;
+      if (formData.optionalImage) {
+        optionalImageB64 = await fileToGoogleGenAIBase64(formData.optionalImage);
+      }
+
+      // Convert pattern image if exists
+      let patternImageB64: string | null = null;
+      let patternImageMimeType: string | null = null;
+      if (formData.ecommercePatternImage) {
+        patternImageB64 = await fileToGoogleGenAIBase64(formData.ecommercePatternImage);
+        patternImageMimeType = formData.ecommercePatternImage.type;
+      }
+
+      // 1. Analyze
+      const analysisResult = await analyzeProductImage(formData.productImage);
+      setAnalysis(analysisResult);
+
+      // 2. Generate Prompts locally
+      const prompts = generateAdPrompts(analysisResult, formData);
+
+      // Initialize Results State
+      const initialResults: GenerationResult[] = prompts.map(p => ({
+        id: p.id,
+        type: p.type,
+        prompt: p.text,
+        status: 'pending',
+        progress: 0
+      }));
+      setResults(initialResults);
+      setStep('generating');
+
+      // 3. Process each prompt
+      const updateResult = (id: number, update: Partial<GenerationResult>) => {
+        setResults(prev => prev.map(r => r.id === id ? { ...r, ...update } : r));
+      };
+
+      const processItem = async (item: GenerationResult) => {
+        // Determine operation type based on mode and video preference
+        let operationType: 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video';
+        const isEcommerce = formData.mode === 'ecommerce';
+
+        if (isEcommerce) {
+          operationType = formData.includeVideo ? 'adgenius_ecommerce_video' : 'adgenius_ecommerce_image';
+        } else {
+          operationType = formData.includeVideo ? 'adgenius_campaign_video' : 'adgenius_campaign_image';
+        }
+
+        // Check credits - each result individually
+        if (!await checkCredits(operationType)) return;
+
+        // Determine Aspect Ratios
+        const imgAspectRatio = formData.aspectRatio;
+
+        // Determine Video Ratio (Veo strictly supports 16:9 or 9:16)
+        let vidAspectRatio = '16:9';
+        if (imgAspectRatio === '9:16' || imgAspectRatio === '3:4' || imgAspectRatio === '1:1') {
+          vidAspectRatio = '9:16';
+        } else {
+          vidAspectRatio = '16:9';
+        }
+
+        try {
+          updateResult(item.id, { status: 'generating_image', progress: 5 });
+
+          if (!formData.productImage) throw new Error("Ana resim eksik");
+
+          const base64Image = await generateAdImage(
+            item.prompt,
+            originalImageB64,
+            formData.productImage.type,
+            optionalImageB64,
+            formData.optionalImage?.type || null,
+            formData.imageModel,
+            imgAspectRatio,
+            patternImageB64,
+            patternImageMimeType
+          );
+
+          updateResult(item.id, {
+            status: 'completed',
+            imageUrl: base64Image,
+            progress: 45
+          });
+
+          // Check if Video is requested
+          if (formData.includeVideo) {
+            updateResult(item.id, {
+              status: 'generating_video',
+              imageUrl: base64Image,
+              progress: 50
+            });
+
+            try {
+              const videoUrl = await generateAdVideo(
+                base64Image,
+                item.type,
+                formData.videoModel,
+                vidAspectRatio,
+                (vidProgress) => {
+                  // Update progress during polling (50% -> 99%)
+                  updateResult(item.id, { progress: vidProgress });
+                }
+              );
+
+              updateResult(item.id, {
+                status: 'completed',
+                videoUrl: videoUrl,
+                progress: 100
+              });
+
+              // Save both image and video
+              await saveToHistory(operationType, base64Image, videoUrl, {
+                ...formData,
+                analysis: analysisResult,
+                generatedPrompts: prompts
+              });
+            } catch (videoError: any) {
+              console.warn(`Video generation failed for item ${item.id}, preserving image. Error:`, videoError);
+              // Mark as completed but attach error message to show partial success
+              updateResult(item.id, {
+                status: 'completed',
+                imageUrl: base64Image,
+                error: videoError.message,
+                progress: 100
+              });
+
+              // Save just the image
+              await saveToHistory(operationType, base64Image, null, {
+                ...formData,
+                analysis: analysisResult,
+                generatedPrompts: prompts,
+                videoError: videoError.message
+              });
+            }
+          } else {
+            // Image Only Mode - save immediately
+            await saveToHistory(operationType, base64Image, null, {
+              ...formData,
+              analysis: analysisResult,
+              generatedPrompts: prompts
+            });
+          }
+
+        } catch (err: any) {
+          console.error(`Error processing item ${item.id}`, err);
+          updateResult(item.id, {
+            status: 'failed',
+            error: err.message || "Bilinmeyen bir hata oluştu.",
+            progress: 0
+          });
+        }
+      };
+
+      // Execute all in parallel
+      await Promise.all(initialResults.map(processItem));
+
+      setStep('results');
+
+    } catch (err: any) {
+      console.error('Generation error:', err);
+      setError(err.message || t.messages.error);
+      setStep('upload');
+    }
+  }, [formData, profile, onRefreshProfile, onShowBuyCredits]);
+
+  const handleReset = () => {
+    setStep('upload');
+    setFormData(prev => ({
+      ...prev,
+      productImage: null,
+      optionalImage: null,
+      ecommercePatternImage: null
+    }));
+    setAnalysis(null);
+    setResults([]);
+    setError(null);
+    setTotalImagesGenerated(0);
+    setTotalVideosGenerated(0);
+    setTotalCreditsUsed(0);
+  };
+
+  // Credit info display
+  const creditCostPerImage = 1;
+  const creditCostPerVideo = 2;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-gray-100 py-8 px-4">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-extrabold tracking-tight text-white mb-4">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">
+            AdGenius
+          </span>
+          <span className="text-slate-400 font-light ml-3">AI</span>
+        </h1>
+        <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          {t.subtitle}
+        </p>
+      </div>
+
+      {error && (
+        <div className="max-w-2xl mx-auto mb-6 bg-red-500/10 border border-red-500/50 text-red-200 p-4 rounded-xl flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-400 hover:text-red-300"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Mode Selection moved into UploadForm to avoid duplication */}
+
+      {/* Credit Info */}
+      {profile && (
+        <div className="max-w-4xl mx-auto bg-slate-800/50 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-slate-700">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-sm text-slate-400 mb-1">{t.creditInfo.imageCost}</div>
+              <div className="text-xl font-bold text-white">{creditCostPerImage} {t.creditInfo.credits}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-slate-400 mb-1">{t.creditInfo.videoCost}</div>
+              <div className="text-xl font-bold text-white">{creditCostPerVideo} {t.creditInfo.credits}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-slate-400 mb-1">{t.creditInfo.available}</div>
+              <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                {profile.credits}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {step === 'upload' && (
+        <UploadForm
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleSubmit}
+          isSubmitting={false}
+          t={t}
+        />
+      )}
+
+      {(step === 'analyzing' || step === 'generating' || step === 'results') && (
+        <ProcessingStep
+          step={step}
+          analysis={analysis}
+          results={results}
+          t={t}
+        />
+      )}
+
+      {(step === 'generating' || step === 'results') && (
+        <ResultsGallery
+          results={results}
+          t={t}
+        />
+      )}
+
+      {step === 'results' && (
+        <div className="max-w-4xl mx-auto mt-12 space-y-6">
+          {/* Statistics */}
+          <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <Sparkles className="w-8 h-8 text-cyan-400" />
+              {t.title}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-700">
+                <div className="text-slate-400 text-sm mb-2">{t.stats.imagesGenerated}</div>
+                <div className="text-4xl font-bold text-cyan-400">{totalImagesGenerated}</div>
+              </div>
+              <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-700">
+                <div className="text-slate-400 text-sm mb-2">{t.stats.videosGenerated}</div>
+                <div className="text-4xl font-bold text-purple-400">{totalVideosGenerated}</div>
+              </div>
+              <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-700">
+                <div className="text-slate-400 text-sm mb-2">{t.stats.creditsUsed}</div>
+                <div className="text-4xl font-bold text-orange-400">{totalCreditsUsed}</div>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                onClick={handleReset}
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-cyan-500 hover:to-blue-500 transition-all transform hover:scale-105 active:scale-95"
+              >
+                {language === 'tr' ? 'Yeni Kampanya Oluştur' : 'Create New Campaign'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <WhatsAppPanel
+        phoneNumber={whatsappNumber}
+        message={whatsappMessage}
+        title="WhatsApp"
+        subtitle={whatsappSubtitle}
+      />
+    </div>
+  );
+};
+
+export default AdgeniusPage;
+

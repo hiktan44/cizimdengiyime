@@ -2,7 +2,7 @@ import { supabase, CREDIT_COSTS } from '../lib/supabase';
 
 export const checkAndDeductCredits = async (
   userId: string,
-  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe'
+  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video'
 ): Promise<{ success: boolean; message?: string; remainingCredits?: number }> => {
   try {
     // Get user profile
@@ -25,8 +25,12 @@ export const checkAndDeductCredits = async (
       'pixshop': 'PIXSHOP',
       'fotomatik_transform': 'FOTOMATIK_TRANSFORM',
       'fotomatik_describe': 'FOTOMATIK_DESCRIBE',
+      'adgenius_campaign_image': 'ADGENIUS_IMAGE',
+      'adgenius_campaign_video': 'ADGENIUS_VIDEO',
+      'adgenius_ecommerce_image': 'ADGENIUS_IMAGE',
+      'adgenius_ecommerce_video': 'ADGENIUS_VIDEO',
     };
-    
+
     const creditsNeeded = CREDIT_COSTS[creditCostMap[operationType]];
 
     if (profile.credits < creditsNeeded) {
@@ -60,7 +64,7 @@ export const checkAndDeductCredits = async (
 
 export const saveGeneration = async (
   userId: string,
-  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe',
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video',
   creditsUsed: number,
   inputImageUrl: string | null,
   outputImageUrl: string | null,
@@ -112,7 +116,7 @@ export const uploadImageToStorage = async (
 export const uploadBase64ToStorage = async (
   base64Data: string,
   userId: string,
-  type: 'output' | 'video'
+  type: 'input' | 'output' | 'video'
 ): Promise<string | null> => {
   try {
     // Extract mime type and base64 data
@@ -121,10 +125,10 @@ export const uploadBase64ToStorage = async (
 
     const mimeType = matches[1];
     const base64 = matches[2];
-    
+
     // Convert base64 to blob
     const blob = await fetch(base64Data).then((res) => res.blob());
-    
+
     const fileExt = mimeType.split('/')[1];
     const fileName = `${userId}/${type}-${Date.now()}.${fileExt}`;
 

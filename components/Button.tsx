@@ -176,7 +176,7 @@ interface IconButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElem
   color?: 'cyan' | 'purple' | 'pink' | 'green' | 'red' | 'yellow' | 'blue' | 'slate';
 }
 
-const iconSizeClasses: Record<string, string> = {
+const iconButtonSizeClasses: Record<string, string> = {
   sm: 'w-8 h-8 p-1.5',
   md: 'w-10 h-10 p-2',
   lg: 'w-12 h-12 p-2.5',
@@ -228,7 +228,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
   return (
     <button
       className={`
-        ${iconSizeClasses[size]}
+        ${iconButtonSizeClasses[size]}
         rounded-xl transition-all duration-300
         hover:scale-110 active:scale-95
         ${colorClasses[color][variant]}
@@ -272,14 +272,14 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
             borderRadius = isFirst
               ? 'rounded-l-xl rounded-r-none'
               : isLast
-              ? 'rounded-r-xl rounded-l-none'
-              : 'rounded-none';
+                ? 'rounded-r-xl rounded-l-none'
+                : 'rounded-none';
           } else {
             borderRadius = isFirst
               ? 'rounded-t-xl rounded-b-none'
               : isLast
-              ? 'rounded-b-xl rounded-t-none'
-              : 'rounded-none';
+                ? 'rounded-b-xl rounded-t-none'
+                : 'rounded-none';
           }
 
           return React.cloneElement(child as React.ReactElement, {

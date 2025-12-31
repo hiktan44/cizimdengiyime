@@ -8,7 +8,7 @@ export function useAuth() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
-  
+
   const mountedRef = useRef(true);
   const initializingRef = useRef(false);
   const profileSubscriptionRef = useRef<any>(null);
@@ -39,14 +39,14 @@ export function useAuth() {
   // Profile'ı getir veya oluştur
   const fetchOrCreateProfile = useCallback(async (userId: string, userEmail?: string, userMetadata?: any): Promise<Profile | null> => {
     if (!mountedRef.current) return null;
-    
+
     console.log('👤 Profile getiriliyor:', userId);
-    
+
     try {
       // Önce mevcut profile'ı kontrol et (timeout ile)
       console.log('🔍 Veritabanı sorgusu başlatılıyor...');
-      const { data: existingProfile, error: fetchError } = await queryWithTimeout(() =>
-        supabase
+      const { data: existingProfile, error: fetchError } = await queryWithTimeout<Profile>(async () =>
+        await supabase
           .from('profiles')
           .select('*')
           .eq('id', userId)
@@ -82,8 +82,8 @@ export function useAuth() {
         credits: 10,
       };
 
-      const { data: createdProfile, error: createError } = await queryWithTimeout(() =>
-        supabase
+      const { data: createdProfile, error: createError } = await queryWithTimeout<Profile>(async () =>
+        await supabase
           .from('profiles')
           .insert([newProfile])
           .select()
@@ -94,8 +94,8 @@ export function useAuth() {
         // Profile zaten varsa tekrar dene
         if (createError.code === '23505') {
           console.log('⚠️ Profile zaten var, tekrar getiriliyor...');
-          const { data: retryProfile } = await queryWithTimeout(() =>
-            supabase
+          const { data: retryProfile } = await queryWithTimeout<Profile>(async () =>
+            await supabase
               .from('profiles')
               .select('*')
               .eq('id', userId)
@@ -121,10 +121,10 @@ export function useAuth() {
       console.log('⏭️ Zaten başlatılıyor, atlanıyor...');
       return;
     }
-    
+
     initializingRef.current = true;
     console.log('🔐 Auth başlatılıyor...');
-    
+
     try {
       // URL'den OAuth hash'i temizle
       if (window.location.hash?.includes('access_token')) {
@@ -136,7 +136,7 @@ export function useAuth() {
       console.log('📡 Session alınıyor...');
       const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
       console.log('📡 Session sonucu:', { hasSession: !!currentSession, error: sessionError?.message });
-      
+
       if (sessionError) {
         console.error('❌ Session hatası:', sessionError);
         setAuthError('Oturum bilgisi alınamadı');
@@ -196,14 +196,14 @@ export function useAuth() {
   // Component mount
   useEffect(() => {
     mountedRef.current = true;
-    
+
     // İlk başlatma
     initialize();
 
     // Auth state değişikliklerini dinle
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       console.log('🔔 Auth event:', event, newSession?.user?.email);
-      
+
       if (!mountedRef.current) return;
 
       // INITIAL_SESSION ve SIGNED_IN - initialize() zaten hallediyor, atla
@@ -220,7 +220,7 @@ export function useAuth() {
         setProfile(null);
         setLoading(false);
         setAuthError(null);
-        
+
         // Realtime subscription'ı kaldır
         if (profileSubscriptionRef.current) {
           profileSubscriptionRef.current.unsubscribe();
@@ -299,7 +299,7 @@ export function useAuth() {
   // Hata mesajlarını Türkçeleştir
   const translateAuthError = (error: any): string => {
     const errorMessage = error.message || '';
-    
+
     // Supabase auth hatalarını Türkçeye çevir
     if (errorMessage.includes('Invalid login credentials')) {
       return 'Geçersiz giriş bilgileri. E-posta veya şifrenizi kontrol edin.';
@@ -328,7 +328,7 @@ export function useAuth() {
     if (errorMessage.includes('Email rate limit exceeded')) {
       return 'Çok fazla deneme yaptınız. Lütfen bir süre bekleyin.';
     }
-    
+
     // Genel hata mesajı
     return errorMessage || 'Bir hata oluştu. Lütfen tekrar deneyin.';
   };
@@ -341,24 +341,24 @@ export function useAuth() {
       const translatedError = new Error(translateAuthError(error));
       throw translatedError;
     }
-    
+
     // Session oluştu, profile'ı yükle
     console.log('✅ Giriş başarılı, profile yükleniyor...');
     setLoading(true);
-    
+
     if (data.session && data.user) {
       setUser(data.user);
       setSession(data.session);
-      
+
       // Küçük bir gecikme ekle - session'ın stabilize olması için
       await new Promise(resolve => setTimeout(resolve, 300));
-      
+
       const userProfile = await fetchOrCreateProfile(
         data.user.id,
         data.user.email,
         data.user.user_metadata
       );
-      
+
       if (mountedRef.current && userProfile) {
         setProfile(userProfile);
         setAuthError(null);
@@ -382,25 +382,25 @@ export function useAuth() {
       const translatedError = new Error(translateAuthError(error));
       throw translatedError;
     }
-    
+
     // Email doğrulama kapalı olduğu için direkt giriş yapılabilir
     // Session otomatik olarak oluşturulacak
     console.log('✅ Kayıt başarılı, profile yükleniyor...');
     setLoading(true);
-    
+
     if (data.session && data.user) {
       setUser(data.user);
       setSession(data.session);
-      
+
       // Küçük bir gecikme ekle - session'ın stabilize olması için
       await new Promise(resolve => setTimeout(resolve, 300));
-      
+
       const userProfile = await fetchOrCreateProfile(
         data.user.id,
         data.user.email,
         data.user.user_metadata
       );
-      
+
       if (mountedRef.current && userProfile) {
         setProfile(userProfile);
         setAuthError(null);
@@ -408,7 +408,7 @@ export function useAuth() {
       }
     }
     setLoading(false);
-    
+
     return data;
   };
 
@@ -421,13 +421,13 @@ export function useAuth() {
   // Profile'ı yenile
   const refreshProfile = useCallback(async () => {
     if (!user) return;
-    
+
     const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single();
-    
+
     if (data && mountedRef.current) {
       setProfile(data);
     }

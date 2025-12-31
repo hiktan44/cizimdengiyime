@@ -41,7 +41,7 @@ export interface Profile {
 export interface Generation {
   id: string;
   user_id: string;
-  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe';
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video';
   credits_used: number;
   input_image_url: string | null;
   output_image_url: string | null;
@@ -81,6 +81,8 @@ export const CREDIT_COSTS = {
   PIXSHOP: 1, // Pixshop fotoğraf düzenleme maliyeti
   FOTOMATIK_TRANSFORM: 1, // Fotomatik görüntü dönüştürme maliyeti
   FOTOMATIK_DESCRIBE: 1, // Fotomatik prompt üretme maliyeti
+  ADGENIUS_IMAGE: 1, // AdGenius görsel maliyeti (her görsel için)
+  ADGENIUS_VIDEO: 2, // AdGenius video maliyeti (her video için)
 } as const;
 
 // Subscription plans

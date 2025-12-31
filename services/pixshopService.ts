@@ -3,7 +3,7 @@
  * Gemini AI kullanarak fotoğraf rötuşlama, filtre uygulama, ayarlama ve yükseltme işlemleri yapar.
  */
 
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse, HarmCategory, HarmBlockThreshold } from "@google/genai";
 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
@@ -20,12 +20,12 @@ const fileToPart = async (file: File): Promise<{ inlineData: { mimeType: string;
         reader.onload = () => resolve(reader.result as string);
         reader.onerror = error => reject(error);
     });
-    
+
     const arr = dataUrl.split(',');
     if (arr.length < 2) throw new Error("Invalid data URL");
     const mimeMatch = arr[0].match(/:(.*?);/);
     if (!mimeMatch || !mimeMatch[1]) throw new Error("Could not parse MIME type from data URL");
-    
+
     const mimeType = mimeMatch[1];
     const data = arr[1];
     return { inlineData: { mimeType, data } };
@@ -59,7 +59,7 @@ const handleApiResponse = (
         console.error(errorMessage, { response });
         throw new Error(errorMessage);
     }
-    
+
     const errorMessage = `Yapay zeka bir resim oluşturamadı. Bu durum, isteğinizin karmaşık olmasından veya güvenlik filtrelerinden kaynaklanabilir. Lütfen isteğinizi basitleştirerek tekrar deneyin.`;
 
     console.error(`Model response did not contain an image part for ${context}.`, { response });
@@ -68,10 +68,10 @@ const handleApiResponse = (
 
 // Common safety settings to be more permissive to avoid IMAGE_OTHER errors on benign edits
 const safetySettings = [
-    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
-    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
-    { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
-    { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' },
+    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
 ];
 
 /**
@@ -88,13 +88,13 @@ export const pixshopGenerateEditedImage = async (
 ): Promise<string> => {
     console.log('Starting generative edit at:', hotspot);
     const ai = new GoogleGenAI({ apiKey: API_KEY });
-    
+
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Edit this image based on the user request.
 User Request: "${userPrompt}"
 Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: ${hotspot.y}).
 Maintain photorealism and blend the edit seamlessly with the original image.`;
-    
+
     const textPart = { text: prompt };
 
     console.log('Sending image and prompt to the model...');
@@ -120,12 +120,12 @@ export const pixshopGenerateFilteredImage = async (
 ): Promise<string> => {
     console.log(`Starting filter generation: ${filterPrompt}`);
     const ai = new GoogleGenAI({ apiKey: API_KEY });
-    
+
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Apply a stylistic filter to this image.
 Filter Request: "${filterPrompt}"
 Do not change the content or composition, only apply the visual style.`;
-    
+
     const textPart = { text: prompt };
 
     console.log('Sending image and filter prompt to the model...');
@@ -135,7 +135,7 @@ Do not change the content or composition, only apply the visual style.`;
         config: { safetySettings },
     });
     console.log('Received response from model for filter.', response);
-    
+
     return handleApiResponse(response, 'filter');
 };
 
@@ -151,12 +151,12 @@ export const pixshopGenerateAdjustedImage = async (
 ): Promise<string> => {
     console.log(`Starting global adjustment generation: ${adjustmentPrompt}`);
     const ai = new GoogleGenAI({ apiKey: API_KEY });
-    
+
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Perform a global adjustment to this image.
 Request: "${adjustmentPrompt}"
 Ensure the result is photorealistic.`;
-    
+
     const textPart = { text: prompt };
 
     console.log('Sending image and adjustment prompt to the model...');
@@ -166,7 +166,7 @@ Ensure the result is photorealistic.`;
         config: { safetySettings },
     });
     console.log('Received response from model for adjustment.', response);
-    
+
     return handleApiResponse(response, 'adjustment');
 };
 
@@ -180,13 +180,13 @@ export const pixshopRemoveBackground = async (
 ): Promise<string> => {
     console.log('Starting background removal...');
     const ai = new GoogleGenAI({ apiKey: API_KEY });
-    
+
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Remove the background from this image. 
 Return ONLY the main subject with a fully transparent background (alpha channel). 
 Ensure there are no background artifacts or white outlines. 
 The output MUST be a transparent PNG.`;
-    
+
     const textPart = { text: prompt };
 
     console.log('Sending image and background removal prompt to the model...');
@@ -196,7 +196,7 @@ The output MUST be a transparent PNG.`;
         config: { safetySettings },
     });
     console.log('Received response from model for background removal.', response);
-    
+
     return handleApiResponse(response, 'remove_bg');
 };
 
@@ -212,10 +212,10 @@ export const pixshopUpscaleImage = async (
 ): Promise<string> => {
     console.log(`Starting image upscale to ${size}...`);
     const ai = new GoogleGenAI({ apiKey: API_KEY });
-    
+
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Upscale this image to ${size} resolution. Increase resolution while maintaining fidelity. Sharpen details, reduce noise.`;
-    
+
     const textPart = { text: prompt };
 
     console.log('Sending image and upscale prompt to the model...');
@@ -230,7 +230,7 @@ export const pixshopUpscaleImage = async (
         }
     });
     console.log('Received response from model for upscale.', response);
-    
+
     return handleApiResponse(response, 'upscale');
 };
 

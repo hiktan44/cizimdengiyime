@@ -49,6 +49,7 @@ import { BuyCreditsModal } from './components/BuyCreditsModal';
 import { uploadHeroVideo, uploadShowcaseImage, getPublicHeroVideos, getPublicShowcaseImages } from './lib/adminService';
 import { PixshopPage } from './pages/PixshopPage';
 import { FotomatikPage } from './pages/FotomatikPage';
+import { AdgeniusPage } from './pages/AdgeniusPage';
 import { WhatsAppPanel } from './components/WhatsAppPanel';
 
 interface PageHeaderProps {
@@ -77,7 +78,7 @@ const ToolPage: React.FC<{
     profile,
     onRefreshProfile
 }) => {
-        const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical' | 'pixshop' | 'fotomatik'>('design');
+        const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical' | 'pixshop' | 'fotomatik' | 'adgenius'>('design');
 
         // --- STATE MANAGEMENT ---
         // Step 1: Sketch (for single item mode)
@@ -713,6 +714,8 @@ const ToolPage: React.FC<{
                     onAdminClick={onAdminClick}
                     onBuyCreditsClick={onBuyCreditsClick}
                     credits={profile.credits}
+                    activeToolTab={activeToolTab}
+                    onToolTabClick={setActiveToolTab}
                 />
 
                 <main className="flex-grow container mx-auto p-4 md:p-8">
@@ -783,6 +786,23 @@ const ToolPage: React.FC<{
                             </div>
                             <span className={`text-xs ${activeToolTab === 'fotomatik' ? 'text-teal-200' : 'text-slate-500'}`}>
                                 1 kredi/işlem
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => setActiveToolTab('adgenius')}
+                            className={`flex flex-col items-center gap-1 px-5 py-3 rounded-xl text-sm font-bold transition-all ${activeToolTab === 'adgenius'
+                                ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg shadow-orange-500/30'
+                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M18 13a3 3 0 110-6m0 6v6m0-6V7m0 6H9m4-3H9m4 3H9" />
+                                </svg>
+                                AdGenius
+                            </div>
+                            <span className={`text-xs ${activeToolTab === 'adgenius' ? 'text-orange-200' : 'text-slate-500'}`}>
+                                1-2 kredi/işlem
                             </span>
                         </button>
                     </div>
@@ -1603,9 +1623,16 @@ const ToolPage: React.FC<{
                             onRefreshProfile={onRefreshProfile}
                             onShowBuyCredits={onBuyCreditsClick}
                         />
-                    ) : (
+                    ) : activeToolTab === 'fotomatik' ? (
                         /* --- FOTOMATIK MODE (Transform & Describe) --- */
                         <FotomatikPage
+                            profile={profile}
+                            onRefreshProfile={onRefreshProfile}
+                            onShowBuyCredits={onBuyCreditsClick}
+                        />
+                    ) : (
+                        /* --- ADGENIUS MODE (E-commerce & Ads) --- */
+                        <AdgeniusPage
                             profile={profile}
                             onRefreshProfile={onRefreshProfile}
                             onShowBuyCredits={onBuyCreditsClick}
