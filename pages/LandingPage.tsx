@@ -278,6 +278,12 @@ const translations = {
           ]
         }
       ],
+      showcase: {
+        title1: '📍 Profesyonel Model Çekimi',
+        title2: '✨ Akıllı Reklam Varyasyonları',
+        hover1: 'Üst düzey prodüksiyon kalitesi, sıfır maliyet.',
+        hover2: 'Tek bir üründen onlarca kampanya konsepti.'
+      },
       benefitsTitle: '🎯 E-Ticaret İşletmeleri İçin Sağladığı Faydalar',
       benefits: [
         {
@@ -526,6 +532,12 @@ const translations = {
           ]
         }
       ],
+      showcase: {
+        title1: '📍 Professional Model Shoot',
+        title2: '✨ Smart Ad Variations',
+        hover1: 'High-end production quality, zero cost.',
+        hover2: 'Dozens of campaign concepts from a single product.'
+      },
       benefitsTitle: '🎯 Benefits for E-Commerce Businesses',
       benefits: [
         {
@@ -1214,7 +1226,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Left: Main Image */}
               <div className="space-y-4">
-                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>📍 Profesyonel Model Çekimi</h3>
+                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title1 || '📍 Profesyonel Model Çekimi'}</h3>
                 <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
                   {adGeniusMainUrl ? (
                     <img
@@ -1228,14 +1240,14 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                    <p className="text-white text-sm">Üst düzey prodüksiyon kalitesi, sıfır maliyet.</p>
+                    <p className="text-white text-sm">{t.adgenius?.showcase?.hover1 || 'Üst düzey prodüksiyon kalitesi, sıfır maliyet.'}</p>
                   </div>
                 </div>
               </div>
 
               {/* Right: Collage Image */}
               <div className="space-y-4">
-                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>✨ Akıllı Reklam Varyasyonları</h3>
+                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title2 || '✨ Akıllı Reklam Varyasyonları'}</h3>
                 <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
                   {adGeniusCollageUrl ? (
                     <img
@@ -1249,7 +1261,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                    <p className="text-white text-sm">Tek bir üründen onlarca kampanya konsepti.</p>
+                    <p className="text-white text-sm">{t.adgenius?.showcase?.hover2 || 'Tek bir üründen onlarca kampanya konsepti.'}</p>
                   </div>
                 </div>
               </div>
@@ -1305,84 +1317,84 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Pixshop Section */}
-      <section className="relative py-20 px-6 z-10 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-b from-slate-50 via-white to-slate-50'}`}>
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Hero */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
               {t.pixshop.heroTitle}
             </h2>
-            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+            <p className={`text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
               {t.pixshop.heroSubtitle}
             </p>
           </div>
 
           {/* Features Grid */}
           <div className="mb-16">
-            <h3 className="text-3xl font-bold text-white text-center mb-12">
+            <h3 className={`text-3xl font-bold ${textClass} text-center mb-12`}>
               {t.pixshop.featuresTitle}
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Feature 1: Smart Retouch */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-cyan-500 transition">
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-cyan-500 transition`}>
                 <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-white mb-3">{t.pixshop.feature1Title}</h4>
-                <p className="text-slate-300 text-sm">{t.pixshop.feature1Desc}</p>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature1Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature1Desc}</p>
               </div>
 
               {/* Feature 2: Creative Filters */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-purple-500 transition">
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-purple-500 transition`}>
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-white mb-3">{t.pixshop.feature2Title}</h4>
-                <p className="text-slate-300 text-sm">{t.pixshop.feature2Desc}</p>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature2Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature2Desc}</p>
               </div>
 
               {/* Feature 3: Professional Atmosphere */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-orange-500 transition">
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-orange-500 transition`}>
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-white mb-3">{t.pixshop.feature3Title}</h4>
-                <p className="text-slate-300 text-sm">{t.pixshop.feature3Desc}</p>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature3Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature3Desc}</p>
               </div>
 
               {/* Feature 4: Upscale */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-green-500 transition">
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-green-500 transition`}>
                 <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-white mb-3">{t.pixshop.feature4Title}</h4>
-                <p className="text-slate-300 text-sm">{t.pixshop.feature4Desc}</p>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature4Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature4Desc}</p>
               </div>
 
               {/* Feature 5: Designer Outputs */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-indigo-500 transition">
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-indigo-500 transition`}>
                 <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center mb-4">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                   </svg>
                 </div>
-                <h4 className="text-xl font-bold text-white mb-3">{t.pixshop.feature5Title}</h4>
-                <p className="text-slate-300 text-sm">{t.pixshop.feature5Desc}</p>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature5Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature5Desc}</p>
               </div>
             </div>
           </div>
 
           {/* Why Pixshop */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 mb-12 text-white">
-            <h3 className="text-3xl font-bold text-white text-center mb-8">
+          <div className={`${cardBg} rounded-2xl p-8 mb-12`}>
+            <h3 className={`text-3xl font-bold ${textClass} text-center mb-8`}>
               {t.pixshop.whyTitle}
             </h3>
             <div className="grid md:grid-cols-2 gap-6">
@@ -1392,7 +1404,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-slate-200">{t.pixshop.why1}</p>
+                <p className={descriptionTextClass}>{t.pixshop.why1}</p>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
@@ -1400,7 +1412,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-slate-200">{t.pixshop.why2}</p>
+                <p className={descriptionTextClass}>{t.pixshop.why2}</p>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
@@ -1408,7 +1420,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-slate-200">{t.pixshop.why3}</p>
+                <p className={descriptionTextClass}>{t.pixshop.why3}</p>
               </div>
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
@@ -1416,17 +1428,17 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-slate-200">{t.pixshop.why4}</p>
+                <p className={descriptionTextClass}>{t.pixshop.why4}</p>
               </div>
             </div>
           </div>
 
           {/* CTA */}
           <div className="text-center">
-            <h3 className="text-3xl font-bold text-white mb-4">
+            <h3 className={`text-3xl font-bold ${textClass} mb-4`}>
               {t.pixshop.cta}
             </h3>
-            <p className="text-lg text-slate-300 mb-8">
+            <p className={`text-lg ${secondaryTextClass} mb-8`}>
               {t.pixshop.ctaSubtitle}
             </p>
             <button
@@ -1440,11 +1452,11 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Fotomatik Section */}
-      <section className="relative py-20 px-6 z-10 bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900">
+      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900' : 'bg-gradient-to-b from-indigo-50 via-white to-purple-50'}`}>
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Hero */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
               {t.fotomatik.heroTitle}
             </h2>
           </div>
@@ -1452,39 +1464,39 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {/* Feature 1: AI Transform */}
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-indigo-500 transition border border-slate-700 bg-slate-900/50`}>
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-indigo-500 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-indigo-500/20">
                 01
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.fotomatik.feature1Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.fotomatik.feature1Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature1Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature1Desc}</p>
             </div>
 
             {/* Feature 2: Visual Analysis */}
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-blue-500 transition border border-slate-700 bg-slate-900/50`}>
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-blue-500 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-blue-500/20">
                 02
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.fotomatik.feature2Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.fotomatik.feature2Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature2Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature2Desc}</p>
             </div>
 
             {/* Feature 3: Auto-Enhance */}
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition border border-slate-700 bg-slate-900/50`}>
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-cyan-500/20">
                 03
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.fotomatik.feature3Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.fotomatik.feature3Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature3Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature3Desc}</p>
             </div>
 
             {/* Feature 4: Precise Editor */}
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-rose-500 transition border border-slate-700 bg-slate-900/50`}>
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-rose-500 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-rose-500/20">
                 04
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.fotomatik.feature4Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.fotomatik.feature4Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature4Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature4Desc}</p>
             </div>
           </div>
 
@@ -1503,14 +1515,14 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
       {/* Tech Pack Section */}
-      <section className="relative py-20 px-6 z-10 bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-900">
+      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-900' : 'bg-gradient-to-b from-emerald-50 via-white to-green-50'}`}>
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Hero */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
               {t.techpack.heroTitle}
             </h2>
-            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+            <p className={`text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
               {t.techpack.heroSubtitle}
             </p>
           </div>
@@ -1518,39 +1530,39 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 gap-8 mb-16">
             {/* Feature 1 */}
-            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 hover:border-emerald-500 transition">
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-emerald-500 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-emerald-500/20">
                 01
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.techpack.feature1Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.techpack.feature1Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature1Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature1Desc}</p>
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 hover:border-teal-500 transition">
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-teal-500 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-teal-500/20">
                 02
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.techpack.feature2Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.techpack.feature2Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature2Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature2Desc}</p>
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 hover:border-lime-500 transition">
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-lime-500 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-lime-500 to-green-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-lime-500/20">
                 03
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.techpack.feature3Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.techpack.feature3Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature3Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature3Desc}</p>
             </div>
 
             {/* Feature 4 */}
-            <div className="bg-slate-900/50 border border-slate-700 rounded-2xl p-8 hover:border-green-400 transition">
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-green-400 transition`}>
               <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-green-400/20">
                 04
               </div>
-              <h4 className="text-xl font-bold text-white mb-4">{t.techpack.feature4Title}</h4>
-              <p className="text-slate-300 leading-relaxed">{t.techpack.feature4Desc}</p>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature4Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature4Desc}</p>
             </div>
           </div>
 
