@@ -76,7 +76,7 @@ CREATE POLICY "Admins can delete hero videos" ON hero_videos
 CREATE TABLE IF NOT EXISTS showcase_images (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   image_url TEXT NOT NULL,
-  type TEXT NOT NULL CHECK (type IN ('sketch', 'product', 'model', 'video')),
+  type TEXT NOT NULL CHECK (type IN ('sketch', 'product', 'model', 'video', 'adgenius_main', 'adgenius_collage')),
   order_index INTEGER NOT NULL DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

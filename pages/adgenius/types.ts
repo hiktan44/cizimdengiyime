@@ -17,13 +17,13 @@ export interface ProductAnalysis {
   eticaret_ozellikler: string[];
 }
 
-export type AdStyle = 
-  | 'Lüks ve Premium' 
-  | 'Minimalist Stüdyo' 
+export type AdStyle =
+  | 'Lüks ve Premium'
+  | 'Minimalist Stüdyo'
   | 'Lüks Mağaza Atmosferi'
   | 'Doğal Gün Işığı'
-  | 'Vintage & Retro' 
-  | 'Neon & Cyberpunk' 
+  | 'Vintage & Retro'
+  | 'Neon & Cyberpunk'
   | 'Sinematik & Dramatik'
   | 'Renkli & Pop Art'
   | 'Art Deco'
@@ -79,5 +79,5 @@ export interface GenerationResult {
   progress?: number; // Added progress field (0-100)
 }
 
-export type AppStep = 'upload' | 'analyzing' | 'generating' | 'results';
+export type AppStep = 'upload' | 'analyzing' | 'preview_prompts' | 'generating' | 'results';
 

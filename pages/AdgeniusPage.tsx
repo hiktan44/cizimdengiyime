@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { UploadForm, ProcessingStep, ResultsGallery } from './adgenius';
+import { UploadForm, ProcessingStep, ResultsGallery, PromptPreview } from './adgenius';
 import { VideoGenerationOverlay } from '../components/adgenius/VideoGenerationOverlay';
 import { analyzeProductImage, generateAdPrompts, generateAdImage, generateAdVideo, ensureApiKey, fileToGoogleGenAIBase64 } from '../services/adgeniusService';
 import { ProductAnalysis, AdPrompt, GenerationResult, FormData, AppStep, AdStyle, ImageModel, VideoModel, GenerationMode, AspectRatio } from './adgenius';
@@ -75,6 +75,15 @@ const translations = {
       imagesGenerated: 'Oluşturulan Görsel',
       videosGenerated: 'Oluşturulan Video',
       creditsUsed: 'Harcanan Kredi'
+    },
+    preview: {
+      title: 'Kampanya Detayları',
+      subtitle: 'Oluşturulacak sahneleri ve mekanları gözden geçirin. İsterseniz her mekan için özel prompt girebilirsiniz.',
+      editButton: 'Düzenle / Değiştir',
+      confirmButton: 'Seçimleri Onayla ve Üretimi Başlat',
+      location: 'Mekan / Sahne',
+      promptPlaceholder: 'Örn: Modern bir stüdyoda, profesyonel ışıklandırma altında, model yürürken...',
+      backButton: 'Geri Dön'
     }
   },
   en: {
@@ -130,6 +139,15 @@ const translations = {
       imagesGenerated: 'Images Generated',
       videosGenerated: 'Videos Generated',
       creditsUsed: 'Credits Used'
+    },
+    preview: {
+      title: 'Campaign Details',
+      subtitle: 'Review the scenes and locations. You can enter custom prompts for each location if you wish.',
+      editButton: 'Edit / Change',
+      confirmButton: 'Confirm & Start Generation',
+      location: 'Location / Scene',
+      promptPlaceholder: 'Ex: Walking in a modern studio under professional lighting...',
+      backButton: 'Go Back'
     }
   },
 };
@@ -180,15 +198,24 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
   const [totalImagesGenerated, setTotalImagesGenerated] = useState(0);
   const [totalVideosGenerated, setTotalVideosGenerated] = useState(0);
   const [totalCreditsUsed, setTotalCreditsUsed] = useState(0);
+  const [base64Strings, setBase64Strings] = useState<{
+    original: string,
+    optional: string | null,
+    pattern: string | null,
+    patternMime: string | null
+  } | null>(null);
 
   // Calculate totals
   useEffect(() => {
     const imagesCount = results.filter(r => r.imageUrl).length;
     const videosCount = results.filter(r => r.videoUrl).length;
     const credits = results.reduce((sum, r) => {
-      // Video costs 2 credits, image costs 1 credit
-      const isVideo = r.videoUrl !== undefined;
-      return sum + (isVideo ? 2 : 1);
+      // If result is completed, check if it has video. 
+      // If is pending/generating, use formData.includeVideo to estimate.
+      if (r.status === 'completed' || r.status === 'failed') {
+        return sum + (r.videoUrl ? 2 : 1);
+      }
+      return sum + (formData.includeVideo ? 2 : 1);
     }, 0);
 
     setTotalImagesGenerated(imagesCount);
@@ -244,6 +271,167 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     );
   };
 
+  const processItem = useCallback(async (
+    item: GenerationResult,
+    currentFormData: FormData,
+    analysisResult: ProductAnalysis,
+    origImgB64: string,
+    optImgB64: string | null,
+    pattImgB64: string | null,
+    pattImgMime: string | null
+  ) => {
+    // Determine operation type based on mode and video preference
+    let operationType: 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video';
+    const isEcommerce = currentFormData.mode === 'ecommerce';
+
+    if (isEcommerce) {
+      operationType = currentFormData.includeVideo ? 'adgenius_ecommerce_video' : 'adgenius_ecommerce_image';
+    } else {
+      operationType = currentFormData.includeVideo ? 'adgenius_campaign_video' : 'adgenius_campaign_image';
+    }
+
+    // Check credits - each result individually
+    if (!await checkCredits(operationType)) return;
+
+    // Determine Aspect Ratios
+    const imgAspectRatio = currentFormData.aspectRatio;
+
+    // Determine Video Ratio (Veo strictly supports 16:9 or 9:16)
+    let vidAspectRatio = '16:9';
+    if (imgAspectRatio === '9:16' || imgAspectRatio === '3:4' || imgAspectRatio === '1:1') {
+      vidAspectRatio = '9:16';
+    } else {
+      vidAspectRatio = '16:9';
+    }
+
+    const updateResult = (id: number, update: Partial<GenerationResult>) => {
+      setResults(prev => prev.map(r => r.id === id ? { ...r, ...update } : r));
+    };
+
+    try {
+      updateResult(item.id, { status: 'generating_image', progress: 5, error: undefined, imageUrl: undefined, videoUrl: undefined });
+
+      if (!currentFormData.productImage) throw new Error("Ana resim eksik");
+
+      const base64Image = await generateAdImage(
+        item.prompt,
+        origImgB64,
+        currentFormData.productImage.type,
+        optImgB64,
+        currentFormData.optionalImage?.type || null,
+        currentFormData.imageModel,
+        imgAspectRatio,
+        pattImgB64,
+        pattImgMime
+      );
+
+      updateResult(item.id, {
+        status: 'completed',
+        imageUrl: base64Image,
+        progress: 45
+      });
+
+      // Check if Video is requested
+      if (currentFormData.includeVideo) {
+        updateResult(item.id, {
+          status: 'generating_video',
+          imageUrl: base64Image,
+          progress: 50
+        });
+
+        try {
+          const videoUrl = await generateAdVideo(
+            base64Image,
+            item.type,
+            currentFormData.videoModel,
+            vidAspectRatio,
+            (vidProgress) => {
+              // Update progress during polling (50% -> 99%)
+              updateResult(item.id, { progress: vidProgress });
+            }
+          );
+
+          updateResult(item.id, {
+            status: 'completed',
+            videoUrl: videoUrl,
+            progress: 100
+          });
+
+          // Save both image and video
+          await saveToHistory(operationType, base64Image, videoUrl, {
+            ...currentFormData,
+            analysis: analysisResult,
+            generatedPrompt: item.prompt
+          });
+        } catch (videoError: any) {
+          console.warn(`Video generation failed for item ${item.id}, preserving image. Error:`, videoError);
+          // Mark as completed but attach error message to show partial success
+          updateResult(item.id, {
+            status: 'completed',
+            imageUrl: base64Image,
+            error: videoError.message,
+            progress: 100
+          });
+
+          // Save just the image
+          await saveToHistory(operationType, base64Image, null, {
+            ...currentFormData,
+            analysis: analysisResult,
+            generatedPrompt: item.prompt,
+            videoError: videoError.message
+          });
+        }
+      } else {
+        // Image Only Mode - save immediately
+        await saveToHistory(operationType, base64Image, null, {
+          ...currentFormData,
+          analysis: analysisResult,
+          generatedPrompt: item.prompt
+        });
+      }
+
+    } catch (err: any) {
+      console.error(`Error processing item ${item.id}`, err);
+      updateResult(item.id, {
+        status: 'failed',
+        error: err.message || "Bilinmeyen bir hata oluştu.",
+        progress: 0
+      });
+    }
+  }, [checkCredits, saveToHistory, onRefreshProfile]); // Added dependencies as they are used inside processItem or its sub-calls. Wait, setResults is also used.
+
+  const handleRegenerateItem = useCallback(async (id: number) => {
+    const item = results.find(r => r.id === id);
+    if (!item || !analysis || !formData.productImage) return;
+
+    try {
+      const originalImageB64 = await fileToGoogleGenAIBase64(formData.productImage);
+      let optionalImageB64: string | null = null;
+      if (formData.optionalImage) {
+        optionalImageB64 = await fileToGoogleGenAIBase64(formData.optionalImage);
+      }
+      let patternImageB64: string | null = null;
+      let patternImageMimeType: string | null = null;
+      if (formData.ecommercePatternImage) {
+        patternImageB64 = await fileToGoogleGenAIBase64(formData.ecommercePatternImage);
+        patternImageMimeType = formData.ecommercePatternImage.type;
+      }
+
+      await processItem(
+        item,
+        formData,
+        analysis,
+        originalImageB64,
+        optionalImageB64,
+        patternImageB64,
+        patternImageMimeType
+      );
+    } catch (err: any) {
+      console.error('Regeneration error:', err);
+      setError(err.message || t.messages.error);
+    }
+  }, [results, analysis, formData, processItem]);
+
   const handleSubmit = useCallback(async () => {
     if (!formData.productImage) {
       setError(t.messages.uploadProductImage);
@@ -298,141 +486,49 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
         progress: 0
       }));
       setResults(initialResults);
-      setStep('generating');
+      setBase64Strings({
+        original: originalImageB64,
+        optional: optionalImageB64,
+        pattern: patternImageB64,
+        patternMime: patternImageMimeType
+      });
 
-      // 3. Process each prompt
-      const updateResult = (id: number, update: Partial<GenerationResult>) => {
-        setResults(prev => prev.map(r => r.id === id ? { ...r, ...update } : r));
-      };
-
-      const processItem = async (item: GenerationResult) => {
-        // Determine operation type based on mode and video preference
-        let operationType: 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video';
-        const isEcommerce = formData.mode === 'ecommerce';
-
-        if (isEcommerce) {
-          operationType = formData.includeVideo ? 'adgenius_ecommerce_video' : 'adgenius_ecommerce_image';
-        } else {
-          operationType = formData.includeVideo ? 'adgenius_campaign_video' : 'adgenius_campaign_image';
-        }
-
-        // Check credits - each result individually
-        if (!await checkCredits(operationType)) return;
-
-        // Determine Aspect Ratios
-        const imgAspectRatio = formData.aspectRatio;
-
-        // Determine Video Ratio (Veo strictly supports 16:9 or 9:16)
-        let vidAspectRatio = '16:9';
-        if (imgAspectRatio === '9:16' || imgAspectRatio === '3:4' || imgAspectRatio === '1:1') {
-          vidAspectRatio = '9:16';
-        } else {
-          vidAspectRatio = '16:9';
-        }
-
-        try {
-          updateResult(item.id, { status: 'generating_image', progress: 5 });
-
-          if (!formData.productImage) throw new Error("Ana resim eksik");
-
-          const base64Image = await generateAdImage(
-            item.prompt,
-            originalImageB64,
-            formData.productImage.type,
-            optionalImageB64,
-            formData.optionalImage?.type || null,
-            formData.imageModel,
-            imgAspectRatio,
-            patternImageB64,
-            patternImageMimeType
-          );
-
-          updateResult(item.id, {
-            status: 'completed',
-            imageUrl: base64Image,
-            progress: 45
-          });
-
-          // Check if Video is requested
-          if (formData.includeVideo) {
-            updateResult(item.id, {
-              status: 'generating_video',
-              imageUrl: base64Image,
-              progress: 50
-            });
-
-            try {
-              const videoUrl = await generateAdVideo(
-                base64Image,
-                item.type,
-                formData.videoModel,
-                vidAspectRatio,
-                (vidProgress) => {
-                  // Update progress during polling (50% -> 99%)
-                  updateResult(item.id, { progress: vidProgress });
-                }
-              );
-
-              updateResult(item.id, {
-                status: 'completed',
-                videoUrl: videoUrl,
-                progress: 100
-              });
-
-              // Save both image and video
-              await saveToHistory(operationType, base64Image, videoUrl, {
-                ...formData,
-                analysis: analysisResult,
-                generatedPrompts: prompts
-              });
-            } catch (videoError: any) {
-              console.warn(`Video generation failed for item ${item.id}, preserving image. Error:`, videoError);
-              // Mark as completed but attach error message to show partial success
-              updateResult(item.id, {
-                status: 'completed',
-                imageUrl: base64Image,
-                error: videoError.message,
-                progress: 100
-              });
-
-              // Save just the image
-              await saveToHistory(operationType, base64Image, null, {
-                ...formData,
-                analysis: analysisResult,
-                generatedPrompts: prompts,
-                videoError: videoError.message
-              });
-            }
-          } else {
-            // Image Only Mode - save immediately
-            await saveToHistory(operationType, base64Image, null, {
-              ...formData,
-              analysis: analysisResult,
-              generatedPrompts: prompts
-            });
-          }
-
-        } catch (err: any) {
-          console.error(`Error processing item ${item.id}`, err);
-          updateResult(item.id, {
-            status: 'failed',
-            error: err.message || "Bilinmeyen bir hata oluştu.",
-            progress: 0
-          });
-        }
-      };
-
-      // Execute all in parallel
-      await Promise.all(initialResults.map(processItem));
-
-      setStep('results');
+      setStep('preview_prompts');
 
     } catch (err: any) {
       console.error('Generation error:', err);
       setError(err.message || t.messages.error);
       setStep('upload');
     }
-  }, [formData, profile, onRefreshProfile, onShowBuyCredits]);
+  }, [formData, profile, onRefreshProfile, onShowBuyCredits, t.messages]);
+
+  const handleConfirmGeneration = useCallback(async () => {
+    if (!base64Strings || !analysis) return;
+
+    setStep('generating');
+
+    try {
+      await Promise.all(results.map(item =>
+        processItem(
+          item,
+          formData,
+          analysis,
+          base64Strings.original,
+          base64Strings.optional,
+          base64Strings.pattern,
+          base64Strings.patternMime
+        )
+      ));
+
+      setStep('results');
+    } catch (err: any) {
+      console.error('Final generation error:', err);
+      setError(err.message || t.messages.error);
+      setStep('preview_prompts');
+    }
+  }, [results, formData, analysis, base64Strings, processItem, t.messages.error]);
+
+
 
   const handleReset = () => {
     setStep('upload');
@@ -515,6 +611,16 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
         />
       )}
 
+      {step === 'preview_prompts' && (
+        <PromptPreview
+          results={results}
+          setResults={setResults}
+          onSubmit={handleConfirmGeneration}
+          onBack={() => setStep('upload')}
+          t={t}
+        />
+      )}
+
       {(step === 'analyzing' || step === 'generating' || step === 'results') && (
         <ProcessingStep
           step={step}
@@ -527,6 +633,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
       {(step === 'generating' || step === 'results') && (
         <ResultsGallery
           results={results}
+          onRegenerate={handleRegenerateItem}
           t={t}
         />
       )}
@@ -586,6 +693,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     </div>
   );
 };
+
 
 export default AdgeniusPage;
 

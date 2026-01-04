@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { GenerationResult } from '../AdgeniusPage';
-import { Download, AlertCircle, Loader2, Video, LayoutGrid, Image as ImageIcon } from 'lucide-react';
+import { Download, AlertCircle, Loader2, Video, LayoutGrid, Image as ImageIcon, RefreshCw } from 'lucide-react';
 
 interface Props {
   results: GenerationResult[];
+  onRegenerate: (id: number) => void;
   t: any;
 }
 
-const ResultsGallery: React.FC<Props> = ({ results, t }) => {
+const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
   const [collageUrl, setCollageUrl] = useState<string | null>(null);
   const [isGeneratingCollage, setIsGeneratingCollage] = useState(false);
 
@@ -343,6 +344,16 @@ const ResultsGallery: React.FC<Props> = ({ results, t }) => {
                   </button>
                 )}
               </div>
+
+              {/* Regenerate Button */}
+              {allFinished && (
+                <button
+                  onClick={() => onRegenerate(result.id)}
+                  className="w-full bg-slate-800 hover:bg-blue-900/40 text-slate-400 hover:text-blue-300 text-[10px] py-1.5 rounded-md flex items-center justify-center gap-2 transition-all border border-slate-700 hover:border-blue-500/30 font-medium"
+                >
+                  <RefreshCw className="w-3 h-3" /> Bu Görseli Yeniden Üret
+                </button>
+              )}
             </div>
           </div>
         ))}
