@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { UploadForm, ProcessingStep, ResultsGallery } from './adgenius';
+import { VideoGenerationOverlay } from '../components/adgenius/VideoGenerationOverlay';
 import { analyzeProductImage, generateAdPrompts, generateAdImage, generateAdVideo, ensureApiKey, fileToGoogleGenAIBase64 } from '../services/adgeniusService';
 import { ProductAnalysis, AdPrompt, GenerationResult, FormData, AppStep, AdStyle, ImageModel, VideoModel, GenerationMode, AspectRatio } from './adgenius';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
@@ -571,6 +572,17 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
         title="WhatsApp"
         subtitle={whatsappSubtitle}
       />
+
+      {/* Video Generation Overlay */}
+      {step === 'generating' && results.some(r => r.status === 'generating_video') && (
+        <VideoGenerationOverlay
+          progress={
+            results.filter(r => r.status === 'generating_video').reduce((sum, r) => sum + (r.progress || 0), 0) /
+            Math.max(1, results.filter(r => r.status === 'generating_video').length)
+          }
+          label={t.messages.generatingVideo}
+        />
+      )}
     </div>
   );
 };

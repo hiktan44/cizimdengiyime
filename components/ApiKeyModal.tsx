@@ -39,10 +39,10 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, curre
                         <XIcon />
                     </button>
                 </div>
-                
+
                 <p className="text-sm text-slate-400 mb-6">
-                    Uygulamanın doğru çalışması için geçerli bir Google Gemini API anahtarına ihtiyaç vardır. Deploy edilen ortamlarda .env dosyası okunamazsa anahtarı buradan manuel olarak girebilirsiniz.
-                    <br/><br/>
+                    Uygulamanın doğru çalışması için geçerli bir API anahtarına ihtiyaç vardır. Deploy edilen ortamlarda .env dosyası okunamazsa anahtarı buradan manuel olarak girebilirsiniz.
+                    <br /><br />
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">
                         API Anahtarı Almak İçin Tıklayın
                     </a>
@@ -60,7 +60,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, curre
                             className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:ring-cyan-500 focus:border-cyan-500 transition font-mono text-sm"
                         />
                     </div>
-                    
+
                     <div className="flex gap-3 justify-end mt-6">
                         <button
                             type="button"

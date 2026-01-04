@@ -8,52 +8,70 @@ import { TransactionsPanel } from './admin/TransactionsPanel';
 type Language = 'tr' | 'en';
 
 const adminTranslations = {
-  tr: {
-    title: 'Admin Paneli',
-    subtitle: 'Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.',
-    tabs: {
-      content: '📸 İçerik Yönetimi',
-      settings: '⚙️ Ayarlar',
-      users: '👥 Kullanıcı Aktivitesi',
-      transactions: '💳 Ödemeler',
+    tr: {
+        title: 'Admin Paneli',
+        subtitle: 'Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.',
+        tabs: {
+            content: '📸 İçerik Yönetimi',
+            settings: '⚙️ Ayarlar',
+            users: '👥 Kullanıcı Aktivitesi',
+            transactions: '💳 Ödemeler',
+            adgenius: '🚀 AdGenius Yönetimi',
+        },
+        heroVideos: {
+            title: '🎬 Hero Gömülü Videolar (4 Adet)',
+            subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.',
+        },
+        showcase: {
+            title: '📸 Showcase Görselleri',
+            subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.',
+            sketch: '1. Çizim (Sketch)',
+            product: '2. Ürün (Product)',
+            model: '3. Model (Live)',
+            video: '4. Video',
+        },
+        adgenius: {
+            title: '🚀 AdGenius Yönetimi',
+            subtitle: 'AdGenius bölümü için ana görsel ve kolaj görselini buradan yönetebilirsiniz.',
+            mainImage: 'Ana Görsel (Büyük Model Çekimi)',
+            collageImage: 'Kolaj Görsel (9\'lu Grid/Varyasyon)',
+            mainTitle: 'AdGenius Ana Görsel',
+            collageTitle: 'AdGenius Kolaj/Grid',
+        },
+        change: 'Değiştir',
     },
-    heroVideos: {
-      title: '🎬 Hero Gömülü Videolar (4 Adet)',
-      subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.',
+    en: {
+        title: 'Admin Panel',
+        subtitle: 'Access all system management functions from here.',
+        tabs: {
+            content: '📸 Content Management',
+            settings: '⚙️ Settings',
+            users: '👥 User Activity',
+            transactions: '💳 Payments',
+            adgenius: '🚀 AdGenius Management',
+        },
+        heroVideos: {
+            title: '🎬 Hero Background Videos (4)',
+            subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.',
+        },
+        showcase: {
+            title: '📸 Showcase Images',
+            subtitle: 'Upload images for sketch-to-reality transformation examples.',
+            sketch: '1. Sketch',
+            product: '2. Product',
+            model: '3. Model (Live)',
+            video: '4. Video',
+        },
+        adgenius: {
+            title: '🚀 AdGenius Management',
+            subtitle: 'Manage the main image and collage image for the AdGenius section candidate from here.',
+            mainImage: 'Main Image (Large Model Shoot)',
+            collageImage: 'Collage Image (9-Grid/Variation)',
+            mainTitle: 'AdGenius Main Image',
+            collageTitle: 'AdGenius Collage/Grid',
+        },
+        change: 'Change',
     },
-    showcase: {
-      title: '📸 Showcase Görselleri',
-      subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.',
-      sketch: '1. Çizim (Sketch)',
-      product: '2. Ürün (Product)',
-      model: '3. Model (Live)',
-      video: '4. Video',
-    },
-    change: 'Değiştir',
-  },
-  en: {
-    title: 'Admin Panel',
-    subtitle: 'Access all system management functions from here.',
-    tabs: {
-      content: '📸 Content Management',
-      settings: '⚙️ Settings',
-      users: '👥 User Activity',
-      transactions: '💳 Payments',
-    },
-    heroVideos: {
-      title: '🎬 Hero Background Videos (4)',
-      subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.',
-    },
-    showcase: {
-      title: '📸 Showcase Images',
-      subtitle: 'Upload images for sketch-to-reality transformation examples.',
-      sketch: '1. Sketch',
-      product: '2. Product',
-      model: '3. Model (Live)',
-      video: '4. Video',
-    },
-    change: 'Change',
-  },
 };
 
 interface AdminDashboardProps {
@@ -80,6 +98,10 @@ interface AdminDashboardProps {
     onHeroVideo2Upload?: (file: File) => void;
     onHeroVideo3Upload?: (file: File) => void;
     credits?: number;
+    adGeniusMainUrl?: string;
+    adGeniusCollageUrl?: string;
+    onAdGeniusMainUpload?: (file: File) => void;
+    onAdGeniusCollageUpload?: (file: File) => void;
 }
 
 const ContentCard: React.FC<{
@@ -128,25 +150,27 @@ const ContentCard: React.FC<{
 };
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
-    const { 
-        onNavigateHome, 
-        sketchUrl, 
-        productUrl, 
-        modelUrl, 
-        videoUrl, 
-        heroVideoUrl, 
-        heroVideo1Url, 
-        heroVideo2Url, 
-        heroVideo3Url, 
-        onSketchUpload, 
-        onProductUpload, 
-        onModelUpload, 
-        onVideoUpload, 
-        onHeroVideoUpload, 
-        onHeroVideo1Upload, 
-        onHeroVideo2Upload, 
-        onHeroVideo3Upload, 
-        ...headerProps 
+    const {
+        onNavigateHome,
+        sketchUrl,
+        productUrl,
+        modelUrl,
+        videoUrl,
+        heroVideoUrl,
+        heroVideo1Url,
+        heroVideo2Url,
+        heroVideo3Url,
+        onSketchUpload,
+        onProductUpload,
+        onModelUpload,
+        onVideoUpload,
+        onHeroVideoUpload,
+        onHeroVideo1Upload,
+        onHeroVideo2Upload,
+        onHeroVideo3Upload,
+        adGeniusMainUrl, adGeniusCollageUrl,
+        onAdGeniusMainUpload, onAdGeniusCollageUpload,
+        ...headerProps
     } = props;
 
     const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions'>('content');
@@ -159,6 +183,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
     }, []);
 
     const t = adminTranslations[language];
+
+
 
     const tabs = [
         { id: 'content' as const, label: t.tabs.content, icon: '📸' },
@@ -185,11 +211,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`px-4 py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${
-                                    activeTab === tab.id
-                                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
-                                }`}
+                                className={`px-4 py-3 rounded-xl font-semibold text-sm md:text-base transition-all ${activeTab === tab.id
+                                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
+                                    : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+                                    }`}
                             >
                                 <span className="hidden md:inline">{tab.label}</span>
                                 <span className="md:hidden">{tab.icon}</span>
@@ -213,7 +238,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         title="Hero Video 1"
                                         mediaUrl={heroVideoUrl || ''}
                                         mediaType="video"
-                                        onFileSelect={onHeroVideoUpload || (() => {})}
+                                        onFileSelect={onHeroVideoUpload || (() => { })}
                                         accept="video/*"
                                         changeLabel={t.change}
                                     />
@@ -221,7 +246,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         title="Hero Video 2"
                                         mediaUrl={heroVideo1Url || ''}
                                         mediaType="video"
-                                        onFileSelect={onHeroVideo1Upload || (() => {})}
+                                        onFileSelect={onHeroVideo1Upload || (() => { })}
                                         accept="video/*"
                                         changeLabel={t.change}
                                     />
@@ -229,7 +254,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         title="Hero Video 3"
                                         mediaUrl={heroVideo2Url || ''}
                                         mediaType="video"
-                                        onFileSelect={onHeroVideo2Upload || (() => {})}
+                                        onFileSelect={onHeroVideo2Upload || (() => { })}
                                         accept="video/*"
                                         changeLabel={t.change}
                                     />
@@ -237,7 +262,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         title="Hero Video 4"
                                         mediaUrl={heroVideo3Url || ''}
                                         mediaType="video"
-                                        onFileSelect={onHeroVideo3Upload || (() => {})}
+                                        onFileSelect={onHeroVideo3Upload || (() => { })}
                                         accept="video/*"
                                         changeLabel={t.change}
                                     />
@@ -285,8 +310,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                     />
                                 </div>
                             </div>
+                            {/* AdGenius Section */}
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-4">{t.adgenius.title}</h2>
+                                <p className="text-slate-400 mb-6">
+                                    {t.adgenius.subtitle}
+                                </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <ContentCard
+                                        title={t.adgenius.mainTitle}
+                                        mediaUrl={adGeniusMainUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={onAdGeniusMainUpload || (() => { })}
+                                        accept="image/*"
+                                        changeLabel={t.change}
+                                    />
+                                    <ContentCard
+                                        title={t.adgenius.collageTitle}
+                                        mediaUrl={adGeniusCollageUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={onAdGeniusCollageUpload || (() => { })}
+                                        accept="image/*"
+                                        changeLabel={t.change}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     )}
+
+
 
                     {activeTab === 'settings' && <SettingsPanel />}
                     {activeTab === 'users' && <UserActivityPanel />}

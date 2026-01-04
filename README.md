@@ -4,7 +4,7 @@
 
 # 🎨 Çizimden Resime Videoya - AI Powered Design App
 
-Google Gemini AI ile çizimlerinizi gerçekçi resimlere ve videolara dönüştürün! Modern, kullanıcı dostu arayüzü ile profesyonel sonuçlar alın.
+Google AI teknolojisi ile çizimlerinizi gerçekçi resimlere ve videolara dönüştürün! Modern, kullanıcı dostu arayüzü ile profesyonel sonuçlar alın.
 
 [![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript)](https://www.typescriptlang.org/)
@@ -17,7 +17,7 @@ Google Gemini AI ile çizimlerinizi gerçekçi resimlere ve videolara dönüşt�
 ## 🌟 Özellikler
 
 ### 🎯 Ana Özellikler
-- ✨ **AI Görsel Dönüştürme**: Google Gemini AI ile çizimlerinizi gerçekçi görsellere dönüştürün
+- ✨ **AI Görsel Dönüştürme**: Gelişmiş AI teknolojisi ile çizimlerinizi gerçekçi görsellere dönüştürün
 - 🎬 **Video Oluşturma**: AI destekli video jeneratörü
 - 🎨 **Renk Düzenleme**: Gelişmiş renk seçici ve özelleştirme araçları
 - 📤 **Kolay Yükleme**: Drag & drop ile resim yükleme
@@ -226,7 +226,7 @@ cizimdengiyime/
 - **Vite 6.2** - Build tool
 - **Tailwind CSS 3.4** - Styling
 - **Supabase** - Backend as a Service
-- **Google Gemini AI** - AI image generation
+- **Google AI** - AI image generation
 
 ### Backend
 - **Node.js** - Runtime
@@ -357,7 +357,7 @@ Sorun yaşarsanız:
 ## 🎉 Teşekkürler
 
 Bu projeyi mümkün kılan harika teknolojilere teşekkürler:
-- [Google Gemini AI](https://ai.google.dev/)
+- [Google AI](https://ai.google.dev/)
 - [Supabase](https://supabase.com/)
 - [React](https://reactjs.org/)
 - [Vite](https://vitejs.dev/)

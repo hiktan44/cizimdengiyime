@@ -23,6 +23,8 @@ interface LandingPageProps {
   heroVideo1Url?: string;
   heroVideo2Url?: string;
   heroVideo3Url?: string;
+  adGeniusMainUrl?: string;
+  adGeniusCollageUrl?: string;
 }
 
 type Language = 'tr' | 'en';
@@ -90,6 +92,26 @@ const translations = {
       sceneSetupDesc: 'Ayrıntılı senaryolar yazın. AI tüm detayları anlayıp uygular.',
       styleControl: 'Stil & Atmosfer Kontrolü',
       styleControlDesc: '100+ hazır seçenek ile birlikte prompt ile daha da özelleştirin.',
+    },
+    adGenius: {
+      title: '🚀 AdGenius AI: Yapay Zeka Destekli Akıllı Reklam ve Prodüksiyon Merkezi',
+      description: 'AdGenius AI, sıradan bir ürün fotoğrafını saniyeler içinde profesyonel bir pazarlama varlığına dönüştüren, uçtan uca bir prodüksiyon çözümüdür. Fiziksel stüdyo maliyetlerini, manken kiralama süreçlerini ve uzun süren grafik tasarım işlerini ortadan kaldırarak ürününüzü doğrudan satışa hazır hale getirir.',
+      featuresTitle: '💎 Temel Özellikler ve Yetenekler',
+      features: [
+        { title: '1. Akıllı Ürün Analizi ve İçerik Yazımı', items: ['SEO Uyumlu Başlıklar: Pazaryeri algoritmalarına uygun, tıklanma oranı yüksek başlıklar üretir.', 'İkna Edici Açıklamalar: Ürünün hikayesini anlatan ve satın alma motivasyonunu tetikleyen profesyonel pazarlama metinleri yazar.', 'Bullet Point Özellik Listesi: Amazon, Trendyol ve Hepsiburada gibi platformlar için hazır teknik özellik maddeleri oluşturur.'] },
+        { title: '2. Profesyonel Mankenli Çekimler (E-Ticaret Paketi)', items: ['12 Farklı Poz: Önden, arkadan, profilden, yürüyüş anından ve sanatsal açılardan oluşan tam bir katalog seti sunar.', 'Model Tutarlılığı: Tüm çekimlerde aynı yüz ve vücut tipine sahip manken kullanarak marka bütünlüğünü korur.'] },
+        { title: '3. Sınırsız Kampanya Konseptleri', items: ['Stil Seçenekleri: Lüks Mağaza, Minimalist Stüdyo, Cyberpunk, Doğal Gün Işığı, Vintage ve daha fazlası.', 'Mekan Özgürlüğü: Ürünü bir şehir sokağında, lüks bir otel lobisinde veya egzotik bir plajda sergileyin.'] },
+        { title: '4. Gelişmiş Doku ve Renk Manipülasyonu', items: ['Renk Değişimi: Ürünün kalıbını bozmadan istediğiniz herhangi bir renge (veya hex koduna) dönüştürür.', 'Doku Eşleştirme (Pattern Mapping): Yüklediğiniz bir desen örneğini, kıyafetin kıvrımlarına ve ışık gölge dengesine uyumlu şekilde üzerine giydirir.'] },
+        { title: '5. Sinematik Reklam Videoları', items: ['Akıcı Hareketler: Ürünün kumaş dokusunu ve modelin duruşunu vurgulayan yavaş çekim (slow-motion) sinematik videolar.', 'Yüksek Çözünürlük: Sosyal medya reklamları (Reels, TikTok, Shorts) için optimize edilmiş yüksek kaliteli çıktılar.'] },
+        { title: '6. Marka ve Metin Entegrasyonu', items: ['Logo/Metin Yerleştirme: Görselin üzerine marka isminizi veya kampanya sloganınızı (Örn: "YENİ SEZON") estetik bir şekilde işler.'] }
+      ],
+      benefitsTitle: '🎯 E-Ticaret İşletmeleri İçin Sağladığı Faydalar',
+      benefits: [
+        { title: '✅ "Hemen Yükle, Hemen Sat" Kolaylığı', desc: 'Geleneksel yöntemde fotoğraf çekimi, rötuş ve içerik yazımı haftalar sürerken; AdGenius ile ürünün fotoğrafını yüklediğiniz anda görsel + video + başlık + açıklama setine sahip olursunuz.' },
+        { title: '✅ %90\'a Varan Maliyet Tasarrufu', desc: 'Işık, Kamera, Manken, Stüdyo, Grafik Tasarımcı masraflarına son.' },
+        { title: '✅ Global Standartlarda Kalite', desc: 'En yeni yapay zeka modellerini kullanarak, dünyanın en ünlü markalarının kullandığı estetik standartlarda görseller üretir.' },
+        { title: '✅ Kişiselleştirilmiş Prodüksiyon', desc: '"Özel İstekler" bölümü sayesinde yapay zekaya dilediğiniz sahneyi kurgulatabilirsiniz.' }
+      ]
     },
     pricing: {
       title: 'Fiyatlandırma',
@@ -186,7 +208,7 @@ const translations = {
     fotomatik: {
       heroTitle: 'Fotomatik Neleri Yapabilir? (Teknik Kapasite)',
       feature1Title: 'Bağlamsal Görsel Dönüşüm (AI Transform)',
-      feature1Desc: 'Gemini 3 Pro Image Preview kullanarak, bir fotoğraftaki ana objeyi veya kişiyi (yüz hatlarını koruyarak) tamamen farklı bir senaryoya yerleştirebilir. Örneğin; evde çekilmiş bir fotoğrafı "Venedik sahilinde yürüyüş yapan" bir sahneye dönüştürebilir.',
+      feature1Desc: 'Yapay zeka teknolojisini kullanarak, bir fotoğraftaki ana objeyi veya kişiyi (yüz hatlarını koruyarak) tamamen farklı bir senaryoya yerleştirebilir. Örneğin; evde çekilmiş bir fotoğrafı "Venedik sahilinde yürüyüş yapan" bir sahneye dönüştürebilir.',
       feature2Title: 'Derinlemesine Görsel Analiz ve Prompt Mühendisliği',
       feature2Desc: 'Yüklenen bir resmi sanatsal ve teknik açıdan analiz ederek Midjourney, Stable Diffusion ve Flux gibi platformlar için optimize edilmiş profesyonel istemler (promptlar) üretir.',
       feature3Title: 'Akıllı İyileştirme (AI Auto-Enhance)',
@@ -207,6 +229,74 @@ const translations = {
       feature4Title: 'Sınırsız Varyasyon',
       feature4Desc: 'Aynı modelin farklı varyasyonları için hızlıca teknik taslaklar oluşturun ve arşivleyin.',
       cta: 'Teknik Çizim Oluştur',
+    },
+    adgenius: {
+      title: '🚀 AdGenius AI: Yapay Zeka Destekli Akıllı Reklam ve Prodüksiyon Merkezi',
+      description: 'AdGenius AI, sıradan bir ürün fotoğrafını saniyeler içinde profesyonel bir pazarlama varlığına dönüştüren, uçtan uca bir prodüksiyon çözümüdür. Fiziksel stüdyo maliyetlerini, manken kiralama süreçlerini ve uzun süren grafik tasarım işlerini ortadan kaldırarak ürününüzü doğrudan satışa hazır hale getirir.',
+      featuresTitle: '💎 Temel Özellikler ve Yetenekler',
+      features: [
+        {
+          title: '1. Akıllı Ürün Analizi ve İçerik Yazımı',
+          items: [
+            'SEO Uyumlu Başlıklar: Pazaryeri algoritmalarına uygun, tıklanma oranı yüksek başlıklar üretir.',
+            'İkna Edici Açıklamalar: Ürünün hikayesini anlatan ve satın alma motivasyonunu tetikleyen profesyonel pazarlama metinleri yazar.',
+            'Bullet Point Özellik Listesi: Amazon, Trendyol ve Hepsiburada gibi platformlar için hazır teknik özellik maddeleri oluşturur.'
+          ]
+        },
+        {
+          title: '2. Profesyonel Mankenli Çekimler',
+          items: [
+            '12 Farklı Poz: Önden, arkadan, profilden, yürüyüş anından ve sanatsal açılardan oluşan tam bir katalog seti sunar.',
+            'Model Tutarlılığı: Tüm çekimlerde aynı yüz ve vücut tipine sahip manken kullanarak marka bütünlüğünü korur.'
+          ]
+        },
+        {
+          title: '3. Sınırsız Kampanya Konseptleri',
+          items: [
+            'Stil Seçenekleri: Lüks Mağaza, Minimalist Stüdyo, Cyberpunk, Doğal Gün Işığı, Vintage ve daha fazlası.',
+            'Mekan Özgürlüğü: Ürünü bir şehir sokağında, lüks bir otel lobisinde veya egzotik bir plajda sergileyin.'
+          ]
+        },
+        {
+          title: '4. Gelişmiş Doku ve Renk Manipülasyonu',
+          items: [
+            'Renk Değişimi: Ürünün kalıbını bozmadan istediğiniz herhangi bir renge dönüştürür.',
+            'Doku Eşleştirme: Yüklediğiniz bir desen örneğini, kıyafetin kıvrımlarına uyumlu şekilde giydirir.'
+          ]
+        },
+        {
+          title: '5. Sinematik Reklam Videoları',
+          items: [
+            'Akıcı Hareketler: Kumaş dokusunu ve modelin duruşunu vurgulayan yavaş çekim videolar.',
+            'Yüksek Çözünürlük: Sosyal medya (Reels, TikTok, Shorts) için optimize edilmiş çıktılar.'
+          ]
+        },
+        {
+          title: '6. Marka ve Metin Entegrasyonu',
+          items: [
+            'Logo/Metin Yerleştirme: Görselin üzerine marka isminizi veya kampanya sloganınızı estetik bir şekilde işler.'
+          ]
+        }
+      ],
+      benefitsTitle: '🎯 E-Ticaret İşletmeleri İçin Sağladığı Faydalar',
+      benefits: [
+        {
+          title: '✅ "Hemen Yükle, Hemen Sat" Kolaylığı',
+          desc: 'Geleneksel yöntemde haftalar süren süreç; AdGenius ile ürünün fotoğrafını yüklediğiniz anda görsel + video + başlık + açıklama setine sahip olursunuz.'
+        },
+        {
+          title: '✅ %90\'a Varan Maliyet Tasarrufu',
+          desc: 'Işık, camera ekipmanı, manken, makyaj artisti, stüdyo kirası ve metin yazarı maliyetlerini ortadan kaldırır.'
+        },
+        {
+          title: '✅ Global Standartlarda Kalite',
+          desc: 'En yeni yapay zeka modellerini kullanarak, dünyanın en ünlü moda markalarının kullandığı estetik standartlarda görseller üretir.'
+        },
+        {
+          title: '✅ Kişiselleştirilmiş Prodüksiyon',
+          desc: 'Özel İstekler bölümü sayesinde yapay zekaya spesifik komutlar vererek tam hayalinizdeki sahneyi kurgulayabilirsiniz.'
+        }
+      ]
     },
   },
   en: {
@@ -366,7 +456,7 @@ const translations = {
     fotomatik: {
       heroTitle: 'What Can Fotomatik Do? (Technical Capacity)',
       feature1Title: 'Contextual Image Transformation (AI Transform)',
-      feature1Desc: 'Using Gemini 3 Pro Image Preview, it can place the main object or person from a photo into a completely different scenario while preserving facial features. For example, it can transform a photo taken at home into a scene "walking on the Venice beach".',
+      feature1Desc: 'Using advanced AI technology, it can place the main object or person from a photo into a completely different scenario while preserving facial features. For example, it can transform a photo taken at home into a scene "walking on the Venice beach".',
       feature2Title: 'Deep Visual Analysis and Prompt Engineering',
       feature2Desc: 'Analyzes an uploaded image artistically and technically to produce professional optimized prompts for platforms like Midjourney, Stable Diffusion, and Flux.',
       feature3Title: 'Smart Enhancement (AI Auto-Enhance)',
@@ -388,6 +478,74 @@ const translations = {
       feature4Desc: 'Quickly create and archive technical drafts for different variations of the same model.',
       cta: 'Create Technical Drawing',
     },
+    adgenius: {
+      title: '🚀 AdGenius AI: AI-Powered Smart Advertising & Production Hub',
+      description: 'AdGenius AI is an end-to-end production solution that transforms an ordinary product photo into a professional marketing asset in seconds. It eliminates physical studio costs, model hiring processes, and long graphic design tasks, making your product ready for sale instantly.',
+      featuresTitle: '💎 Key Features & Capabilities',
+      features: [
+        {
+          title: '1. Smart Product Analysis & Copywriting',
+          items: [
+            'SEO-Friendly Titles: Generates high-click-rate titles optimized for marketplace algorithms.',
+            'Persuasive Descriptions: Writes professional marketing copy that tells the product story and triggers motivation.',
+            'Bullet Point Feature Lists: Ready-to-use lists for platforms like Amazon, eBay, and Etsy.'
+          ]
+        },
+        {
+          title: '2. Professional Model Shoots',
+          items: [
+            '12 Different Poses: Full catalog set from front, back, profile, walking, and artistic angles.',
+            'Model Consistency: Maintains brand integrity by using models with the same facial and body types.'
+          ]
+        },
+        {
+          title: '3. Unlimited Campaign Concepts',
+          items: [
+            'Style Options: Luxury Store, Minimalist Studio, Cyberpunk, Natural Daylight, Vintage, and more.',
+            'Location Freedom: Showcase products in a city street, luxury hotel lobby, or an exotic beach.'
+          ]
+        },
+        {
+          title: '4. Advanced Texture & Color Manipulation',
+          items: [
+            'Color Swapping: Transform product colors without losing silhouette or texture.',
+            'Pattern Mapping: Realistically apply pattern samples to garment folds and lighting.'
+          ]
+        },
+        {
+          title: '5. Cinematic Ad Videos',
+          items: [
+            'Fluid Motion: Slow-motion videos highlighting fabric texture and model presence.',
+            'High Resolution: Optimized outputs for social media (Reels, TikTok, Shorts).'
+          ]
+        },
+        {
+          title: '6. Brand & Text Integration',
+          items: [
+            'Logo/Text Placement: Esthetically embeds brand names or campaign slogans onto visuals.'
+          ]
+        }
+      ],
+      benefitsTitle: '🎯 Benefits for E-Commerce Businesses',
+      benefits: [
+        {
+          title: '✅ "Upload Now, Sell Now" Ease',
+          desc: 'Get full visual + video + title + description sets instantly, reducing weeks of work to seconds.'
+        },
+        {
+          title: '✅ Up to 90% Cost Savings',
+          desc: 'Eliminates costs for lighting, cameras, models, makeup artists, studios, and copywriters.'
+        },
+        {
+          title: '✅ Global Quality Standards',
+          desc: 'Uses latest AI models to produce aesthetics matching world-renowned fashion brands.'
+        },
+        {
+          title: '✅ Personalized Production',
+          desc: 'Give specific AI commands like "Model looking right" or "City lights in background" for custom scenes.'
+        }
+      ]
+    },
   },
 };
 
@@ -402,25 +560,28 @@ const detectDefaultLanguage = (): Language => {
   return 'en';
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({
-  onGetStarted,
-  onSignIn,
-  isLoggedIn = false,
-  userName,
-  userRole,
-  credits,
-  onLogout,
-  onAdminClick,
-  onBuyCreditsClick,
-  sketchUrl,
-  productUrl,
-  modelUrl,
-  videoUrl,
-  heroVideoUrl,
-  heroVideo1Url,
-  heroVideo2Url,
-  heroVideo3Url
-}) => {
+export const LandingPage: React.FC<LandingPageProps> = (props) => {
+  const {
+    onGetStarted,
+    onSignIn,
+    isLoggedIn = false,
+    userName,
+    userRole,
+    credits,
+    onLogout,
+    onAdminClick,
+    onBuyCreditsClick,
+    sketchUrl,
+    productUrl,
+    modelUrl,
+    videoUrl,
+    heroVideoUrl,
+    heroVideo1Url,
+    heroVideo2Url,
+    heroVideo3Url,
+    adGeniusMainUrl,
+    adGeniusCollageUrl,
+  } = props;
   // State for DB content
   const [heroVideos, setHeroVideos] = useState<string[]>([]);
   const [showcaseImages, setShowcaseImages] = useState<{
@@ -1035,6 +1196,114 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
+      {/* AdGenius Section */}
+      <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto">
+          {/* Hero Content */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 mb-6">
+              {t.adgenius?.title || 'AdGenius AI'}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto`}>
+              {t.adgenius?.description}
+            </p>
+          </div>
+
+          {/* Visual Showcase (Main + Collage) */}
+          <div className="mb-20">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Main Image */}
+              <div className="space-y-4">
+                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>📍 Profesyonel Model Çekimi</h3>
+                <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
+                  {adGeniusMainUrl ? (
+                    <img
+                      src={adGeniusMainUrl}
+                      alt="AdGenius Main"
+                      className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
+                      Ana Görsel Yüklenmedi
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+                    <p className="text-white text-sm">Üst düzey prodüksiyon kalitesi, sıfır maliyet.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Collage Image */}
+              <div className="space-y-4">
+                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>✨ Akıllı Reklam Varyasyonları</h3>
+                <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
+                  {adGeniusCollageUrl ? (
+                    <img
+                      src={adGeniusCollageUrl}
+                      alt="AdGenius Collage"
+                      className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
+                      Kolaj Görseli Yüklenmedi
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+                    <p className="text-white text-sm">Tek bir üründen onlarca kampanya konsepti.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Features & Benefits Detail Boxes */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+            {/* Features */}
+            <div>
+              <h3 className={`text-3xl font-bold ${textClass} mb-8 text-center md:text-left`}>{t.adgenius?.featuresTitle}</h3>
+              <div className="space-y-4">
+                {t.adgenius?.features?.map((feature: any, idx: number) => (
+                  <div key={idx} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700 hover:border-cyan-500/50' : 'bg-slate-50 border-slate-200 hover:border-cyan-400'} transition-all duration-300 shadow-lg group`}>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform text-lg">
+                        {idx === 0 ? '🧠' : idx === 1 ? '📸' : idx === 2 ? '🌍' : idx === 3 ? '🎨' : idx === 4 ? '🎬' : '🏷️'}
+                      </div>
+                      <h4 className={`text-xl font-bold ${textClass}`}>{feature.title}</h4>
+                    </div>
+                    <ul className="space-y-2">
+                      {feature.items.map((item: string, i: number) => (
+                        <li key={i} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                          <span className="text-cyan-500 mt-1">✓</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Benefits */}
+            <div>
+              <h3 className={`text-3xl font-bold ${textClass} mb-8 text-center md:text-left`}>{t.adgenius?.benefitsTitle}</h3>
+              <div className="space-y-4">
+                {t.adgenius?.benefits?.map((benefit: any, idx: number) => (
+                  <div key={idx} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700 hover:border-green-500/50' : 'bg-slate-50 border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform text-lg">
+                        {idx === 0 ? '⚡' : idx === 1 ? '💰' : idx === 2 ? '💎' : '🎯'}
+                      </div>
+                      <h4 className={`text-lg font-bold ${textClass}`}>{benefit.title}</h4>
+                    </div>
+                    <p className={`${descriptionTextClass} text-sm leading-relaxed`}>{benefit.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pixshop Section */}
       <section className="relative py-20 px-6 z-10 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
         <div className="max-w-7xl mx-auto relative z-10">
@@ -1231,73 +1500,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Tech Pack Section */}
-      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-50'}`}>
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* Hero */}
-          <div className="text-center mb-16">
-            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
-              {t.techpack.heroTitle}
-            </h2>
-            <p className={`${descriptionTextClass} text-xl max-w-3xl mx-auto`}>
-              {t.techpack.heroSubtitle}
-            </p>
-          </div>
 
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-purple-500 transition shadow-xl`}>
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-6 text-white shadow-lg">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature1Title}</h4>
-              <p className={`${secondaryTextClass} text-sm leading-relaxed`}>{t.techpack.feature1Desc}</p>
-            </div>
-
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-blue-500 transition shadow-xl`}>
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 text-white shadow-lg">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                </svg>
-              </div>
-              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature2Title}</h4>
-              <p className={`${secondaryTextClass} text-sm leading-relaxed`}>{t.techpack.feature2Desc}</p>
-            </div>
-
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-green-500 transition shadow-xl`}>
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-6 text-white shadow-lg">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature3Title}</h4>
-              <p className={`${secondaryTextClass} text-sm leading-relaxed`}>{t.techpack.feature3Desc}</p>
-            </div>
-
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-orange-500 transition shadow-xl`}>
-              <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center mb-6 text-white shadow-lg">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-              </div>
-              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature4Title}</h4>
-              <p className={`${secondaryTextClass} text-sm leading-relaxed`}>{t.techpack.feature4Desc}</p>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center">
-            <button
-              onClick={onGetStarted}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition-all transform hover:scale-105"
-            >
-              {t.techpack.cta}
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Tech Pack Section */}
       <section className="relative py-20 px-6 z-10 bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-900">

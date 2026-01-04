@@ -30,7 +30,7 @@ Coolify'da deployment yapmadan önce bu listeyi takip edin.
   - [ ] `PAYTR_MERCHANT_SALT`
 - [ ] Test mode aktif (production'a geçmeden önce test edin!)
 
-### Google AI (Gemini)
+### Google AI
 - [ ] Google AI Studio'da proje oluşturuldu
 - [ ] API key alındı: `VITE_GOOGLE_AI_API_KEY`
 - [ ] API key rate limit'leri kontrol edildi

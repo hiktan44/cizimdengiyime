@@ -1707,6 +1707,10 @@ const App: React.FC = () => {
         return saved && saved.startsWith('data:') ? saved : '';
     });
 
+    // AdGenius States
+    const [adGeniusMainUrl, setAdGeniusMainUrl] = useState(() => { const saved = localStorage.getItem('adGeniusMainUrl'); return saved && saved.startsWith('data:') ? saved : ''; });
+    const [adGeniusCollageUrl, setAdGeniusCollageUrl] = useState(() => { const saved = localStorage.getItem('adGeniusCollageUrl'); return saved && saved.startsWith('data:') ? saved : ''; });
+
     // Load content from Supabase on mount
     React.useEffect(() => {
         const loadContentFromSupabase = async () => {
@@ -1747,6 +1751,12 @@ const App: React.FC = () => {
                     } else if (image.type === 'video') {
                         setVideoUrl(image.image_url);
                         localStorage.setItem('videoUrl', image.image_url);
+                    } else if (image.type === 'adgenius_main') {
+                        setAdGeniusMainUrl(image.image_url);
+                        localStorage.setItem('adGeniusMainUrl', image.image_url);
+                    } else if (image.type === 'adgenius_collage') {
+                        setAdGeniusCollageUrl(image.image_url);
+                        localStorage.setItem('adGeniusCollageUrl', image.image_url);
                     }
                 });
                 console.log('✅ Showcase görseller Supabase\'den yüklendi:', showcaseImages.length);
@@ -1758,7 +1768,7 @@ const App: React.FC = () => {
         loadContentFromSupabase();
     }, []);
 
-    const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3') => {
+    const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3' | 'adgenius_main' | 'adgenius_collage') => {
         try {
             // Convert file to base64 for immediate display
             const reader = new FileReader();
@@ -1790,6 +1800,12 @@ const App: React.FC = () => {
                 } else if (type === 'heroVideo3') {
                     setHeroVideo3Url(base64String);
                     localStorage.setItem('heroVideo3Url', base64String);
+                } else if (type === 'adgenius_main') {
+                    setAdGeniusMainUrl(base64String);
+                    localStorage.setItem('adGeniusMainUrl', base64String);
+                } else if (type === 'adgenius_collage') {
+                    setAdGeniusCollageUrl(base64String);
+                    localStorage.setItem('adGeniusCollageUrl', base64String);
                 }
             };
             reader.readAsDataURL(file);
@@ -1859,6 +1875,25 @@ const App: React.FC = () => {
                 } else {
                     console.error('❌ Showcase video Supabase yüklemesi başarısız:', result.error);
                     alert(`❌ Showcase video yükleme başarısız: ${result.error}\n\nLütfen Supabase storage bucket'larının oluşturulduğundan emin olun.`);
+                }
+            } else if (type === 'adgenius_main' || type === 'adgenius_collage') {
+                // Upload AdGenius image
+                const adGeniusType = type as any;
+                const result = await uploadShowcaseImage(file, adGeniusType, 0);
+
+                if (result.success && result.imageUrl) {
+                    console.log(`✅ AdGenius ${type} görseli yüklendi:`, result.imageUrl);
+                    alert('✅ Görsel başarıyla yüklendi!\n\nAna sayfada AdGenius bölümünde görünecektir.');
+
+                    if (type === 'adgenius_main') {
+                        setAdGeniusMainUrl(result.imageUrl);
+                        localStorage.setItem('adGeniusMainUrl', result.imageUrl);
+                    } else if (type === 'adgenius_collage') {
+                        setAdGeniusCollageUrl(result.imageUrl);
+                        localStorage.setItem('adGeniusCollageUrl', result.imageUrl);
+                    }
+                } else {
+                    alert(`❌ Yükleme başarısız: ${result.error}`);
                 }
             }
         } catch (error) {
@@ -2007,6 +2042,8 @@ const App: React.FC = () => {
                     heroVideo1Url={heroVideo1Url}
                     heroVideo2Url={heroVideo2Url}
                     heroVideo3Url={heroVideo3Url}
+                    adGeniusMainUrl={adGeniusMainUrl}
+                    adGeniusCollageUrl={adGeniusCollageUrl}
                 />
             )}
             {currentPage === 'tool' && user && profile && (
@@ -2059,6 +2096,10 @@ const App: React.FC = () => {
                     onHeroVideo1Upload={(f) => handleFileUpload(f, 'heroVideo1')}
                     onHeroVideo2Upload={(f) => handleFileUpload(f, 'heroVideo2')}
                     onHeroVideo3Upload={(f) => handleFileUpload(f, 'heroVideo3')}
+                    adGeniusMainUrl={adGeniusMainUrl}
+                    adGeniusCollageUrl={adGeniusCollageUrl}
+                    onAdGeniusMainUpload={(f) => handleFileUpload(f, 'adgenius_main')}
+                    onAdGeniusCollageUpload={(f) => handleFileUpload(f, 'adgenius_collage')}
                     credits={profile.credits}
                 />
             )}
