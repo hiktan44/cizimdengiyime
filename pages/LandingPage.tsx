@@ -3,6 +3,7 @@ import { Logo } from '../components/Logo';
 import { CREDIT_PACKAGES } from '../lib/supabase';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { getPublicHeroVideos, getPublicShowcaseImages, getSiteSettings } from '../lib/adminService';
+import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 import { WhatsAppPanel } from '../components/WhatsAppPanel';
 
 interface LandingPageProps {
@@ -608,6 +609,16 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     large: { credits: 200, price: 1000 },
   });
 
+  const handleGetStarted = () => {
+    trackEvent('cta_click', { p_label: 'Get Started', source: 'landing_page' });
+    onGetStarted();
+  };
+
+  const handleSignIn = () => {
+    trackEvent('cta_click', { p_label: 'Sign In', source: 'landing_page' });
+    onSignIn();
+  };
+
   // Fetch content from DB on mount and periodically
   useEffect(() => {
     const fetchContent = async () => {
@@ -807,13 +818,13 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             ) : (
               <>
                 <button
-                  onClick={onSignIn}
+                  onClick={handleSignIn}
                   className={`${theme === 'dark' ? 'text-slate-300 hover:text-white' : 'text-slate-700 hover:text-slate-900'} transition px-4 py-2`}
                 >
                   {t.header.signIn}
                 </button>
                 <button
-                  onClick={onGetStarted}
+                  onClick={handleGetStarted}
                   className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition"
                 >
                   {t.header.start}
@@ -900,10 +911,10 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               </>
             ) : (
               <div className="grid grid-cols-2 gap-3 pt-2">
-                <button onClick={onSignIn} className="py-3 bg-slate-800 text-slate-300 rounded-lg text-sm text-center">
+                <button onClick={handleSignIn} className="py-3 bg-slate-800 text-slate-300 rounded-lg text-sm text-center">
                   {t.header.signIn}
                 </button>
-                <button onClick={onGetStarted} className="py-3 bg-cyan-600 text-white rounded-lg text-sm font-bold text-center">
+                <button onClick={handleGetStarted} className="py-3 bg-cyan-600 text-white rounded-lg text-sm font-bold text-center">
                   {t.header.start}
                 </button>
               </div>
@@ -951,7 +962,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           </p>
 
           <button
-            onClick={onGetStarted}
+            onClick={handleGetStarted}
             className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105 relative z-40"
           >
             {isLoggedIn ? t.header.continueUsing : t.hero.cta}
@@ -1101,7 +1112,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
           <div className="text-center mt-12">
             <button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-cyan-500 hover:to-blue-500 transition shadow-xl"
             >
               {t.showcase.tryNow}
@@ -1442,7 +1453,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               {t.pixshop.ctaSubtitle}
             </p>
             <button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition"
             >
               {t.pixshop.tryButton}
@@ -1503,7 +1514,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           {/* CTA */}
           <div className="text-center mt-12">
             <button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-indigo-500/50 transition transform hover:scale-105"
             >
               {t.fotomatik.cta}
@@ -1569,7 +1580,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           {/* CTA */}
           <div className="text-center mt-12">
             <button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-emerald-500/50 transition transform hover:scale-105"
             >
               {t.techpack.cta}
@@ -1598,7 +1609,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 1 {t.pricing.credit} = {(creditPackages.small.price / creditPackages.small.credits).toFixed(2)}₺
               </div>
               <button
-                onClick={onGetStarted}
+                onClick={handleGetStarted}
                 className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
               >
                 {t.pricing.buyNow}
@@ -1616,7 +1627,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 1 {t.pricing.credit} = {(creditPackages.medium.price / creditPackages.medium.credits).toFixed(2)}₺
               </div>
               <button
-                onClick={onGetStarted}
+                onClick={handleGetStarted}
                 className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
               >
                 {t.pricing.buyNow}
@@ -1631,7 +1642,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 1 {t.pricing.credit} = {(creditPackages.large.price / creditPackages.large.credits).toFixed(2)}₺
               </div>
               <button
-                onClick={onGetStarted}
+                onClick={handleGetStarted}
                 className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
               >
                 {t.pricing.buyNow}
@@ -1914,7 +1925,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             {t.cta.subtitle}
           </p>
           <button
-            onClick={onGetStarted}
+            onClick={handleGetStarted}
             className={`${theme === 'dark' ? 'bg-white text-slate-900' : 'bg-cyan-600 text-white'} px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition`}
           >
             {t.cta.button}

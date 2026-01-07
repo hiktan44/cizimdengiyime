@@ -13,6 +13,7 @@ import { processFile } from '../components/fotomatik/fileUtils';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
 import { WhatsAppPanel } from '../components/WhatsAppPanel';
+import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 
 interface FotomatikPageProps {
   profile: Profile | null;
@@ -150,13 +151,13 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   const [prompt, setPrompt] = useState<string>('');
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
   const [imageSize, setImageSize] = useState<string>('1K');
-  
+
   const [status, setStatus] = useState<FotomatikAppStatus>(FotomatikAppStatus.IDLE);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
+
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-  
+
   // Describe Mode States
   const [generatedPrompts, setGeneratedPrompts] = useState<PromptAnalysisResponse | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -164,10 +165,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Enhance Mode States
   const [selectedEnhanceMode, setSelectedEnhanceMode] = useState<EnhanceMode>('balanced');
   const [enhancedImageUrl, setEnhancedImageUrl] = useState<string | null>(null);
-  
+
   // Language
   const [language, setLanguage] = useState<Language>('tr');
-  
+
   useEffect(() => {
     const savedLang = localStorage.getItem('fasheone_language') as Language;
     if (savedLang) setLanguage(savedLang);
@@ -210,7 +211,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Save generation to history
   const saveToHistory = async (outputUrl: string, type: 'fotomatik_transform' | 'fotomatik_describe', settings: Record<string, any>) => {
     if (!profile) return;
-    
+
     const uploadedUrl = await uploadBase64ToStorage(outputUrl, profile.id, 'output');
     await saveGeneration(
       profile.id,
@@ -221,6 +222,13 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       null,
       settings
     );
+
+    // Track analytics
+    trackEvent(ANALYTICS_EVENTS.GENERATE_FOTOMATIK, {
+      type,
+      mode,
+      userId: profile.id
+    });
   };
 
   // Transform Mode - Generate Image
@@ -243,10 +251,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
         prompt,
         { aspectRatio, imageSize }
       );
-      
+
       setGeneratedImageUrl(result);
       setStatus(FotomatikAppStatus.SUCCESS);
-      
+
       await saveToHistory(result, 'fotomatik_transform', { prompt, aspectRatio, imageSize });
     } catch (error: any) {
       console.error('Transform Error:', error);
@@ -272,7 +280,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       const result = await fotomatikGenerateImagePrompt(selectedImage.base64, selectedImage.mimeType);
       setGeneratedPrompts(result);
       setStatus(FotomatikAppStatus.SUCCESS);
-      
+
       // Save with a placeholder since no image output
       if (profile) {
         await saveGeneration(
@@ -282,14 +290,21 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
           null,
           null,
           null,
-          { 
-            promptTr: result.tr, 
+          {
+            promptTr: result.tr,
             promptEn: result.en,
             midjourney: result.midjourney,
             stableDiffusion: result.stableDiffusion,
             tips: result.tips
           }
         );
+
+        // Track analytics
+        trackEvent(ANALYTICS_EVENTS.GENERATE_FOTOMATIK, {
+          type: 'fotomatik_describe',
+          mode: 'describe',
+          userId: profile.id
+        });
       }
     } catch (error: any) {
       console.error('Describe Error:', error);
@@ -343,7 +358,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       const brightnessVal = suggestions.brightness / 100;
       const contrastVal = suggestions.contrast / 100;
       const saturateVal = suggestions.saturation / 100;
-      
+
       ctx.filter = `brightness(${brightnessVal}) contrast(${contrastVal}) saturate(${saturateVal})`;
       ctx.drawImage(img, 0, 0);
 
@@ -351,10 +366,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       setEnhancedImageUrl(resultUrl);
       setStatus(FotomatikAppStatus.SUCCESS);
 
-      await saveToHistory(resultUrl, 'fotomatik_transform', { 
-        mode: 'enhance', 
+      await saveToHistory(resultUrl, 'fotomatik_transform', {
+        mode: 'enhance',
         enhanceMode: selectedEnhanceMode,
-        suggestions 
+        suggestions
       });
     } catch (error: any) {
       console.error('Enhance Error:', error);
@@ -403,31 +418,28 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
         <div className="flex justify-center gap-2 md:gap-4 mb-8 flex-wrap">
           <button
             onClick={() => { setMode('describe'); handleReset(); }}
-            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
-              mode === 'describe'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
-            }`}
+            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${mode === 'describe'
+              ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+              : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+              }`}
           >
             📝 Prompt Üret
           </button>
           <button
             onClick={() => { setMode('transform'); handleReset(); }}
-            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
-              mode === 'transform'
-                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
-                : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
-            }`}
+            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${mode === 'transform'
+              ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/30'
+              : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+              }`}
           >
             {t.modes.transform}
           </button>
           <button
             onClick={() => { setMode('enhance'); handleReset(); }}
-            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${
-              mode === 'enhance'
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
-                : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
-            }`}
+            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${mode === 'enhance'
+              ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
+              : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+              }`}
           >
             {t.modes.enhance}
           </button>
@@ -462,12 +474,12 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
             {/* Left Column - Input */}
             <div className="space-y-6">
-              <UploadArea 
+              <UploadArea
                 selectedImage={selectedImage}
                 onImageSelected={setSelectedImage}
                 onEditStart={() => setIsEditorOpen(true)}
               />
-              
+
               {selectedImage && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
                   {/* Prompt Input */}
@@ -494,11 +506,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                         <button
                           key={ratio.value}
                           onClick={() => setAspectRatio(ratio.value)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                            aspectRatio === ratio.value
-                              ? 'bg-cyan-600 text-white'
-                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                          }`}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${aspectRatio === ratio.value
+                            ? 'bg-cyan-600 text-white'
+                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            }`}
                         >
                           {ratio.label}
                         </button>
@@ -516,11 +527,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                         <button
                           key={size}
                           onClick={() => setImageSize(size)}
-                          className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${
-                            imageSize === size
-                              ? 'bg-cyan-600 text-white'
-                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                          }`}
+                          className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${imageSize === size
+                            ? 'bg-cyan-600 text-white'
+                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            }`}
                         >
                           {size}
                         </button>
@@ -550,7 +560,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
         {/* Describe Mode */}
         {mode === 'describe' && (
           <div className="max-w-4xl mx-auto space-y-6">
-            <UploadArea 
+            <UploadArea
               selectedImage={selectedImage}
               onImageSelected={setSelectedImage}
               onEditStart={() => setIsEditorOpen(true)}
@@ -576,11 +586,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                           <span className="font-semibold text-slate-200">🇹🇷 {t.prompts.turkish}</span>
                           <button
                             onClick={() => handleCopyPrompt('tr', generatedPrompts.tr)}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                              copiedKey === 'tr'
-                                ? 'bg-green-600 text-white'
-                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                            }`}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'tr'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                              }`}
                           >
                             {copiedKey === 'tr' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
                           </button>
@@ -594,11 +603,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                           <span className="font-semibold text-slate-200">🇬🇧 English</span>
                           <button
                             onClick={() => handleCopyPrompt('en', generatedPrompts.en)}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                              copiedKey === 'en'
-                                ? 'bg-green-600 text-white'
-                                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                            }`}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'en'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                              }`}
                           >
                             {copiedKey === 'en' ? '✓ Copied' : 'Copy'}
                           </button>
@@ -613,11 +621,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                         <span className="font-semibold text-purple-300">🎨 {t.prompts.midjourney}</span>
                         <button
                           onClick={() => handleCopyPrompt('midjourney', generatedPrompts.midjourney)}
-                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                            copiedKey === 'midjourney'
-                              ? 'bg-green-600 text-white'
-                              : 'bg-purple-700 text-purple-200 hover:bg-purple-600'
-                          }`}
+                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'midjourney'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-purple-700 text-purple-200 hover:bg-purple-600'
+                            }`}
                         >
                           {copiedKey === 'midjourney' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
                         </button>
@@ -636,11 +643,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                             <span className="text-xs font-semibold text-cyan-400">Positive Prompt:</span>
                             <button
                               onClick={() => handleCopyPrompt('sd-positive', generatedPrompts.stableDiffusion.positive)}
-                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
-                                copiedKey === 'sd-positive'
-                                  ? 'bg-green-600 text-white'
-                                  : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
-                              }`}
+                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${copiedKey === 'sd-positive'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
+                                }`}
                             >
                               {copiedKey === 'sd-positive' ? '✓' : 'Copy'}
                             </button>
@@ -652,11 +658,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                             <span className="text-xs font-semibold text-cyan-400">Negative Prompt:</span>
                             <button
                               onClick={() => handleCopyPrompt('sd-negative', generatedPrompts.stableDiffusion.negative)}
-                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${
-                                copiedKey === 'sd-negative'
-                                  ? 'bg-green-600 text-white'
-                                  : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
-                              }`}
+                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${copiedKey === 'sd-negative'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
+                                }`}
                             >
                               {copiedKey === 'sd-negative' ? '✓' : 'Copy'}
                             </button>
@@ -696,12 +701,12 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
             {/* Left Column - Input */}
             <div className="space-y-6">
-              <UploadArea 
+              <UploadArea
                 selectedImage={selectedImage}
                 onImageSelected={setSelectedImage}
                 onEditStart={() => setIsEditorOpen(true)}
               />
-              
+
               {selectedImage && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                   {/* Enhance Mode Selection */}
@@ -714,16 +719,14 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                         <button
                           key={modeOption.id}
                           onClick={() => setSelectedEnhanceMode(modeOption.id)}
-                          className={`p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 ${
-                            selectedEnhanceMode === modeOption.id 
-                              ? 'bg-emerald-600/20 border-emerald-500/50 shadow-lg shadow-emerald-500/20' 
-                              : 'bg-slate-900/40 border-slate-700 hover:border-slate-600'
-                          }`}
+                          className={`p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 ${selectedEnhanceMode === modeOption.id
+                            ? 'bg-emerald-600/20 border-emerald-500/50 shadow-lg shadow-emerald-500/20'
+                            : 'bg-slate-900/40 border-slate-700 hover:border-slate-600'
+                            }`}
                         >
                           <span className="text-2xl">{modeOption.icon}</span>
-                          <div className={`text-xs font-black uppercase tracking-widest ${
-                            selectedEnhanceMode === modeOption.id ? modeOption.color : 'text-slate-400'
-                          }`}>
+                          <div className={`text-xs font-black uppercase tracking-widest ${selectedEnhanceMode === modeOption.id ? modeOption.color : 'text-slate-400'
+                            }`}>
                             {modeOption.label}
                           </div>
                           <p className="text-[10px] text-slate-500">{modeOption.desc}</p>
@@ -753,9 +756,9 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 </div>
               ) : enhancedImageUrl ? (
                 <div className="w-full space-y-4">
-                  <img 
-                    src={enhancedImageUrl} 
-                    alt={language === 'tr' ? 'İyileştirilmiş' : 'Enhanced'} 
+                  <img
+                    src={enhancedImageUrl}
+                    alt={language === 'tr' ? 'İyileştirilmiş' : 'Enhanced'}
                     className="w-full h-auto rounded-xl shadow-2xl"
                   />
                   <a

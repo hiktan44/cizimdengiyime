@@ -3,6 +3,7 @@ import { supabase, CREDIT_PACKAGES } from '../lib/supabase';
 import { getSiteSettings } from '../lib/adminService';
 import { getStripe, createPaymentIntent } from '../lib/stripeService';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 
 interface BuyCreditsModalProps {
   isOpen: boolean;
@@ -72,13 +73,20 @@ const CheckoutForm: React.FC<{
       if (error.type === "card_error" || error.type === "validation_error") {
         setMessage(error.message || "Bir hata oluştu");
         onError(error.message || "Ödeme hatası");
+        trackEvent(ANALYTICS_EVENTS.PURCHASE_FAILURE, { error: error.message, type: error.type });
       } else {
         setMessage("Beklenmedik bir hata oluştu.");
         onError("Beklenmedik hata");
+        trackEvent(ANALYTICS_EVENTS.PURCHASE_FAILURE, { error: "Beklenmedik hata" });
       }
     } else {
       // Success!
       setMessage("Ödeme Başarılı!");
+      trackEvent(ANALYTICS_EVENTS.PURCHASE_SUCCESS, {
+        amount: amountEUR,
+        credits: credits,
+        currency: 'EUR'
+      });
       // Explicitly wait a moment for webhook to process (optional) or just show success
       // In a real app we might poll for status, but here we assume webhook works fast.
       setTimeout(() => {
@@ -202,9 +210,17 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
         rate: response.rate
       });
 
+      trackEvent(ANALYTICS_EVENTS.BEGIN_CHECKOUT, {
+        package: selectedPackage,
+        price: pkg.price,
+        credits: pkg.credits,
+        userId
+      });
+
     } catch (err: any) {
       console.error("Payment init error:", err);
       setError(err.message || "Ödeme başlatılamadı.");
+      trackEvent(ANALYTICS_EVENTS.PURCHASE_FAILURE, { error: err.message || "Init failed", userId });
     } finally {
       setLoading(false);
     }

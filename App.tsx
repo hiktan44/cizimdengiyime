@@ -51,6 +51,7 @@ import { PixshopPage } from './pages/PixshopPage';
 import { FotomatikPage } from './pages/FotomatikPage';
 import { AdgeniusPage } from './pages/AdgeniusPage';
 import { WhatsAppPanel } from './components/WhatsAppPanel';
+import { trackEvent, ANALYTICS_EVENTS } from './utils/analytics';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -250,6 +251,12 @@ const ToolPage: React.FC<{
 
                 // Refresh profile to update credits
                 onRefreshProfile();
+
+                // Track analytics
+                trackEvent(ANALYTICS_EVENTS.GENERATE_PRODUCT, {
+                    color: productColor,
+                    userId: profile.id
+                });
             } catch (error) {
                 alert(`Ürün oluşturma hatası: ${error}`);
             } finally {
@@ -540,6 +547,16 @@ const ToolPage: React.FC<{
 
                 // Refresh profile to update credits
                 onRefreshProfile();
+
+                // Track analytics
+                trackEvent(ANALYTICS_EVENTS.GENERATE_MODEL, {
+                    clothingType,
+                    modelEthnicity,
+                    artisticStyle,
+                    location,
+                    isKombinMode,
+                    userId: profile.id
+                });
             } catch (error) {
                 console.error('Görsel oluşturma hatası:', error);
                 alert(`Görsel oluşturulurken bir hata oluştu: ${error instanceof Error ? error.message : String(error)}`);
@@ -586,6 +603,12 @@ const ToolPage: React.FC<{
 
                 // Refresh profile to update credits
                 onRefreshProfile();
+
+                // Track analytics
+                trackEvent(ANALYTICS_EVENTS.GENERATE_TECH_PACK, {
+                    style: techSketchStyle,
+                    userId: profile.id
+                });
             } catch (error) {
                 console.error('Teknik çizim hatası:', error);
                 alert(`Hata: ${error instanceof Error ? error.message : String(error)}`);
@@ -643,6 +666,13 @@ const ToolPage: React.FC<{
 
                 // Refresh profile to update credits
                 onRefreshProfile();
+
+                // Track analytics
+                trackEvent(ANALYTICS_EVENTS.GENERATE_VIDEO, {
+                    quality: settings.quality,
+                    motion: settings.motion,
+                    userId: profile.id
+                });
             } catch (error) {
                 console.error('Video oluşturma hatası:', error);
                 alert(`Video oluşturulurken hata: ${error instanceof Error ? error.message : String(error)}`);
@@ -667,6 +697,12 @@ const ToolPage: React.FC<{
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
+
+                // Track analytics
+                trackEvent(ANALYTICS_EVENTS.DOWNLOAD_CONTENT, {
+                    filename,
+                    userId: profile.id
+                });
             } catch (error) {
                 console.error("Blob download failed, falling back to direct link", error);
                 // Fallback for simple links if fetch fails (e.g. CORS on external demo assets)
@@ -689,6 +725,11 @@ const ToolPage: React.FC<{
                         title: 'Çizimden Gerçeğe AI',
                         text: 'Yapay zeka ile oluşturduğum tasarıma göz at!',
                         files: [file],
+                    });
+
+                    // Track analytics
+                    trackEvent(ANALYTICS_EVENTS.SHARE_CONTENT, {
+                        userId: profile.id
                     });
                 } catch (error) {
                     console.log('Paylaşım iptal edildi veya hata oluştu', error);
@@ -1940,6 +1981,16 @@ const App: React.FC = () => {
 
     // Debug logging
     React.useEffect(() => {
+        if (user) {
+            // Check if this is a first-time login (sign up)
+            const lastLogin = localStorage.getItem('fasheone_last_login');
+            if (!lastLogin) {
+                trackEvent('sign_up', { method: 'auto', userId: user.id });
+                localStorage.setItem('fasheone_last_login', new Date().toISOString());
+            } else {
+                trackEvent('login', { userId: user.id });
+            }
+        }
         console.log('Auth State:', {
             user: !!user,
             profile: !!profile,

@@ -11,6 +11,7 @@ import { ProductAnalysis, AdPrompt, GenerationResult, FormData, AppStep, AdStyle
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
 import { WhatsAppPanel } from '../components/WhatsAppPanel';
+import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 import { Sparkles, Upload, BrainCircuit, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
 
 interface AdgeniusPageProps {
@@ -269,6 +270,15 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
       uploadedVideoUrl,
       settings
     );
+
+    // Track analytics
+    trackEvent(ANALYTICS_EVENTS.GENERATE_AD, {
+      operationType,
+      hasVideo: !!outputVideoUrl,
+      mode: formData.mode,
+      style: formData.adStyle,
+      userId: profile.id
+    });
   };
 
   const processItem = useCallback(async (
