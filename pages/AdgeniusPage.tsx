@@ -205,6 +205,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     pattern: string | null,
     patternMime: string | null
   } | null>(null);
+  const [batchSeed, setBatchSeed] = useState<number>(Math.floor(Math.random() * 1000000));
 
   // Calculate totals
   useEffect(() => {
@@ -332,7 +333,8 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
         currentFormData.imageModel,
         imgAspectRatio,
         pattImgB64,
-        pattImgMime
+        pattImgMime,
+        batchSeed
       );
 
       updateResult(item.id, {
@@ -554,6 +556,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     setTotalImagesGenerated(0);
     setTotalVideosGenerated(0);
     setTotalCreditsUsed(0);
+    setBatchSeed(Math.floor(Math.random() * 1000000));
   };
 
   // Credit info display

@@ -520,24 +520,42 @@ export const generateImage = async (
     - Her iki kıyafetin de orijinal tasarım detayları KORUNMALIDIR
     ` : '';
 
+    // Enhanced detailed descriptions to force consistency across multiple calls
+    const gen = gender || 'Female';
+    const age = ageRange || 'Adult';
+    const eth = ethnicity && ethnicity !== 'Genel Dünya Karması' ? ethnicity : 'diverse international model';
+
+    const isMale = gen === 'Male';
+
+    const consistentModelDesc = isMale
+        ? `A handsome 26-year-old male fashion model, 185cm tall, athletic build, sharp symmetrical jawline, specific short dark hair (cleanly tapered sides), deep brown eyes, and a neutral professional high-fashion expression. He has a very specific and consistent facial structure.`
+        : `A beautiful 24-year-old female fashion model, 175cm tall, slender and elegant build, long dark brown hair styled in a sleek professional low ponytail, almond-shaped hazel eyes, oval face with high cheekbones, and a sophisticated neutral expression. She has a very specific and consistent facial identity.`;
+
     const identityInstruction = modelIdentityFile ? `
-    *** MÜKEMMEL YÜZ EŞLEŞTİRME KURALI (FACE SWAP) ***
-    - Referans olarak verilen "Model Kimlik Görseli"ni analiz et. Bu görseldeki kişinin yüzünü, saçını ve ifadesini KOPYALA.
-    - Ana girdi görselindeki (kıyafet referansı) mankeni YOKSAY.
-    - HEDEF: Ana görseldeki KIYAFETİ al, "Model Kimlik Görseli"ndeki KİŞİYE giydir.
+    *** MÜKEMMEL YÜZ EŞLEŞTİRME VE DEVAMLILIK KURALI (STRICT IDENTITY LOCK) ***
+    - Referans olarak verilen "Model Kimlik Görseli"ni (Image 2) analiz et. Bu görseldeki kişinin yüzünü, saç dokusunu, saç rengini, etnik kökenini ve ifadesini %100 KOPYALA.
+    - KRİTİK: Aşağıdaki metin bazlı parametreler (etnik köken, saç rengi vb.) Image 2 ile çelişirse, KESİNLİKE Image 2'deki görsel veriyi öncelikli al.
+    - Ana girdi görselindeki (Image 1 - kıyafet referansı) mankeni YOKSAY.
+    - HEDEF: Image 1'deki KIYAFETİ al, Image 2'deki KİŞİYE giydir.
     - SONUÇ: Tıpatıp aynı yüz, aynı kimlik, yeni kıyafet.
+    - Devamlılık: Bu kişinin yüz hatları ve vücut oranları hiçbir şekilde değişmemelidir.
     ` : `
-    *** MUTLAK YASAK: REFERANS YÜZ KULLANIMI (FORBIDDEN FACE PROTOCOL) ***
+    *** MUTLAK YASAK VE TUTARLI KİMLİK PROTOKOLÜ (FORBIDDEN FACE & CONSISTENCY) ***
     1. Girdi görselindeki yüz, ASLA ve ASLA çıktıya taşınmamalıdır.
-    2. Girdi görseli bir "Başsız Manken" (Headless Mannequin) olarak kabul et. Üzerindeki kafayı ve yüzü "GEÇERSİZ VERİ" olarak işaretle ve SİL.
+    2. Girdi görselini bir "Başsız Manken" (Headless Mannequin) olarak kabul et. Üzerindeki kafayı "GEÇERSİZ VERİ" olarak işaretle ve SİL.
     3. HEDEF: Aşağıda tanımlanan "Hedef Model Kimliği"ne göre SIFIRDAN bir kafa ve yüz oluştur.
-    4. KİMLİK SIFIRLAMA: Eğer Seed tanımlanmışsa, bu Seed'i REFERANS GÖRSELDEN BAĞIMSIZ olarak, sadece YENİ YÜZÜ oluşturmak için kullan.
+    4. KİMLİK SABİTLEME: Seed('${seed || 'random'}') değerini kullanarak her seferinde AYNI YÜZÜ üret.
     
+    CHARACTER & CLOTHING CONTINUITY (ABSOLUTE RULES):
+    - CHARACTER CONSISTENCY: Render the EXACT SAME PERSON in every generation. Facial features, hair texture, and body proportions must be 100% identical.
+    - CLOTHING FIDELITY: The clothing piece from Image 1 must be the EXACT SAME garment. Do not change neckline, seams, buttons, or structural details.
+    - NO DRIFT: Do not allow the model's face or the garment's design to drift or vary between different poses or locations.
+
     ALGORİTMA:
-    Adım 1: Referans görseldeki kıyafeti (ve varsa deseni) analiz et.
-    Adım 2: Referans görseldeki "İnsan/Manken" katmanını tamamen çöpe at.
-    Adım 3: Seed ve Prompt özelliklerine göre (Etnik köken, yaş, saç) YENİ BİR İNSAN yarat.
-    Adım 4: Analiz ettiğin kıyafeti bu YENİ İNSANA giydir.
+    Adım 1: Referans görseldeki kıyafeti analiz et.
+    Adım 2: Referans görseldeki "İnsan/Manken" katmanını tamamen yoksay.
+    Adım 3: Seed ve Model Kimliği (Reference: ${consistentModelDesc}) özelliklerine göre sabit bir insan yarat.
+    Adım 4: Analiz ettiğin kıyafeti bu sabit insana giydir.
     `;
 
     let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.

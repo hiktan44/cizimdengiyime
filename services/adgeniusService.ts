@@ -168,34 +168,40 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
   // CONSISTENCY LOGIC:
   const isMale = analysis.hedef_kitle.toLowerCase().includes('erkek') || analysis.hedef_kitle.toLowerCase().includes('men') || analysis.urun_kategorisi.toLowerCase().includes('erkek');
 
+  // Enhanced detailed descriptions to force consistency across multiple calls
   const consistentModelDesc = isMale
-    ? "A handsome male fashion model, fit build, short dark hair, sharp jawline, neutral professional expression."
-    : "A beautiful female fashion model, slender build, long brown hair tied back, natural makeup, elegant neutral expression.";
+    ? "A handsome 26-year-old male fashion model, 185cm tall, athletic build, sharp symmetrical jawline, specific short dark brown hair (cleanly tapered sides), deep brown eyes, and a neutral professional high-fashion expression. He has a very specific and consistent facial structure."
+    : "A beautiful 24-year-old female fashion model, 175cm tall, slender and elegant build, long dark brown hair styled in a sleek professional low ponytail, almond-shaped hazel eyes, oval face with high cheekbones, and a sophisticated neutral expression. She has a very specific and consistent facial identity.";
 
-  // Base instruction allows human models, emphasizing SAFETY and PROFESSIONALISM
+  // Base instruction allows human models, emphasizing SAFETY, PROFESSIONALISM and STRICT CONTINUITY
   const baseInstruction = `
-  CONTEXT: Professional Commercial Fashion Photography.
-  PURPOSE: High-End Retail Catalog.
+  CONTEXT: Professional Commercial Fashion Photography Series.
+  PURPOSE: High-End Brand Catalog (Multi-Shot Consistency is Mandatory).
   SUBJECT: ${analysis.urun_adi}.
   
   SYSTEM GUIDELINES: 
   - Generate a safe-for-work, professional retail image.
   - USE A REALISTIC HUMAN MODEL (Fashion Model).
   - NO sexually suggestive content, poses, or expressions.
-  - Modest, elegant, and professional posing suitable for general audiences.
+  - Modest, elegant, and professional posing suitable for global commercial standards.
+
+  CHARACTER & CLOTHING CONTINUITY (ABSOLUTE RULES):
+  1. CHARACTER CONSISTENCY: You MUST render the EXACT SAME PERSON in every frame. Facial features, hair texture/style, and body proportions must be 100% identical as if shot in the same session.
+  2. CLOTHING FIDELITY: The clothing piece (${analysis.urun_adi}) must be the EXACT SAME garment from the reference image. Do not change seams, buttons, drapery patterns, or structural details.
+  3. NO DRIFT: Do not allow the model's face or the garment's design to drift or vary between different poses.
+
+  TASK: ${brandInstruction} Visualize the product from reference image worn by the specific model described below.
   
-  TASK: ${brandInstruction} Visualize product from reference image worn by a model.
+  PRODUCT PRESERVATION RULES (ABSOLUTE):
+  1. CRITICAL: The product design, cut, and silhouette MUST BE 100% IDENTICAL to the reference image. No exceptions.
+  2. ZERO ALTERATION: Do not change neckline, sleeve length, pocket placement, stitch lines, or hem of the product. It must be the exact same physical unit.
+  3. COLOR/TEXTURE FIDELITY: The product color/texture MUST match the reference (or the specific transformation requested below) exactly.
+  4. MATERIAL: Emphasize the ${analysis.malzeme} texture with extreme high-fidelity detail.
   
-  PRODUCT PRESERVATION RULES (STRICT):
-  1. CRITICAL: The product design, cut, and silhouette MUST BE IDENTICAL to the reference image.
-  2. DO NOT CHANGE neckline, sleeve length, or hem of product.
-  3. COLOR/TEXTURE FIDELITY: The product color/texture MUST match the reference (or the specific transformation requested below).
-  4. MATERIAL: Emphasize ${analysis.malzeme} texture.
+  MODEL IDENTIFICATION:
+  - Reference Model: **${consistentModelDesc}**
   
-  MODEL CONSISTENCY:
-  - You MUST use this specific model description for consistency: **${consistentModelDesc}**
-  
-  STYLE: ${selectedStyle}. 8k resolution, highly detailed, sharp focus, professional lighting.
+  TECHNICAL QUALITY: ${selectedStyle}. 8k resolution, hyper-realistic, sharp focus, professional three-point lighting, clean textures.
   
   ${textRenderingInstruction}
   
@@ -404,7 +410,8 @@ export const generateAdImage = async (
   model: ImageModel = 'gemini-3-pro-image-preview',
   aspectRatio: string = '16:9',
   patternImageB64?: string | null,
-  patternImageMimeType?: string | null
+  patternImageMimeType?: string | null,
+  seed?: number
 ): Promise<string> => {
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
@@ -491,6 +498,7 @@ export const generateAdImage = async (
         safetySettings: PERMISSIVE_SAFETY_SETTINGS,
         imageConfig: {
           aspectRatio: aspectRatio,
+          seed: seed,
           ...(model === 'gemini-3-pro-image-preview' ? { imageSize: "2K" } : {})
         }
       }
