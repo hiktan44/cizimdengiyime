@@ -480,74 +480,72 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 onEditStart={() => setIsEditorOpen(true)}
               />
 
-              {selectedImage && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                  {/* Prompt Input */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Dönüşüm İstemi
-                    </label>
-                    <textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="Ör: Bu fotoğraftaki kişiyi bir astronot yap, uzay arka planı ekle..."
-                      rows={4}
-                      className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition resize-none"
-                    />
-                  </div>
-
-                  {/* Aspect Ratio */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      En Boy Oranı
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {aspectRatios.map((ratio) => (
-                        <button
-                          key={ratio.value}
-                          onClick={() => setAspectRatio(ratio.value)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${aspectRatio === ratio.value
-                            ? 'bg-cyan-600 text-white'
-                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                            }`}
-                        >
-                          {ratio.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Image Size */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Çözünürlük
-                    </label>
-                    <div className="flex gap-2">
-                      {imageSizes.map((size) => (
-                        <button
-                          key={size}
-                          onClick={() => setImageSize(size)}
-                          className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${imageSize === size
-                            ? 'bg-cyan-600 text-white'
-                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                            }`}
-                        >
-                          {size}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Generate Button */}
-                  <button
-                    onClick={handleTransform}
-                    disabled={status === FotomatikAppStatus.LOADING || !prompt.trim()}
-                    className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-                  >
-                    {status === FotomatikAppStatus.LOADING ? t.messages.generating : `✨ ${t.buttons.generate}`}
-                  </button>
+              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                {/* Prompt Input */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Dönüşüm İstemi
+                  </label>
+                  <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Ör: Bu fotoğraftaki kişiyi bir astronot yap, uzay arka planı ekle..."
+                    rows={4}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition resize-none"
+                  />
                 </div>
-              )}
+
+                {/* Aspect Ratio */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    En Boy Oranı
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {aspectRatios.map((ratio) => (
+                      <button
+                        key={ratio.value}
+                        onClick={() => setAspectRatio(ratio.value)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${aspectRatio === ratio.value
+                          ? 'bg-cyan-600 text-white'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          }`}
+                      >
+                        {ratio.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Image Size */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Çözünürlük
+                  </label>
+                  <div className="flex gap-2">
+                    {imageSizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setImageSize(size)}
+                        className={`px-6 py-2 rounded-lg text-sm font-medium transition-all ${imageSize === size
+                          ? 'bg-cyan-600 text-white'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Generate Button */}
+                <button
+                  onClick={handleTransform}
+                  disabled={status === FotomatikAppStatus.LOADING || !prompt.trim() || !selectedImage}
+                  className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                >
+                  {status === FotomatikAppStatus.LOADING ? t.messages.generating : !selectedImage ? 'Lütfen Görsel Yükleyin' : `✨ ${t.buttons.generate}`}
+                </button>
+              </div>
             </div>
 
             {/* Right Column - Result */}
@@ -566,132 +564,131 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
               onEditStart={() => setIsEditorOpen(true)}
             />
 
-            {selectedImage && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                <button
-                  onClick={handleDescribe}
-                  disabled={status === FotomatikAppStatus.LOADING}
-                  className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-                >
-                  {status === FotomatikAppStatus.LOADING ? t.messages.describing : `📝 ${t.buttons.describe}`}
-                </button>
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+              <button
+                onClick={handleDescribe}
+                disabled={status === FotomatikAppStatus.LOADING || !selectedImage}
+                className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              >
+                {status === FotomatikAppStatus.LOADING ? t.messages.describing : !selectedImage ? 'Lütfen Görsel Yükleyin' : `📝 ${t.buttons.describe}`}
+              </button>
 
-                {/* Generated Prompts */}
-                {generatedPrompts && (
-                  <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {/* Turkish Prompt */}
-                      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="font-semibold text-slate-200">🇹🇷 {t.prompts.turkish}</span>
-                          <button
-                            onClick={() => handleCopyPrompt('tr', generatedPrompts.tr)}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'tr'
-                              ? 'bg-green-600 text-white'
-                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                              }`}
-                          >
-                            {copiedKey === 'tr' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
-                          </button>
-                        </div>
-                        <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.tr}</p>
-                      </div>
-
-                      {/* English Prompt */}
-                      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="font-semibold text-slate-200">🇬🇧 English</span>
-                          <button
-                            onClick={() => handleCopyPrompt('en', generatedPrompts.en)}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'en'
-                              ? 'bg-green-600 text-white'
-                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                              }`}
-                          >
-                            {copiedKey === 'en' ? '✓ Copied' : 'Copy'}
-                          </button>
-                        </div>
-                        <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.en}</p>
-                      </div>
-                    </div>
-
-                    {/* Midjourney Prompt */}
-                    <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4">
+              {/* Generated Prompts */}
+              {generatedPrompts && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* Turkish Prompt */}
+                    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-purple-300">🎨 {t.prompts.midjourney}</span>
+                        <span className="font-semibold text-slate-200">🇹🇷 {t.prompts.turkish}</span>
                         <button
-                          onClick={() => handleCopyPrompt('midjourney', generatedPrompts.midjourney)}
-                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'midjourney'
+                          onClick={() => handleCopyPrompt('tr', generatedPrompts.tr)}
+                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'tr'
                             ? 'bg-green-600 text-white'
-                            : 'bg-purple-700 text-purple-200 hover:bg-purple-600'
+                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                             }`}
                         >
-                          {copiedKey === 'midjourney' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
+                          {copiedKey === 'tr' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
                         </button>
                       </div>
-                      <p className="text-purple-100 text-sm leading-relaxed font-mono">{generatedPrompts.midjourney}</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.tr}</p>
                     </div>
 
-                    {/* Stable Diffusion Prompt */}
-                    <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-xl p-4">
+                    {/* English Prompt */}
+                    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-cyan-300">⚡ Stable Diffusion (SDXL/Flux)</span>
+                        <span className="font-semibold text-slate-200">🇬🇧 English</span>
+                        <button
+                          onClick={() => handleCopyPrompt('en', generatedPrompts.en)}
+                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'en'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                            }`}
+                        >
+                          {copiedKey === 'en' ? '✓ Copied' : 'Copy'}
+                        </button>
                       </div>
-                      <div className="space-y-3">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-semibold text-cyan-400">Positive Prompt:</span>
-                            <button
-                              onClick={() => handleCopyPrompt('sd-positive', generatedPrompts.stableDiffusion.positive)}
-                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${copiedKey === 'sd-positive'
-                                ? 'bg-green-600 text-white'
-                                : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
-                                }`}
-                            >
-                              {copiedKey === 'sd-positive' ? '✓' : 'Copy'}
-                            </button>
-                          </div>
-                          <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.positive}</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.en}</p>
+                    </div>
+                  </div>
+
+                  {/* Midjourney Prompt */}
+                  <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-purple-300">🎨 {t.prompts.midjourney}</span>
+                      <button
+                        onClick={() => handleCopyPrompt('midjourney', generatedPrompts.midjourney)}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'midjourney'
+                          ? 'bg-green-600 text-white'
+                          : 'bg-purple-700 text-purple-200 hover:bg-purple-600'
+                          }`}
+                      >
+                        {copiedKey === 'midjourney' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
+                      </button>
+                    </div>
+                    <p className="text-purple-100 text-sm leading-relaxed font-mono">{generatedPrompts.midjourney}</p>
+                  </div>
+
+                  {/* Stable Diffusion Prompt */}
+                  <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-cyan-300">⚡ Stable Diffusion (SDXL/Flux)</span>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-cyan-400">Positive Prompt:</span>
+                          <button
+                            onClick={() => handleCopyPrompt('sd-positive', generatedPrompts.stableDiffusion.positive)}
+                            className={`px-2 py-1 rounded text-xs font-medium transition-all ${copiedKey === 'sd-positive'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
+                              }`}
+                          >
+                            {copiedKey === 'sd-positive' ? '✓' : 'Copy'}
+                          </button>
                         </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-semibold text-cyan-400">Negative Prompt:</span>
-                            <button
-                              onClick={() => handleCopyPrompt('sd-negative', generatedPrompts.stableDiffusion.negative)}
-                              className={`px-2 py-1 rounded text-xs font-medium transition-all ${copiedKey === 'sd-negative'
-                                ? 'bg-green-600 text-white'
-                                : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
-                                }`}
-                            >
-                              {copiedKey === 'sd-negative' ? '✓' : 'Copy'}
-                            </button>
-                          </div>
-                          <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.negative}</p>
+                        <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.positive}</p>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-cyan-400">Negative Prompt:</span>
+                          <button
+                            onClick={() => handleCopyPrompt('sd-negative', generatedPrompts.stableDiffusion.negative)}
+                            className={`px-2 py-1 rounded text-xs font-medium transition-all ${copiedKey === 'sd-negative'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
+                              }`}
+                          >
+                            {copiedKey === 'sd-negative' ? '✓' : 'Copy'}
+                          </button>
                         </div>
-                        <div>
-                          <span className="text-xs font-semibold text-cyan-400">Önerilen Parametreler:</span>
-                          <p className="text-cyan-100 text-xs mt-1">{generatedPrompts.stableDiffusion.params}</p>
-                        </div>
+                        <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.negative}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs font-semibold text-cyan-400">Önerilen Parametreler:</span>
+                        <p className="text-cyan-100 text-xs mt-1">{generatedPrompts.stableDiffusion.params}</p>
                       </div>
                     </div>
-
-                    {/* Expert Tips */}
-                    {generatedPrompts.tips && generatedPrompts.tips.length > 0 && (
-                      <div className="bg-orange-900/20 border border-orange-500/30 rounded-xl p-4">
-                        <span className="font-semibold text-orange-300 mb-3 block">💡 Uzman İpuçları</span>
-                        <ul className="space-y-2">
-                          {generatedPrompts.tips.map((tip, idx) => (
-                            <li key={idx} className="text-orange-100 text-sm flex items-start gap-2">
-                              <span className="text-orange-400 font-bold">{idx + 1}.</span>
-                              <span>{tip}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                   </div>
-                )}
-              </div>
+
+                  {/* Expert Tips */}
+                  {generatedPrompts.tips && generatedPrompts.tips.length > 0 && (
+                    <div className="bg-orange-900/20 border border-orange-500/30 rounded-xl p-4">
+                      <span className="font-semibold text-orange-300 mb-3 block">💡 Uzman İpuçları</span>
+                      <ul className="space-y-2">
+                        {generatedPrompts.tips.map((tip, idx) => (
+                          <li key={idx} className="text-orange-100 text-sm flex items-start gap-2">
+                            <span className="text-orange-400 font-bold">{idx + 1}.</span>
+                            <span>{tip}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             )}
           </div>
         )}
@@ -707,44 +704,42 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 onEditStart={() => setIsEditorOpen(true)}
               />
 
-              {selectedImage && (
-                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                  {/* Enhance Mode Selection */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-3">
-                      {t.labels.enhanceMode}
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {ENHANCE_MODES.map((modeOption) => (
-                        <button
-                          key={modeOption.id}
-                          onClick={() => setSelectedEnhanceMode(modeOption.id)}
-                          className={`p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 ${selectedEnhanceMode === modeOption.id
-                            ? 'bg-emerald-600/20 border-emerald-500/50 shadow-lg shadow-emerald-500/20'
-                            : 'bg-slate-900/40 border-slate-700 hover:border-slate-600'
-                            }`}
-                        >
-                          <span className="text-2xl">{modeOption.icon}</span>
-                          <div className={`text-xs font-black uppercase tracking-widest ${selectedEnhanceMode === modeOption.id ? modeOption.color : 'text-slate-400'
-                            }`}>
-                            {modeOption.label}
-                          </div>
-                          <p className="text-[10px] text-slate-500">{modeOption.desc}</p>
-                        </button>
-                      ))}
-                    </div>
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                {/* Enhance Mode Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-3">
+                    {t.labels.enhanceMode}
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {ENHANCE_MODES.map((modeOption) => (
+                      <button
+                        key={modeOption.id}
+                        onClick={() => setSelectedEnhanceMode(modeOption.id)}
+                        className={`p-4 rounded-2xl border transition-all text-left flex flex-col gap-2 ${selectedEnhanceMode === modeOption.id
+                          ? 'bg-emerald-600/20 border-emerald-500/50 shadow-lg shadow-emerald-500/20'
+                          : 'bg-slate-900/40 border-slate-700 hover:border-slate-600'
+                          }`}
+                      >
+                        <span className="text-2xl">{modeOption.icon}</span>
+                        <div className={`text-xs font-black uppercase tracking-widest ${selectedEnhanceMode === modeOption.id ? modeOption.color : 'text-slate-400'
+                          }`}>
+                          {modeOption.label}
+                        </div>
+                        <p className="text-[10px] text-slate-500">{modeOption.desc}</p>
+                      </button>
+                    ))}
                   </div>
-
-                  {/* Enhance Button */}
-                  <button
-                    onClick={handleEnhance}
-                    disabled={status === FotomatikAppStatus.LOADING}
-                    className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-                  >
-                    {status === FotomatikAppStatus.LOADING ? t.messages.enhancing : `⚡ ${t.buttons.autoEnhance}`}
-                  </button>
                 </div>
-              )}
+
+                {/* Enhance Button */}
+                <button
+                  onClick={handleEnhance}
+                  disabled={status === FotomatikAppStatus.LOADING || !selectedImage}
+                  className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                >
+                  {status === FotomatikAppStatus.LOADING ? t.messages.enhancing : !selectedImage ? 'Lütfen Görsel Yükleyin' : `⚡ ${t.buttons.autoEnhance}`}
+                </button>
+              </div>
             </div>
 
             {/* Right Column - Result */}

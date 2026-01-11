@@ -823,9 +823,9 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       );
     }
 
-    if (!currentImageUrl) {
-      return <StartScreen onFileSelect={handleFileSelect} />;
-    }
+    // if (!currentImageUrl) {
+    //   return <StartScreen onFileSelect={handleFileSelect} />;
+    // }
 
     const cropImageElement = (
       <img
@@ -855,119 +855,127 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
-          {isLoading && (
-            <div className="absolute inset-0 bg-black/70 z-30 flex flex-col items-center justify-center gap-4 animate-fade-in">
-              <Spinner />
-              <p className="text-gray-300">Yapay zeka sihrini konuşturuyor...</p>
-            </div>
-          )}
-
-          {activeTab === 'crop' ? (
-            <div className="w-full h-full flex items-center justify-center p-4">
-              <ReactCrop
-                crop={crop}
-                onChange={c => setCrop(c)}
-                onComplete={c => setCompletedCrop(c)}
-                aspect={aspect}
-                className="max-h-[60vh] max-w-full"
-              >
-                {cropImageElement}
-              </ReactCrop>
+          {!currentImageUrl ? (
+            <div className="w-full h-full min-h-[400px] flex items-center justify-center p-8">
+              <StartScreen onFileSelect={handleFileSelect} />
             </div>
           ) : (
-            <div
-              className={`w-full h-[60vh] ${getCursorClass()} overflow-hidden`}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onWheel={handleWheel}
-            >
-              <div style={{
-                transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-                transformOrigin: 'top left',
-                willChange: 'transform',
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                {/* Split Mode Base Layer */}
-                {isSplitMode && originalImageUrl && (
-                  <img
-                    src={originalImageUrl}
-                    alt="Original Base"
-                    className="absolute max-w-full max-h-full object-contain m-auto"
-                    draggable={false}
-                  />
-                )}
+            <>
+              {isLoading && (
+                <div className="absolute inset-0 bg-black/70 z-30 flex flex-col items-center justify-center gap-4 animate-fade-in">
+                  <Spinner />
+                  <p className="text-gray-300">Yapay zeka sihrini konuşturuyor...</p>
+                </div>
+              )}
 
-                {/* Original Image (for normal view or peek mode) */}
-                {!isSplitMode && originalImageUrl && (
-                  <img
-                    key={originalImageUrl}
-                    src={originalImageUrl}
-                    alt="Orijinal"
-                    className="max-w-full max-h-full object-contain pointer-events-none"
-                  />
-                )}
-                {/* Edited (Current) Image */}
-                <img
-                  ref={imgRef}
-                  key={currentImageUrl}
-                  src={currentImageUrl}
-                  alt="Mevcut"
-                  className={`absolute inset-0 max-w-full max-h-full object-contain m-auto transition-opacity duration-200 ease-in-out ${isComparing && !isSplitMode ? 'opacity-0' : 'opacity-100'}`}
-                  style={isSplitMode ? { clipPath: `inset(0 0 0 ${splitPos}%)` } : undefined}
-                  draggable={false}
-                />
-
-                {displayHotspot && !isLoading && activeTab === 'retouch' && !isSplitMode && (
-                  <div
-                    className="absolute rounded-full w-6 h-6 bg-blue-500/50 border-2 border-white pointer-events-none z-10"
-                    style={{
-                      left: `${displayHotspot.unscaledX}px`,
-                      top: `${displayHotspot.unscaledY}px`,
-                      transform: `translate(-50%, -50%) scale(${1 / scale})`
-                    }}
+              {activeTab === 'crop' ? (
+                <div className="w-full h-full flex items-center justify-center p-4">
+                  <ReactCrop
+                    crop={crop}
+                    onChange={c => setCrop(c)}
+                    onComplete={c => setCompletedCrop(c)}
+                    aspect={aspect}
+                    className="max-h-[60vh] max-w-full"
                   >
-                    <div className="absolute inset-0 rounded-full w-6 h-6 animate-ping bg-blue-400"></div>
-                  </div>
-                )}
+                    {cropImageElement}
+                  </ReactCrop>
+                </div>
+              ) : (
+                <div
+                  className={`w-full h-[60vh] ${getCursorClass()} overflow-hidden`}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onWheel={handleWheel}
+                >
+                  <div style={{
+                    transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+                    transformOrigin: 'top left',
+                    willChange: 'transform',
+                    position: 'relative',
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {/* Split Mode Base Layer */}
+                    {isSplitMode && originalImageUrl && (
+                      <img
+                        src={originalImageUrl}
+                        alt="Original Base"
+                        className="absolute max-w-full max-h-full object-contain m-auto"
+                        draggable={false}
+                      />
+                    )}
 
-                {/* Magnifier */}
-                {isHovering && !isPanning && activeTab !== 'crop' && !isLoading && !isSplitMode && imgRef.current && (
-                  <div
-                    className="absolute z-50 pointer-events-none rounded-full border-4 border-white shadow-2xl overflow-hidden bg-gray-900"
-                    style={{
-                      left: magnifierPos.x,
-                      top: magnifierPos.y,
-                      width: '160px',
-                      height: '160px',
-                      transform: `translate(-50%, -50%) scale(${1 / scale})`,
-                      boxShadow: '0 0 0 2px rgba(0,0,0,0.3), 0 25px 50px -12px rgba(0,0,0,0.5)'
-                    }}
-                  >
-                    <div
-                      className="absolute inset-0 w-full h-full"
-                      style={{
-                        backgroundImage: `url(${isComparing ? (originalImageUrl || currentImageUrl) : currentImageUrl})`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundSize: `${imgRef.current.width * 2.5}px ${imgRef.current.height * 2.5}px`,
-                        backgroundPosition: `${-magnifierPos.x * 2.5 + 80}px ${-magnifierPos.y * 2.5 + 80}px`
-                      }}
+                    {/* Original Image (for normal view or peek mode) */}
+                    {!isSplitMode && originalImageUrl && (
+                      <img
+                        key={originalImageUrl}
+                        src={originalImageUrl}
+                        alt="Orijinal"
+                        className="max-w-full max-h-full object-contain pointer-events-none"
+                      />
+                    )}
+                    {/* Edited (Current) Image */}
+                    <img
+                      ref={imgRef}
+                      key={currentImageUrl}
+                      src={currentImageUrl}
+                      alt="Mevcut"
+                      className={`absolute inset-0 max-w-full max-h-full object-contain m-auto transition-opacity duration-200 ease-in-out ${isComparing && !isSplitMode ? 'opacity-0' : 'opacity-100'}`}
+                      style={isSplitMode ? { clipPath: `inset(0 0 0 ${splitPos}%)` } : undefined}
+                      draggable={false}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-4 h-[1px] bg-white/50"></div>
-                      <div className="h-4 w-[1px] bg-white/50 absolute"></div>
-                    </div>
-                  </div>
-                )}
 
-              </div>
-            </div>
+                    {displayHotspot && !isLoading && activeTab === 'retouch' && !isSplitMode && (
+                      <div
+                        className="absolute rounded-full w-6 h-6 bg-blue-500/50 border-2 border-white pointer-events-none z-10"
+                        style={{
+                          left: `${displayHotspot.unscaledX}px`,
+                          top: `${displayHotspot.unscaledY}px`,
+                          transform: `translate(-50%, -50%) scale(${1 / scale})`
+                        }}
+                      >
+                        <div className="absolute inset-0 rounded-full w-6 h-6 animate-ping bg-blue-400"></div>
+                      </div>
+                    )}
+
+                    {/* Magnifier */}
+                    {isHovering && !isPanning && activeTab !== 'crop' && !isLoading && !isSplitMode && imgRef.current && (
+                      <div
+                        className="absolute z-50 pointer-events-none rounded-full border-4 border-white shadow-2xl overflow-hidden bg-gray-900"
+                        style={{
+                          left: magnifierPos.x,
+                          top: magnifierPos.y,
+                          width: '160px',
+                          height: '160px',
+                          transform: `translate(-50%, -50%) scale(${1 / scale})`,
+                          boxShadow: '0 0 0 2px rgba(0,0,0,0.3), 0 25px 50px -12px rgba(0,0,0,0.5)'
+                        }}
+                      >
+                        <div
+                          className="absolute inset-0 w-full h-full"
+                          style={{
+                            backgroundImage: `url(${isComparing ? (originalImageUrl || currentImageUrl) : currentImageUrl})`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundSize: `${imgRef.current.width * 2.5}px ${imgRef.current.height * 2.5}px`,
+                            backgroundPosition: `${-magnifierPos.x * 2.5 + 80}px ${-magnifierPos.y * 2.5 + 80}px`
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-4 h-[1px] bg-white/50"></div>
+                          <div className="h-4 w-[1px] bg-white/50 absolute"></div>
+                        </div>
+                      </div>
+                    )}
+
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -1090,18 +1098,20 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-          <button onClick={handleUndo} disabled={!canUndo} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-white/5">
+          <button onClick={handleUndo} disabled={!canUndo || !currentImage} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-white/5">
             <UndoIcon className="w-5 h-5 mr-2" />
             Geri Al
           </button>
-          <button onClick={handleRedo} disabled={!canRedo} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-white/5">
+          <button onClick={handleRedo} disabled={!canRedo || !currentImage} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-white/5">
             <RedoIcon className="w-5 h-5 mr-2" />
             İleri Al
           </button>
 
-          <div className="h-6 w-px bg-gray-600 mx-1 hidden sm:block"></div>
+          {currentImage && (
+            <div className="h-6 w-px bg-gray-600 mx-1 hidden sm:block"></div>
+          )}
 
-          {canUndo && (
+          {canUndo && currentImage && (
             <>
               <button
                 onMouseDown={() => { setIsSplitMode(false); setIsComparing(true); }}
@@ -1124,17 +1134,19 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
             </>
           )}
 
-          <div className="h-6 w-px bg-gray-600 mx-1 hidden sm:block"></div>
+          {currentImage && (
+            <div className="h-6 w-px bg-gray-600 mx-1 hidden sm:block"></div>
+          )}
 
           <div className="flex items-center bg-white/10 border border-white/20 rounded-md">
-            <button onClick={() => handleZoom(-0.2)} disabled={scale <= 0.5} className="p-3 text-gray-200 hover:bg-white/20 rounded-l-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"><ZoomOutIcon className="w-5 h-5" /></button>
+            <button onClick={() => handleZoom(-0.2)} disabled={scale <= 0.5 || !currentImage} className="p-3 text-gray-200 hover:bg-white/20 rounded-l-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"><ZoomOutIcon className="w-5 h-5" /></button>
             <span className="w-16 text-center text-base font-semibold text-gray-300">{Math.round(scale * 100)}%</span>
-            <button onClick={() => handleZoom(0.2)} disabled={scale >= 5} className="p-3 text-gray-200 hover:bg-white/20 rounded-r-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"><ZoomInIcon className="w-5 h-5" /></button>
+            <button onClick={() => handleZoom(0.2)} disabled={scale >= 5 || !currentImage} className="p-3 text-gray-200 hover:bg-white/20 rounded-r-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"><ZoomInIcon className="w-5 h-5" /></button>
           </div>
-          <button onClick={handleResetView} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base"><ArrowsPointingOutIcon className="w-5 h-5 mr-2" /> Görünümü Sıfırla</button>
+          <button onClick={handleResetView} disabled={!currentImage} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed"><ArrowsPointingOutIcon className="w-5 h-5 mr-2" /> Görünümü Sıfırla</button>
 
 
-          <button onClick={handleReset} disabled={!canUndo} className="text-center bg-transparent border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/10 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-transparent">
+          <button onClick={handleReset} disabled={!canUndo || !currentImage} className="text-center bg-transparent border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/10 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-transparent">
             Sıfırla
           </button>
           <button onClick={handleUploadNew} className="text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base">
@@ -1142,11 +1154,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
           </button>
 
           <div className="flex-grow sm:flex-grow-0 ml-auto flex gap-2">
-            <button onClick={handleDownloadTransparentSvg} disabled={isLoading} className="bg-transparent border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-300 ease-in-out hover:bg-white/10 hover:border-white/30 active:scale-95 text-base flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={handleDownloadTransparentSvg} disabled={isLoading || !currentImage} className="bg-transparent border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-300 ease-in-out hover:bg-white/10 hover:border-white/30 active:scale-95 text-base flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
               <DownloadIcon className="w-5 h-5 mr-2" />
               SVG (Şeffaf)
             </button>
-            <button onClick={handleDownload} className="bg-gradient-to-br from-green-600 to-green-500 text-white font-bold py-3 px-5 rounded-md transition-all duration-300 ease-in-out shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/40 hover:-translate-y-px active:scale-95 active:shadow-inner text-base flex items-center">
+            <button onClick={handleDownload} disabled={!currentImage} className="bg-gradient-to-br from-green-600 to-green-500 text-white font-bold py-3 px-5 rounded-md transition-all duration-300 ease-in-out shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/40 hover:-translate-y-px active:scale-95 active:shadow-inner text-base flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
               Resmi İndir
             </button>
           </div>
