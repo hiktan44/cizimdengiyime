@@ -689,7 +689,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 </div>
               )}
             </div>
-            )}
+
           </div>
         )}
 
