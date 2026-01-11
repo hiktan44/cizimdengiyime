@@ -611,11 +611,15 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
   const handleGetStarted = () => {
     trackEvent('cta_click', { p_label: 'Get Started', source: 'landing_page' });
+    const menu = document.getElementById('mobile-menu');
+    menu?.classList.add('hidden');
     onGetStarted();
   };
 
   const handleSignIn = () => {
     trackEvent('cta_click', { p_label: 'Sign In', source: 'landing_page' });
+    const menu = document.getElementById('mobile-menu');
+    menu?.classList.add('hidden');
     onSignIn();
   };
 
