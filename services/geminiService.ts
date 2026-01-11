@@ -633,9 +633,7 @@ export const generateImage = async (
     }
 
     // Explicit Identity Instruction Block
-    const gen = gender || 'Female';
-    const age = ageRange || 'Adult';
-    const eth = ethnicity && ethnicity !== 'Genel Dünya Karması' ? ethnicity : 'diverse/international model look';
+    // Explicit Identity Instruction Block (Variables already defined above)
 
     prompt += `
     *** MODEL KİMLİĞİ TALİMATI ***
