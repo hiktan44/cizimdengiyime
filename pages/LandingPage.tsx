@@ -114,6 +114,25 @@ const translations = {
         { title: '✅ Kişiselleştirilmiş Prodüksiyon', desc: '"Özel İstekler" bölümü sayesinde yapay zekaya dilediğiniz sahneyi kurgulatabilirsiniz.' }
       ]
     },
+    collage: {
+      title: '🎨 Kolaj Stüdyosu: Çoklu Görsel Kompozisyon Aracı',
+      description: 'Birden fazla görseli saniyeler içinde profesyonel kolajlara dönüştürün. AI destekli kompozisyon motoru, görsellerinizi otomatik olarak analiz eder ve mükemmel düzenleme önerileri sunar.',
+      featuresTitle: '💎 Temel Özellikler',
+      features: [
+        { title: '1. Akıllı Görsel Düzenleme', items: ['Otomatik Hizalama: 2-6 arası görseli yatay veya dikey olarak otomatik düzenler.', 'Arka Plan Uyumu: Tüm görseller için tutarlı arka plan ve renk paleti oluşturur.', 'Boyut Optimizasyonu: Görselleri orantılı şekilde yeniden boyutlandırır.'] },
+        { title: '2. Profesyonel Katalog Çıktıları', items: ['E-Ticaret Hazır: Amazon, Trendyol ve diğer platformlar için ideal kolaj formatları.', 'Yüksek Çözünürlük: Baskı kalitesinde çıktılar (300 DPI).', 'Marka Tutarlılığı: Tüm ürünleriniz için tek tip görsel dil.'] },
+        { title: '3. Video Dönüşümü', items: ['Kolajdan Videoya: Oluşturduğunuz kolajları sinematik videolara dönüştürün.', 'Sosyal Medya Formatları: Instagram, TikTok ve YouTube için optimize edilmiş çıktılar.', 'Dinamik Geçişler: Profesyonel geçiş efektleri ile akıcı videolar.'] },
+        { title: '4. Özelleştirilebilir Düzen', items: ['Prompt Desteği: "Beyaz arka plan üzerinde grid düzeni" gibi özel talimatlar verin.', 'Esnek Kompozisyon: Dikey, yatay veya grid düzenler arasında seçim yapın.', 'Marka Öğeleri: Logo ve metin eklemeleri için AI desteği.'] }
+      ],
+      benefitsTitle: '🎯 Kullanım Alanları',
+      benefits: [
+        { title: '✅ E-Ticaret Katalogları', desc: 'Ürün varyasyonlarını tek bir görselde sergileyin. Farklı renk ve model seçeneklerini müşterilerinize etkili şekilde sunun.' },
+        { title: '✅ Sosyal Medya İçeriği', desc: 'Instagram grid postları, Pinterest panoları ve Facebook katalogları için profesyonel kolajlar oluşturun.' },
+        { title: '✅ Lookbook Hazırlama', desc: 'Koleksiyon lansmanları için etkileyici lookbook sayfaları hazırlayın. Tüm parçaları bir arada gösterin.' },
+        { title: '✅ Hızlı Karşılaştırma', desc: 'Önce/Sonra karşılaştırmaları veya farklı stil seçeneklerini yan yana gösterin.' }
+      ],
+      creditInfo: 'Kolaj oluşturma: 2 kredi | Video dönüşümü: +3 kredi'
+    },
     pricing: {
       title: 'Fiyatlandırma',
       subtitle: 'İhtiyacınıza uygun planı seçin. Her ay krediniz otomatik yenilenir.',
@@ -558,6 +577,25 @@ const translations = {
           desc: 'Give specific AI commands like "Model looking right" or "City lights in background" for custom scenes.'
         }
       ]
+    },
+    collage: {
+      title: '🎨 Collage Studio: Multi-Image Composition Tool',
+      description: 'Transform multiple images into professional collages in seconds. AI-powered composition engine automatically analyzes your visuals and provides perfect layout suggestions.',
+      featuresTitle: '💎 Key Features',
+      features: [
+        { title: '1. Smart Image Arrangement', items: ['Auto Alignment: Automatically arranges 2-6 images horizontally or vertically.', 'Background Harmony: Creates consistent background and color palette for all images.', 'Size Optimization: Proportionally resizes images for perfect composition.'] },
+        { title: '2. Professional Catalog Outputs', items: ['E-Commerce Ready: Ideal collage formats for Amazon, eBay, and other platforms.', 'High Resolution: Print-quality outputs (300 DPI).', 'Brand Consistency: Uniform visual language for all your products.'] },
+        { title: '3. Video Conversion', items: ['Collage to Video: Transform your collages into cinematic videos.', 'Social Media Formats: Optimized outputs for Instagram, TikTok, and YouTube.', 'Dynamic Transitions: Smooth videos with professional transition effects.'] },
+        { title: '4. Customizable Layout', items: ['Prompt Support: Give custom instructions like "Grid layout on white background".', 'Flexible Composition: Choose between vertical, horizontal, or grid layouts.', 'Brand Elements: AI support for logo and text additions.'] }
+      ],
+      benefitsTitle: '🎯 Use Cases',
+      benefits: [
+        { title: '✅ E-Commerce Catalogs', desc: 'Showcase product variations in a single image. Effectively present different color and model options to your customers.' },
+        { title: '✅ Social Media Content', desc: 'Create professional collages for Instagram grid posts, Pinterest boards, and Facebook catalogs.' },
+        { title: '✅ Lookbook Preparation', desc: 'Prepare impressive lookbook pages for collection launches. Show all pieces together.' },
+        { title: '✅ Quick Comparison', desc: 'Display before/after comparisons or different style options side by side.' }
+      ],
+      creditInfo: 'Collage creation: 2 credits | Video conversion: +3 credits'
     },
   },
 };
