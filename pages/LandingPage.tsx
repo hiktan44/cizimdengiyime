@@ -682,6 +682,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const demoModel = showcaseImages.model || modelUrl || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600';
   const demoVideo = showcaseImages.video || videoUrl;
 
+  const demoAdGeniusMain = showcaseImages.adgenius_main || adGeniusMainUrl;
+  const demoAdGeniusCollage = showcaseImages.adgenius_collage || adGeniusCollageUrl;
+
   // Use DB hero videos or fallback
   const demoHeroVideo = heroVideos[0] || heroVideoUrl || 'https://cdn.pixabay.com/video/2024/01/09/196454-904303173_large.mp4';
   const demoHeroVideo1 = heroVideos[1] || heroVideo1Url || '';
@@ -1243,9 +1246,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               <div className="space-y-4">
                 <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title1 || '📍 Profesyonel Model Çekimi'}</h3>
                 <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
-                  {adGeniusMainUrl ? (
+                  {demoAdGeniusMain ? (
                     <img
-                      src={adGeniusMainUrl}
+                      src={demoAdGeniusMain}
                       alt="AdGenius Main"
                       className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
                     />
@@ -1264,9 +1267,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               <div className="space-y-4">
                 <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title2 || '✨ Akıllı Reklam Varyasyonları'}</h3>
                 <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
-                  {adGeniusCollageUrl ? (
+                  {demoAdGeniusCollage ? (
                     <img
-                      src={adGeniusCollageUrl}
+                      src={demoAdGeniusCollage}
                       alt="AdGenius Collage"
                       className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
                     />

@@ -36,6 +36,7 @@ const translations = {
       downloadVideo: 'Videoyu İndir',
       copyTitle: 'Başlığı Kopyala',
       copied: 'Kopyalandı!',
+      createCampaign: 'Yeni Kampanya Oluştur',
     },
     labels: {
       productName: 'Elbise veya Model Adı',
@@ -100,6 +101,7 @@ const translations = {
       downloadVideo: 'Download Video',
       copyTitle: 'Copy Title',
       copied: 'Copied!',
+      createCampaign: 'Create New Campaign',
     },
     labels: {
       productName: 'Garment or Model Name',
@@ -679,7 +681,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
                 onClick={handleReset}
                 className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-cyan-500 hover:to-blue-500 transition-all transform hover:scale-105 active:scale-95"
               >
-                {language === 'tr' ? 'Yeni Kampanya Oluştur' : 'Create New Campaign'}
+                {t.buttons.createCampaign}
               </button>
             </div>
           </div>

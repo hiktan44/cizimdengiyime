@@ -173,7 +173,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
         ...headerProps
     } = props;
 
-    const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions'>('content');
+    const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions' | 'adgenius'>('content');
     const [language, setLanguage] = useState<Language>('tr');
 
     // Load language from localStorage
@@ -188,6 +188,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
 
     const tabs = [
         { id: 'content' as const, label: t.tabs.content, icon: '📸' },
+        { id: 'adgenius' as const, label: t.tabs.adgenius, icon: '🚀' },
         { id: 'settings' as const, label: t.tabs.settings, icon: '⚙️' },
         { id: 'users' as const, label: t.tabs.users, icon: '👥' },
         { id: 'transactions' as const, label: t.tabs.transactions, icon: '💳' },
@@ -310,6 +311,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                     />
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'adgenius' && (
+                        <div className="space-y-12">
                             {/* AdGenius Section */}
                             <div>
                                 <h2 className="text-2xl font-bold text-white mb-4">{t.adgenius.title}</h2>

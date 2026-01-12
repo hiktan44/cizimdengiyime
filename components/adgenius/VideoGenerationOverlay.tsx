@@ -97,7 +97,9 @@ export const VideoGenerationOverlay: React.FC<Props> = ({ progress, label }) => 
                         <span className="text-5xl font-black text-white tracking-tighter drop-shadow-lg">
                             {Math.round(progress)}%
                         </span>
-                        <span className="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mt-1">İşleniyor</span>
+                        <span className="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mt-1">
+                            {progress === 100 ? (label.includes('video') ? 'Tamamlandı' : 'Success') : 'İşleniyor'}
+                        </span>
                     </div>
                 </div>
 
