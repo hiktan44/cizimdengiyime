@@ -41,7 +41,7 @@ export interface Profile {
 export interface Generation {
   id: string;
   user_id: string;
-  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video';
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage';
   credits_used: number;
   input_image_url: string | null;
   output_image_url: string | null;
@@ -83,6 +83,7 @@ export const CREDIT_COSTS = {
   FOTOMATIK_DESCRIBE: 1, // Fotomatik prompt üretme maliyeti
   ADGENIUS_IMAGE: 1, // AdGenius görsel maliyeti (her görsel için)
   ADGENIUS_VIDEO: 2, // AdGenius video maliyeti (her video için)
+  COLLAGE: 2, // Kolaj oluşturma maliyeti (2-6 görsel birleştirme)
 } as const;
 
 // Subscription plans

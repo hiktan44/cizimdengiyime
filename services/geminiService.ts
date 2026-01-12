@@ -812,3 +812,82 @@ export const upscaleImage = async (imageFile: File): Promise<string> => {
         throw e;
     }
 };
+
+/**
+ * Generates a collage from multiple images
+ * @param imageFiles Array of 2-6 image files
+ * @param prompt User instructions for the composition
+ * @param aspectRatio Desired aspect ratio for the output
+ * @returns Base64 data URL of the generated collage
+ */
+export const generateCollage = async (
+    imageFiles: File[],
+    prompt: string,
+    aspectRatio: '1:1' | '16:9' | '9:16' | '3:4' | '4:3' = '16:9'
+): Promise<string> => {
+    if (imageFiles.length < 2 || imageFiles.length > 6) {
+        throw new Error('Lütfen 2-6 arası görsel yükleyin');
+    }
+
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+    try {
+        // Convert all images to generative parts
+        const imageParts = await Promise.all(
+            imageFiles.map(file => fileToGenerativePart(file))
+        );
+
+        // Build the prompt with clear instructions
+        const fullPrompt = `Create a professional collage composition from these ${imageFiles.length} images.
+
+USER INSTRUCTIONS:
+${prompt}
+
+COMPOSITION RULES:
+1. Arrange all ${imageFiles.length} images in a visually appealing layout
+2. Maintain the quality and clarity of each image
+3. Create smooth transitions between images
+4. Use professional design principles (balance, harmony, contrast)
+5. Ensure all images are clearly visible
+6. Create a cohesive final composition
+
+OUTPUT REQUIREMENTS:
+- High quality, professional result
+- Clean and polished appearance
+- All images integrated seamlessly
+- Aspect ratio: ${aspectRatio}`;
+
+        // Add all image parts and the text prompt
+        const parts = [...imageParts, { text: fullPrompt }];
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-pro-image-preview',
+            contents: {
+                parts: parts,
+            },
+            config: {
+                responseModalities: [Modality.IMAGE],
+                imageConfig: {
+                    aspectRatio: aspectRatio,
+                    imageSize: '2K', // Higher quality output
+                }
+            },
+        });
+
+        const candidate = response.candidates?.[0];
+        const responseParts = candidate?.content?.parts;
+
+        if (responseParts) {
+            for (const part of responseParts) {
+                if (part.inlineData) {
+                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                }
+            }
+        }
+
+        throw new Error("Kolaj oluşturulamadı. API'den görsel döndürülmedi.");
+    } catch (e) {
+        console.error("Collage Generation Error:", e);
+        throw e;
+    }
+};

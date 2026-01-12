@@ -50,6 +50,7 @@ import { uploadHeroVideo, uploadShowcaseImage, getPublicHeroVideos, getPublicSho
 import { PixshopPage } from './pages/PixshopPage';
 import { FotomatikPage } from './pages/FotomatikPage';
 import { AdgeniusPage } from './pages/AdgeniusPage';
+import { CollagePage } from './pages/CollagePage';
 import { WhatsAppPanel } from './components/WhatsAppPanel';
 import { trackEvent, ANALYTICS_EVENTS } from './utils/analytics';
 
@@ -79,7 +80,7 @@ const ToolPage: React.FC<{
     profile,
     onRefreshProfile
 }) => {
-        const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical' | 'pixshop' | 'fotomatik' | 'adgenius'>('design');
+        const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical' | 'pixshop' | 'fotomatik' | 'adgenius' | 'collage'>('design');
 
         // --- STATE MANAGEMENT ---
         // Step 1: Sketch (for single item mode)
@@ -843,6 +844,24 @@ const ToolPage: React.FC<{
                             </div>
                             <span className={`text-xs ${activeToolTab === 'adgenius' ? 'text-orange-200' : 'text-slate-500'}`}>
                                 1-2 kredi/işlem
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => setActiveToolTab('collage')}
+                            className={`flex flex-col items-center gap-1 px-5 py-3 rounded-xl text-sm font-bold transition-all ${activeToolTab === 'collage'
+                                ? 'bg-gradient-to-r from-pink-600 to-purple-600 text-white shadow-lg shadow-pink-500/30'
+                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-slate-700'
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                                </svg>
+                                <span className="hidden sm:inline">Kolaj Stüdyosu</span>
+                                <span className="sm:hidden">Kolaj</span>
+                            </div>
+                            <span className={`text-xs ${activeToolTab === 'collage' ? 'text-pink-200' : 'text-slate-500'}`}>
+                                2 kredi/işlem
                             </span>
                         </button>
                     </div>
@@ -1666,6 +1685,13 @@ const ToolPage: React.FC<{
                     ) : activeToolTab === 'fotomatik' ? (
                         /* --- FOTOMATIK MODE (Transform & Describe) --- */
                         <FotomatikPage
+                            profile={profile}
+                            onRefreshProfile={onRefreshProfile}
+                            onShowBuyCredits={onBuyCreditsClick}
+                        />
+                    ) : activeToolTab === 'collage' ? (
+                        /* --- COLLAGE MODE (Multi-Image Composition) --- */
+                        <CollagePage
                             profile={profile}
                             onRefreshProfile={onRefreshProfile}
                             onShowBuyCredits={onBuyCreditsClick}

@@ -2,7 +2,7 @@ import { supabase, CREDIT_COSTS } from '../lib/supabase';
 
 export const checkAndDeductCredits = async (
   userId: string,
-  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video'
+  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage'
 ): Promise<{ success: boolean; message?: string; remainingCredits?: number }> => {
   try {
     // Get user profile
@@ -29,6 +29,7 @@ export const checkAndDeductCredits = async (
       'adgenius_campaign_video': 'ADGENIUS_VIDEO',
       'adgenius_ecommerce_image': 'ADGENIUS_IMAGE',
       'adgenius_ecommerce_video': 'ADGENIUS_VIDEO',
+      'collage': 'COLLAGE',
     };
 
     const creditsNeeded = CREDIT_COSTS[creditCostMap[operationType]];
@@ -64,7 +65,7 @@ export const checkAndDeductCredits = async (
 
 export const saveGeneration = async (
   userId: string,
-  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video',
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage',
   creditsUsed: number,
   inputImageUrl: string | null,
   outputImageUrl: string | null,

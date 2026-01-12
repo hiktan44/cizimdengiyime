@@ -46,11 +46,12 @@ export const ANALYTICS_EVENTS = {
   GENERATE_AD: 'generate_ad_genius',
   GENERATE_FOTOMATIK: 'generate_fotomatik',
   GENERATE_PIXSHOP: 'generate_pixshop',
-  
+  GENERATE_COLLAGE: 'generate_collage',
+
   // User Interaction
   DOWNLOAD_CONTENT: 'download_content',
   SHARE_CONTENT: 'share_content',
-  
+
   // Payment Events
   BEGIN_CHECKOUT: 'begin_checkout',
   PURCHASE_SUCCESS: 'purchase_success',
