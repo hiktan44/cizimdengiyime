@@ -680,41 +680,24 @@ const ToolPage: React.FC<{
             }
         };
 
-        // Improved Download Handler using fetch -> blob to force download behavior
-        const handleDownload = async (url: string | null, filename: string) => {
+        // Improved Download Handler using unified utility
+        const handleDownload = async (url: string | null, suggestedFilename: string) => {
             if (!url) return;
 
-            try {
-                // Attempt to fetch the blob first (Stable download method)
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
+            const { downloadFile } = await import('./utils/downloadHelper');
+            const success = await downloadFile(url, suggestedFilename);
 
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
-
+            if (success) {
                 // Track analytics
                 trackEvent(ANALYTICS_EVENTS.DOWNLOAD_CONTENT, {
-                    filename,
+                    filename: suggestedFilename,
                     userId: profile.id
                 });
-            } catch (error) {
-                console.error("Blob download failed, falling back to direct link", error);
-                // Fallback for simple links if fetch fails (e.g. CORS on external demo assets)
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = filename;
-                link.target = "_blank"; // Safer for external links
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            } else {
+                alert('İndirme başarısız oldu. Lütfen tekrar deneyin.');
             }
         };
+
 
         const handleShare = async (url: string | null) => {
             if (url && isShareSupported) {

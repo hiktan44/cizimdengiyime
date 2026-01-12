@@ -629,15 +629,13 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     setFlipV(false);
   }, []);
 
-  const handleDownload = useCallback(() => {
+  const handleDownload = useCallback(async () => {
     if (currentImage) {
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(currentImage);
-      link.download = `pixshop-${currentImage.name}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+      const { downloadFile } = await import('../utils/downloadHelper');
+      const filename = `pixshop-${currentImage.name}`;
+      const url = URL.createObjectURL(currentImage);
+      await downloadFile(url, filename);
+      URL.revokeObjectURL(url);
     }
   }, [currentImage]);
 
@@ -663,14 +661,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
-      link.href = url;
       const nameParts = currentImage.name.split('.');
       const fileName = nameParts.length > 1 ? nameParts.slice(0, -1).join('.') : currentImage.name;
-      link.download = `transparent-${fileName}.svg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const svgFilename = `transparent-${fileName}.svg`;
+
+      const { downloadFile } = await import('../utils/downloadHelper');
+      await downloadFile(url, svgFilename);
       URL.revokeObjectURL(url);
 
       await saveToHistory(transparentImageUrl);

@@ -16,13 +16,13 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
   const completedImages = results.filter(r => r.imageUrl && (r.status === 'completed' || r.status === 'generating_video'));
   const allFinished = results.every(r => r.status === 'completed' || r.status === 'failed');
 
-  const handleDownload = (url: string, filename: string) => {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleDownload = async (url: string, suggestedFilename: string) => {
+    const { downloadFile } = await import('../../utils/downloadHelper');
+    const success = await downloadFile(url, suggestedFilename);
+
+    if (!success) {
+      alert('İndirme başarısız oldu. Lütfen tekrar deneyin.');
+    }
   };
 
   const getExtension = (url: string) => {

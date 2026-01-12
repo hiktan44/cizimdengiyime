@@ -8,6 +8,8 @@ import { Profile, CREDIT_COSTS } from '../lib/supabase';
 import { checkAndDeductCredits, saveGeneration } from '../lib/database';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 import { WhatsAppPanel } from '../components/WhatsAppPanel';
+import { VideoSettingsModal } from '../components/VideoSettingsModal';
+import { VideoGenerationSettings, generateVideoFromImage } from '../services/geminiService';
 
 interface CollagePageProps {
     profile: Profile | null;
@@ -81,6 +83,13 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
     const [prompt, setPrompt] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Video generation states
+    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+    const [isVideoGenerating, setIsVideoGenerating] = useState(false);
+    const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+
 
     const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -130,8 +139,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
         }
 
         // Check credits
-        const hasCredits = await checkAndDeductCredits(profile.id, CREDIT_COSTS.COLLAGE);
-        if (!hasCredits) {
+        const result = await checkAndDeductCredits(profile.id, 'collage');
+        if (!result.success) {
             alert(t.insufficientCredits);
             if (onShowBuyCredits) onShowBuyCredits();
             return;
@@ -185,22 +194,79 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
         }
     }, [profile, uploadedImages, prompt, onRefreshProfile, onShowBuyCredits, t]);
 
+
     const handleDownload = useCallback(async (url: string) => {
-        try {
-            const response = await fetch(url);
-            const blob = await response.blob();
-            const downloadUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.download = `collage-${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(downloadUrl);
-        } catch (error) {
-            console.error('Download error:', error);
+        const { downloadFile, generateFilename, getFileExtension } = await import('../utils/downloadHelper');
+        const extension = getFileExtension(url);
+        const filename = generateFilename('kolaj', extension);
+        const success = await downloadFile(url, filename);
+
+        if (success) {
+            // Track analytics
+            trackEvent(ANALYTICS_EVENTS.DOWNLOAD_CONTENT, {
+                filename,
+                type: 'collage',
+                userId: profile?.id
+            });
+        } else {
+            alert('İndirme başarısız oldu. Lütfen tekrar deneyin.');
         }
-    }, []);
+    }, [profile]);
+
+    const handleVideoGeneration = useCallback(async (settings: VideoGenerationSettings) => {
+        if (!profile) {
+            alert(t.loginRequired);
+            return;
+        }
+
+        if (!generatedImageUrl) {
+            alert('Önce bir kolaj oluşturmalısınız!');
+            return;
+        }
+
+        // Check credits
+        const result = await checkAndDeductCredits(profile.id, 'video');
+        if (!result.success) {
+            alert(t.insufficientCredits);
+            if (onShowBuyCredits) onShowBuyCredits();
+            return;
+        }
+
+        setIsVideoModalOpen(false);
+        setIsVideoGenerating(true);
+
+        try {
+            const videoUrl = await generateVideoFromImage(generatedImageUrl, settings);
+            setGeneratedVideoUrl(videoUrl);
+
+            // Save to database
+            await saveGeneration(
+                profile.id,
+                'video',
+                CREDIT_COSTS.VIDEO,
+                null,
+                null,
+                videoUrl,
+                { settings, source: 'collage' }
+            );
+
+            // Refresh profile
+            onRefreshProfile();
+
+            // Track analytics
+            trackEvent(ANALYTICS_EVENTS.GENERATE_VIDEO, {
+                quality: settings.quality,
+                source: 'collage',
+                userId: profile.id
+            });
+        } catch (error) {
+            console.error('Video generation error:', error);
+            alert('Video oluşturulurken hata: ' + (error instanceof Error ? error.message : String(error)));
+        } finally {
+            setIsVideoGenerating(false);
+        }
+    }, [profile, generatedImageUrl, onRefreshProfile, onShowBuyCredits, t]);
+
 
     return (
         <div className="min-h-screen bg-slate-900 text-white">
@@ -308,14 +374,37 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                     <p className="text-slate-400">{t.generating}</p>
                                 </div>
                             ) : generatedImageUrl ? (
-                                <div className="relative w-full h-full">
-                                    <img src={generatedImageUrl} alt="Generated collage" className="w-full h-full object-contain" />
-                                    <button
-                                        onClick={() => handleDownload(generatedImageUrl)}
-                                        className="absolute bottom-4 right-4 bg-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-700 transition-colors shadow-lg"
-                                    >
-                                        📥 {t.downloadButton}
-                                    </button>
+                                <div className="relative w-full h-full group">
+                                    <img
+                                        src={generatedImageUrl}
+                                        alt="Generated collage"
+                                        className="w-full h-full object-contain cursor-pointer transition-transform hover:scale-105"
+                                        onClick={() => setIsModalOpen(true)}
+                                    />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors pointer-events-none flex items-center justify-center">
+                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-purple-600 text-white px-4 py-2 rounded-lg font-medium">
+                                            🔍 Detaylı Görüntüle
+                                        </div>
+                                    </div>
+                                    <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+                                        <button
+                                            onClick={() => setIsVideoModalOpen(true)}
+                                            disabled={isVideoGenerating}
+                                            className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-3 rounded-xl font-bold transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {isVideoGenerating ? 'Video Oluşturuluyor...' : '🎬 Video Oluştur'}
+                                        </button>
+                                        <button
+                                            onClick={() => handleDownload(generatedImageUrl)}
+                                            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-lg"
+                                        >
+                                            📥 {t.downloadButton}
+                                        </button>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="text-center text-slate-500">
@@ -329,6 +418,101 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                     </div>
                 </div>
             </div>
+
+            {/* Premium Image Modal */}
+            {isModalOpen && generatedImageUrl && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-fadeIn"
+                    onClick={() => setIsModalOpen(false)}
+                >
+                    <div
+                        className="relative max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close Button */}
+                        <button
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute top-4 right-4 z-10 bg-slate-800/90 hover:bg-slate-700 text-white p-3 rounded-full transition-all shadow-lg hover:shadow-xl"
+                            aria-label="Close"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        {/* Download Button */}
+                        <button
+                            onClick={() => handleDownload(generatedImageUrl)}
+                            className="absolute top-4 left-4 z-10 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            {t.downloadButton}
+                        </button>
+
+                        {/* Image Container with Zoom */}
+                        <div className="relative w-full h-full flex items-center justify-center">
+                            <img
+                                src={generatedImageUrl}
+                                alt="Generated collage - Full view"
+                                className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl transition-transform hover:scale-105 cursor-zoom-in"
+                                style={{
+                                    animation: 'scaleIn 0.3s ease-out',
+                                }}
+                            />
+                        </div>
+
+                        {/* Info Badge */}
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-800/90 backdrop-blur-sm px-6 py-3 rounded-full text-white text-sm font-medium shadow-lg">
+                            🎨 Kolaj Detay Görünümü
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Video Display Section */}
+            {generatedVideoUrl && (
+                <div className="max-w-7xl mx-auto px-4 pb-8">
+                    <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xl font-bold text-white">🎬 Oluşturulan Video</h3>
+                            <button
+                                onClick={async () => {
+                                    const { downloadFile, generateFilename } = await import('../utils/downloadHelper');
+                                    const filename = generateFilename('kolaj-video', 'mp4');
+                                    await downloadFile(generatedVideoUrl, filename);
+                                }}
+                                className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2 rounded-xl font-bold transition-colors shadow-lg flex items-center gap-2"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Videoyu İndir
+                            </button>
+                        </div>
+                        <div className="aspect-video bg-black rounded-xl overflow-hidden">
+                            <video
+                                src={generatedVideoUrl}
+                                controls
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="w-full h-full"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Video Settings Modal */}
+            <VideoSettingsModal
+                isOpen={isVideoModalOpen}
+                isGenerating={isVideoGenerating}
+                onClose={() => setIsVideoModalOpen(false)}
+                onGenerate={handleVideoGeneration}
+            />
 
             <WhatsAppPanel
                 phoneNumber={whatsappNumber}
