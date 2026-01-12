@@ -1,5 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
+
+type Language = 'tr' | 'en';
+
+const translations = {
+    tr: {
+        processing: 'İşleniyor',
+        completed: 'Tamamlandı',
+        success: 'Success',
+        warning: 'AI motoru sahneleri canlandırıyor. Lütfen pencereyi kapatmayın.',
+    },
+    en: {
+        processing: 'Processing',
+        completed: 'Completed',
+        success: 'Success',
+        warning: 'AI engine is bringing scenes to life. Please do not close the window.',
+    },
+};
 
 interface Props {
     progress: number;
@@ -7,6 +24,14 @@ interface Props {
 }
 
 export const VideoGenerationOverlay: React.FC<Props> = ({ progress, label }) => {
+    const [language, setLanguage] = useState<Language>('tr');
+
+    useEffect(() => {
+        const savedLang = localStorage.getItem('fasheone_language') as Language;
+        setLanguage(savedLang || 'tr');
+    }, []);
+
+    const t = translations[language];
     // Generate random particles once
     const particles = useMemo(() => {
         return Array.from({ length: 30 }).map((_, i) => ({
@@ -98,7 +123,7 @@ export const VideoGenerationOverlay: React.FC<Props> = ({ progress, label }) => 
                             {Math.round(progress)}%
                         </span>
                         <span className="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mt-1">
-                            {progress === 100 ? (label.includes('video') ? 'Tamamlandı' : 'Success') : 'İşleniyor'}
+                            {progress === 100 ? (label.includes('video') ? t.completed : t.success) : t.processing}
                         </span>
                     </div>
                 </div>
@@ -109,7 +134,7 @@ export const VideoGenerationOverlay: React.FC<Props> = ({ progress, label }) => 
                         {label}
                     </h3>
                     <p className="text-slate-400 text-sm leading-relaxed max-w-xs mx-auto font-medium">
-                        AI motoru sahneleri canlandırıyor. Lütfen pencereyi kapatmayın.
+                        {t.warning}
                     </p>
                 </div>
 
