@@ -670,7 +670,6 @@ const ToolPage: React.FC<{
                 // Track analytics
                 trackEvent(ANALYTICS_EVENTS.GENERATE_VIDEO, {
                     quality: settings.quality,
-                    motion: settings.motion,
                     userId: profile.id
                 });
             } catch (error) {

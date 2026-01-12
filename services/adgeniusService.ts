@@ -496,9 +496,9 @@ export const generateAdImage = async (
       contents: { parts },
       config: {
         safetySettings: PERMISSIVE_SAFETY_SETTINGS,
+        seed: seed,
         imageConfig: {
           aspectRatio: aspectRatio,
-          seed: seed,
           ...(model === 'gemini-3-pro-image-preview' ? { imageSize: "2K" } : {})
         }
       }
