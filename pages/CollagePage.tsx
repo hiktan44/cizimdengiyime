@@ -91,18 +91,79 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
     const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
 
 
-    const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // Convert image to PNG if it's in an unsupported format (like AVIF)
+    const convertImageToPNG = async (file: File): Promise<File> => {
+        // Supported formats by Gemini API
+        const supportedFormats = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+        if (supportedFormats.includes(file.type)) {
+            return file; // Already supported, return as is
+        }
+
+        console.log(`Converting ${file.type} to PNG...`);
+
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                if (!ctx) {
+                    reject(new Error('Canvas context not available'));
+                    return;
+                }
+
+                ctx.drawImage(img, 0, 0);
+
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        reject(new Error('Failed to convert image'));
+                        return;
+                    }
+
+                    const convertedFile = new File(
+                        [blob],
+                        file.name.replace(/\.[^/.]+$/, '.png'),
+                        { type: 'image/png' }
+                    );
+
+                    console.log(`✅ Converted ${file.type} to PNG`);
+                    resolve(convertedFile);
+                }, 'image/png', 0.95);
+            };
+
+            img.onerror = () => {
+                reject(new Error('Failed to load image for conversion'));
+            };
+
+            img.src = URL.createObjectURL(file);
+        });
+    };
+
+    const handleImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
 
         const newImages: UploadedImage[] = [];
-        Array.from(files).forEach((file) => {
-            if (uploadedImages.length + newImages.length >= 6) return;
 
-            const id = Math.random().toString(36).substring(7);
-            const preview = URL.createObjectURL(file);
-            newImages.push({ id, file, preview });
-        });
+        for (const file of Array.from(files)) {
+            if (uploadedImages.length + newImages.length >= 6) break;
+
+            try {
+                // Convert to PNG if needed
+                const convertedFile = await convertImageToPNG(file);
+
+                const id = Math.random().toString(36).substring(7);
+                const preview = URL.createObjectURL(convertedFile);
+                newImages.push({ id, file: convertedFile, preview });
+            } catch (error) {
+                console.error('Error converting image:', error);
+                alert(`Resim yüklenirken hata: ${file.name}`);
+            }
+        }
 
         setUploadedImages((prev) => [...prev, ...newImages]);
     }, [uploadedImages.length]);

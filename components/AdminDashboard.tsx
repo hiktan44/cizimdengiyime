@@ -102,6 +102,8 @@ interface AdminDashboardProps {
     adGeniusCollageUrl?: string;
     onAdGeniusMainUpload?: (file: File) => void;
     onAdGeniusCollageUpload?: (file: File) => void;
+    currentUserId?: string;
+    onRefreshProfile?: () => void;
 }
 
 const ContentCard: React.FC<{
@@ -347,7 +349,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
 
 
                     {activeTab === 'settings' && <SettingsPanel />}
-                    {activeTab === 'users' && <UserActivityPanel />}
+                    {activeTab === 'users' && <UserActivityPanel currentUserId={props.currentUserId} onRefreshProfile={props.onRefreshProfile} />}
                     {activeTab === 'transactions' && <TransactionsPanel />}
                 </div>
             </main>

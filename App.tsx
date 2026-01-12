@@ -2160,6 +2160,8 @@ const App: React.FC = () => {
                     onAdGeniusMainUpload={(f) => handleFileUpload(f, 'adgenius_main')}
                     onAdGeniusCollageUpload={(f) => handleFileUpload(f, 'adgenius_collage')}
                     credits={profile.credits}
+                    currentUserId={profile.id}
+                    onRefreshProfile={refreshProfile}
                 />
             )}
 

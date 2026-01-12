@@ -128,7 +128,12 @@ const translations = {
   },
 };
 
-export const UserActivityPanel: React.FC = () => {
+interface UserActivityPanelProps {
+  currentUserId?: string;
+  onRefreshProfile?: () => void;
+}
+
+export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUserId, onRefreshProfile }) => {
   const [users, setUsers] = useState<UserActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -278,6 +283,13 @@ export const UserActivityPanel: React.FC = () => {
         });
         // Refresh user list
         await loadUsers();
+
+        // If admin added credits to their own account, refresh their profile
+        if (currentUserId && selectedUser.id === currentUserId && onRefreshProfile) {
+          console.log('🔄 Refreshing current user profile after credit addition');
+          onRefreshProfile();
+        }
+
         setShowAddCredit(false);
         setCreditAmount(10);
         setCreditReason('');
