@@ -976,7 +976,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         <HeroVideoCarousel
           videos={[demoHeroVideo, demoHeroVideo1, demoHeroVideo2, demoHeroVideo3].filter(Boolean)}
           logoVideo={props.logoMediaUrl}
-          interval={8000}
+          logoDisplayDuration={5000}
         />
 
         <div className="max-w-7xl mx-auto text-center relative z-30 w-full mt-24">
