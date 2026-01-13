@@ -5,6 +5,7 @@ import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
 import { getPublicHeroVideos, getPublicShowcaseImages, getSiteSettings } from '../lib/adminService';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 import { WhatsAppPanel } from '../components/WhatsAppPanel';
+import { HeroVideoCarousel } from '../components/HeroVideoCarousel';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -970,29 +971,12 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
       {/* Hero Section - Genişletilmiş */}
       <section className="relative pt-64 pb-32 px-6 z-10 min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Hero Arka Plan Videoları - 4 adet sırayla dönen */}
-        {/* Hero Arka Plan Videoları - Güvenilir Oynatma */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-          {/* Tek bir ana video kullanıyoruz mobil için, complexity'i düşürmek ve autoplay'i garanti etmek için */}
-          {(demoHeroVideo || demoHeroVideo1) && (
-            <video
-              key={demoHeroVideo}
-              src={demoHeroVideo}
-              className="absolute inset-0 w-full h-full object-cover opacity-80"
-              autoPlay
-              loop
-              muted
-              playsInline={true}
-              webkit-playsinline="true"
-              poster="https://images.unsplash.com/photo-1558769132-cb1f16413c80?q=80&w=2574&auto=format&fit=crop"
-            >
-              <source src={demoHeroVideo} type="video/mp4" />
-              Tarayıcınız video oynatmayı desteklemiyor.
-            </video>
-          )}
-
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-transparent to-slate-900"></div>
-        </div>
+        {/* Hero Video Carousel - 4 videos + logo with smooth transitions */}
+        <HeroVideoCarousel
+          videos={[demoHeroVideo, demoHeroVideo1, demoHeroVideo2, demoHeroVideo3].filter(Boolean)}
+          logoVideo={undefined} // Logo video URL'ini buraya ekleyebilirsiniz
+          interval={8000}
+        />
 
         <div className="max-w-7xl mx-auto text-center relative z-30 w-full mt-24">
           <h1 className={`text-5xl md:text-7xl font-black ${textClass} mb-6 leading-tight drop-shadow-2xl`}>
