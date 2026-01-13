@@ -1957,17 +1957,16 @@ const App: React.FC = () => {
                     alert(`❌ Yükleme başarısız: ${result.error}`);
                 }
             } else if (type === 'logo_media') {
-                // Upload logo media (video or image)
-                const result = await uploadShowcaseImage(file, 'logo_media', 0);
+                // TEMPORARY: Upload logo media to localStorage only
+                // TODO: Enable Supabase upload after running this SQL:
+                // ALTER TABLE showcase_images DROP CONSTRAINT IF EXISTS showcase_images_type_check;
+                // ALTER TABLE showcase_images ADD CONSTRAINT showcase_images_type_check 
+                // CHECK (type IN ('sketch', 'product', 'model', 'video', 'adgenius_main', 'adgenius_collage', 'logo_media'));
 
-                if (result.success && result.imageUrl) {
-                    console.log('✅ Logo media Supabase\'e yüklendi:', result.imageUrl);
-                    alert('✅ Logo video/resim başarıyla yüklendi!\n\nAna sayfada hero videolar arasında görünecektir.');
-                    setLogoMediaUrl(result.imageUrl);
-                    localStorage.setItem('logoMediaUrl', result.imageUrl);
-                } else {
-                    alert(`❌ Logo yükleme başarısız: ${result.error}`);
-                }
+                console.log('✅ Logo media localStorage\'e kaydedildi (Supabase atlandı)');
+                alert('✅ Logo video/resim başarıyla yüklendi!\n\n⚠️ Not: Şu anda sadece bu tarayıcıda görünür.\nKalıcı olması için Supabase database\'i güncellemeniz gerekiyor.');
+
+                // Logo already saved to localStorage in the reader.onloadend above
             }
         } catch (error) {
             console.error('❌ Dosya yükleme hatası:', error);
