@@ -16,7 +16,7 @@ export interface HeroVideo {
 export interface ShowcaseImage {
   id: string;
   image_url: string;
-  type: 'sketch' | 'product' | 'model' | 'video' | 'adgenius_main' | 'adgenius_collage';
+  type: 'sketch' | 'product' | 'model' | 'video' | 'adgenius_main' | 'adgenius_collage' | 'logo_media';
   order_index: number;
   is_active: boolean;
   created_at: string;
@@ -117,7 +117,7 @@ export const uploadHeroVideo = async (
 // Upload showcase image to storage and save to DB
 export const uploadShowcaseImage = async (
   file: File,
-  type: 'sketch' | 'product' | 'model' | 'video' | 'adgenius_main' | 'adgenius_collage',
+  type: 'sketch' | 'product' | 'model' | 'video' | 'adgenius_main' | 'adgenius_collage' | 'logo_media',
   orderIndex: number = 0
 ): Promise<{ success: boolean; imageUrl?: string; error?: string }> => {
   try {

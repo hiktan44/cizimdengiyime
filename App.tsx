@@ -1812,6 +1812,9 @@ const App: React.FC = () => {
                     } else if (image.type === 'adgenius_collage') {
                         setAdGeniusCollageUrl(image.image_url);
                         localStorage.setItem('adGeniusCollageUrl', image.image_url);
+                    } else if (image.type === 'logo_media') {
+                        setLogoMediaUrl(image.image_url);
+                        localStorage.setItem('logoMediaUrl', image.image_url);
                     }
                 });
                 console.log('✅ Showcase görseller Supabase\'den yüklendi:', showcaseImages.length);
@@ -1952,6 +1955,18 @@ const App: React.FC = () => {
                     }
                 } else {
                     alert(`❌ Yükleme başarısız: ${result.error}`);
+                }
+            } else if (type === 'logo_media') {
+                // Upload logo media (video or image)
+                const result = await uploadShowcaseImage(file, 'logo_media', 0);
+
+                if (result.success && result.imageUrl) {
+                    console.log('✅ Logo media Supabase\'e yüklendi:', result.imageUrl);
+                    alert('✅ Logo video/resim başarıyla yüklendi!\n\nAna sayfada hero videolar arasında görünecektir.');
+                    setLogoMediaUrl(result.imageUrl);
+                    localStorage.setItem('logoMediaUrl', result.imageUrl);
+                } else {
+                    alert(`❌ Logo yükleme başarısız: ${result.error}`);
                 }
             }
         } catch (error) {
