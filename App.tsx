@@ -1756,6 +1756,12 @@ const App: React.FC = () => {
         return saved && saved.startsWith('data:') ? saved : '';
     });
 
+    // Logo Media State
+    const [logoMediaUrl, setLogoMediaUrl] = useState(() => {
+        const saved = localStorage.getItem('logoMediaUrl');
+        return saved && saved.startsWith('data:') ? saved : '';
+    });
+
     // AdGenius States
     const [adGeniusMainUrl, setAdGeniusMainUrl] = useState(() => { const saved = localStorage.getItem('adGeniusMainUrl'); return saved && saved.startsWith('data:') ? saved : ''; });
     const [adGeniusCollageUrl, setAdGeniusCollageUrl] = useState(() => { const saved = localStorage.getItem('adGeniusCollageUrl'); return saved && saved.startsWith('data:') ? saved : ''; });
@@ -1817,7 +1823,7 @@ const App: React.FC = () => {
         loadContentFromSupabase();
     }, []);
 
-    const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3' | 'adgenius_main' | 'adgenius_collage') => {
+    const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3' | 'adgenius_main' | 'adgenius_collage' | 'logo_media') => {
         try {
             // Convert file to base64 for immediate display
             const reader = new FileReader();
@@ -1855,6 +1861,9 @@ const App: React.FC = () => {
                 } else if (type === 'adgenius_collage') {
                     setAdGeniusCollageUrl(base64String);
                     localStorage.setItem('adGeniusCollageUrl', base64String);
+                } else if (type === 'logo_media') {
+                    setLogoMediaUrl(base64String);
+                    localStorage.setItem('logoMediaUrl', base64String);
                 }
             };
             reader.readAsDataURL(file);
@@ -2103,6 +2112,7 @@ const App: React.FC = () => {
                     heroVideo3Url={heroVideo3Url}
                     adGeniusMainUrl={adGeniusMainUrl}
                     adGeniusCollageUrl={adGeniusCollageUrl}
+                    logoMediaUrl={logoMediaUrl}
                 />
             )}
             {currentPage === 'tool' && user && profile && (
@@ -2162,6 +2172,8 @@ const App: React.FC = () => {
                     credits={profile.credits}
                     currentUserId={profile.id}
                     onRefreshProfile={refreshProfile}
+                    logoMediaUrl={logoMediaUrl}
+                    onLogoMediaUpload={(f) => handleFileUpload(f, 'logo_media')}
                 />
             )}
 

@@ -104,6 +104,8 @@ interface AdminDashboardProps {
     onAdGeniusCollageUpload?: (file: File) => void;
     currentUserId?: string;
     onRefreshProfile?: () => void;
+    logoMediaUrl?: string;
+    onLogoMediaUpload?: (file: File) => void;
 }
 
 const ContentCard: React.FC<{
@@ -267,6 +269,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         mediaType="video"
                                         onFileSelect={onHeroVideo3Upload || (() => { })}
                                         accept="video/*"
+                                        changeLabel={t.change}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Logo Video/Image Section */}
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-4">🎨 Logo Animasyonu / Geçiş Görseli</h2>
+                                <p className="text-slate-400 mb-6">
+                                    Hero videolar arasında gösterilecek logo animasyonu veya geçiş görseli. Video veya resim yükleyebilirsiniz.
+                                </p>
+                                <div className="max-w-md">
+                                    <ContentCard
+                                        title="Logo Video/Image"
+                                        mediaUrl={props.logoMediaUrl || ''}
+                                        mediaType={props.logoMediaUrl?.match(/\.(mp4|webm|mov)$/i) ? 'video' : 'image'}
+                                        onFileSelect={props.onLogoMediaUpload || (() => { })}
+                                        accept="video/*,image/*"
                                         changeLabel={t.change}
                                     />
                                 </div>

@@ -27,6 +27,7 @@ interface LandingPageProps {
   heroVideo3Url?: string;
   adGeniusMainUrl?: string;
   adGeniusCollageUrl?: string;
+  logoMediaUrl?: string;
 }
 
 type Language = 'tr' | 'en';
@@ -974,7 +975,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         {/* Hero Video Carousel - 4 videos + logo with smooth transitions */}
         <HeroVideoCarousel
           videos={[demoHeroVideo, demoHeroVideo1, demoHeroVideo2, demoHeroVideo3].filter(Boolean)}
-          logoVideo={undefined} // Logo video URL'ini buraya ekleyebilirsiniz
+          logoVideo={props.logoMediaUrl}
           interval={8000}
         />
 
