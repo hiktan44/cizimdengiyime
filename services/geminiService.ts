@@ -166,7 +166,7 @@ BAŞKA RENK KULLANMA.` : '';
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3.0-nano-banana-pro-image-preview',
+            model: 'gemini-3-pro-image-preview',
             contents: {
                 parts: [
                     imagePart,
@@ -220,7 +220,7 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3.0-nano-banana-pro-image-preview',
+            model: 'gemini-3-pro-image-preview',
             contents: {
                 parts: [
                     imagePart,
@@ -712,7 +712,7 @@ export const generateImage = async (
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3.0-nano-banana-pro-image-preview',
+            model: 'gemini-3-pro-image-preview',
             contents: {
                 parts: promptParts,
             },
