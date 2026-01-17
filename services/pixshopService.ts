@@ -99,7 +99,7 @@ Maintain photorealism and blend the edit seamlessly with the original image.`;
 
     console.log('Sending image and prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
+        model: 'gemini-3.0-nano-banana-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
         config: { safetySettings },
     });
@@ -130,7 +130,7 @@ Do not change the content or composition, only apply the visual style.`;
 
     console.log('Sending image and filter prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
+        model: 'gemini-3.0-nano-banana-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
         config: { safetySettings },
     });
@@ -161,7 +161,7 @@ Ensure the result is photorealistic.`;
 
     console.log('Sending image and adjustment prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
+        model: 'gemini-3.0-nano-banana-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
         config: { safetySettings },
     });
@@ -191,7 +191,7 @@ The output MUST be a transparent PNG.`;
 
     console.log('Sending image and background removal prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
+        model: 'gemini-3.0-nano-banana-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
         config: { safetySettings },
     });
