@@ -273,8 +273,8 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     try {
       console.log('🔵 Google ile giriş başlatılıyor...');
-      // Local development için window.location.origin kullan
-      const redirectUrl = window.location.origin;
+      // Çevre değişkeninden veya mevcut origin'den redirect URL'sini al
+      const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
       console.log('🔗 Redirect URL:', redirectUrl);
 
       const { error } = await supabase.auth.signInWithOAuth({

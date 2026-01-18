@@ -113,14 +113,23 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
                 <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                     <div className="space-y-2">
                         <label htmlFor="prompt" className="text-sm font-semibold text-slate-300 uppercase tracking-wider">{t.scenario}</label>
-                        <textarea
-                            id="prompt"
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            rows={3}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition resize-none text-sm leading-relaxed"
-                            placeholder={t.scenarioPlaceholder}
-                        />
+                        <div className="relative">
+                            <textarea
+                                id="prompt"
+                                value={prompt}
+                                onChange={(e) => {
+                                    setPrompt(e.target.value);
+                                }}
+                                rows={3}
+                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-y min-h-[120px] text-sm leading-relaxed"
+                                placeholder={t.scenarioPlaceholder}
+                            />
+                            <div className="absolute bottom-2 right-2 text-slate-600 pointer-events-none">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -194,8 +203,8 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
                             type="submit"
                             disabled={isGenerating}
                             className={`w-full font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 ${quality === 'high'
-                                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-purple-900/40'
-                                    : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-900/40'
+                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-purple-900/40'
+                                : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-900/40'
                                 }`}
                         >
                             {isGenerating ? (

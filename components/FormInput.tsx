@@ -3,7 +3,7 @@
  * Modern form input'ları için floating label ve validation
  */
 
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useRef, useEffect, useImperativeHandle } from 'react';
 
 interface FormInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label: string;
@@ -62,9 +62,8 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     return (
       <div className="relative w-full">
         <div
-          className={`relative transition-all duration-300 ${
-            error ? 'ring-2 ring-red-500/50' : isFocused ? 'ring-2 ring-cyan-500/50' : ''
-          }`}
+          className={`relative transition-all duration-300 ${error ? 'ring-2 ring-red-500/50' : isFocused ? 'ring-2 ring-cyan-500/50' : ''
+            }`}
         >
           {/* Icon */}
           {icon && (
@@ -98,12 +97,10 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           <label
             className={`
               absolute left-4 transition-all duration-300 pointer-events-none
-              ${
-                isFocused || value
-                  ? `-${size === 'sm' ? 'top-2.5' : size === 'md' ? 'top-3' : 'top-3.5'} ${labelSizeClasses[size]} ${
-                      error ? 'text-red-500' : 'text-cyan-400'
-                    }`
-                  : `top-1/2 -translate-y-1/2 ${size === 'sm' ? 'text-sm' : 'text-base'} text-slate-400`
+              ${isFocused || value
+                ? `-${size === 'sm' ? 'top-2.5' : size === 'md' ? 'top-3' : 'top-3.5'} ${labelSizeClasses[size]} ${error ? 'text-red-500' : 'text-cyan-400'
+                }`
+                : `top-1/2 -translate-y-1/2 ${size === 'sm' ? 'text-sm' : 'text-base'} text-slate-400`
               }
               ${icon ? 'left-10' : ''}
             `}
@@ -174,6 +171,10 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(!!value);
+    const internalRef = useRef<HTMLTextAreaElement>(null);
+
+    // Sync external ref with internal ref
+    useImperativeHandle(ref, () => internalRef.current!);
 
     const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
       setIsFocused(true);
@@ -188,18 +189,17 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
     return (
       <div className="relative w-full">
         <div
-          className={`relative transition-all duration-300 ${
-            error ? 'ring-2 ring-red-500/50' : isFocused ? 'ring-2 ring-cyan-500/50' : ''
-          }`}
+          className={`relative transition-all duration-300 ${error ? 'ring-2 ring-red-500/50' : isFocused ? 'ring-2 ring-cyan-500/50' : ''
+            }`}
         >
           <textarea
-            ref={ref}
+            ref={internalRef}
             value={value}
             rows={rows}
             className={`
               w-full bg-slate-800 border border-slate-700 rounded-xl
               text-white placeholder-transparent
-              focus:outline-none focus:border-cyan-500 resize-none
+              focus:outline-none focus:border-cyan-500 resize-y min-h-[120px]
               transition-all duration-300
               ${sizeClasses[size]}
               ${error ? 'border-red-500' : ''}
@@ -210,15 +210,20 @@ export const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
             {...props}
           />
 
+          {/* Resize Indicator */}
+          <div className="absolute bottom-2 right-2 text-slate-500 pointer-events-none">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
+            </svg>
+          </div>
+
           <label
             className={`
               absolute left-4 transition-all duration-300 pointer-events-none
-              ${
-                isFocused || value
-                  ? `-${size === 'sm' ? 'top-2.5' : size === 'md' ? 'top-3' : 'top-3.5'} ${labelSizeClasses[size]} ${
-                      error ? 'text-red-500' : 'text-cyan-400'
-                    }`
-                  : `top-4 ${size === 'sm' ? 'text-sm' : 'text-base'} text-slate-400`
+              ${isFocused || value
+                ? `-${size === 'sm' ? 'top-2.5' : size === 'md' ? 'top-3' : 'top-3.5'} ${labelSizeClasses[size]} ${error ? 'text-red-500' : 'text-cyan-400'
+                }`
+                : `top-4 ${size === 'sm' ? 'text-sm' : 'text-base'} text-slate-400`
               }
             `}
           >
@@ -286,9 +291,8 @@ export const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
     return (
       <div className="relative w-full">
         <div
-          className={`relative transition-all duration-300 ${
-            error ? 'ring-2 ring-red-500/50' : isFocused ? 'ring-2 ring-cyan-500/50' : ''
-          }`}
+          className={`relative transition-all duration-300 ${error ? 'ring-2 ring-red-500/50' : isFocused ? 'ring-2 ring-cyan-500/50' : ''
+            }`}
         >
           <select
             ref={ref}
@@ -316,12 +320,10 @@ export const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
           <label
             className={`
               absolute left-4 transition-all duration-300 pointer-events-none
-              ${
-                isFocused || value
-                  ? `-${size === 'sm' ? 'top-2.5' : size === 'md' ? 'top-3' : 'top-3.5'} ${labelSizeClasses[size]} ${
-                      error ? 'text-red-500' : 'text-cyan-400'
-                    }`
-                  : `top-1/2 -translate-y-1/2 ${size === 'sm' ? 'text-sm' : 'text-base'} text-slate-400`
+              ${isFocused || value
+                ? `-${size === 'sm' ? 'top-2.5' : size === 'md' ? 'top-3' : 'top-3.5'} ${labelSizeClasses[size]} ${error ? 'text-red-500' : 'text-cyan-400'
+                }`
+                : `top-1/2 -translate-y-1/2 ${size === 'sm' ? 'text-sm' : 'text-base'} text-slate-400`
               }
             `}
           >

@@ -1,15 +1,15 @@
 import { GoogleGenAI, Modality } from "@google/genai";
-import { fileToGenerativePart, blobToBase64 } from '../utils/fileUtils';
+import { fileToGenerativePart, blobToBase64, base64ToFile, cropImageFromFile, fileToBase64 } from '../utils/fileUtils';
 import { colors } from '../components/ColorPicker';
 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır.
-// .env.local dosyasında VITE_GEMINI_API_KEY olarak tanımlanmalıdır.
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
-if (!API_KEY) {
-    console.error('VITE_GEMINI_API_KEY environment variable is not set!');
-    console.error('Please add VITE_GEMINI_API_KEY to your Netlify environment variables.');
-}
+const checkApiKey = () => {
+    if (!API_KEY || API_KEY === 'undefined' || API_KEY === 'your-gemini-api-key-here') {
+        throw new Error('Gemini API anahtarı ayarlanmamış. Lütfen .env.local dosyasını kontrol edin ve VITE_GEMINI_API_KEY değişkeninin doğru olduğundan emin olun.');
+    }
+};
 
 // Simple hash function (djb2 algorithm)
 const hashString = (str: string): number => {
@@ -110,6 +110,7 @@ const getLocationPromptFragment = (location: string): string => {
 };
 
 export const generateProductFromSketch = async (sketchFile: File, color?: string): Promise<string> => {
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(sketchFile);
 
@@ -196,6 +197,7 @@ BAŞKA RENK KULLANMA.` : '';
 };
 
 export const generateSketchFromProduct = async (productFile: File, style: 'colored' | 'blackwhite' = 'blackwhite'): Promise<string> => {
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(productFile);
 
@@ -267,6 +269,7 @@ export const generateVideoFromImage = async (
     }
 
     // Use the variable defined at the top
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     let imageBytes = '';
@@ -426,6 +429,7 @@ export const generateImage = async (
     seed?: number, // New: Seed for consistency
     modelIdentityFile?: File // New: Previous generation result for identity locking
 ): Promise<string> => {
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
 
@@ -887,6 +891,294 @@ OUTPUT REQUIREMENTS:
         throw new Error("Kolaj oluşturulamadı. API'den görsel döndürülmedi.");
     } catch (e) {
         console.error("Collage Generation Error:", e);
+        throw e;
+    }
+};
+
+/**
+ * Generates a specialized product collage from multiple products
+ * @param products Array of product items with metadata
+ * @param background Background style or custom color
+ * @param aspectRatio Desired aspect ratio for the output
+ * @param customPrompt Optional additional user instructions
+ * @returns Base64 data URL of the generated collage
+ */
+export interface ProductItem {
+    id: string;
+    file: File | string;
+    name: string;
+    price?: string;
+    description?: string;
+    preview?: string; // Base64 preview for UI
+}
+
+/**
+ * Analyzes an outfit image and returns a list of detected products
+ * @param imageFile The main outfit image
+ * @returns Array of ProductItem objects
+ */
+export const analyzeOutfitItems = async (imageInput: File | string): Promise<ProductItem[]> => {
+    checkApiKey();
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+    let imagePart;
+    let originalFile: File;
+
+    if (typeof imageInput === 'string') {
+        const file = await base64ToFile(imageInput, 'analysis_input.png');
+        originalFile = file;
+        imagePart = await fileToGenerativePart(file);
+    } else {
+        originalFile = imageInput;
+        imagePart = await fileToGenerativePart(imageInput);
+    }
+
+    const prompt = `Bu moda görselindeki TÜM kıyafetleri, ayakkabıları ve aksesuarları (saat, gözlük, çanta, şapka vb.) tek tek tespit et. 
+    
+    KURALLAR (KRİTİK):
+    1. AYAKKABILAR: Ayakkabıları asla "Sağ Ayakkabı" veya "Sol Ayakkabı" olarak AYIRMA. Her ikisini tek bir box içine alan tek bir "Ayakkabı" (Çift) öğesi döndür.
+    2. PARÇALARA AYIR: Kombinleri (örneğin takım elbise) mutlaka parçalarına ayır: "Ceket", "Pantolon", "Gömlek", "Kravat".
+    3. box_2d: Ürünü tam kaplayan [üst, sol, alt, sağ] koordinatları (0-1000).
+    4. price: Ürün için gerçekçi bir piyasa satış fiyatı tahmini (SADECE rakam ve TL simgesi, örn: "1.299 TL").
+    
+    SADECE aşağıdaki JSON'u döndür:
+    [
+      {
+        "name": "Ürün Adı (Türkçe)", 
+        "description": "Profesyonel moda açıklaması (Türkçe)", 
+        "category": "Kategori",
+        "price": "Fiyat (TL)",
+        "box_2d": [ymin, xmin, ymax, xmax]
+      }
+    ]
+    JSON dışında metin yazma.`;
+
+    try {
+        const result = await ai.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: {
+                parts: [imagePart, { text: prompt }],
+            }
+        });
+
+        const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (!responseText) {
+            throw new Error("API'den metin yanıtı alınamadı.");
+        }
+
+        const jsonMatch = responseText.match(/\[.*\]/s);
+        const jsonStr = jsonMatch ? jsonMatch[0] : responseText;
+        const detectedItems = JSON.parse(jsonStr);
+
+        // Kırpma işlemlerini paralel yapalım
+        const productPromises = detectedItems.map(async (item: any) => {
+            let croppedFile: File | string = originalFile;
+            let previewUrl = "";
+
+            // Eğer koordinatlar varsa resmi kırpalım
+            if (item.box_2d && Array.isArray(item.box_2d) && item.box_2d.length === 4) {
+                try {
+                    const cropped = await cropImageFromFile(originalFile, item.box_2d as [number, number, number, number]);
+                    croppedFile = cropped;
+                    previewUrl = await fileToBase64(cropped);
+                } catch (err) {
+                    console.warn(`Kırpma hatası (${item.name}):`, err);
+                }
+            }
+
+            // Fallback: Kırpma yapılamadıysa veya koordinat yoksa orijinalden önizleme al
+            if (!previewUrl) {
+                try {
+                    previewUrl = await fileToBase64(originalFile);
+                } catch (e) {
+                    console.error("Preview fallback failed:", e);
+                    previewUrl = ""; // Son çare boş string, ama UI'da kontrol edeceğiz
+                }
+            }
+
+            return {
+                id: Math.random().toString(36).substring(7),
+                file: croppedFile,
+                name: item.name,
+                description: item.description,
+                price: item.price || "Fiyat Belirtilmedi",
+                preview: previewUrl || undefined
+            };
+        });
+
+        return await Promise.all(productPromises);
+    } catch (e) {
+        console.error("Outfit Analysis Error:", e);
+        throw new Error("Görseldeki ürünler analiz edilemedi.");
+    }
+};
+
+/**
+ * Generates an automatic product collage from a single outfit/inspiration image
+ * @param imageFile The main outfit image
+ * @param aspectRatio Desired aspect ratio
+ * @returns Base64 data URL of the generated collage
+ */
+export const generateAutoProductCollage = async (
+    imageFile: File,
+    aspectRatio: '1:1' | '16:9' | '9:16' | '3:4' | '4:3' = '16:9'
+): Promise<string> => {
+    checkApiKey();
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const imagePart = await fileToGenerativePart(imageFile);
+
+    const fullPrompt = `GÖREV: PROFESYONEL FLAT LAY MODA EDİTÖRYALİ (DERGİ KONSEPTİ)
+    Bu kombin görselini analiz et ve içindeki parçaları bir "Flat Lay" (yukarıdan aşağıya düz serim) moda çekimi estetiğiyle yeniden oluştur.
+    
+    TASARIM KURALLARI (KRİTİK):
+    1. KONSEP VE ARKA PLAN: Ürünler, estetik bir mermer yüzey veya yumuşak dokulu nötr bir keten kumaş (linen) üzerine sanatsal bir şekilde dizilmelidir. (Kullanıcının paylaştığı minimalist ve lüks Flat Lay tarzı).
+    2. YERLEŞİM: Ana kombin parçaları (Örn: Üst, Alt) merkeze yakın yerleştirilmeli. Aksesuarlar (Gözlük, Parfüm, Takı, Çanta) çevreye zarifçe serpiştirilmelidir.
+    3. REFERANS GÖRSEL: Yüklenen Orijinal Kombin Görselini, tasarımın bir köşesine veya merkezine yakın bir yere, şık bir "İlham Fotoğrafı" (Inspiration Shot) veya "Referans Kare" olarak yerleştir. Bu görsel profesyonel bir çerçeve veya şık bir Polaroid kağıdı üzerinde duruyormuş gibi görünmelidir.
+    4. KESİT DEĞİL, ÜRÜN: Diğer ayrıştırılmış ürünler orijinal resimden kırılarak alınmamalıdır. Her biri sanki profesyonel bir ürün çekimindeymiş gibi; TAMAMI GÖRÜNEN, net, ütülü ve temiz birer bağımsız ürün fotoğrafı olarak çizilmelidir.
+    5. AYAKKABILAR: Ayakkabılar şık bir çift (sağ ve sol yan yana) olarak sergilenmelidir.
+    6. IŞIKLANDIRMA: Yumuşak, doğal gün ışığı (sunlight) efekti. Hafif, gerçekçi yumuşak gölgeler (soft shadows).
+    7. ESTETİK: "Vogue" veya "Harper's Bazaar" moda çekimi kalitesinde, minimalist, temiz ve ultra premium bir görünüm.
+    
+    ÇIKTI:
+    Bu sanatsal Flat Lay kompozisyonunun tek bir yüksek çözünürlüklü görselini oluştur.
+    Boyut Oranı: ${aspectRatio}`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-pro-image-preview',
+            contents: {
+                parts: [imagePart, { text: fullPrompt }],
+            },
+            config: {
+                responseModalities: [Modality.IMAGE],
+                imageConfig: {
+                    aspectRatio: aspectRatio,
+                    imageSize: '2K',
+                }
+            },
+        });
+
+        const candidate = response.candidates?.[0];
+        const responseParts = candidate?.content?.parts;
+
+        if (responseParts) {
+            for (const part of responseParts) {
+                if (part.inlineData) {
+                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                }
+            }
+        }
+
+        throw new Error("Otomatik kolaj oluşturulamadı. API'den görsel döndürülmedi.");
+    } catch (e) {
+        console.error("Auto Collage Generation Error:", e);
+        throw e;
+    }
+};
+
+export const generateProductCollage = async (
+    products: ProductItem[],
+    background: string,
+    aspectRatio: '1:1' | '16:9' | '9:16' | '3:4' | '4:3' = '16:9',
+    customPrompt?: string,
+    mainImage?: File
+): Promise<string> => {
+    if (products.length < 1 || products.length > 6) {
+        throw new Error('Lütfen 1-6 arası ürün ekleyin');
+    }
+
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+    try {
+        // Convert all products to generative parts
+        const productParts = await Promise.all(
+            products.map(async (p) => {
+                if (typeof p.file === 'string') {
+                    const file = await base64ToFile(p.file, `product_${p.id}.png`);
+                    return fileToGenerativePart(file);
+                }
+                return fileToGenerativePart(p.file);
+            })
+        );
+
+        // Add main image if provided
+        let mainImagePart = null;
+        if (mainImage) {
+            mainImagePart = await fileToGenerativePart(mainImage);
+        }
+
+        // Build a detailed prompt for product collage
+        let backgroundInstruction = '';
+        if (background === 'corkboard') {
+            backgroundInstruction = 'The background should be a realistic brown corkboard texture.';
+        } else if (background === 'white') {
+            backgroundInstruction = 'The background should be a clean, minimalist white studio floor or frame.';
+        } else if (background === 'black') {
+            backgroundInstruction = 'The background should be a sleek black frame or elegant dark surface.';
+        } else if (background.startsWith('#')) {
+            backgroundInstruction = `The background should be a solid color with hex code ${background}.`;
+        } else {
+            backgroundInstruction = `The background should be ${background}.`;
+        }
+
+        const productDetails = products.map((p, i) =>
+            `Product ${i + 1}: "${p.name}"${p.price ? `, Price: ${p.price}` : ''}${p.description ? `, Description: ${p.description}` : ''}`
+        ).join('\n');
+
+        const fullPrompt = `${mainImage ? 'GÖREV: PROFESYONEL KOMBİN AYRIŞTIRMA VE KOMPOZİSYON' : 'GÖREV: ÜRÜN KATALOG KOLAJI'}
+        
+        ARKA PLAN:
+        ${backgroundInstruction}
+
+        BİLEŞENLER:
+        ${mainImage ? '- ANA MERKEZ GÖRSEL: Sağlanan ilk görsel (kombinin bütünü).' : ''}
+        ${productDetails}
+
+        STİL VE YERLEŞİM KURALLARI:
+        1. MERKEZİ ODAK: ${mainImage ? 'Ana kombin görselini (ilk görsel) kolajın tam ortasına, diğer parçalardan daha büyük bir polaroid olarak yerleştir.' : 'Ürünleri dengeli bir katalog düzeninde yerleştir.'}
+        2. ÜRÜN POLAROIDLERİ: ${mainImage ? 'Diğer ürünleri (kırpılmış parçaları) ana görselin etrafına rastgele ama düzenli bir şekilde saçılmış' : 'Tüm ürünleri'} polaroid fotoğraf tarzında yerleştir.
+        3. AYAKKABI KURALI: Ayakkabılar her zaman çift olarak (sağ ve sol yan yana) görünmelidir.
+        4. GERÇEKÇİ DETAYLAR: ${background === 'corkboard' ? 'Her polaroidi mantar panoya renkli iğnelerle (pushpins) tuttur. Fotoğrafların altına gerçekçi gölgeler ekle.' : 'Fotoğrafları minimalist bir düzenle yerleştir.'}
+        5. ETİKETLEME: Her ürünün altına el yazısı fontuyla Türkçe isimlerini yaz. Örn: "Keten Gömlek", "Deri Ayakkabı".
+        6. KALİTE: En üst düzey moda dergisi estetiği, profesyonel ışıklandırma ve netlik.
+        ${customPrompt ? `\nEKSTRA TALİMAT: ${customPrompt}` : ''}
+
+        ÇIKTI GEREKSİNİMLERİ:
+        - 2K Çözünürlük, Foto-realistik kalite.
+        - Boyut Oranı: ${aspectRatio}`;
+
+        const parts = mainImagePart
+            ? [mainImagePart, ...productParts, { text: fullPrompt }]
+            : [...productParts, { text: fullPrompt }];
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-pro-image-preview',
+            contents: {
+                parts: parts,
+            },
+            config: {
+                responseModalities: [Modality.IMAGE],
+                imageConfig: {
+                    aspectRatio: aspectRatio,
+                    imageSize: '2K',
+                }
+            },
+        });
+
+        const candidate = response.candidates?.[0];
+        const responseParts = candidate?.content?.parts;
+
+        if (responseParts) {
+            for (const part of responseParts) {
+                if (part.inlineData) {
+                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                }
+            }
+        }
+
+        throw new Error("Ürün kolajı oluşturulamadı. API'den görsel döndürülmedi.");
+    } catch (e) {
+        console.error("Product Collage Generation Error:", e);
         throw e;
     }
 };

@@ -119,12 +119,12 @@ const translations = {
     collage: {
       title: '🎨 Kolaj Stüdyosu: Çoklu Görsel Kompozisyon Aracı',
       description: 'Birden fazla görseli saniyeler içinde profesyonel kolajlara dönüştürün. AI destekli kompozisyon motoru, görsellerinizi otomatik olarak analiz eder ve mükemmel düzenleme önerileri sunar.',
-      featuresTitle: '💎 Temel Özellikler',
+      featuresTitle: '💎 Kolaj Seçenekleri',
       features: [
-        { title: '1. Akıllı Görsel Düzenleme', items: ['Otomatik Hizalama: 2-6 arası görseli yatay veya dikey olarak otomatik düzenler.', 'Arka Plan Uyumu: Tüm görseller için tutarlı arka plan ve renk paleti oluşturur.', 'Boyut Optimizasyonu: Görselleri orantılı şekilde yeniden boyutlandırır.'] },
-        { title: '2. Profesyonel Katalog Çıktıları', items: ['E-Ticaret Hazır: Amazon, Trendyol ve diğer platformlar için ideal kolaj formatları.', 'Yüksek Çözünürlük: Baskı kalitesinde çıktılar (300 DPI).', 'Marka Tutarlılığı: Tüm ürünleriniz için tek tip görsel dil.'] },
-        { title: '3. Video Dönüşümü', items: ['Kolajdan Videoya: Oluşturduğunuz kolajları sinematik videolara dönüştürün.', 'Sosyal Medya Formatları: Instagram, TikTok ve YouTube için optimize edilmiş çıktılar.', 'Dinamik Geçişler: Profesyonel geçiş efektleri ile akıcı videolar.'] },
-        { title: '4. Özelleştirilebilir Düzen', items: ['Prompt Desteği: "Beyaz arka plan üzerinde grid düzeni" gibi özel talimatlar verin.', 'Esnek Kompozisyon: Dikey, yatay veya grid düzenler arasında seçim yapın.', 'Marka Öğeleri: Logo ve metin eklemeleri için AI desteği.'] }
+        { title: '1. Standart Kolaj', items: ['Geleneksel Düzen: 2-6 arası görseli yan yana veya alt alta saniyeler içinde birleştirir.', 'Hızlı Katalog: Ürün varyasyonlarını ve detaylarını topluca sergilemek için idealdir.', 'Önizleme Kolaylığı: Müşterilerinize ürün gruplarını tek bakışta sunmanızı sağlar.'] },
+        { title: '2. Sihirli Kolaj (AI)', items: ['Profesyonel Flat Lay: Tek bir kombin fotoğrafını analiz ederek lüks dergi çekimi estetiğinde bir flat-lay kompozisyon oluşturur.', 'Otomatik Ayrıştırma: Kombindeki parçaları (üret, alt, çanta vb.) yapay zeka ile tanır ve tek tek resmeder.', 'Dergi Modu: İndirilebilir, fiyat etiketli profesyonel bir katalog sayfası üretir.'] },
+        { title: '3. Ürün Kolajı', items: ['Estetik Kompozisyon: Farklı zamanlarda çekilmiş ürünleri tek bir sanatsal düzende birleştirir.', 'Marka Kimliği: Tüm ürünleriniz için tutarlı arka plan ve ışık ayarları sunar.', 'Sınırsız Varyasyon: Farklı renk ve model seçeneklerini şık bir pano üzerinde sergiler.'] },
+        { title: '4. Video Dönüşümü', items: ['Dinamik İçerik: Oluşturduğunuz kolajları tek tıkla 2K sinematik videolara dönüştürün.', 'Sosyal Medya Hazır: Instagram Reels, TikTok ve Shorts için optimize edilmiş boyutlar.', 'Müzikli Geçişler: Ürünlerinizi daha etkileyici kılan profesyonel kamera hareketleri.'] }
       ],
       benefitsTitle: '🎯 Kullanım Alanları',
       benefits: [
@@ -583,12 +583,12 @@ const translations = {
     collage: {
       title: '🎨 Collage Studio: Multi-Image Composition Tool',
       description: 'Transform multiple images into professional collages in seconds. AI-powered composition engine automatically analyzes your visuals and provides perfect layout suggestions.',
-      featuresTitle: '💎 Key Features',
+      featuresTitle: '💎 Collage Options',
       features: [
-        { title: '1. Smart Image Arrangement', items: ['Auto Alignment: Automatically arranges 2-6 images horizontally or vertically.', 'Background Harmony: Creates consistent background and color palette for all images.', 'Size Optimization: Proportionally resizes images for perfect composition.'] },
-        { title: '2. Professional Catalog Outputs', items: ['E-Commerce Ready: Ideal collage formats for Amazon, eBay, and other platforms.', 'High Resolution: Print-quality outputs (300 DPI).', 'Brand Consistency: Uniform visual language for all your products.'] },
-        { title: '3. Video Conversion', items: ['Collage to Video: Transform your collages into cinematic videos.', 'Social Media Formats: Optimized outputs for Instagram, TikTok, and YouTube.', 'Dynamic Transitions: Smooth videos with professional transition effects.'] },
-        { title: '4. Customizable Layout', items: ['Prompt Support: Give custom instructions like "Grid layout on white background".', 'Flexible Composition: Choose between vertical, horizontal, or grid layouts.', 'Brand Elements: AI support for logo and text additions.'] }
+        { title: '1. Standard Collage', items: ['Traditional Layout: Combines 2-6 images side-by-side or stacked in seconds.', 'Quick Catalog: Ideal for showcasing product variations and details collectively.', 'Easy Preview: Present product groups to your customers at a single glance.'] },
+        { title: '2. Magic Collage (AI)', items: ['Professional Flat Lay: Analyzes a single outfit photo to create a flat-lay composition in luxury magazine aesthetics.', 'Auto Decomposition: AI recognizes outfit pieces (top, bottom, bag, etc.) and paints them individually.', 'Magazine Mode: Produces a downloadable, price-tagged professional catalog page.'] },
+        { title: '3. Product Collage', items: ['Aesthetic Composition: Merges different product photos taken at different times into a single artistic layout.', 'Brand Identity: Provides consistent background and lighting settings for all your products.', 'Unlimited Variations: Showcases different color and model options on a stylish board.'] },
+        { title: '4. Video Conversion', items: ['Dynamic Content: Transform your collages into 2K cinematic videos with one click.', 'Social Media Ready: Optimized sizes for Instagram Reels, TikTok, and Shorts.', 'Musical Transitions: Professional camera movements that make your products more impressive.'] }
       ],
       benefitsTitle: '🎯 Use Cases',
       benefits: [
@@ -1351,6 +1351,73 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <p className={`${descriptionTextClass} text-sm leading-relaxed`}>{benefit.desc}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Collage Section */}
+      <section className={`py-24 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-slate-50/50'} overflow-hidden`}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20 relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10"></div>
+            <h2 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 mb-6 uppercase tracking-tighter">
+              {t.collage.title}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto leading-relaxed`}>
+              {t.collage.description}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+            {t.collage.features.map((feature: any, idx: number) => (
+              <div key={idx} className={`${cardBg} p-8 rounded-[2rem] border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 group relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-8 shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                  <span className="text-3xl">
+                    {idx === 0 ? '🖼️' : idx === 1 ? '✨' : idx === 2 ? '🎨' : '🎬'}
+                  </span>
+                </div>
+                <h3 className={`text-2xl font-black ${textClass} mb-5 tracking-tight uppercase`}>{feature.title}</h3>
+                <ul className="space-y-4">
+                  {feature.items.map((item: string, i: number) => (
+                    <li key={i} className={`${descriptionTextClass} text-sm flex items-start gap-4 leading-relaxed group/item`}>
+                      <span className="text-blue-500 mt-1 font-black group-hover/item:translate-x-1 transition-transform">▸</span>
+                      <span className="font-medium">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className={`${cardBg} rounded-[2.5rem] p-12 border border-slate-700/50 relative overflow-hidden shadow-2xl`}>
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] -mr-64 -mt-64"></div>
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[120px] -ml-64 -mb-64"></div>
+            <div className="relative z-10">
+              <h3 className={`text-3xl font-black ${textClass} mb-12 text-center tracking-tight uppercase`}>
+                {t.collage.benefitsTitle}
+              </h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+                {t.collage.benefits.map((benefit: any, idx: number) => (
+                  <div key={idx} className="space-y-4 group">
+                    <div className="w-8 h-1 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-full group-hover:w-16 transition-all duration-500"></div>
+                    <h4 className={`text-lg font-black text-blue-400 uppercase tracking-tight`}>
+                      {benefit.title}
+                    </h4>
+                    <p className={`${descriptionTextClass} text-[13px] leading-relaxed font-medium opacity-80 uppercase tracking-tighter`}>
+                      {benefit.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-16 pt-8 border-t border-slate-700/20 text-center">
+                <div className="inline-block px-10 py-3 bg-blue-500/10 rounded-full border border-blue-500/20">
+                  <p className="text-blue-400 font-black tracking-[0.3em] text-[10px] uppercase italic drop-shadow-sm">
+                    ⚡ {t.collage.creditInfo}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

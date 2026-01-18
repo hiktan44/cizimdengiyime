@@ -628,12 +628,21 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
             <label className="block text-sm font-medium text-slate-300 mb-2">
               <span className="flex items-center gap-2"><MessageSquarePlus className="w-4 h-4" /> {t.labels.customPrompt}</span>
             </label>
-            <textarea
-              value={formData.customPrompt}
-              onChange={(e) => setFormData(prev => ({ ...prev, customPrompt: e.target.value }))}
-              placeholder={'Örn: "Model hafifçe sağa baksın", "Arka planda hafif şehir ışıkları olsun" veya "Yüklediğim aksesuarı modelin eline doğal bir şekilde yerleştirin".'}
-              className="w-full h-[120px] bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none text-sm"
-            />
+            <div className="relative">
+              <textarea
+                value={formData.customPrompt}
+                onChange={(e) => {
+                  setFormData(prev => ({ ...prev, customPrompt: e.target.value }));
+                }}
+                placeholder={'Örn: "Model hafifçe sağa baksın", "Arka planda hafif şehir ışıkları olsun" veya "Yüklediğim aksesuarı modelin eline doğal bir şekilde yerleştirin".'}
+                className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-y min-h-[120px] text-sm"
+              />
+              <div className="absolute bottom-2 right-2 text-slate-600 pointer-events-none">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -658,8 +667,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
               type="button"
               onClick={() => setFormData(prev => ({ ...prev, includeVideo: true }))}
               className={`flex-1 py-2 px-3 rounded-md text-xs font-medium transition-all flex items-center justify-center gap-2 ${formData.includeVideo
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
                 }`}
             >
               <Video className="w-3 h-3" />

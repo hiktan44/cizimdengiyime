@@ -486,13 +486,22 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                   <label className="block text-sm font-medium text-slate-300 mb-2">
                     Dönüşüm İstemi
                   </label>
-                  <textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Ör: Bu fotoğraftaki kişiyi bir astronot yap, uzay arka planı ekle..."
-                    rows={4}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition resize-none"
-                  />
+                  <div className="relative">
+                    <textarea
+                      value={prompt}
+                      onChange={(e) => {
+                        setPrompt(e.target.value);
+                      }}
+                      placeholder="Ör: Bu fotoğraftaki kişiyi bir astronot yap, uzay arka planı ekle..."
+                      rows={4}
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none resize-y min-h-[120px]"
+                    />
+                    <div className="absolute bottom-2 right-2 text-slate-600 pointer-events-none">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Aspect Ratio */}

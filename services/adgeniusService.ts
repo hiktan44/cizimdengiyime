@@ -4,6 +4,12 @@ import { ProductAnalysis, AdPrompt, FormData, AdStyle, ImageModel, VideoModel } 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
+const checkApiKey = () => {
+  if (!API_KEY || API_KEY === 'undefined' || API_KEY === 'your-gemini-api-key-here') {
+    throw new Error('Gemini API anahtarı ayarlanmamış. Lütfen .env.local dosyasını kontrol edin ve VITE_GEMINI_API_KEY değişkeninin doğru olduğundan emin olun.');
+  }
+};
+
 // Define maximally permissive safety settings for e-commerce
 // Using BLOCK_NONE is essential for underwear/swimwear models to avoid IMAGE_SAFETY triggers.
 const PERMISSIVE_SAFETY_SETTINGS = [
@@ -46,6 +52,7 @@ export const fileToGoogleGenAIBase64 = async (file: File): Promise<string> => {
 
 // 1. Analyze Product Image
 export const analyzeProductImage = async (file: File): Promise<ProductAnalysis> => {
+  checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
   const base64Data = await fileToGoogleGenAIBase64(file);
 
@@ -413,6 +420,7 @@ export const generateAdImage = async (
   patternImageMimeType?: string | null,
   seed?: number
 ): Promise<string> => {
+  checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   // Reusable generation function
@@ -564,6 +572,7 @@ export const generateAdVideo = async (
   aspectRatio: string = '16:9',
   onProgress?: (progress: number) => void
 ): Promise<string> => {
+  checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   const mimeType = 'image/png';

@@ -1174,13 +1174,20 @@ const ToolPage: React.FC<{
                                             <label className="font-medium text-cyan-400 block mb-2 text-sm flex items-center gap-2">
                                                 <SparklesIcon /> Yapay Zeka ile Sohbet / Detaylı İstek
                                             </label>
-                                            <textarea
-                                                value={customPrompt}
-                                                onChange={(e) => setCustomPrompt(e.target.value)}
-                                                placeholder="Örn: Parkta bankta oturan, elinde kahve tutan, güneş gözlüklü bir model olsun. Arka planda sonbahar yaprakları..."
-                                                rows={3}
-                                                className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-sm placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-none"
-                                            />
+                                            <div className="relative">
+                                                <textarea
+                                                    value={customPrompt}
+                                                    onChange={(e) => setCustomPrompt(e.target.value)}
+                                                    placeholder="Örn: Parkta bankta oturan, elinde kahve tutan, güneş gözlüklü bir model olsun. Arka planda sonbahar yaprakları..."
+                                                    rows={3}
+                                                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-sm placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-y min-h-[100px]"
+                                                />
+                                                <div className="absolute bottom-2 right-2 text-slate-600 pointer-events-none opacity-50">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
+                                                    </svg>
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1469,14 +1476,19 @@ const ToolPage: React.FC<{
                                                 </div>
                                             )}
                                             {/* Custom Background Prompt */}
-                                            <div className="mt-2">
+                                            <div className="mt-2 relative">
                                                 <textarea
                                                     value={customBackgroundPrompt}
                                                     onChange={(e) => setCustomBackgroundPrompt(e.target.value)}
                                                     placeholder="Örn: Güneş batarken sahilde, kumda yürüyor... (isteğe bağlı)"
                                                     rows={2}
-                                                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-white text-xs placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-none"
+                                                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-xs placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-y min-h-[80px]"
                                                 />
+                                                <div className="absolute bottom-2 right-2 text-slate-600 pointer-events-none opacity-50">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
+                                                    </svg>
+                                                </div>
                                                 <p className="text-xs text-slate-500 mt-1">İsteğe bağlı: Arka plan hakkında özel detaylar ekleyin</p>
                                             </div>
                                         </div>

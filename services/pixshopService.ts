@@ -8,9 +8,11 @@ import { GoogleGenAI, GenerateContentResponse, HarmCategory, HarmBlockThreshold 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
-if (!API_KEY) {
-    console.error('VITE_GEMINI_API_KEY environment variable is not set for Pixshop!');
-}
+const checkApiKey = () => {
+    if (!API_KEY || API_KEY === 'undefined' || API_KEY === 'your-gemini-api-key-here') {
+        throw new Error('Gemini API anahtarı ayarlanmamış. Lütfen .env.local dosyasını kontrol edin ve VITE_GEMINI_API_KEY değişkeninin doğru olduğundan emin olun.');
+    }
+};
 
 // Helper function to convert a File object to a Gemini API Part
 const fileToPart = async (file: File): Promise<{ inlineData: { mimeType: string; data: string; } }> => {
@@ -87,6 +89,7 @@ export const pixshopGenerateEditedImage = async (
     hotspot: { x: number, y: number }
 ): Promise<string> => {
     console.log('Starting generative edit at:', hotspot);
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const originalImagePart = await fileToPart(originalImage);
@@ -119,6 +122,7 @@ export const pixshopGenerateFilteredImage = async (
     filterPrompt: string,
 ): Promise<string> => {
     console.log(`Starting filter generation: ${filterPrompt}`);
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const originalImagePart = await fileToPart(originalImage);
@@ -150,6 +154,7 @@ export const pixshopGenerateAdjustedImage = async (
     adjustmentPrompt: string,
 ): Promise<string> => {
     console.log(`Starting global adjustment generation: ${adjustmentPrompt}`);
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const originalImagePart = await fileToPart(originalImage);
@@ -179,6 +184,7 @@ export const pixshopRemoveBackground = async (
     originalImage: File
 ): Promise<string> => {
     console.log('Starting background removal...');
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const originalImagePart = await fileToPart(originalImage);
@@ -211,6 +217,7 @@ export const pixshopUpscaleImage = async (
     size: '2K' | '4K'
 ): Promise<string> => {
     console.log(`Starting image upscale to ${size}...`);
+    checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const originalImagePart = await fileToPart(originalImage);

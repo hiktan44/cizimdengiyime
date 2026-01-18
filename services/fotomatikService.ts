@@ -8,9 +8,11 @@ import { GoogleGenAI } from "@google/genai";
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
-if (!API_KEY) {
-    console.error('VITE_GEMINI_API_KEY environment variable is not set for Fotomatik!');
-}
+const checkApiKey = () => {
+  if (!API_KEY || API_KEY === 'undefined' || API_KEY === 'your-gemini-api-key-here') {
+    throw new Error('Gemini API anahtarı ayarlanmamış. Lütfen .env.local dosyasını kontrol edin ve VITE_GEMINI_API_KEY değişkeninin doğru olduğundan emin olun.');
+  }
+};
 
 /**
  * Görüntüyü dönüştürür (Transform modu)
@@ -29,10 +31,7 @@ export const fotomatikGenerateEditedImage = async (
     imageSize: string;
   }
 ): Promise<string> => {
-  if (!API_KEY) {
-    throw new Error("API Key is missing. Please check your environment configuration.");
-  }
-
+  checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   try {
@@ -61,7 +60,7 @@ export const fotomatikGenerateEditedImage = async (
 
     const parts = response.candidates?.[0]?.content?.parts;
     if (!parts) {
-        throw new Error("No content returned from Gemini.");
+      throw new Error("No content returned from Gemini.");
     }
 
     for (const part of parts) {
@@ -69,12 +68,12 @@ export const fotomatikGenerateEditedImage = async (
         return `data:image/png;base64,${part.inlineData.data}`;
       }
     }
-    
+
     // If only text is returned (e.g., a refusal or explanation), throw it as an error to display
     for (const part of parts) {
-        if (part.text) {
-            throw new Error(`Model returned text instead of image: ${part.text}`);
-        }
+      if (part.text) {
+        throw new Error(`Model returned text instead of image: ${part.text}`);
+      }
     }
 
     throw new Error("No valid image data found in the response.");
@@ -107,10 +106,7 @@ export const fotomatikGenerateImagePrompt = async (
   imageBase64: string,
   mimeType: string
 ): Promise<PromptAnalysisResponse> => {
-  if (!API_KEY) {
-    throw new Error("API Key is missing.");
-  }
-
+  checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   try {
@@ -171,18 +167,15 @@ export const fotomatikSuggestEnhancements = async (
   imageBase64: string,
   mimeType: string,
   mode: 'balanced' | 'vibrant' | 'crisp' | 'cinematic' = 'balanced'
-): Promise<{ 
-  brightness: number; 
-  contrast: number; 
-  saturation: number; 
-  sharpness: number; 
-  highlights: number; 
-  shadows: number; 
+): Promise<{
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  sharpness: number;
+  highlights: number;
+  shadows: number;
 }> => {
-  if (!API_KEY) {
-    throw new Error("API Key is missing.");
-  }
-
+  checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   const modeInstructions = {
@@ -227,7 +220,7 @@ export const fotomatikSuggestEnhancements = async (
 
     const text = response.text;
     if (!text) throw new Error("No text returned from Gemini");
-    
+
     const json = JSON.parse(text);
     return {
       brightness: typeof json.brightness === 'number' ? json.brightness : 100,
