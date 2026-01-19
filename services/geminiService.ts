@@ -324,19 +324,26 @@ export const generateVideoFromImage = async (
 
     console.log('Starting video generation with model:', modelName);
 
-    let operation = await ai.models.generateVideos({
-        model: modelName,
-        prompt: settings.prompt,
-        image: {
-            imageBytes: imageBytes,
-            mimeType: mimeType,
-        },
-        config: {
-            numberOfVideos: 1,
-            resolution: settings.resolution,
-            aspectRatio: settings.aspectRatio,
-        }
-    });
+    let operation;
+
+    try {
+        operation = await ai.models.generateVideos({
+            model: modelName,
+            prompt: settings.prompt,
+            image: {
+                imageBytes: imageBytes,
+                mimeType: mimeType,
+            },
+            config: {
+                numberOfVideos: 1,
+                resolution: settings.resolution,
+                aspectRatio: settings.aspectRatio,
+            }
+        });
+    } catch (e: any) {
+        console.error("Video initiation error:", e);
+        throw new Error(`Video başlatılamadı: ${e.message}`);
+    }
 
     console.log('Initial operation response:', operation);
 
@@ -350,8 +357,16 @@ export const generateVideoFromImage = async (
         console.log(`Polling attempt ${pollCount}/${maxPolls}...`);
 
         try {
-            operation = await ai.operations.getVideosOperation({ operation: operation });
+            const updatedOp = await ai.operations.getVideosOperation({ operation: operation });
+            operation = updatedOp;
             console.log('Operation status:', { done: operation.done, pollCount });
+
+            // Check for immediate errors during polling
+            if ((operation as any).error) {
+                console.error("Operation error detected during polling:", (operation as any).error);
+                throw new Error((operation as any).error.message || 'Video işleme sırasında API hatası oluştu.');
+            }
+
         } catch (e: any) {
             // Handle "Requested entity was not found" error during polling (common Veo issue)
             if (e.message && e.message.includes('404')) {
@@ -369,33 +384,62 @@ export const generateVideoFromImage = async (
 
     console.log('Final operation response:', JSON.stringify(operation, null, 2));
 
-    if (operation.response?.generatedVideos?.[0]?.video?.uri) {
-        const downloadLink = operation.response.generatedVideos[0].video.uri;
+    // Double check error after loop
+    if ((operation as any).error) {
+        throw new Error(`Video API Hatası: ${(operation as any).error.message}`);
+    }
+
+    // Attempt to extract URI with fallback for result property
+    // Some SDK versions or API responses might put data in 'result' instead of 'response'
+    const responseData = operation.response || (operation as any).result;
+    const videoUri = responseData?.generatedVideos?.[0]?.video?.uri;
+
+    if (videoUri) {
+        const downloadLink = videoUri;
         console.log('Video URI found:', downloadLink);
 
         // Append API key strictly from the variable
-        const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
+        try {
+            const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
 
-        if (!videoRes.ok) {
-            const err = await videoRes.text();
-            console.warn("Video download failed:", err);
-            throw new Error(`Video indirilemedi: ${err}`);
+            if (!videoRes.ok) {
+                const err = await videoRes.text();
+                console.warn("Video download failed:", err);
+                throw new Error(`Video indirilemedi: ${err}`);
+            }
+
+            const blob = await videoRes.blob();
+            return URL.createObjectURL(blob);
+        } catch (e: any) {
+            throw new Error(`Video indirme hatası: ${e.message}`);
         }
-
-        const blob = await videoRes.blob();
-        return URL.createObjectURL(blob);
     }
 
-    // More detailed error message
+    // Check for RAI filters (Safety/Policy blocks)
+    if (responseData?.raiMediaFilteredReasons && responseData.raiMediaFilteredReasons.length > 0) {
+        const reason = responseData.raiMediaFilteredReasons[0];
+        console.warn("Video blocked by RAI filter:", reason);
+
+        if (reason.includes("celebrity") || reason.includes("identity")) {
+            throw new Error("Güvenlik Filtresi: Videoda ünlü benzerliği veya kimlik koruması algılandı.");
+        }
+        if (reason.includes("sexual") || reason.includes("nsfw")) {
+            throw new Error("Güvenlik Filtresi: Görsel veya prompt güvenli içerik politikasına takıldı.");
+        }
+        throw new Error(`Video güvenlik filtresine takıldı: ${reason}`);
+    }
+
+    // More detailed error message if we still don't have a URI
     const errorDetails = {
         done: operation.done,
-        hasResponse: !!operation.response,
-        hasVideos: !!operation.response?.generatedVideos,
-        videoCount: operation.response?.generatedVideos?.length || 0,
+        hasResponse: !!responseData,
+        hasVideos: !!responseData?.generatedVideos,
+        videoCount: responseData?.generatedVideos?.length || 0,
+        fullOp: operation
     };
 
     console.error('Video generation failed. Operation details:', errorDetails);
-    throw new Error(`Video oluşturulamadı. API'den video URI alınamadı. Lütfen tekrar deneyin veya farklı ayarlar kullanın.`);
+    throw new Error(`Video oluşturulamadı. API'den video URI alınamadı. Lütfen görseli veya promptu değiştirip tekrar deneyin.`);
 };
 
 export const generateImage = async (
