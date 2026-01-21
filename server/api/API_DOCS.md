@@ -1,61 +1,89 @@
-# Fasheone Mobile API v1.0
+# 📱 Fasheone Mobile API - Kullanım Kılavuzu
 
-Mobil uygulamalar için kapsamlı REST API dokümantasyonu.
+Bu doküman, mobil uygulama geliştiricileri için Fasheone API'sinin nasıl kullanılacağını detaylı olarak açıklar.
 
-## Base URL
+---
+
+## 📋 İçindekiler
+
+1. [Hızlı Başlangıç](#hızlı-başlangıç)
+2. [Kimlik Doğrulama](#kimlik-doğrulama)
+3. [Kullanıcı İşlemleri](#kullanıcı-işlemleri)
+4. [AI Görsel Oluşturma](#ai-görsel-oluşturma)
+5. [Ödeme Entegrasyonu](#ödeme-entegrasyonu)
+6. [Hata Yönetimi](#hata-yönetimi)
+7. [SDK Örnekleri](#sdk-örnekleri)
+
+---
+
+## 🚀 Hızlı Başlangıç
+
+### Base URL
 ```
 Production: https://api.fasheone.com/api/v1
 Development: http://localhost:3002/api/v1
 ```
 
-## Authentication
-
-Tüm korumalı endpointler için Bearer token gereklidir:
-```
-Authorization: Bearer <access_token>
+### Health Check
+```bash
+curl https://api.fasheone.com/api/v1/health
 ```
 
----
-
-## 🔐 Auth Endpoints
-
-### POST /auth/signup
-Yeni kullanıcı kaydı
-
-**Request Body:**
+**Yanıt:**
 ```json
 {
-  "email": "user@example.com",
-  "password": "securepassword",
-  "fullName": "Ahmet Yılmaz"
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "user": {
-    "id": "uuid",
-    "email": "user@example.com"
+  "status": "OK",
+  "version": "1.0.0",
+  "services": {
+    "supabase": true,
+    "gemini": true
   }
 }
 ```
 
 ---
 
-### POST /auth/login
-Kullanıcı girişi
+## 🔐 Kimlik Doğrulama
 
-**Request Body:**
+### 1. Kayıt Olma
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "guvenli123",
+    "fullName": "Ahmet Yılmaz"
+  }'
+```
+
+**Yanıt:**
 ```json
 {
-  "email": "user@example.com",
-  "password": "securepassword"
+  "success": true,
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "user@example.com"
+  }
 }
 ```
 
-**Response:**
+> 💡 Yeni kullanıcılara otomatik olarak **5 ücretsiz kredi** verilir.
+
+---
+
+### 2. Giriş Yapma
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "guvenli123"
+  }'
+```
+
+**Yanıt:**
 ```json
 {
   "success": true,
@@ -65,10 +93,9 @@ Kullanıcı girişi
     "expires_at": 1706000000
   },
   "user": {
-    "id": "uuid",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "email": "user@example.com",
-    "fullName": "Ahmet Yılmaz",
-    "avatarUrl": null
+    "fullName": "Ahmet Yılmaz"
   },
   "profile": {
     "credits": 5,
@@ -78,268 +105,326 @@ Kullanıcı girişi
 }
 ```
 
+> ⚠️ `access_token` değerini saklayın! Tüm korumalı isteklerde kullanacaksınız.
+
 ---
 
-### POST /auth/refresh
-Token yenileme
+### 3. Token Kullanımı
 
-**Request Body:**
-```json
-{
-  "refreshToken": "v1.MjNiNzI4..."
-}
+Korumalı endpointlere istek yaparken `Authorization` header'ı ekleyin:
+
+```bash
+curl -X GET https://api.fasheone.com/api/v1/user/profile \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
 ```
 
 ---
 
-### GET /auth/google
-Google OAuth URL alma
+### 4. Token Yenileme
 
-**Query Parameters:**
-- `redirectTo`: Callback URL (opsiyonel)
+Access token süresi dolduğunda (1 saat) refresh token ile yenileyin:
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "v1.MjNiNzI4..."
+  }'
+```
 
 ---
 
-## 👤 User Endpoints
+## 👤 Kullanıcı İşlemleri
 
-### GET /user/profile
-🔒 Kullanıcı profili
+### Profil Bilgisi Alma
 
-**Response:**
+```bash
+curl -X GET https://api.fasheone.com/api/v1/user/profile \
+  -H "Authorization: Bearer TOKEN"
+```
+
+**Yanıt:**
 ```json
 {
-  "id": "uuid",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
   "email": "user@example.com",
   "fullName": "Ahmet Yılmaz",
-  "avatarUrl": null,
   "credits": 45,
   "subscriptionTier": "pro",
-  "subscriptionStart": "2024-01-01",
-  "subscriptionEnd": "2024-02-01",
-  "isAdmin": false,
-  "createdAt": "2024-01-01T00:00:00Z"
+  "isAdmin": false
 }
 ```
 
 ---
 
-### PUT /user/profile
-🔒 Profil güncelleme
+### Üretim Geçmişi
 
-**Request Body:**
+```bash
+curl -X GET "https://api.fasheone.com/api/v1/user/generations?limit=10&offset=0" \
+  -H "Authorization: Bearer TOKEN"
+```
+
+**Yanıt:**
 ```json
 {
-  "fullName": "Ahmet Yılmaz",
-  "avatarUrl": "https://..."
+  "generations": [
+    {
+      "id": "uuid",
+      "type": "product_to_model",
+      "credits_used": 1,
+      "output_image_url": "data:image/png;base64,...",
+      "created_at": "2024-01-20T10:30:00Z"
+    }
+  ],
+  "total": 25,
+  "limit": 10,
+  "offset": 0
 }
 ```
 
 ---
 
-### GET /user/generations
-🔒 Üretim geçmişi
+## 🎨 AI Görsel Oluşturma
 
-**Query Parameters:**
-- `limit`: Sayfa başına kayıt (default: 20)
-- `offset`: Başlangıç (default: 0)
-- `type`: Filtre (opsiyonel)
+### Kredi Maliyetleri
+
+| İşlem | Kredi |
+|-------|-------|
+| Eskiz → Ürün | 1 |
+| Ürün → Canlı Model | 1 |
+| Video Oluşturma | 3 |
+| Teknik Çizim | 1 |
+| Pixshop Düzenleme | 1 |
+| Fotomatik Transform | 1 |
+| Fotomatik Describe | 1 |
+| AdGenius Görsel | 1 |
+| AdGenius Video | 2 |
+| Kolaj | 2 |
 
 ---
 
-### GET /user/transactions
-🔒 İşlem geçmişi
+### 1. Eskiz → Ürün Dönüşümü
 
----
+Moda eskizinizi fotorealistik ürün görseline dönüştürün.
 
-## 🎨 Generation Endpoints
-
-### GET /generation/costs
-Kredi maliyetleri
-
-**Response:**
-```json
-{
-  "SKETCH_TO_PRODUCT": 1,
-  "PRODUCT_TO_MODEL": 1,
-  "VIDEO": 3,
-  "TECH_SKETCH": 1,
-  "PIXSHOP": 1,
-  "FOTOMATIK_TRANSFORM": 1,
-  "FOTOMATIK_DESCRIBE": 1,
-  "ADGENIUS_IMAGE": 1,
-  "ADGENIUS_VIDEO": 2,
-  "COLLAGE": 2
-}
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/sketch-to-product \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@eskiz.png" \
+  -F "color=Kırmızı"
 ```
 
----
-
-### POST /generation/sketch-to-product
-🔒 Eskiz → Ürün dönüşümü (1 kredi)
-
-**Request:** `multipart/form-data`
-- `image`: Eskiz dosyası (required)
-- `color`: Renk (optional)
-
-**Response:**
+**Yanıt:**
 ```json
 {
   "success": true,
-  "image": "data:image/png;base64,...",
+  "image": "data:image/png;base64,iVBORw0KGgo...",
   "creditsRemaining": 44
 }
 ```
 
----
-
-### POST /generation/product-to-model
-🔒 Ürün → Canlı Model (1 kredi)
-
-**Request:** `multipart/form-data`
-- `image`: Ürün fotoğrafı (required)
-- `clothingType`: Kıyafet tipi
-- `color`: Ana renk
-- `ethnicity`: Etnik köken
-- `bodyType`: Vücut tipi (Standart, İnce, Atletik, vb.)
-- `pose`: Poz (Ayakta, Yürürken, Otururken)
-- `hairColor`: Saç rengi
-- `hairStyle`: Saç stili
-- `location`: Mekan (Stüdyo, Sokak, Podyum)
-- `lighting`: Işıklandırma
-- `cameraAngle`: Kamera açısı
-- `gender`: Cinsiyet (Male/Female)
-- `ageRange`: Yaş grubu (Child/Teen/Adult/Elderly)
-- `aspectRatio`: En boy oranı
-- `customPrompt`: Özel istek
+> 💡 `image` alanındaki base64 veriyi doğrudan `<img src="...">` olarak kullanabilirsiniz.
 
 ---
 
-### POST /generation/video
-🔒 Görsel → Video (3 kredi)
+### 2. Ürün → Canlı Model
 
-**Request:** `multipart/form-data`
-- `image`: Kaynak görsel
-- `prompt`: Video açıklaması
-- `duration`: Süre (saniye)
-- `aspectRatio`: 16:9 veya 9:16
+Ürün görselinizi bir model üzerinde gösterin.
 
----
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/product-to-model \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@urun.jpg" \
+  -F "gender=Female" \
+  -F "ethnicity=Türk" \
+  -F "bodyType=Standart" \
+  -F "pose=Ayakta" \
+  -F "location=Stüdyo" \
+  -F "lighting=Doğal" \
+  -F "aspectRatio=3:4"
+```
 
-### POST /generation/tech-sketch
-🔒 Ürün → Teknik Çizim (1 kredi)
+**Tüm Parametreler:**
 
-**Request:** `multipart/form-data`
-- `image`: Ürün fotoğrafı
-- `style`: blackwhite veya colored
-
----
-
-### POST /generation/pixshop/edit
-🔒 Fotoğraf düzenleme (1 kredi)
-
-**Request:** `multipart/form-data`
-- `image`: Düzenlenecek görsel
-- `prompt`: Düzenleme talimatı
-- `hotspotX`: Odak noktası X
-- `hotspotY`: Odak noktası Y
-
----
-
-### POST /generation/pixshop/remove-bg
-🔒 Arka plan kaldırma (1 kredi)
-
-**Request:** `multipart/form-data`
-- `image`: Görsel
+| Parametre | Değerler | Varsayılan |
+|-----------|----------|------------|
+| `clothingType` | Üst, Alt, Elbise, Dış Giyim, Alt & Üst, Takım Elbise | - |
+| `gender` | Female, Male | Female |
+| `ethnicity` | Farklı, Türk, Avrupalı, İskandinav, Akdeniz, Asyalı, Afrikalı, Latin, Orta Doğulu | Farklı |
+| `ageRange` | Child, Teen, Adult, Elderly | Adult |
+| `bodyType` | Standart, İnce, Kıvrımlı, Atletik, Büyük Beden, Battal Beden | Standart |
+| `pose` | Rastgele, Ayakta, Yürürken, Eller Belde, Otururken | Rastgele |
+| `hairColor` | Doğal, Sarı, Kumral, Siyah, Kızıl, Gri, Pastel Pembe | Doğal |
+| `hairStyle` | Doğal, Uzun Düz, Uzun Dalgalı, Kısa Küt, Kısa Pixie, Topuz, At Kuyruğu, Kıvırcık | Doğal |
+| `location` | Podyum, Stüdyo, Sokak, Doğal Mekan, Lüks Mağaza | Stüdyo |
+| `lighting` | Doğal, Stüdyo, Gün Batımı, Dramatik, Neon | Doğal |
+| `cameraAngle` | Normal, Alt Açı, Üst Açı, Geniş Açı, Portre | Normal |
+| `aspectRatio` | 3:4, 9:16, 4:5, 1:1, 16:9 | 3:4 |
+| `customPrompt` | Özel metin | - |
 
 ---
 
-### POST /generation/fotomatik/transform
-🔒 Görüntü dönüştürme (1 kredi)
+### 3. Video Oluşturma
 
-**Request:** `multipart/form-data`
-- `image`: Kaynak görsel
-- `prompt`: Dönüşüm talimatı
-- `aspectRatio`: En boy oranı
+Statik görselden video oluşturun.
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/video \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@model.png" \
+  -F "prompt=Model yavaşça yürüyor" \
+  -F "duration=5" \
+  -F "aspectRatio=9:16"
+```
 
 ---
 
-### POST /generation/fotomatik/describe
-🔒 Prompt üretme (1 kredi)
+### 4. Teknik Çizim
 
-**Request:** `multipart/form-data`
-- `image`: Analiz edilecek görsel
+Ürün fotoğrafından profesyonel teknik çizim oluşturun.
 
-**Response:**
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/tech-sketch \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@urun.jpg" \
+  -F "style=blackwhite"  # veya "colored"
+```
+
+---
+
+### 5. Pixshop - Fotoğraf Düzenleme
+
+AI ile görseli düzenleyin.
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/pixshop/edit \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@foto.jpg" \
+  -F "prompt=Arka planı mavi yap"
+```
+
+---
+
+### 6. Pixshop - Arka Plan Kaldırma
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/pixshop/remove-bg \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@foto.jpg"
+```
+
+---
+
+### 7. Fotomatik - Görüntü Dönüştürme
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/fotomatik/transform \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@foto.jpg" \
+  -F "prompt=Anime stiline dönüştür" \
+  -F "aspectRatio=1:1"
+```
+
+---
+
+### 8. Fotomatik - Prompt Üretme
+
+Görselden Midjourney ve Stable Diffusion promptları üretin.
+
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/fotomatik/describe \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@foto.jpg"
+```
+
+**Yanıt:**
 ```json
 {
   "success": true,
   "prompts": {
-    "tr": "Türkçe açıklama...",
-    "en": "English description...",
-    "midjourney": "MJ prompt --ar 16:9...",
+    "tr": "Profesyonel moda fotoğrafı, kadın model...",
+    "en": "Professional fashion photography, female model...",
+    "midjourney": "fashion photography, female model wearing elegant dress --ar 3:4 --stylize 500",
     "stableDiffusion": {
-      "positive": "...",
-      "negative": "...",
-      "params": "..."
+      "positive": "masterpiece, best quality, fashion photography...",
+      "negative": "low quality, blurry, distorted...",
+      "params": "Steps: 25, CFG: 7, Sampler: DPM++ 2M Karras"
     },
-    "tips": ["Öneri 1", "Öneri 2", "Öneri 3"]
+    "tips": [
+      "Daha iyi sonuç için 85mm lens kullanın",
+      "Golden hour ışığı deneyin",
+      "Kontrastı artırın"
+    ]
   }
 }
 ```
 
 ---
 
-### POST /generation/adgenius/analyze
-🔒 Ürün analizi (ÜCRETSİZ)
+### 9. AdGenius - Ürün Analizi (ÜCRETSİZ)
 
-**Request:** `multipart/form-data`
-- `image`: Ürün görseli
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/adgenius/analyze \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@urun.jpg"
+```
 
-**Response:**
+**Yanıt:**
 ```json
 {
   "success": true,
   "analysis": {
     "productType": "Elbise",
-    "name": "Yazlık Maxi Elbise",
-    "description": "...",
-    "features": ["Çiçek deseni", "V yaka"],
-    "targetAudience": "25-45 yaş kadın",
-    "suggestedStyles": ["Lifestyle", "Beach"],
-    "colors": ["Beyaz", "Mavi"]
+    "name": "Zarif Yazlık Maxi Elbise",
+    "description": "Çiçek desenli, V yaka, uzun yazlık elbise",
+    "features": ["Çiçek deseni", "V yaka", "Bel korsajlı"],
+    "targetAudience": "25-45 yaş kadın, romantik stil seven",
+    "suggestedStyles": ["Lifestyle", "Beach", "Romantic"],
+    "colors": ["Beyaz", "Pembe", "Yeşil"]
   }
 }
 ```
 
 ---
 
-### POST /generation/adgenius/image
-🔒 Reklam görseli oluşturma (1 kredi)
+### 10. AdGenius - Reklam Görseli
 
-**Request:** `multipart/form-data`
-- `image`: Ürün görseli
-- `prompt`: Reklam açıklaması
-- `style`: Stil
-- `aspectRatio`: En boy oranı
-
----
-
-### POST /generation/collage
-🔒 Kolaj oluşturma (2 kredi)
-
-**Request:** `multipart/form-data`
-- `images`: 2-6 görsel (array)
-- `prompt`: Kompozisyon talimatı
-- `aspectRatio`: En boy oranı
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/adgenius/image \
+  -H "Authorization: Bearer TOKEN" \
+  -F "image=@urun.jpg" \
+  -F "style=Lifestyle" \
+  -F "prompt=Sahil kenarında romantik görünüm" \
+  -F "aspectRatio=1:1"
+```
 
 ---
 
-## 💳 Payment Endpoints
+### 11. Kolaj Oluşturma
 
-### GET /payment/packages
-Kredi paketleri
+2-6 görseli birleştirin.
 
-**Response:**
+```bash
+curl -X POST https://api.fasheone.com/api/v1/generation/collage \
+  -H "Authorization: Bearer TOKEN" \
+  -F "images=@gorsel1.jpg" \
+  -F "images=@gorsel2.jpg" \
+  -F "images=@gorsel3.jpg" \
+  -F "prompt=Grid layout, minimalist" \
+  -F "aspectRatio=16:9"
+```
+
+---
+
+## 💳 Ödeme Entegrasyonu
+
+### Kredi Paketlerini Görüntüleme
+
+```bash
+curl https://api.fasheone.com/api/v1/payment/packages
+```
+
+**Yanıt:**
 ```json
 {
   "packages": [
@@ -357,157 +442,272 @@ Kredi paketleri
 
 ---
 
-### GET /payment/exchange-rate
-Güncel döviz kuru
+### Stripe ile Ödeme Başlatma
 
-**Response:**
-```json
-{
-  "currency": "EUR",
-  "rate": 35.42
-}
+```bash
+curl -X POST https://api.fasheone.com/api/v1/payment/create-intent \
+  -H "Authorization: Bearer TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packageId": "medium",
+    "amountTL": 500,
+    "credits": 100
+  }'
 ```
 
----
-
-### POST /payment/create-intent
-🔒 Ödeme başlatma
-
-**Request Body:**
+**Yanıt:**
 ```json
 {
-  "packageId": "medium",
-  "amountTL": 500,
-  "credits": 100
-}
-```
-
-**Response:**
-```json
-{
-  "clientSecret": "pi_..._secret_...",
+  "clientSecret": "pi_3NkFe2Hk..._secret_...",
   "amountEUR": "14.12",
   "rate": 35.42
 }
 ```
 
----
-
-## 👑 Admin Endpoints
-
-### GET /admin/users
-🔒👑 Tüm kullanıcılar
-
-**Query Parameters:**
-- `limit`: Sayfa başına (default: 50)
-- `offset`: Başlangıç
-- `search`: E-posta veya isim araması
+> 💡 `clientSecret` değerini Stripe SDK ile kullanarak ödeme formunu gösterin.
 
 ---
 
-### GET /admin/transactions
-🔒👑 Tüm işlemler
+## ⚠️ Hata Yönetimi
 
----
-
-### GET /admin/generations
-🔒👑 Tüm üretimler
-
-**Query Parameters:**
-- `type`: Filtre (opsiyonel)
-
----
-
-### PUT /admin/users/:userId/credits
-🔒👑 Kullanıcı kredisi güncelleme
-
-**Request Body:**
-```json
-{
-  "credits": 100,
-  "reason": "Bonus kredi"
-}
-```
-
----
-
-### GET /admin/stats
-🔒👑 Dashboard istatistikleri
-
-**Response:**
-```json
-{
-  "totalUsers": 1250,
-  "todayGenerations": 456,
-  "monthlyRevenue": 45000,
-  "generationBreakdown": {
-    "product_to_model": 180,
-    "sketch_to_product": 120,
-    "video": 45
-  }
-}
-```
-
----
-
-## Error Responses
+### Hata Formatı
 
 Tüm hatalar aşağıdaki formatta döner:
 
 ```json
 {
-  "error": "Error message description"
+  "error": "Hata açıklaması"
 }
 ```
 
-### HTTP Status Codes
-- `200` - Başarılı
-- `400` - Geçersiz istek
-- `401` - Yetkilendirme hatası
-- `403` - Erişim reddedildi
-- `500` - Sunucu hatası
+### HTTP Status Kodları
+
+| Kod | Açıklama |
+|-----|----------|
+| 200 | Başarılı |
+| 400 | Geçersiz istek (eksik parametre, yetersiz kredi) |
+| 401 | Yetkilendirme hatası (geçersiz/süresi dolmuş token) |
+| 403 | Erişim reddedildi (admin yetkisi gerekli) |
+| 500 | Sunucu hatası |
+
+### Yaygın Hatalar
+
+```json
+// Yetersiz kredi
+{ "error": "Insufficient credits" }
+
+// Geçersiz token
+{ "error": "Invalid or expired token" }
+
+// Görsel yok
+{ "error": "No image generated" }
+
+// API yapılandırma hatası
+{ "error": "Gemini API not configured" }
+```
 
 ---
 
-## Rate Limiting
+## 📱 SDK Örnekleri
 
-- Anonim: 60 istek/dakika
-- Authenticated: 300 istek/dakika
-- Admin: 1000 istek/dakika
+### React Native (Axios)
 
----
-
-## Mobile SDK Önerileri
-
-### React Native
 ```javascript
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const API_BASE = 'https://api.fasheone.com/api/v1';
+
+// API Client
 const api = axios.create({
-  baseURL: 'https://api.fasheone.com/api/v1',
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  baseURL: API_BASE,
+  timeout: 60000, // AI işlemleri için 60 saniye
 });
 
-// Token ayarla
-api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-```
+// Token interceptor
+api.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-### Flutter
-```dart
-final dio = Dio(BaseOptions(
-  baseUrl: 'https://api.fasheone.com/api/v1',
-  headers: {'Authorization': 'Bearer $token'},
-));
+// Giriş
+export const login = async (email, password) => {
+  const res = await api.post('/auth/login', { email, password });
+  await AsyncStorage.setItem('accessToken', res.data.session.access_token);
+  await AsyncStorage.setItem('refreshToken', res.data.session.refresh_token);
+  return res.data;
+};
+
+// Canlı Model Oluşturma
+export const generateLiveModel = async (imageUri, options) => {
+  const formData = new FormData();
+  formData.append('image', {
+    uri: imageUri,
+    type: 'image/jpeg',
+    name: 'product.jpg',
+  });
+  
+  Object.keys(options).forEach(key => {
+    formData.append(key, options[key]);
+  });
+
+  const res = await api.post('/generation/product-to-model', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  
+  return res.data.image; // Base64 data URL
+};
 ```
 
 ---
 
-## Changelog
+### Flutter (Dio)
+
+```dart
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class FasheoneAPI {
+  static const String baseUrl = 'https://api.fasheone.com/api/v1';
+  late Dio _dio;
+
+  FasheoneAPI() {
+    _dio = Dio(BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: Duration(seconds: 60),
+    ));
+    
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('accessToken');
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+        return handler.next(options);
+      },
+    ));
+  }
+
+  // Giriş
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final response = await _dio.post('/auth/login', data: {
+      'email': email,
+      'password': password,
+    });
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('accessToken', response.data['session']['access_token']);
+    
+    return response.data;
+  }
+
+  // Canlı Model Oluşturma
+  Future<String> generateLiveModel(String imagePath, Map<String, dynamic> options) async {
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(imagePath),
+      ...options,
+    });
+
+    final response = await _dio.post('/generation/product-to-model', data: formData);
+    return response.data['image']; // Base64 data URL
+  }
+}
+```
+
+---
+
+### Swift (iOS Native)
+
+```swift
+import Foundation
+
+class FasheoneAPI {
+    static let shared = FasheoneAPI()
+    private let baseURL = "https://api.fasheone.com/api/v1"
+    
+    var accessToken: String? {
+        get { UserDefaults.standard.string(forKey: "accessToken") }
+        set { UserDefaults.standard.set(newValue, forKey: "accessToken") }
+    }
+    
+    // Login
+    func login(email: String, password: String) async throws -> LoginResponse {
+        let url = URL(string: "\(baseURL)/auth/login")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(["email": email, "password": password])
+        
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let response = try JSONDecoder().decode(LoginResponse.self, from: data)
+        
+        self.accessToken = response.session.accessToken
+        return response
+    }
+    
+    // Generate Live Model
+    func generateLiveModel(imageData: Data, options: [String: String]) async throws -> String {
+        let url = URL(string: "\(baseURL)/generation/product-to-model")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken ?? "")", forHTTPHeaderField: "Authorization")
+        
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        var body = Data()
+        // Add image
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+        body.append(imageData)
+        body.append("\r\n".data(using: .utf8)!)
+        
+        // Add other fields
+        for (key, value) in options {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n".data(using: .utf8)!)
+            body.append("\(value)\r\n".data(using: .utf8)!)
+        }
+        
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+        
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let response = try JSONDecoder().decode(GenerationResponse.self, from: data)
+        return response.image
+    }
+}
+```
+
+---
+
+## 📊 Rate Limiting
+
+| Kullanıcı Tipi | Limit |
+|----------------|-------|
+| Anonim | 60 istek/dakika |
+| Authenticated | 300 istek/dakika |
+| Admin | 1000 istek/dakika |
+
+---
+
+## 📞 Destek
+
+- **Email:** support@fasheone.com
+- **Web:** https://fasheone.com
+- **API Durumu:** https://status.fasheone.com
+
+---
+
+## 📝 Versiyon Geçmişi
 
 ### v1.0.0 (2024-01-21)
 - İlk sürüm
-- Auth, User, Generation, Payment, Admin endpointleri
+- Tüm AI generation endpointleri
 - Stripe ödeme entegrasyonu
-- Supabase auth entegrasyonu
+- Admin dashboard API

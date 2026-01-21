@@ -191,6 +191,19 @@ const deductCredits = async (userId, amount, type) => {
 // API ROUTES
 // ==========================================
 
+// Serve static files for documentation
+app.use('/docs', express.static(__dirname));
+
+// Documentation redirect
+app.get('/api/v1/docs', (req, res) => {
+    res.redirect('/docs/docs.html');
+});
+
+// OpenAPI JSON endpoint
+app.get('/api/v1/openapi.json', (req, res) => {
+    res.sendFile(join(__dirname, 'openapi.json'));
+});
+
 // Health Check
 app.get('/api/v1/health', (req, res) => {
     res.json({
@@ -200,7 +213,8 @@ app.get('/api/v1/health', (req, res) => {
         services: {
             supabase: !!supabaseUrl,
             gemini: !!GEMINI_API_KEY,
-        }
+        },
+        docs: '/api/v1/docs'
     });
 });
 
