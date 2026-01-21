@@ -691,7 +691,11 @@ export const generateImage = async (
     `;
 
     if (bodyType && bodyType !== 'Standart') {
-        prompt += ` Modelin vücut tipi: ${bodyType}.`;
+        if (bodyType === 'Battal Beden') {
+            prompt += ` Modelin vücut tipi: Battal Beden (Extremely Plus Size, Heavy Build, over 130kg). Model çok kilolu ve iri yapılı görünmelidir.`;
+        } else {
+            prompt += ` Modelin vücut tipi: ${bodyType}.`;
+        }
     }
 
     if (ageRange && ageRange !== 'Adult') {

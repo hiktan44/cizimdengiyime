@@ -1326,6 +1326,7 @@ const ToolPage: React.FC<{
                                                     <option value="Kıvrımlı">Kıvrımlı (Curvy)</option>
                                                     <option value="Atletik">Atletik</option>
                                                     <option value="Büyük Beden">Büyük Beden</option>
+                                                    <option value="Battal Beden">Battal Beden (130kg+)</option>
                                                 </select>
                                             </div>
                                             <div>
