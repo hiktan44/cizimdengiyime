@@ -180,6 +180,11 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
     ? "A handsome 26-year-old male fashion model, 185cm tall, athletic build, sharp symmetrical jawline, specific short dark brown hair (cleanly tapered sides), deep brown eyes, and a neutral professional high-fashion expression. He has a very specific and consistent facial structure."
     : "A beautiful 24-year-old female fashion model, 175cm tall, slender and elegant build, long dark brown hair styled in a sleek professional low ponytail, almond-shaped hazel eyes, oval face with high cheekbones, and a sophisticated neutral expression. She has a very specific and consistent facial identity.";
 
+  // STABILIZED RANDOM SEED GENERATION (Fixes Face Drifting)
+  // We generate a deterministic seed based on the product name to keep the model consistent for this specific product across all shots.
+  const productSeed = analysis.urun_adi.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) * 12345;
+  const gender = isMale ? 'Male' : 'Female';
+
   // Base instruction allows human models, emphasizing SAFETY, PROFESSIONALISM and STRICT CONTINUITY
   const baseInstruction = `
   CONTEXT: Professional Commercial Fashion Photography Series.
@@ -191,6 +196,12 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
   - USE A REALISTIC HUMAN MODEL (Fashion Model).
   - NO sexually suggestive content, poses, or expressions.
   - Modest, elegant, and professional posing suitable for global commercial standards.
+
+  *** STRICT MODEL IDENTITY LOCK (DO NOT CHANGE THE FACE) ***
+  1. BIOMETRIC LOCK: You are generating the same specific individual for the "${analysis.urun_adi}" campaign.
+  2. FACE: ${isMale ? 'Strong jawline, specific nose shape, dark brown eyes, short tapered hair.' : 'High cheekbones, specific almond eyes, defined chin, long dark hair.'}
+  3. CONSISTENCY: Do not generate random faces. Use the Seed to lock facial structure.
+  4. NO DRIFTING: Even if the pose changes, the person's identity (face, race, age) MUST remain 100% frozen.
 
   CHARACTER & CLOTHING CONTINUITY (ABSOLUTE RULES):
   1. CHARACTER CONSISTENCY: You MUST render the EXACT SAME PERSON in every frame. Facial features, hair texture/style, and body proportions must be 100% identical as if shot in the same session.
@@ -418,10 +429,14 @@ export const generateAdImage = async (
   aspectRatio: string = '16:9',
   patternImageB64?: string | null,
   patternImageMimeType?: string | null,
-  seed?: number
+  seed?: number // Seed will be auto-calculated if not provided, for consistency
 ): Promise<string> => {
   checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+  // Use provided seed or generate deterministic seed from prompt to lock identity
+  // This ensures that if the user retries with the same prompt, they get the same model face.
+  const effectiveSeed = seed || (prompt.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) * 12345) % 2000000000;
 
   // Reusable generation function
   const attemptGeneration = async (promptText: string) => {

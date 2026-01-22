@@ -499,9 +499,13 @@ export const generateImage = async (
     if (modelIdentityFile) {
         if (modelIdentityFile instanceof Blob) {
             // 1. Generate Seed (HEAD logic)
-            const referenceSeed = await generateStableSeed(modelIdentityFile);
-            effectiveSeed = referenceSeed;
-            console.log('🔒 Model Identity Locked - Using stable seed from reference image:', referenceSeed);
+            if (!seed) {
+                const referenceSeed = await generateStableSeed(modelIdentityFile);
+                effectiveSeed = referenceSeed;
+                console.log('🔒 Model Identity Locked - Using stable seed from reference image:', referenceSeed);
+            } else {
+                console.log('🔒 Model Identity Locked - Using EXPLICIT seed provided by App:', seed);
+            }
 
             // 2. Add to prompt parts (Local fix)
             const identityPart = await fileToGenerativePart(modelIdentityFile);
@@ -922,7 +926,13 @@ OUTPUT REQUIREMENTS:
 - High quality, professional result
 - Clean and polished appearance
 - All images integrated seamlessly
-- Aspect ratio: ${aspectRatio}`;
+- Aspect ratio: ${aspectRatio}
+
+*** IDENTITY PRESERVATION RULES (ABSOLUTE) ***:
+1. DO NOT CHANGE FACES: The identities of any people in the input images must remain 100% IDENTICAL.
+2. NO GENERATIVE FACES: Do not generate new faces or "fix" faces unless explicitly asked.
+3. PRESERVE LIKENESS: Keep facial features, expressions, and age exactly as they appear in the source.
+4. NO BLENDING: Do not blend faces from different images.`;
 
         // Add all image parts and the text prompt
         const parts = [...imageParts, { text: fullPrompt }];

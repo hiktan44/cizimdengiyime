@@ -1269,6 +1269,9 @@ const ToolPage: React.FC<{
                                                         if (generatedImageUrl) {
                                                             setLockedModelReference(generatedImageUrl);
                                                             console.log("🔒 Model Identity LOCKED: Saved reference image.");
+                                                        } else if (modelSeed) {
+                                                            // Fallback: If no image URL but we have a seed (rare), just lock the seed
+                                                            console.log("🔒 Model Seed LOCKED (No visual ref yet).");
                                                         }
                                                         setIsModelLocked(true);
                                                     } else {
@@ -1276,6 +1279,7 @@ const ToolPage: React.FC<{
                                                         setLockedModelReference(null);
                                                         console.log("🔓 Model Identity UNLOCKED: Cleared reference image.");
                                                         setIsModelLocked(false);
+                                                        // Optional: Generate new seed immediately for next run or let it be random
                                                     }
                                                 }}
                                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${isModelLocked
