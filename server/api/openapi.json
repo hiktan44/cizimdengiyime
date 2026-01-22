@@ -1615,7 +1615,7 @@
                     },
                     "ADGENIUS_VIDEO": {
                         "type": "integer",
-                        "example": 2
+                        "example": 3
                     },
                     "COLLAGE": {
                         "type": "integer",

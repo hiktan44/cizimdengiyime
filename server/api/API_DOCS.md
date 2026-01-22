@@ -198,7 +198,7 @@ curl -X GET "https://api.fasheone.com/api/v1/user/generations?limit=10&offset=0"
 | Fotomatik Transform | 1 |
 | Fotomatik Describe | 1 |
 | AdGenius Görsel | 1 |
-| AdGenius Video | 2 |
+| AdGenius Video | 3 |
 | Kolaj | 2 |
 
 ---
