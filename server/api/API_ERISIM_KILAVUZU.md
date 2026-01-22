@@ -19,7 +19,7 @@ Bu doküman, mobil uygulama geliştiricilerinin Fasheone API'sine nasıl erişeb
 1. [fasheone.com](https://fasheone.com) adresine gidin
 2. "Kayıt Ol" butonuna tıklayın
 3. Email ve şifrenizi girin
-4. Hesabınız oluşturulur ve **5 ücretsiz kredi** verilir
+4. Hesabınız oluşturulur ve **10 ücretsiz kredi** verilir
 
 ### API Üzerinden
 ```bash

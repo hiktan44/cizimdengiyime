@@ -96,7 +96,12 @@ export const pixshopGenerateEditedImage = async (
     const prompt = `Edit this image based on the user request.
 User Request: "${userPrompt}"
 Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: ${hotspot.y}).
-Maintain photorealism and blend the edit seamlessly with the original image.`;
+
+*** EXECUTION RULES FOR HYPER-REALISM ***:
+1. NO AI LOOK: The edited area MUST blend 100% physically correct with the grain, noise, and lighting of the original RAW photo. Do not introduce smooth, plastic, or cartoonish textures.
+2. TEXTURE MATCHING: If the original image has film grain or sensor noise, the edited part perfectly copy that noise pattern.
+3. LIGHTING CONSISTENCY: Subsurface scattering and shadow softness must match the original scene exactly.
+4. INVISIBLE EDIT: The result should look like it was captured in-camera, not photoshopped.`;
 
     const textPart = { text: prompt };
 
@@ -160,7 +165,11 @@ export const pixshopGenerateAdjustedImage = async (
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Perform a global adjustment to this image.
 Request: "${adjustmentPrompt}"
-Ensure the result is photorealistic.`;
+
+*** PROFESSIONAL COLOR GRADING RULES ***:
+1. PRESERVE DYNAMIC RANGE: Do not blow out highlights or crush shadows excessively unless requested.
+2. NATURAL SKIN TONES: If people are present, skin tones must remain within natural vectors (Vectorscope line). Avoid orange/teal abuse on skin.
+3. ORGANIC FEEL: The adjustment should feel like optical filters or professional chemical film processing, not digital overlays.`;
 
     const textPart = { text: prompt };
 

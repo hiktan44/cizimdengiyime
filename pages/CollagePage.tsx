@@ -1011,7 +1011,20 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                     <button
                                         onClick={async () => {
                                             const { downloadFile, generateFilename } = await import('../utils/downloadHelper');
-                                            const filename = generateFilename('kolaj-video', 'mp4');
+
+                                            // Detect real mime type from blob
+                                            let extension = 'mp4';
+                                            try {
+                                                const response = await fetch(generatedVideoUrl);
+                                                const blob = await response.blob();
+                                                if (blob.type.includes('webm')) extension = 'webm';
+                                                else if (blob.type.includes('mp4')) extension = 'mp4';
+                                                else if (blob.type.includes('quicktime')) extension = 'mov';
+                                            } catch (e) {
+                                                console.warn("Could not detect video mime type, defaulting to mp4");
+                                            }
+
+                                            const filename = generateFilename('kolaj-video', extension);
                                             await downloadFile(generatedVideoUrl, filename);
                                         }}
                                         className="text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 transition-colors"

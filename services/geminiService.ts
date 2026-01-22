@@ -156,14 +156,15 @@ BAŞKA RENK KULLANMA.` : '';
     - Referans çizimdeki rengi %100 KORU.
     `}
     
-    *** 2. GÖRSEL KALİTE ODAĞI ***:
-    1. Kumaş Dokusu: Kumaşın cinsi (pamuk, ipek, yün, denim vb.) fotoğrafta net bir şekilde anlaşılmalı. İplik dokusu ve malzemenin ağırlığı hissedilmeli.
-    2. Işıklandırma: Ürünün formunu ortaya çıkaran yumuşak, profesyonel stüdyo aydınlatması. Gerçekçi gölgeler ve ışık yansımaları.
-    3. Detaylar: Dikişler, fermuarlar, düğmeler, cepler ve kat yerleri makro detay seviyesinde keskin olmalı.
-    4. Sadakat: Çizim üzerindeki her türlü desen, logo eskizi veya baskı detayı ürüne aynen aktarılmalı.
-    5. Arka Plan: Temiz, saf beyaz veya çok açık nötr gri.
+    *** 2. GÖRSEL KALİTE VE GERÇEKÇİLİK STANDARDI ***:
+    1. Kumaş Dokusu (Texture Fidelity): Kumaşın cinsi (pamuk, ipek, yün, denim vb.) fotoğrafta %100 GERÇEKÇİ görünmeli. Makro çekim kalitesinde iplik detayları görünmeli. " Dijital çizim" hissi KESİNLİKLE olmamalı.
+    2. Işıklandırma (Lighting): Ürünün formunu ve drapelerini ortaya çıkaran profesyonel "Softbox" stüdyo aydınlatması. Derinlik katan doğal gölgeler.
+    3. Detaylar: Dikişler (stitch lines), fermuar çekme uçları, düğme dokuları, yaka içi etiketleri gibi mikro detaylar keskin ve net olmalı.
+    4. Sadakat: Çizim üzerindeki her türlü desen, logo eskizi veya baskı detayı ürüne BİREBİR VE DÜZGÜN BİR ŞEKİLDE (warping olmadan) aktarılmalı.
+    5. Ghost Mannequin Etkisi: Ürün dolgun ve 3 boyutlu görünmeli, ancak içinde görünmez bir manken varmış gibi durmalı. Boyun içi kısmı gerçekçi bir şekilde (arka etiket vb.) gösterilmeli.
+    6. Arka Plan: Saf beyaz (#FFFFFF) veya çok açık nötr gri (#F5F5F5).
     
-    Sonuç, e-ticaret sitelerinde kullanılan 'High-End' ürün fotoğrafı kalitesinde, 8k çözünürlükte olmalıdır.` + colorClosing;
+    Sonuç, Vogue veya Harper's Bazaar gibi dergilerde veya Lüks E-Ticaret (Farfetch, Net-a-Porter) sitelerinde kullanılacak kalitede, 8K, RAW PHOTO, HİPER-GERÇEKÇİ bir ürün fotoğrafı olmalıdır.` + colorClosing;
 
     try {
         const response = await ai.models.generateContent({
@@ -209,8 +210,9 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
     2. Detay: Dikiş yerleri (topstitching), fermuarlar, cepler, ribana detayları, düğmeler net bir şekilde çizilmeli.
     3. Perspektif: Ürün tamamen önden, düz (flat) ve simetrik bir şekilde çizilmeli.
     4. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
-    5. Kalite: Vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
-    6. Renklendirme: Kumaş renkleri, detay renkleri (düğme, fermuar vb.) gerçekçi olmalı.`
+    5. Kalite: 4K çözünürlükte, vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
+    6. Renklendirme: Kumaş renkleri, detay renkleri (düğme, fermuar vb.) fotoğraftaki ile birebir aynı olmalı. Gölge ve ışık oyunlarıyla derinlik katılmalı.
+    7. Doku: Kumaşın dokusu (Texture) çizimde hissedilmeli.`
         : `Bu ürün fotoğrafını analiz et ve moda tasarımı üretimi için profesyonel bir 'Teknik Çizim' (Technical Flat Sketch / CAD) oluştur.
     
     Kurallar:
@@ -643,10 +645,24 @@ export const generateImage = async (
     - HEDEF: Aşağıdaki fiziksel özelliklere sahip YENİ ve ÖZGÜN bir model oluştur ve kıyafeti ona giydir.
     
     
-    *** 3. GÖRSEL KALİTESİ VE GERÇEKÇİLİK ***:
-    1. Kumaş Simülasyonu: Kumaşın fiziksel özellikleri (ağırlık, döküm, parlaklık, doku) mükemmel şekilde yansıtılmalı.${fabricType ? ` Kumaş tipi: ${fabricType}.` : ''}${fabricFinish ? ` Kumaş yüzey bitişi: ${fabricFinish}.` : ''}
-    2. Işık ve Atmosfer: Sahneye derinlik katan, ${lighting} tarzında profesyonel aydınlatma. Cilt üzerinde gerçekçi ışık kırılımları (subsurface scattering).
-    3. Cilt Dokusu: Modelin cildi pürüzsüz plastik gibi değil, doğal gözenekli, kusurları ve detayları olan gerçek insan cildi gibi olmalı.
+    *** 3. GÖRSEL KALİTESİ VE HİPER-GERÇEKÇİLİK TALİMATLARI ***:
+    1. FOTOĞRAFÇILIK STANDARDI: Bu bir "dijital sanat" veya "CGI" değil, %100 GERÇEK BİR FOTOĞRAF (RAW PHOTO) olmalıdır.
+    2. KAMERA VE LENS: Hasselblad X2D 100C veya Sony A7R V ile çekilmiş gibi görünmeli. 85mm f/1.2 portre lensi kullanılmış gibi alan derinliği ve bokeh etkisi yarat.
+    3. CİLT DOKUSU (KRİTİK):
+       - "AIRBRUSH" VEYA "PLASTİK CİLT" EFEKTİ KESİNLİKLE YASAKTIR.
+       - Ciltte doğal gözenekler, mikro kusurlar, ince tüyler, benler ve renk eşitsizlikleri (melanin variation) bulunmalıdır.
+       - Işık ciltte "Subsurface Scattering" (SSS) etkisiyle doğal bir şekilde dağılmalı.
+    4. KUMAŞ DOKUSU: Kumaşın iplik yapısı (weave), dikişlerdeki gerilim, kumaşın ağırlığı ve yerçekimine tepkisi fiziksel olarak kusursuz olmalı.
+    5. IŞIKLANDIRMA: "Studio Softbox" + "Rim Light" setup kullan. Işık patlamalarını önle ama kontrastı koru. Yüzde sert gölgelerden kaçın.
+    6. YASAKLI ÖGELER (NEGATIVE PROMPT):
+       - Cartoonish, 3D Render, Plastik Görünüm, Aşırı Pürüzsüz Cilt, Yamuk Eller, Fazla Parmaklar, Bulanık Yüz Hatları.
+       
+    ${fabricType ? `7. ÖZEL KUMAŞ TALİMATI: Kumaş tipi "${fabricType}". Bu kumaşın ışığı yansıtma ve kırışma özelliklerini tam olarak yansıt.` : ''}
+    ${fabricFinish ? `8. KUMAŞ YÜZEYİ: "${fabricFinish}" bitişi.` : ''}
+    
+    *** 4. GÖRSEL TUTARLILIK ***:
+    - Eller ve parmaklar anatomik olarak %100 doğru olmalı (AI hand artifact'lerinden kaçın).
+    - Gözler canlı, nemli ve odaklanmış olmalı (Dead eyes look engellenmeli).
     4. Kamera Tekniği: ${cameraAngle} açısı ile ${cameraZoom === 'Yakın' ? 'yakın çekim (close-up), detaylar net görünmeli' : cameraZoom === 'Uzak' ? 'UZAK ÇEKİM (FULL BODY SHOT) - TÜM VÜCUT: Baştan ayakkabılara kadar tüm vücut görünmeli. Ayaklar ve ayakkabılar MUTLAKA çerçevede olmalı. Model tam boy çekilmeli' : 'orta mesafe çekim (medium shot), bel üstü'}. Arka plan (bokeh) estetik bir şekilde bulanıklaştırılarak odak modelde tutulmalı.
     
     *** 4. KIYAFET YAPILANDIRMASI ***:
@@ -1086,6 +1102,7 @@ export const generateAutoProductCollage = async (
     5. AYAKKABILAR: Ayakkabılar şık bir çift (sağ ve sol yan yana) olarak sergilenmelidir.
     6. IŞIKLANDIRMA: Yumuşak, doğal gün ışığı (sunlight) efekti. Hafif, gerçekçi yumuşak gölgeler (soft shadows).
     7. ESTETİK: "Vogue" veya "Harper's Bazaar" moda çekimi kalitesinde, minimalist, temiz ve ultra premium bir görünüm.
+    8. GERÇEKÇİLİK (ZORUNLU): Bu bir İLLÜSTRASYON DEĞİL, bir FOTOĞRAF olmalıdır. Ürünlerin kırışıklıkları, dikiş izleri ve dokuları %100 görünmelidir. "Dijital Sanat" veya "Vektör" görünümü YASAKTIR.
     
     ÇIKTI:
     Bu sanatsal Flat Lay kompozisyonunun tek bir yüksek çözünürlüklü görselini oluştur.

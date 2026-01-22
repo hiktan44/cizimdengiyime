@@ -826,7 +826,7 @@ const ToolPage: React.FC<{
                                 AdGenius
                             </div>
                             <span className={`text-xs ${activeToolTab === 'adgenius' ? 'text-orange-200' : 'text-slate-500'}`}>
-                                1-2 kredi/işlem
+                                1-3 kredi/işlem
                             </span>
                         </button>
                         <button

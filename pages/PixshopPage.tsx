@@ -39,7 +39,33 @@ const dataURLtoFile = (dataurl: string, filename: string): File => {
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
-  return new File([u8arr], filename, { type: mime });
+
+  // Auto-correct extension based on MIME type
+  const mimeToExt: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+    'image/svg+xml': 'svg',
+    'video/mp4': 'mp4',
+    'video/webm': 'webm'
+  };
+
+  const correctExt = mimeToExt[mime];
+  let finalFilename = filename;
+
+  if (correctExt) {
+    const parts = filename.split('.');
+    const currentExt = parts.length > 1 ? parts.pop()?.toLowerCase() : '';
+
+    // If extension doesn't match or is missing, fix it
+    if (currentExt !== correctExt && currentExt !== (correctExt === 'jpg' ? 'jpeg' : correctExt)) {
+      const baseName = parts.length > 0 ? parts.join('.') : filename;
+      finalFilename = `${baseName}.${correctExt}`;
+    }
+  }
+
+  return new File([u8arr], finalFilename, { type: mime });
 }
 
 // Helper for auto-centering crop

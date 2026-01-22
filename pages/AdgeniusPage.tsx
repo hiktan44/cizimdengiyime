@@ -1,6 +1,6 @@
 /**
  * AdGenius Page - Reklam Kampanyaları ve E-Ticaret Ürün Fotoğrafları
- * Kredi sistemi entegrasyonuyla (Görsel = 1 kredi, Video = 2 kredi)
+ * Kredi sistemi entegrasyonuyla (Görsel = 1 kredi, Video = 3 kredi)
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -217,9 +217,9 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
       // If result is completed, check if it has video. 
       // If is pending/generating, use formData.includeVideo to estimate.
       if (r.status === 'completed' || r.status === 'failed') {
-        return sum + (r.videoUrl ? 2 : 1);
+        return sum + (r.videoUrl ? CREDIT_COSTS.ADGENIUS_VIDEO : CREDIT_COSTS.ADGENIUS_IMAGE);
       }
-      return sum + (formData.includeVideo ? 2 : 1);
+      return sum + (formData.includeVideo ? CREDIT_COSTS.ADGENIUS_VIDEO : CREDIT_COSTS.ADGENIUS_IMAGE);
     }, 0);
 
     setTotalImagesGenerated(imagesCount);
@@ -258,7 +258,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     const uploadedVideoUrl = outputVideoUrl ? await uploadBase64ToStorage(outputVideoUrl, profile.id, 'video') : null;
 
     // Calculate credits used based on outputs
-    const creditsUsed = (outputVideoUrl ? 2 : 1);
+    const creditsUsed = (outputVideoUrl ? CREDIT_COSTS.ADGENIUS_VIDEO : CREDIT_COSTS.ADGENIUS_IMAGE);
 
     await saveGeneration(
       profile.id,
@@ -561,9 +561,9 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     setBatchSeed(Math.floor(Math.random() * 1000000));
   };
 
-  // Credit info display
-  const creditCostPerImage = 1;
-  const creditCostPerVideo = 2;
+  // Credit info display - CREDIT_COSTS sabitinden dinamik olarak alınıyor
+  const creditCostPerImage = CREDIT_COSTS.ADGENIUS_IMAGE;
+  const creditCostPerVideo = CREDIT_COSTS.ADGENIUS_VIDEO;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-gray-100 py-8 px-4">
