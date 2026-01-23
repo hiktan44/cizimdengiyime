@@ -979,7 +979,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           logoDisplayDuration={5000}
         />
 
-        <div className="max-w-7xl mx-auto text-center relative z-30 w-full mt-24">
+        <div className="max-w-7xl mx-auto text-center relative z-30 w-full mt-48">
           <h1 className={`text-5xl md:text-7xl font-black ${textClass} mb-6 leading-tight drop-shadow-2xl`}>
             {t.hero.title}
             <br />
