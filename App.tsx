@@ -1974,16 +1974,36 @@ const App: React.FC = () => {
                     alert(`❌ Yükleme başarısız: ${result.error}`);
                 }
             } else if (type === 'logo_media') {
-                // TEMPORARY: Upload logo media to localStorage only
-                // TODO: Enable Supabase upload after running this SQL:
-                // ALTER TABLE showcase_images DROP CONSTRAINT IF EXISTS showcase_images_type_check;
-                // ALTER TABLE showcase_images ADD CONSTRAINT showcase_images_type_check 
-                // CHECK (type IN ('sketch', 'product', 'model', 'video', 'adgenius_main', 'adgenius_collage', 'logo_media'));
+                // Attempt to upload to Supabase
+                const result = await uploadShowcaseImage(file, 'logo_media', 0);
 
-                console.log('✅ Logo media localStorage\'e kaydedildi (Supabase atlandı)');
-                alert('✅ Logo video/resim başarıyla yüklendi!\n\n⚠️ Not: Şu anda sadece bu tarayıcıda görünür.\nKalıcı olması için Supabase database\'i güncellemeniz gerekiyor.');
+                if (result.success && result.imageUrl) {
+                    console.log('✅ Logo media Supabase\'e yüklendi:', result.imageUrl);
+                    alert('✅ Logo video/resim başarıyla veritabanına yüklendi!\n\nArtık tüm kullanıcılarda görünecektir.');
 
-                // Logo already saved to localStorage in the reader.onloadend above
+                    setLogoMediaUrl(result.imageUrl);
+                    localStorage.setItem('logoMediaUrl', result.imageUrl);
+                } else {
+                    console.error('❌ Logo media Supabase yüklemesi başarısız:', result.error);
+
+                    // Fallback to localStorage if DB upload fails (e.g. Constraint violation)
+                    console.log('⚠️ Supabase yüklemesi başarısız oldu, yerel depolama kullanılıyor.');
+
+                    let errorMessage = `❌ Veritabanına yüklenemedi: ${result.error}`;
+
+                    if (result.error && result.error.includes('showcase_images_type_check')) {
+                        errorMessage += '\n\n⚠️ HATA NEDENİ: Veritabanı "logo_media" tipini kabul etmiyor.\nLütfen "ADD_LOGO_MEDIA_CONSTRAINT.sql" dosyasındaki SQL komutunu Supabase SQL Editöründe çalıştırın.';
+                    }
+
+                    alert(`${errorMessage}\n\n⚠️ Geçici olarak sadece bu tarayıcıda görünecektir.`);
+
+                    // Fallback: We already have base64String from reader above, but scope is tricky. 
+                    // Actually reader logic runs before this if/else block for upload
+                    // The reader.onloadend event sets the state to base64String immediately.
+                    // So key state is already updated visually. We just need to persist to localStorage as fallback.
+                    // Note: setLogoMediaUrl(base64String) was already called in reader.onloadend
+                    // We just accept the current state as fallback.
+                }
             }
         } catch (error) {
             console.error('❌ Dosya yükleme hatası:', error);
