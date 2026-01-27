@@ -33,6 +33,7 @@ const translations = {
       success: 'Ayarlar başarıyla kaydedildi!',
       error: 'Ayarlar kaydedilirken hata oluştu!',
     },
+
   },
   en: {
     initialCredits: {
@@ -63,6 +64,7 @@ const translations = {
       success: 'Settings saved successfully!',
       error: 'Error saving settings!',
     },
+
   },
 };
 
@@ -309,6 +311,8 @@ export const SettingsPanel: React.FC = () => {
           </div>
         </div>
       </div>
+
+
 
       {/* Save Button */}
       <div className="flex justify-end pt-4">

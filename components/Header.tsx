@@ -13,6 +13,7 @@ interface HeaderProps {
     onLogoutClick: () => void;
     onAdminClick?: () => void;
     onBuyCreditsClick?: () => void;
+    onHistoryClick?: () => void;
     credits?: number;
     theme?: 'light' | 'dark';
     activeToolTab?: 'design' | 'technical' | 'pixshop' | 'fotomatik' | 'adgenius';
@@ -27,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
     onLogoutClick,
     onAdminClick,
     onBuyCreditsClick,
+    onHistoryClick,
     credits,
     theme = 'dark',
     onToolTabClick,
@@ -105,6 +107,19 @@ export const Header: React.FC<HeaderProps> = ({
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
                                     Kredi Al
+                                </button>
+                            )}
+
+                            {onHistoryClick && (
+                                <button
+                                    onClick={onHistoryClick}
+                                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-semibold transition-all border border-slate-700"
+                                    title="Geçmiş Çalışmalar"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Geçmiş
                                 </button>
                             )}
                         </>
@@ -209,12 +224,22 @@ export const Header: React.FC<HeaderProps> = ({
                                         onClick={() => handleMenuItemClick(onBuyCreditsClick)}
                                         className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
                                     >
-                                        <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-                                            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        <span className="text-sm font-medium text-white">Kredi Al</span>
+                                    </button>
+                                )}
+
+                                {/* History */}
+                                {onHistoryClick && (
+                                    <button
+                                        onClick={() => handleMenuItemClick(onHistoryClick)}
+                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                    >
+                                        <div className="w-8 h-8 bg-slate-700/50 rounded-lg flex items-center justify-center">
+                                            <svg className="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </div>
-                                        <span className="text-sm font-medium text-white">Kredi Al</span>
+                                        <span className="text-sm font-medium text-white">Geçmiş Çalışmalar</span>
                                     </button>
                                 )}
 

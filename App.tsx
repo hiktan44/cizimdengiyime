@@ -44,9 +44,10 @@ import { AuthModal } from './components/AuthModal';
 
 import { LandingPage } from './pages/LandingPage';
 import { Dashboard } from './components/Dashboard';
-import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from './lib/database';
+import { checkAndDeductCredits, saveGeneration } from './lib/database';
 import { CREDIT_COSTS } from './lib/supabase';
 import { BuyCreditsModal } from './components/BuyCreditsModal';
+import { HistoryPanel } from './components/HistoryPanel';
 import { uploadHeroVideo, uploadShowcaseImage, getPublicHeroVideos, getPublicShowcaseImages } from './lib/adminService';
 import { PixshopPage } from './pages/PixshopPage';
 import { FotomatikPage } from './pages/FotomatikPage';
@@ -172,6 +173,7 @@ const ToolPage: React.FC<{
         const [customBackgroundFile, setCustomBackgroundFile] = useState<File | undefined>(undefined);
 
         const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+        const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
         const [isShareSupported, setIsShareSupported] = useState(false);
         const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -228,6 +230,7 @@ const ToolPage: React.FC<{
             try {
                 const productUrl = await generateProductFromSketch(uploadedSketchFile, productColor || undefined);
                 finishProgress();
+
                 setGeneratedProductUrl(productUrl);
                 // Automatically set this as the preview for step 2
                 setProductPreviewUrl(productUrl);
@@ -307,6 +310,7 @@ const ToolPage: React.FC<{
             try {
                 const productUrl = await generateProductFromSketch(topSketchFile, colorSuggestion || undefined);
                 finishProgress();
+
                 setGeneratedTopProductUrl(productUrl);
                 setTopProductPreviewUrl(productUrl);
                 setTopProductFile(null);
@@ -358,6 +362,7 @@ const ToolPage: React.FC<{
             try {
                 const productUrl = await generateProductFromSketch(bottomSketchFile, secondaryColor || undefined);
                 finishProgress();
+
                 setGeneratedBottomProductUrl(productUrl);
                 setBottomProductPreviewUrl(productUrl);
                 setBottomProductFile(null);
@@ -524,6 +529,7 @@ const ToolPage: React.FC<{
                     modelIdentityFile // Pass identity file
                 );
                 finishProgress();
+
                 setTimeout(() => {
                     setGeneratedImageUrl(imageUrl);
                     setIsModelLoading(false);
@@ -590,6 +596,7 @@ const ToolPage: React.FC<{
             try {
                 const sketchUrl = await generateSketchFromProduct(techInputFile, techSketchStyle);
                 finishProgress();
+
                 setGeneratedTechSketchUrl(sketchUrl);
 
                 // Save to database
@@ -645,11 +652,34 @@ const ToolPage: React.FC<{
             }
 
             try {
-                const videoUrl = await generateVideoFromImage(
+                let videoUrl = await generateVideoFromImage(
                     generatedImageUrl,
                     settings
                 );
                 finishProgress();
+
+                // Upload to Supabase Storage
+                try {
+                    // Video URL from generateVideoFromImage is usually a Blob URL or Base64
+                    // If it's a blob url, we need to fetch it to get the blob/buffer for upload
+                    // uploadBase64ToStorage handles data: urls. For blob: urls we might need extra handling or convert to base64.
+
+                    if (videoUrl.startsWith('blob:')) {
+                        const blob = await fetch(videoUrl).then(r => r.blob());
+                        // Convert blob to base64 for our helper, or use uploadImageToStorage if I modify it to accept Blob
+                        // Actually I can just create a File object from Blob and use uploadImageToStorage
+                        const videoFile = new File([blob], 'generated_video.mp4', { type: 'video/mp4' });
+                        const { uploadImageToStorage } = await import('./lib/database');
+                        const storageUrl = await uploadImageToStorage(videoFile, profile.id, 'output');
+                        if (storageUrl) videoUrl = storageUrl;
+                    } else if (videoUrl.startsWith('data:')) {
+                        const storageUrl = await uploadBase64ToStorage(videoUrl, profile.id, 'video');
+                        if (storageUrl) videoUrl = storageUrl;
+                    }
+                } catch (e) {
+                    console.warn('Video storage upload failed:', e);
+                }
+
                 setTimeout(() => {
                     setGeneratedVideoUrl(videoUrl);
                     setIsModelLoading(false);
@@ -738,9 +768,16 @@ const ToolPage: React.FC<{
                     onHomeClick={onNavigateHome}
                     onAdminClick={onAdminClick}
                     onBuyCreditsClick={onBuyCreditsClick}
+                    onHistoryClick={() => setIsHistoryPanelOpen(true)}
                     credits={profile.credits}
                     activeToolTab={activeToolTab}
                     onToolTabClick={setActiveToolTab}
+                />
+
+                <HistoryPanel
+                    isOpen={isHistoryPanelOpen}
+                    onClose={() => setIsHistoryPanelOpen(false)}
+                    userId={profile?.id}
                 />
 
                 <main className="flex-grow container mx-auto p-4 md:p-8">

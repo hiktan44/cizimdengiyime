@@ -1,4 +1,4 @@
-import { supabase, CREDIT_COSTS } from '../lib/supabase';
+import { supabase, CREDIT_COSTS, Generation } from '../lib/supabase';
 
 export const checkAndDeductCredits = async (
   userId: string,
@@ -255,5 +255,34 @@ export const getUserTransactions = async (userId: string) => {
   } catch (error) {
     console.error('Error fetching user transactions:', error);
     return [];
+  }
+};
+
+export const getUserGenerations = async (userId: string): Promise<Generation[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('generations')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching user generations:', error);
+    return [];
+  }
+};
+
+export const deleteOldGenerations = async (): Promise<{ success: boolean; deletedCount?: number; error?: string }> => {
+  try {
+    const { data, error } = await supabase.rpc('delete_old_generations');
+
+    if (error) throw error;
+
+    return { success: true, deletedCount: data };
+  } catch (error: any) {
+    console.error('Error deleting old generations:', error);
+    return { success: false, error: error.message };
   }
 };
