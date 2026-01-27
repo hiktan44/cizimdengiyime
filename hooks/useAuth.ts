@@ -8,6 +8,7 @@ export function useAuth() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   const mountedRef = useRef(true);
   const initializingRef = useRef(false);
@@ -130,6 +131,7 @@ export function useAuth() {
       const isRecovery = window.location.hash?.includes('type=recovery');
       if (isRecovery) {
         console.log('🔄 Şifre sıfırlama akışı algılandı');
+        setIsPasswordRecovery(true);
       }
 
       // URL'den OAuth hash'i temizle
@@ -241,6 +243,7 @@ export function useAuth() {
       // Şifre sıfırlama olayı
       if (event === 'PASSWORD_RECOVERY') {
         console.log('🔄 Şifre sıfırlama modu aktif');
+        setIsPasswordRecovery(true);
         // Bu durumda kullanıcıyı şifre güncelleme ekranına yönlendirmemiz lazım
         // App.tsx tarafında bunu yakalayabilmek için custom event fırlatabiliriz veya state tutabiliriz
         window.dispatchEvent(new CustomEvent('auth:password_recovery'));
@@ -492,6 +495,7 @@ export function useAuth() {
     profile,
     loading,
     authError,
+    isPasswordRecovery,
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,

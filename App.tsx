@@ -1718,7 +1718,7 @@ const ToolPage: React.FC<{
     };
 
 const App: React.FC = () => {
-    const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, sendPasswordResetEmail, updatePassword, signOut, refreshProfile, retryAuth } = useAuth();
+    const { user, profile, loading, authError, isPasswordRecovery, signInWithGoogle, signInWithEmail, signUpWithEmail, sendPasswordResetEmail, updatePassword, signOut, refreshProfile, retryAuth } = useAuth();
     const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
@@ -1727,8 +1727,14 @@ const App: React.FC = () => {
     const [showPasswordUpdateModal, setShowPasswordUpdateModal] = useState(false);
 
     useEffect(() => {
+        // Recovery mod kontrolü
+        if (isPasswordRecovery) {
+            console.log('🔄 Şifre güncelleme modu aktif, modal açılıyor...');
+            setShowPasswordUpdateModal(true);
+        }
+
         const handlePasswordRecovery = () => {
-            console.log('🔄 Şifre güncelleme isteği algılandı, modal açılıyor...');
+            console.log('🔄 Şifre güncelleme isteği algılandı (event), modal açılıyor...');
             setShowPasswordUpdateModal(true);
         };
 
@@ -1740,7 +1746,7 @@ const App: React.FC = () => {
         }
 
         return () => window.removeEventListener('auth:password_recovery', handlePasswordRecovery);
-    }, []);
+    }, [isPasswordRecovery]);
 
     // Close auth modal when user is logged in
     React.useEffect(() => {
@@ -1752,7 +1758,7 @@ const App: React.FC = () => {
                 setCurrentPage('tool');
             }
         }
-    }, [user, profile]);
+    }, [user, profile, showPasswordUpdateModal, currentPage]);
 
     // Admin check - use is_admin field from profile
     const isAdmin = profile?.is_admin === true;
