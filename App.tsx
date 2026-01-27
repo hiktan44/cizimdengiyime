@@ -1750,6 +1750,12 @@ const App: React.FC = () => {
 
     // Close auth modal when user is logged in
     React.useEffect(() => {
+        // Eğer şifre güncelleme modundaysak yönlendirme yapma
+        if (isPasswordRecovery) {
+            console.log('🛑 Recovery modu aktif, yönlendirme engellendi');
+            return;
+        }
+
         if (user && profile && !showPasswordUpdateModal) {
             console.log('✅ User logged in, closing auth modal');
             setShowAuthModal(false);
@@ -1758,7 +1764,7 @@ const App: React.FC = () => {
                 setCurrentPage('tool');
             }
         }
-    }, [user, profile, showPasswordUpdateModal, currentPage]);
+    }, [user, profile, showPasswordUpdateModal, currentPage, isPasswordRecovery]);
 
     // Admin check - use is_admin field from profile
     const isAdmin = profile?.is_admin === true;

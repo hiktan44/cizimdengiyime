@@ -465,6 +465,7 @@ export function useAuth() {
       throw translatedError;
     }
 
+    setIsPasswordRecovery(false);
     return data;
   };
 
