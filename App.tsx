@@ -41,6 +41,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { BeforeAfterSlider } from './components/BeforeAfterSlider';
 import { useAuth } from './hooks/useAuth';
 import { AuthModal } from './components/AuthModal';
+import { PasswordUpdateModal } from './components/PasswordUpdateModal';
 import { LandingPage } from './pages/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from './lib/database';
@@ -1717,16 +1718,33 @@ const ToolPage: React.FC<{
     };
 
 const App: React.FC = () => {
-    const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, refreshProfile, retryAuth } = useAuth();
+    const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, sendPasswordResetEmail, updatePassword, signOut, refreshProfile, retryAuth } = useAuth();
     const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
     const [showBuyCreditsModal, setShowBuyCreditsModal] = useState(false);
+    const [showPasswordUpdateModal, setShowPasswordUpdateModal] = useState(false);
+
+    useEffect(() => {
+        const handlePasswordRecovery = () => {
+            console.log('🔄 Şifre güncelleme isteği algılandı, modal açılıyor...');
+            setShowPasswordUpdateModal(true);
+        };
+
+        window.addEventListener('auth:password_recovery', handlePasswordRecovery);
+
+        // URL'de type=recovery varsa da tetikle (yedek)
+        if (window.location.hash.includes('type=recovery')) {
+            setShowPasswordUpdateModal(true);
+        }
+
+        return () => window.removeEventListener('auth:password_recovery', handlePasswordRecovery);
+    }, []);
 
     // Close auth modal when user is logged in
     React.useEffect(() => {
-        if (user && profile) {
+        if (user && profile && !showPasswordUpdateModal) {
             console.log('✅ User logged in, closing auth modal');
             setShowAuthModal(false);
             // If on landing page, redirect to tool
@@ -2234,6 +2252,7 @@ const App: React.FC = () => {
                 onGoogleSignIn={signInWithGoogle}
                 onEmailSignIn={signInWithEmail}
                 onEmailSignUp={signUpWithEmail}
+                onForgotPassword={sendPasswordResetEmail}
             />
 
             <LoginModal
@@ -2257,6 +2276,12 @@ const App: React.FC = () => {
                     }}
                 />
             )}
+
+            <PasswordUpdateModal
+                isOpen={showPasswordUpdateModal}
+                onClose={() => setShowPasswordUpdateModal(false)}
+                onUpdatePassword={updatePassword}
+            />
         </>
     );
 };

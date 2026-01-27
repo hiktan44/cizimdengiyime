@@ -126,10 +126,19 @@ export function useAuth() {
     console.log('🔐 Auth başlatılıyor...');
 
     try {
+      // URL'den recover token kontrolü
+      const isRecovery = window.location.hash?.includes('type=recovery');
+      if (isRecovery) {
+        console.log('🔄 Şifre sıfırlama akışı algılandı');
+      }
+
       // URL'den OAuth hash'i temizle
       if (window.location.hash?.includes('access_token')) {
         console.log('🔗 OAuth hash temizleniyor...');
-        window.history.replaceState({}, document.title, window.location.pathname);
+        // Hash'i temizlemeden önce recovery bilgisini sakla
+        if (!isRecovery) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       }
 
       // Session'ı al
@@ -227,6 +236,14 @@ export function useAuth() {
           profileSubscriptionRef.current = null;
         }
         return;
+      }
+
+      // Şifre sıfırlama olayı
+      if (event === 'PASSWORD_RECOVERY') {
+        console.log('🔄 Şifre sıfırlama modu aktif');
+        // Bu durumda kullanıcıyı şifre güncelleme ekranına yönlendirmemiz lazım
+        // App.tsx tarafında bunu yakalayabilmek için custom event fırlatabiliriz veya state tutabiliriz
+        window.dispatchEvent(new CustomEvent('auth:password_recovery'));
       }
 
       // Token yenileme - sadece bu durumda profile güncelle
@@ -418,6 +435,23 @@ export function useAuth() {
     return data;
   };
 
+  // Şifre sıfırlama e-postası gönder
+  const sendPasswordResetEmail = async (email: string) => {
+    console.log('📧 Şifre sıfırlama e-postası gönderiliyor:', email);
+    const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${redirectUrl}/update-password`,
+    });
+
+    if (error) {
+      const translatedError = new Error(translateAuthError(error));
+      throw translatedError;
+    }
+
+    return data;
+  };
+
   // Çıkış
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -448,6 +482,8 @@ export function useAuth() {
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,
+    sendPasswordResetEmail,
+    updatePassword,
     signOut,
     refreshProfile,
     retryAuth,
