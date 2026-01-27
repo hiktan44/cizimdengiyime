@@ -441,7 +441,7 @@ export function useAuth() {
     const redirectUrl = import.meta.env.VITE_REDIRECT_URL || window.location.origin;
 
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${redirectUrl}/update-password`,
+      redirectTo: `${redirectUrl}`,
     });
 
     if (error) {
