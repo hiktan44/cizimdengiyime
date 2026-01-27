@@ -8,7 +8,6 @@ export function useAuth() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
-  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   const mountedRef = useRef(true);
   const initializingRef = useRef(false);
@@ -127,20 +126,10 @@ export function useAuth() {
     console.log('🔐 Auth başlatılıyor...');
 
     try {
-      // URL'den recover token kontrolü
-      const isRecovery = window.location.hash?.includes('type=recovery');
-      if (isRecovery) {
-        console.log('🔄 Şifre sıfırlama akışı algılandı');
-        setIsPasswordRecovery(true);
-      }
-
       // URL'den OAuth hash'i temizle
       if (window.location.hash?.includes('access_token')) {
         console.log('🔗 OAuth hash temizleniyor...');
-        // Hash'i temizlemeden önce recovery bilgisini sakla
-        if (!isRecovery) {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
 
       // Session'ı al
@@ -243,10 +232,7 @@ export function useAuth() {
       // Şifre sıfırlama olayı
       if (event === 'PASSWORD_RECOVERY') {
         console.log('🔄 Şifre sıfırlama modu aktif');
-        setIsPasswordRecovery(true);
-        // Bu durumda kullanıcıyı şifre güncelleme ekranına yönlendirmemiz lazım
-        // App.tsx tarafında bunu yakalayabilmek için custom event fırlatabiliriz veya state tutabiliriz
-        window.dispatchEvent(new CustomEvent('auth:password_recovery'));
+        // Modal kaldırıldığı için sadece log basıyoruz
       }
 
       // Token yenileme - sadece bu durumda profile güncelle
@@ -465,7 +451,7 @@ export function useAuth() {
       throw translatedError;
     }
 
-    setIsPasswordRecovery(false);
+
     return data;
   };
 
@@ -496,7 +482,7 @@ export function useAuth() {
     profile,
     loading,
     authError,
-    isPasswordRecovery,
+
     signInWithGoogle,
     signInWithEmail,
     signUpWithEmail,
