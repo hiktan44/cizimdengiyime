@@ -452,6 +452,19 @@ export function useAuth() {
     return data;
   };
 
+  // Yeni şifre belirle (Recovery sonrası)
+  const updatePassword = async (password: string) => {
+    console.log('🔑 Şifre güncelleniyor...');
+    const { data, error } = await supabase.auth.updateUser({ password });
+
+    if (error) {
+      const translatedError = new Error(translateAuthError(error));
+      throw translatedError;
+    }
+
+    return data;
+  };
+
   // Çıkış
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
