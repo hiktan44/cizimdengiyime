@@ -1727,7 +1727,8 @@ const App: React.FC = () => {
 
     // Close auth modal when user is logged in
     React.useEffect(() => {
-        if (user && profile) {
+
+        if (user && profile && showAuthModal) {
             console.log('✅ User logged in, closing auth modal');
             setShowAuthModal(false);
             // If on landing page, redirect to tool
@@ -1735,7 +1736,7 @@ const App: React.FC = () => {
                 setCurrentPage('tool');
             }
         }
-    }, [user, profile, currentPage]);
+    }, [user, profile, currentPage, showAuthModal]);
 
     // Admin check - use is_admin field from profile
     const isAdmin = profile?.is_admin === true;
