@@ -267,6 +267,7 @@ export const getUserGenerations = async (userId: string, page: number = 1, limit
       .from('generations')
       .select('*')
       .eq('user_id', userId)
+      .neq('type', 'video')
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -275,6 +276,21 @@ export const getUserGenerations = async (userId: string, page: number = 1, limit
   } catch (error) {
     console.error('Error fetching user generations:', error);
     return [];
+  }
+};
+
+export const deleteGeneration = async (id: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('generations')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error deleting generation:', error);
+    return false;
   }
 };
 

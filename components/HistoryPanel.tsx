@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase, Generation } from '../lib/supabase';
-import { getUserGenerations } from '../lib/database';
+import { getUserGenerations, deleteGeneration } from '../lib/database';
 import { HistoryIcon } from './icons/HistoryIcon';
 
 interface HistoryPanelProps {
@@ -35,6 +35,17 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ isOpen, onClose, use
             console.error('Failed to load history', error);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (window.confirm('Bu görseli silmek istediğinize emin misiniz?')) {
+            const success = await deleteGeneration(id);
+            if (success) {
+                setGenerations(prev => prev.filter(g => g.id !== id));
+            } else {
+                alert('Silme işlemi başarısız oldu.');
+            }
         }
     };
 
@@ -128,19 +139,18 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ isOpen, onClose, use
 
                                     {/* Actions */}
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <a
-                                            href={gen.output_image_url || gen.output_video_url || '#'}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-sm"
-                                            title="Görüntüle"
-                                            onClick={(e) => e.stopPropagation()}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(gen.id);
+                                            }}
+                                            className="p-2 bg-red-600/80 hover:bg-red-600 rounded-full text-white backdrop-blur-sm"
+                                            title="Sil"
                                         >
                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                        </a>
+                                        </button>
                                         <a
                                             href={gen.output_image_url || gen.output_video_url || '#'}
                                             download={`fasheone-${gen.type}-${gen.id}`}
