@@ -258,13 +258,17 @@ export const getUserTransactions = async (userId: string) => {
   }
 };
 
-export const getUserGenerations = async (userId: string): Promise<Generation[]> => {
+export const getUserGenerations = async (userId: string, page: number = 1, limit: number = 5): Promise<Generation[]> => {
   try {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     const { data, error } = await supabase
       .from('generations')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (error) throw error;
     return data || [];

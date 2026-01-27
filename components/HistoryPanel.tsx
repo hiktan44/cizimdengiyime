@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase, Generation } from '../lib/supabase';
-import { getUserGenerations, deleteOldGenerations } from '../lib/database';
+import { getUserGenerations } from '../lib/database';
 import { HistoryIcon } from './icons/HistoryIcon';
 
 interface HistoryPanelProps {
@@ -13,19 +13,45 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ isOpen, onClose, use
     const [generations, setGenerations] = useState<Generation[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const LIMIT = 5;
 
-    const fetchHistory = async () => {
+    const fetchHistory = async (pageNumber: number) => {
         setIsLoading(true);
-        const data = await getUserGenerations(userId);
-        setGenerations(data);
-        setIsLoading(false);
+        try {
+            const data = await getUserGenerations(userId, pageNumber, LIMIT);
+
+            if (data.length < LIMIT) {
+                setHasMore(false);
+            }
+
+            if (pageNumber === 1) {
+                setGenerations(data);
+            } else {
+                setGenerations(prev => [...prev, ...data]);
+            }
+        } catch (error) {
+            console.error('Failed to load history', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
         if (isOpen && userId) {
-            fetchHistory();
+            setGenerations([]);
+            setPage(1);
+            setHasMore(true);
+            fetchHistory(1);
         }
     }, [isOpen, userId]);
+
+    const handleLoadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchHistory(nextPage);
+    };
 
     if (!isOpen) return null;
 
@@ -59,16 +85,12 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ isOpen, onClose, use
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                    {isLoading ? (
-                        <div className="flex justify-center py-10">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
-                        </div>
-                    ) : generations.length === 0 ? (
+                    {generations.length === 0 && !isLoading ? (
                         <div className="text-center py-10 text-slate-500">
                             <p>Henüz kayıtlı bir çalışmanız yok.</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-3 mb-4">
                             {generations.map((gen) => (
                                 <div key={gen.id} className="group relative aspect-[3/4] bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
                                     {/* Image/Video Thumbnail */}
@@ -134,6 +156,21 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ isOpen, onClose, use
                                 </div>
                             ))}
                         </div>
+                    )}
+
+                    {isLoading && (
+                        <div className="flex justify-center py-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
+                        </div>
+                    )}
+
+                    {!isLoading && hasMore && generations.length > 0 && (
+                        <button
+                            onClick={handleLoadMore}
+                            className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors text-sm font-medium border border-slate-700"
+                        >
+                            Devamını Yükle
+                        </button>
                     )}
                 </div>
             </div>
