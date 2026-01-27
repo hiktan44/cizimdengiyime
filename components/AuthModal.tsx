@@ -53,7 +53,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           setPassword('');
           setFullName('');
         }, 300);
-      }, 1000);
+      }, 5000);
     } catch (err: any) {
       // Hata mesajını göster (zaten Türkçeleştirilmiş olarak gelecek)
       setError(err.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
@@ -89,7 +89,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            {mode === 'signin' ? 'Giriş başarılı! Yönlendiriliyorsunuz...' : 'Hesap başarıyla oluşturuldu! Giriş yapılıyor...'}
+            {mode === 'signin' ? 'Giriş başarılı! Yönlendiriliyorsunuz...' : 'Hesap oluşturuldu! Lütfen e-postanızı kontrol edip doğrulama linkine tıklayın.'}
           </div>
         )}
 
@@ -166,8 +166,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             type="submit"
             disabled={loading || success}
             className={`w-full px-6 py-3 rounded-lg font-semibold transition disabled:cursor-not-allowed ${success
-                ? 'bg-green-600 text-white'
-                : 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50'
+              ? 'bg-green-600 text-white'
+              : 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 disabled:opacity-50'
               }`}
           >
             {success ? (

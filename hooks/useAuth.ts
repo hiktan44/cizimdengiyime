@@ -385,9 +385,8 @@ export function useAuth() {
       throw translatedError;
     }
 
-    // Email doğrulama kapalı olduğu için direkt giriş yapılabilir
-    // Session otomatik olarak oluşturulacak
-    console.log('✅ Kayıt başarılı, profile yükleniyor...');
+    // E-posta doğrulama açıksa session null gelebilir
+    console.log('✅ Kayıt işlemi tamamlandı.');
     setLoading(true);
 
     if (data.session && data.user) {
@@ -408,6 +407,11 @@ export function useAuth() {
         setAuthError(null);
         console.log('✅ Profile oluşturuldu:', userProfile.email);
       }
+    } else if (data.user && !data.session) {
+      console.log('📩 E-posta doğrulaması bekleniyor...');
+      // Session yoksa kullanıcı doğrulama yapmalı, loading'i kapat
+      setLoading(false);
+      return data;
     }
     setLoading(false);
 
