@@ -552,37 +552,49 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     }
   }, [currentImage, addImageToHistory, profile]);
 
-  const handleApplyCrop = useCallback(() => {
+  const handleApplyCrop = useCallback(async () => {
     if (!completedCrop?.width || !completedCrop?.height || !imgRef.current) {
       setError('Lütfen kırpmak için geçerli bir alan seçin.');
       return;
     }
 
-    const image = imgRef.current;
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
+    if (!await checkCredits()) return;
 
-    const cropX = completedCrop.x * scaleX;
-    const cropY = completedCrop.y * scaleY;
-    const cropWidth = completedCrop.width * scaleX;
-    const cropHeight = completedCrop.height * scaleY;
+    setIsLoading(true);
 
-    const canvas = document.createElement('canvas');
-    canvas.width = cropWidth;
-    canvas.height = cropHeight;
-    const ctx = canvas.getContext('2d');
+    try {
+      const image = imgRef.current;
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
 
-    if (!ctx) {
-      setError('Kırpma işlemi yapılamadı.');
-      return;
+      const cropX = completedCrop.x * scaleX;
+      const cropY = completedCrop.y * scaleY;
+      const cropWidth = completedCrop.width * scaleX;
+      const cropHeight = completedCrop.height * scaleY;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        setError('Kırpma işlemi yapılamadı.');
+        return;
+      }
+
+      ctx.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+      const croppedImageUrl = canvas.toDataURL('image/png');
+      const newImageFile = dataURLtoFile(croppedImageUrl, `cropped-${Date.now()}.png`);
+      addImageToHistory(newImageFile);
+      await saveToHistory(croppedImageUrl);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Kırpma işlemi sırasında hata oluştu.';
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-
-    ctx.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-    const croppedImageUrl = canvas.toDataURL('image/png');
-    const newImageFile = dataURLtoFile(croppedImageUrl, `cropped-${Date.now()}.png`);
-    addImageToHistory(newImageFile);
-  }, [completedCrop, addImageToHistory]);
+  }, [completedCrop, addImageToHistory, profile]);
 
   const handleUpscale = useCallback(async (size: '2K' | '4K') => {
     if (!currentImage) return;
