@@ -793,9 +793,31 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
                                     className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                   />
                                 </div>
-                                <a href={gen.input_image_url} target="_blank" rel="noreferrer" className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    const url = gen.input_image_url;
+                                    if (!url) return;
+
+                                    const newWindow = window.open();
+                                    if (newWindow) {
+                                      if (url.startsWith('data:')) {
+                                        newWindow.document.write(
+                                          `<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;height:100vh;">
+                                                  <img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;" />
+                                              </body></html>`
+                                        );
+                                        newWindow.document.close();
+                                      } else {
+                                        newWindow.location.href = url;
+                                      }
+                                    }
+                                  }}
+                                  className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                  title="Görseli Aç"
+                                >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                </a>
+                                </button>
                               </div>
                             )}
 
@@ -818,9 +840,34 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
                                     />
                                   )}
                                 </div>
-                                <a href={gen.output_video_url || gen.output_image_url!} target="_blank" rel="noreferrer" className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    const url = gen.output_video_url || gen.output_image_url;
+                                    if (!url) return;
+
+                                    const newWindow = window.open();
+                                    if (newWindow) {
+                                      if (url.startsWith('data:')) {
+                                        newWindow.document.write(
+                                          `<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;height:100vh;">
+                                                  ${gen.output_video_url
+                                            ? `<video src="${url}" controls style="max-width:100%;max-height:100%;" />`
+                                            : `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;" />`
+                                          }
+                                              </body></html>`
+                                        );
+                                        newWindow.document.close();
+                                      } else {
+                                        newWindow.location.href = url;
+                                      }
+                                    }
+                                  }}
+                                  className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                  title="Görseli/Videoyu Aç"
+                                >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                </a>
+                                </button>
                               </div>
                             ) : (
                               <div className="aspect-[3/4] rounded-lg bg-orange-900/10 border border-orange-500/30 flex items-center justify-center p-4 text-center">
