@@ -506,17 +506,35 @@ export const getAllTransactions = async (): Promise<AdminTransaction[]> => {
 // Get user's generation details (for admin view)
 export const getUserGenerations = async (userId: string) => {
   try {
+    // 1. Try RPC (Secure & Correct Way - Bypasses RLS)
+    const { data: rpcData, error: rpcError } = await supabase.rpc('get_user_generations_admin', {
+      target_user_id: userId
+    });
+
+    if (!rpcError) {
+      return rpcData || [];
+    }
+
+    // 2. Fallback to direct select (Old Way - Subject to RLS)
     const { data, error } = await supabase
       .from('generations')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === '42501' || error.message?.includes('row-level security')) {
+        throw new Error('İşlem kayıtlarına erişim sağlanamadı. Lütfen "FIX_ADMIN_ACCESS_VIA_RPC.sql" dosyasını Supabase SQL Editor''de çalıştırın.');
+      }
+      throw error;
+    }
     return data || [];
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching user generations:', error);
-    return [];
+    if (error.message?.includes('FIX_ADMIN_ACCESS_VIA_RPC')) {
+      throw error;
+    }
+    throw new Error('İşlem kayıtlarına erişim sağlanamadı. RLS policy güncellemesi gerekebilir.');
   }
 };
 
