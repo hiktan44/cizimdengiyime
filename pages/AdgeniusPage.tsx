@@ -217,9 +217,15 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
       // If result is completed, check if it has video. 
       // If is pending/generating, use formData.includeVideo to estimate.
       if (r.status === 'completed' || r.status === 'failed') {
-        return sum + (r.videoUrl ? CREDIT_COSTS.ADGENIUS_VIDEO : CREDIT_COSTS.ADGENIUS_IMAGE);
+        let cost = CREDIT_COSTS.ADGENIUS_IMAGE; // Always 1 for image
+        if (r.videoUrl) cost += CREDIT_COSTS.ADGENIUS_VIDEO; // Add 3 for video
+        return sum + cost;
       }
-      return sum + (formData.includeVideo ? CREDIT_COSTS.ADGENIUS_VIDEO : CREDIT_COSTS.ADGENIUS_IMAGE);
+
+      // Pending
+      let expectedCost = CREDIT_COSTS.ADGENIUS_IMAGE;
+      if (formData.includeVideo) expectedCost += CREDIT_COSTS.ADGENIUS_VIDEO;
+      return sum + expectedCost;
     }, 0);
 
     setTotalImagesGenerated(imagesCount);
@@ -258,7 +264,11 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     const uploadedVideoUrl = outputVideoUrl ? await uploadBase64ToStorage(outputVideoUrl, profile.id, 'video') : null;
 
     // Calculate credits used based on outputs
-    const creditsUsed = (outputVideoUrl ? CREDIT_COSTS.ADGENIUS_VIDEO : CREDIT_COSTS.ADGENIUS_IMAGE);
+    // Logic: Image (1) + Video (3) if video exists = Total 4
+    let creditsUsed = CREDIT_COSTS.ADGENIUS_IMAGE;
+    if (outputVideoUrl) {
+      creditsUsed += CREDIT_COSTS.ADGENIUS_VIDEO;
+    }
 
     await saveGeneration(
       profile.id,
@@ -298,18 +308,13 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
       setResults(prev => prev.map(r => r.id === id ? { ...r, ...update } : r));
     };
 
-    // Determine operation type based on mode and video preference
-    let operationType: 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video';
+    // Determine operation types
     const isEcommerce = currentFormData.mode === 'ecommerce';
+    const imageOperationType = isEcommerce ? 'adgenius_ecommerce_image' : 'adgenius_campaign_image';
+    const videoOperationType = isEcommerce ? 'adgenius_ecommerce_video' : 'adgenius_campaign_video';
 
-    if (isEcommerce) {
-      operationType = currentFormData.includeVideo ? 'adgenius_ecommerce_video' : 'adgenius_ecommerce_image';
-    } else {
-      operationType = currentFormData.includeVideo ? 'adgenius_campaign_video' : 'adgenius_campaign_image';
-    }
-
-    // Check credits - each result individually
-    if (!await checkCredits(operationType)) return;
+    // 1. Check & Deduct Credits for IMAGE first (1 Credit)
+    if (!await checkCredits(imageOperationType)) return;
 
     // Determine Aspect Ratios
     const imgAspectRatio = currentFormData.aspectRatio;
@@ -355,6 +360,26 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
 
       // Check if Video is requested
       if (currentFormData.includeVideo) {
+
+        // 2. Check & Deduct Credits for VIDEO separately (3 Credits)
+        // This ensures if video fails or user has no credits, they still keep the image
+        if (!await checkCredits(videoOperationType)) {
+          updateResult(item.id, {
+            status: 'completed', // Complete with just image
+            imageUrl: base64Image,
+            error: 'Video oluşturulamadı: Yetersiz kredi.', // Non-fatal warning
+            progress: 100
+          });
+          // Save Image Only
+          await saveToHistory(imageOperationType, base64Image, null, {
+            ...currentFormData,
+            analysis: analysisResult,
+            generatedPrompt: item.prompt,
+            videoError: 'Insufficient credits for video'
+          });
+          return;
+        }
+
         updateResult(item.id, {
           status: 'generating_video',
           imageUrl: base64Image,
@@ -380,7 +405,8 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
           });
 
           // Save both image and video
-          await saveToHistory(operationType, base64Image, videoUrl, {
+          // Using videoOperationType for history tagging, but calculation handles full cost
+          await saveToHistory(videoOperationType, base64Image, videoUrl, {
             ...currentFormData,
             analysis: analysisResult,
             generatedPrompt: item.prompt
@@ -396,7 +422,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
           });
 
           // Save just the image
-          await saveToHistory(operationType, base64Image, null, {
+          await saveToHistory(imageOperationType, base64Image, null, {
             ...currentFormData,
             analysis: analysisResult,
             generatedPrompt: item.prompt,
@@ -405,7 +431,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
         }
       } else {
         // Image Only Mode - save immediately
-        await saveToHistory(operationType, base64Image, null, {
+        await saveToHistory(imageOperationType, base64Image, null, {
           ...currentFormData,
           analysis: analysisResult,
           generatedPrompt: item.prompt
