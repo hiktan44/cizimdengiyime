@@ -250,3 +250,53 @@ export const pixshopUpscaleImage = async (
     return handleApiResponse(response, 'upscale');
 };
 
+/**
+ * Adds a logo or product (accessory) to the main image at a specific location.
+ * @param originalImage The base image file.
+ * @param overlayImage The logo or product image to add (e.g., logo, tie, scarf).
+ * @param userPrompt Description of what to add and where.
+ * @param hotspot Optional {x, y} coordinates for precise placement.
+ * @returns A promise that resolves to the data URL of the composite image.
+ */
+export const pixshopAddProductOrLogo = async (
+    originalImage: File,
+    overlayImage: File,
+    userPrompt: string,
+    hotspot?: { x: number, y: number }
+): Promise<string> => {
+    console.log('Starting product/logo addition...');
+    checkApiKey();
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+    const originalImagePart = await fileToPart(originalImage);
+    const overlayImagePart = await fileToPart(overlayImage);
+
+    const hotspotText = hotspot
+        ? `Focus placement around pixel coordinates (x: ${hotspot.x}, y: ${hotspot.y}).`
+        : '';
+
+    const prompt = `Add the second image (logo/product/accessory) to the first image based on this request:
+User Request: "${userPrompt}"
+${hotspotText}
+
+*** PROFESSIONAL COMPOSITE RULES ***:
+1. NATURAL INTEGRATION: The added element must look like it was photographed with the original scene - match lighting, shadows, and perspective.
+2. PRESERVE LOGO CLARITY: If adding a logo, it MUST remain sharp, clear, and readable. Do not blur or distort logos.
+3. REALISTIC PHYSICS: If adding clothing/accessories (tie, scarf, etc.), they must drape naturally with realistic fabric physics and shadows.
+4. PROPER SCALING: Scale the added element appropriately for the scene - logos should be visible but not overwhelming, accessories should fit the person naturally.
+5. SEAMLESS BLENDING: Edges must blend perfectly - no harsh cutouts or obvious compositing artifacts.
+6. MAINTAIN QUALITY: The final image should look professional and production-ready, suitable for e-commerce or marketing use.`;
+
+    const textPart = { text: prompt };
+
+    console.log('Sending images and composite prompt to the model...');
+    const response: GenerateContentResponse = await ai.models.generateContent({
+        model: 'gemini-3-pro-image-preview',
+        contents: { parts: [originalImagePart, overlayImagePart, textPart] },
+        config: { safetySettings },
+    });
+    console.log('Received response from model for product/logo addition.', response);
+
+    return handleApiResponse(response, 'add_product_logo');
+};
+
