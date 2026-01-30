@@ -83,7 +83,7 @@ export const CREDIT_COSTS = {
   FOTOMATIK_TRANSFORM: 1, // Fotomatik görüntü dönüştürme maliyeti
   FOTOMATIK_DESCRIBE: 1, // Fotomatik prompt üretme maliyeti
   ADGENIUS_IMAGE: 1, // AdGenius görsel maliyeti (her görsel için)
-  ADGENIUS_VIDEO: 3, // AdGenius video maliyeti (her video için)
+  ADGENIUS_VIDEO: 4, // AdGenius video maliyeti (her video için)
   COLLAGE: 2, // Kolaj oluşturma maliyeti (2-6 görsel birleştirme) - 2 kredi
 } as const;
 
