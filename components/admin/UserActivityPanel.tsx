@@ -859,33 +859,34 @@ const GenList = ({
 
       {/* Lightbox Modal */}
       {lightboxMedia && (
-        <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-fade-in" onClick={() => setLightboxMedia(null)}>
+        <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-fade-in cursor-zoom-out" onClick={() => setLightboxMedia(null)}>
           <button
             onClick={() => setLightboxMedia(null)}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition z-50 border border-white/5"
+            className="fixed top-6 right-6 p-2 text-slate-400 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition z-[70] border border-white/10 shadow-xl"
+            title="Kapat (ESC)"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
 
-          <div className="w-full max-w-7xl max-h-screen flex flex-col items-center justify-center h-full gap-4" onClick={e => e.stopPropagation()}>
-            <div className="relative w-full h-full flex items-center justify-center">
+          <div className="w-full max-w-7xl max-h-screen flex flex-col items-center justify-center h-full gap-4 pointer-events-none">
+            <div className="relative w-full h-full flex items-center justify-center pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               {lightboxMedia.type === 'video' ? (
                 <video
                   src={lightboxMedia.url}
                   controls
                   autoPlay
-                  className="max-w-full max-h-[85vh] rounded shadow-2xl border border-white/10"
+                  className="max-w-full max-h-[85vh] rounded shadow-2xl border border-white/10 bg-black cursor-default"
                 />
               ) : (
                 <img
                   src={lightboxMedia.url}
                   alt="Zoom Preview"
-                  className="max-w-full max-h-[85vh] object-contain rounded shadow-2xl border border-white/10"
+                  className="max-w-full max-h-[85vh] object-contain rounded shadow-2xl border border-white/10 cursor-default"
                 />
               )}
             </div>
 
-            <div className="flex gap-4 z-50">
+            <div className="flex gap-4 z-50 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => {
                   const windowRef = window.open();
@@ -905,7 +906,7 @@ const GenList = ({
                     }
                   }
                 }}
-                className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full font-medium transition flex items-center gap-2 border border-slate-600 shadow-lg shadow-black/50"
+                className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full font-medium transition flex items-center gap-2 border border-slate-600 shadow-lg shadow-black/50 cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                 Yeni Sekmede Aç
