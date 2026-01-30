@@ -151,7 +151,7 @@ const CREDIT_COSTS = {
     VIDEO: 3,
     TECH_SKETCH: 1,
     PIXSHOP: 1,
-    PIXSHOP_4K: 1, // 4K upscale için standart kredi
+    PIXSHOP_4K: 2, // 4K upscale için ekstra kredi
     FOTOMATIK_TRANSFORM: 1,
     FOTOMATIK_DESCRIBE: 1,
     ADGENIUS_IMAGE: 1,

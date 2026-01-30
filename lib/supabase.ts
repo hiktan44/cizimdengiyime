@@ -79,7 +79,7 @@ export const CREDIT_COSTS = {
   VIDEO: 3,
   TECH_SKETCH: 1, // Teknik çizim maliyeti
   PIXSHOP: 1, // Pixshop fotoğraf düzenleme maliyeti (rötuş, filtre, ayarlama, kırpma, 2K upscale)
-  PIXSHOP_4K: 1, // Pixshop 4K upscale maliyeti (standart 1 kredi)
+  PIXSHOP_4K: 2, // Pixshop 4K upscale maliyeti (ekstra işlem gücü gerektirir)
   FOTOMATIK_TRANSFORM: 1, // Fotomatik görüntü dönüştürme maliyeti
   FOTOMATIK_DESCRIBE: 1, // Fotomatik prompt üretme maliyeti
   ADGENIUS_IMAGE: 1, // AdGenius görsel maliyeti (her görsel için)
