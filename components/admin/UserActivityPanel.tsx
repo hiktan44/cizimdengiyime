@@ -602,13 +602,24 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
 
       {/* User Details Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 rounded-2xl border border-slate-700 max-w-4xl w-full max-h-[80vh] overflow-y-auto p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">{t.modal.title}</h2>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 rounded-2xl border border-slate-700 w-full max-w-7xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-900 z-10 shrink-0">
+              <div>
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  {selectedUser.full_name || t.modal.unnamed}
+                  <span className="text-sm font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">{selectedUser.email}</span>
+                </h2>
+                <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400"></span>Harcanan: <span className="text-white font-medium">{selectedUser.total_credits_used}</span></span>
+                  <span className="text-slate-700">|</span>
+                  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-cyan-400"></span>Mevcut: <span className="text-white font-medium">{selectedUser.credits}</span></span>
+                </p>
+              </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="text-slate-400 hover:text-white transition"
+                className="text-slate-400 hover:text-white transition p-2 hover:bg-slate-800 rounded-full"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -616,285 +627,289 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
               </button>
             </div>
 
-            <div className="space-y-6">
-              {/* User Info */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-1">{t.modal.email}</div>
-                  <div className="text-white font-medium">{selectedUser.email}</div>
-                </div>
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-1">{t.modal.name}</div>
-                  <div className="text-white font-medium">{selectedUser.full_name || t.modal.notSpecified}</div>
-                </div>
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-1">{t.modal.currentCredits}</div>
-                  <div className="text-2xl font-bold text-cyan-400">{selectedUser.credits}</div>
-                </div>
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-1">{t.modal.totalSpent}</div>
-                  <div className="text-2xl font-bold text-orange-400">{selectedUser.total_credits_used}</div>
-                </div>
-              </div>
+            <GenList
+              t={t}
+              userGenerations={userGenerations}
+              generationsLoading={generationsLoading}
+              generationsError={generationsError}
+              showAddCredit={showAddCredit}
+              setShowAddCredit={setShowAddCredit}
+              creditAmount={creditAmount}
+              setCreditAmount={setCreditAmount}
+              handleAddCredits={handleAddCredits}
+              isAddingCredit={isAddingCredit}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
-              {/* Add Credits Section */}
-              <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/30 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    {t.modal.addCreditsTitle}
-                  </h3>
-                  {!showAddCredit && (
-                    <button
-                      onClick={() => setShowAddCredit(true)}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold text-sm transition"
+// Sub-component for Generation List logic
+const GenList = ({
+  t,
+  userGenerations,
+  generationsLoading,
+  generationsError,
+  showAddCredit,
+  setShowAddCredit,
+  creditAmount,
+  setCreditAmount,
+  handleAddCredits,
+  isAddingCredit
+}: any) => {
+  const [lightboxMedia, setLightboxMedia] = useState<{ url: string; type: 'image' | 'video' } | null>(null);
+  const [filterType, setFilterType] = useState<string>('all');
+
+  // Analytics
+  const getAnalytics = (gens: any[]) => {
+    const counts: Record<string, number> = {};
+    gens.forEach(g => {
+      counts[g.type] = (counts[g.type] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  };
+
+  const filteredGenerations = userGenerations.filter((gen: any) =>
+    filterType === 'all' || gen.type === filterType
+  );
+
+  const analytics = getAnalytics(userGenerations);
+
+  const formatType = (type: string) => {
+    const map: Record<string, string> = {
+      'sketch_to_product': 'Çizim → Ürün',
+      'product_to_model': 'Ürün → Model',
+      'tech_sketch': 'Teknik Çizim',
+      'video': 'Video',
+      'pixshop': 'Pixshop',
+      'fotomatik_transform': 'Fotomatik',
+      'fotomatik_describe': 'Foto Analiz',
+      'adgenius_campaign_image': 'AdGenius (Kampanya)',
+      'adgenius_ecommerce_image': 'AdGenius (E-ticaret)',
+      'collage': 'Kolaj'
+    };
+    return map[type] || type;
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-900/50">
+      {/* Analytics & Actions Bar */}
+      <div className="flex flex-col xl:flex-row gap-4">
+
+        {/* Analytics Chart */}
+        <div className="flex-1 bg-slate-800/40 rounded-xl p-4 border border-slate-700/50">
+          <h4 className="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-wider">Kullanım Analizi</h4>
+          <div className="flex flex-wrap gap-2">
+            {analytics.length > 0 ? analytics.map(([type, count]) => (
+              <div key={type} className="flex items-center gap-2 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-700/50 hover:border-cyan-500/30 transition cursor-help" title={`${count} adet ${formatType(type)} işlemi`}>
+                <div className={`w-2 h-2 rounded-full ${type === 'pixshop' ? 'bg-pink-500' : type === 'video' ? 'bg-purple-500' : 'bg-cyan-500'}`}></div>
+                <span className="text-xs font-medium text-slate-300">{formatType(type)}</span>
+                <span className="text-xs font-bold text-white ml-1">{count}</span>
+              </div>
+            )) : (
+              <span className="text-sm text-slate-500 italic">Analiz verisi bulunamadı</span>
+            )}
+          </div>
+        </div>
+
+        {/* Quick Credits */}
+        <div className="w-full xl:w-auto flex-shrink-0 bg-slate-800/40 rounded-xl p-4 border border-slate-700/50 flex flex-col justify-center min-w-[300px]">
+          {!showAddCredit ? (
+            <button
+              onClick={() => setShowAddCredit(true)}
+              className="w-full h-full min-h-[40px] bg-green-600/10 hover:bg-green-600/20 text-green-400 border border-green-500/20 hover:border-green-500/40 rounded-lg font-semibold transition flex items-center justify-center gap-2 text-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {t.modal.addCreditsTitle}
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 animate-fade-in">
+              <input
+                type="number"
+                value={creditAmount}
+                onChange={(e) => setCreditAmount(Number(e.target.value))}
+                className="w-24 bg-slate-900 border border-slate-600 rounded-lg p-2 text-white text-sm focus:border-green-500 focus:outline-none"
+                placeholder="Miktar"
+                autoFocus
+              />
+              <button
+                onClick={handleAddCredits}
+                disabled={isAddingCredit}
+                className="bg-green-600 hover:bg-green-500 text-white px-3 py-2 rounded-lg text-sm font-medium disabled:opacity-50 transition shadow-lg shadow-green-900/20"
+              >
+                {isAddingCredit ? '...' : 'Ekle'}
+              </button>
+              <button
+                onClick={() => setShowAddCredit(false)}
+                className="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm transition"
+              >
+                İptal
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="sticky top-0 z-20 bg-slate-900/95 backdrop-blur-sm -mx-2 px-2 py-2 border-b border-slate-800">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <button
+            onClick={() => setFilterType('all')}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap border ${filterType === 'all' ? 'bg-white text-black border-white' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500'}`}
+          >
+            Tümü ({userGenerations.length})
+          </button>
+          {analytics.map(([type, count]) => (
+            <button
+              key={type}
+              onClick={() => setFilterType(type)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap border flex items-center gap-2 ${filterType === type ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/50' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500'}`}
+            >
+              {formatType(type)}
+              <span className="bg-slate-800 px-1.5 rounded-full text-[10px] opacity-70 border border-slate-700">{count}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Generations Grid */}
+      <div className="min-h-[400px]">
+        {generationsLoading ? (
+          <div className="flex items-center justify-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-700 border-t-cyan-500"></div>
+            <span className="ml-3 text-slate-400">{t.modal.loading}</span>
+          </div>
+        ) : filteredGenerations.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-48 text-slate-500 border-2 border-dashed border-slate-800 rounded-xl bg-slate-800/20">
+            <svg className="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            <p>Bu filtrede gösterilecek kayıt yok.</p>
+            {generationsError && <p className="text-orange-400 mt-2 text-sm bg-orange-900/20 px-4 py-2 rounded-lg border border-orange-500/30">{generationsError}</p>}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 pb-12">
+            {filteredGenerations.map((gen: any) => (
+              <div key={gen.id} className="group bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-900/10 transition-all duration-300 flex flex-col">
+                {/* Thumbnail Container */}
+                <div className="aspect-square relative bg-slate-900 border-b border-slate-700 overflow-hidden">
+                  {/* Input Mini-thumbnail (Overlay) */}
+                  {gen.input_image_url && (
+                    <div
+                      onClick={(e) => { e.stopPropagation(); setLightboxMedia({ url: gen.input_image_url, type: 'image' }); }}
+                      className="absolute top-2 left-2 w-10 h-10 md:w-12 md:h-12 rounded-lg border border-white/20 shadow-lg z-10 cursor-pointer hover:scale-110 transition bg-black group-hover:block"
+                      title="Giriş Görseli"
                     >
-                      {t.modal.addCreditsBtn}
-                    </button>
+                      <img src={gen.input_image_url} className="w-full h-full object-cover rounded-lg opacity-90 hover:opacity-100" />
+                    </div>
+                  )}
+
+                  {/* Main Output Content */}
+                  {gen.output_video_url ? (
+                    <video src={gen.output_video_url} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" />
+                  ) : gen.output_image_url ? (
+                    <img src={gen.output_image_url} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 bg-slate-800/50 p-4 text-center">
+                      <span className="text-2xl mb-1 opacity-50">🖼️</span>
+                      <span className="text-[10px]">Görsel Yok</span>
+                    </div>
+                  )}
+
+                  {/* Overlay Actions */}
+                  {(gen.output_video_url || gen.output_image_url) && (
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setLightboxMedia({
+                          url: gen.output_video_url || gen.output_image_url || '',
+                          type: gen.output_video_url ? 'video' : 'image'
+                        })}
+                        className="p-3 bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md transition text-white border border-white/10"
+                        title="Büyüt"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                      </button>
+                    </div>
                   )}
                 </div>
 
-                {showAddCredit && (
-                  <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">{t.modal.creditAmount}</label>
-                        <input
-                          type="number"
-                          min="1"
-                          value={creditAmount}
-                          onChange={(e) => setCreditAmount(parseInt(e.target.value) || 0)}
-                          className="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          placeholder="10"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">{t.modal.description}</label>
-                        <input
-                          type="text"
-                          value={creditReason}
-                          onChange={(e) => setCreditReason(e.target.value)}
-                          className="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          placeholder={t.modal.descPlaceholder}
-                        />
-                      </div>
+                {/* Card Footer */}
+                <div className="p-3 flex flex-col justify-between flex-1">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[9px] font-bold uppercase text-white bg-slate-700 px-1.5 py-0.5 rounded tracking-wide truncate max-w-[70%]" title={formatType(gen.type)}>
+                        {formatType(gen.type).split(' ')[0]}..
+                      </span>
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${gen.credits_used > 5 ? 'text-orange-300 bg-orange-900/20' : 'text-cyan-300 bg-cyan-900/20'}`}>
+                        -{gen.credits_used}
+                      </span>
                     </div>
-
-                    {/* Quick Amount Buttons */}
-                    <div className="flex flex-wrap gap-2">
-                      {[10, 25, 50, 100, 250, 500].map((amount) => (
-                        <button
-                          key={amount}
-                          onClick={() => setCreditAmount(amount)}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${creditAmount === amount
-                            ? 'bg-green-600 text-white'
-                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                            }`}
-                        >
-                          +{amount}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex gap-3 pt-2">
-                      <button
-                        onClick={handleAddCredits}
-                        disabled={isAddingCredit || creditAmount <= 0}
-                        className="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 disabled:from-slate-600 disabled:to-slate-600 text-white rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                      >
-                        {isAddingCredit ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            {t.modal.adding}
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            {creditAmount} {t.modal.addCredits}
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowAddCredit(false);
-                          setCreditAmount(10);
-                          setCreditReason('');
-                        }}
-                        className="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition"
-                      >
-                        {t.modal.cancel}
-                      </button>
+                    <div className="text-[10px] text-slate-500 font-mono truncate" title={new Date(gen.created_at).toLocaleString()}>
+                      {new Date(gen.created_at).toLocaleDateString()}
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* Recent Generations */}
-              <div>
-                <h3 className="text-lg font-bold text-white mb-4">{t.modal.recentOps}</h3>
-                <div className="space-y-3">
-                  {generationsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-700 border-t-cyan-500"></div>
-                      <span className="ml-3 text-slate-400">{t.modal.loading}</span>
-                    </div>
-                  ) : generationsError ? (
-                    <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <div>
-                          <p className="text-orange-400 font-medium">{generationsError}</p>
-                          <p className="text-sm text-slate-400 mt-1">
-                            {t.errors.fixNote}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : userGenerations.length === 0 ? (
-                    <p className="text-slate-400 text-center py-4">{t.modal.noOps}</p>
-                  ) : (
-                    userGenerations.map((gen) => (
-                      <div key={gen.id} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 transition hover:bg-slate-800">
-                        <div className="flex flex-col gap-4">
-                          {/* Header: Type, ID, Date, Cost */}
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="text-sm font-bold text-cyan-400">
-                                {gen.type === 'sketch_to_product' ? t.modal.sketchToProduct :
-                                  gen.type === 'product_to_model' ? t.modal.productToModel :
-                                    gen.type === 'tech_sketch' ? t.modal.techSketch :
-                                      gen.type === 'video' ? t.modal.video :
-                                        gen.type}
-                              </span>
-                              <div className="text-xs text-slate-500 font-mono mt-0.5">{gen.id.slice(0, 8)}...</div>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-sm text-white font-medium block">{gen.credits_used} {t.modal.credit}</span>
-                              <span className="text-xs text-slate-400 block">{new Date(gen.created_at).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
-                            </div>
-                          </div>
-
-                          {/* Images Grid */}
-                          <div className="grid grid-cols-2 gap-3 mt-2">
-                            {/* Input Image */}
-                            {gen.input_image_url && (
-                              <div className="relative group">
-                                <div className="text-xs text-slate-400 mb-1">Giriş Görseli</div>
-                                <div className="aspect-[3/4] rounded-lg overflow-hidden bg-slate-900 border border-slate-700">
-                                  <img
-                                    src={gen.input_image_url}
-                                    alt="Input"
-                                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                                  />
-                                </div>
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    const url = gen.input_image_url;
-                                    if (!url) return;
-
-                                    const newWindow = window.open();
-                                    if (newWindow) {
-                                      if (url.startsWith('data:')) {
-                                        newWindow.document.write(
-                                          `<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;height:100vh;">
-                                                  <img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;" />
-                                              </body></html>`
-                                        );
-                                        newWindow.document.close();
-                                      } else {
-                                        newWindow.location.href = url;
-                                      }
-                                    }
-                                  }}
-                                  className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                  title="Görseli Aç"
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                </button>
-                              </div>
-                            )}
-
-                            {/* Output Image/Video */}
-                            {(gen.output_image_url || gen.output_video_url) ? (
-                              <div className="relative group">
-                                <div className="text-xs text-green-400 mb-1 font-medium">Çıktı Görseli/Gen</div>
-                                <div className="aspect-[3/4] rounded-lg overflow-hidden bg-slate-900 border border-green-900/30">
-                                  {gen.output_video_url ? (
-                                    <video
-                                      src={gen.output_video_url}
-                                      controls
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <img
-                                      src={gen.output_image_url!}
-                                      alt="Output"
-                                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                                    />
-                                  )}
-                                </div>
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    const url = gen.output_video_url || gen.output_image_url;
-                                    if (!url) return;
-
-                                    const newWindow = window.open();
-                                    if (newWindow) {
-                                      if (url.startsWith('data:')) {
-                                        newWindow.document.write(
-                                          `<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;height:100vh;">
-                                                  ${gen.output_video_url
-                                            ? `<video src="${url}" controls style="max-width:100%;max-height:100%;" />`
-                                            : `<img src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;" />`
-                                          }
-                                              </body></html>`
-                                        );
-                                        newWindow.document.close();
-                                      } else {
-                                        newWindow.location.href = url;
-                                      }
-                                    }
-                                  }}
-                                  className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                  title="Görseli/Videoyu Aç"
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="aspect-[3/4] rounded-lg bg-orange-900/10 border border-orange-500/30 flex items-center justify-center p-4 text-center">
-                                <div>
-                                  <span className="text-2xl mb-2 block">⚠️</span>
-                                  <span className="text-xs text-orange-300 font-medium">Çıktı Oluşmadı</span>
-                                  <p className="text-[10px] text-orange-400 mt-1">İşlem başarısız veya beklemede</p>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Settings Info (Optional) */}
-                          {gen.settings && Object.keys(gen.settings).length > 0 && (
-                            <div className="mt-2 text-xs text-slate-500 bg-slate-900/50 p-2 rounded">
-                              <span className="font-semibold block mb-1">Ayarlar:</span>
-                              <pre className="whitespace-pre-wrap font-mono text-[10px]">
-                                {JSON.stringify(gen.settings, null, 2)}
-                              </pre>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  )}
                 </div>
               </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Lightbox Modal */}
+      {lightboxMedia && (
+        <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-fade-in" onClick={() => setLightboxMedia(null)}>
+          <button
+            onClick={() => setLightboxMedia(null)}
+            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition z-50 border border-white/5"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+
+          <div className="w-full max-w-7xl max-h-screen flex flex-col items-center justify-center h-full gap-4" onClick={e => e.stopPropagation()}>
+            <div className="relative w-full h-full flex items-center justify-center">
+              {lightboxMedia.type === 'video' ? (
+                <video
+                  src={lightboxMedia.url}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-[85vh] rounded shadow-2xl border border-white/10"
+                />
+              ) : (
+                <img
+                  src={lightboxMedia.url}
+                  alt="Zoom Preview"
+                  className="max-w-full max-h-[85vh] object-contain rounded shadow-2xl border border-white/10"
+                />
+              )}
+            </div>
+
+            <div className="flex gap-4 z-50">
+              <button
+                onClick={() => {
+                  const windowRef = window.open();
+                  if (windowRef) {
+                    if (lightboxMedia.url.startsWith('data:')) {
+                      windowRef.document.write(
+                        `<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;height:100vh;">
+                                                   ${lightboxMedia.type === 'video'
+                          ? `<video src="${lightboxMedia.url}" controls style="max-width:100%;max-height:100%;" />`
+                          : `<img src="${lightboxMedia.url}" style="max-width:100%;max-height:100%;object-fit:contain;" />`
+                        }
+                                               </body></html>`
+                      );
+                      windowRef.document.close();
+                    } else {
+                      windowRef.location = lightboxMedia.url;
+                    }
+                  }
+                }}
+                className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-full font-medium transition flex items-center gap-2 border border-slate-600 shadow-lg shadow-black/50"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                Yeni Sekmede Aç
+              </button>
             </div>
           </div>
         </div>
