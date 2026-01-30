@@ -3,7 +3,7 @@
  * Gemini AI kullanarak fotoğraf rötuşlama, filtre uygulama, ayarlama ve yükseltme işlemleri yapar.
  */
 
-import { GoogleGenAI, GenerateContentResponse, HarmCategory, HarmBlockThreshold } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse, HarmCategory, HarmBlockThreshold, Modality } from "@google/genai";
 
 // Vite projelerinde ortam değişkenlerine erişmek için import.meta.env kullanılır
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
@@ -109,7 +109,14 @@ Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: $
     const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-3-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
-        config: { safetySettings },
+        config: {
+            safetySettings,
+            responseModalities: [Modality.IMAGE],
+            imageConfig: {
+                imageSize: "4K",
+                aspectRatio: "3:4"
+            }
+        },
     });
     console.log('Received response from model.', response);
 
@@ -141,7 +148,14 @@ Do not change the content or composition, only apply the visual style.`;
     const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-3-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
-        config: { safetySettings },
+        config: {
+            safetySettings,
+            responseModalities: [Modality.IMAGE],
+            imageConfig: {
+                imageSize: "4K",
+                aspectRatio: "3:4"
+            }
+        },
     });
     console.log('Received response from model for filter.', response);
 
@@ -177,7 +191,14 @@ Request: "${adjustmentPrompt}"
     const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-3-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
-        config: { safetySettings },
+        config: {
+            safetySettings,
+            responseModalities: [Modality.IMAGE],
+            imageConfig: {
+                imageSize: "4K",
+                aspectRatio: "3:4"
+            }
+        },
     });
     console.log('Received response from model for adjustment.', response);
 
@@ -208,7 +229,14 @@ The output MUST be a transparent PNG.`;
     const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-3-pro-image-preview',
         contents: { parts: [originalImagePart, textPart] },
-        config: { safetySettings },
+        config: {
+            safetySettings,
+            responseModalities: [Modality.IMAGE],
+            imageConfig: {
+                imageSize: "4K",
+                aspectRatio: "3:4"
+            }
+        },
     });
     console.log('Received response from model for background removal.', response);
 
@@ -293,7 +321,14 @@ ${hotspotText}
     const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-3-pro-image-preview',
         contents: { parts: [originalImagePart, overlayImagePart, textPart] },
-        config: { safetySettings },
+        config: {
+            safetySettings,
+            responseModalities: [Modality.IMAGE],
+            imageConfig: {
+                imageSize: "4K", // 4K çıktı için - giriş çözünürlüğünü korur
+                aspectRatio: "3:4" // Varsayılan aspect ratio
+            }
+        },
     });
     console.log('Received response from model for product/logo addition.', response);
 
