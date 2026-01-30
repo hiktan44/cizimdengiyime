@@ -1420,6 +1420,8 @@ const ToolPage: React.FC<{
                                                     <option value="">Seçiniz</option>
                                                     <option value="Dokuma">Dokuma</option>
                                                     <option value="Örme">Örme</option>
+                                                    <option value="Deri">Deri (Leather)</option>
+                                                    <option value="Triko">Triko (Knitwear)</option>
                                                 </select>
                                             </div>
                                             <div>

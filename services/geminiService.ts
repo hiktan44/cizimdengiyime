@@ -661,7 +661,12 @@ export const generateImage = async (
     6. YASAKLI ÖGELER (NEGATIVE PROMPT):
        - Cartoonish, 3D Render, Plastik Görünüm, Aşırı Pürüzsüz Cilt, Yamuk Eller, Fazla Parmaklar, Bulanık Yüz Hatları.
        
-    ${fabricType ? `7. ÖZEL KUMAŞ TALİMATI: Kumaş tipi "${fabricType}". Bu kumaşın ışığı yansıtma ve kırışma özelliklerini tam olarak yansıt.` : ''}
+    ${fabricType ? `7. ÖZEL KUMAŞ TALİMATI: Kumaş tipi "${fabricType}". ${fabricType === 'Deri'
+                ? 'DERİ DOKU DETAYLARI (KRİTİK): Deri yüzeyinde doğal doku çizgileri (grain pattern), hafif parlaklık ve mat alanlar, dikiş detayları NET görünmeli. Işık derinin üzerinde gerçekçi bir şekilde yansımalı. Deri kalınlığı ve ağırlığı hissedilmeli. Yüzeyde doğal kırışıklıklar ve doku varyasyonları olmalı.'
+                : fabricType === 'Triko'
+                    ? 'TRİKO DOKU DETAYLARI (KRİTİK): Örgü yapısı (knit texture) ve iplik detayları AÇIKÇA görünmeli. Her bir örgü ilmeği seçilebilir netlikte olmalı. Trikonun yumuşak, esnek yapısı ve doğal kıvrımları hissedilmeli. Işık örgü dokusunun üzerinde gerçekçi gölgeler oluşturmalı.'
+                    : `Bu kumaşın ışığı yansıtma ve kırışma özelliklerini tam olarak yansıt.`
+            }` : ''}
     ${fabricFinish ? `8. KUMAŞ YÜZEYİ: "${fabricFinish}" bitişi.` : ''}
     
     *** 4. GÖRSEL TUTARLILIK ***:
