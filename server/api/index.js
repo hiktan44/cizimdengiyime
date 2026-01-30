@@ -155,7 +155,7 @@ const CREDIT_COSTS = {
     FOTOMATIK_TRANSFORM: 1,
     FOTOMATIK_DESCRIBE: 1,
     ADGENIUS_IMAGE: 1,
-    ADGENIUS_VIDEO: 3,
+    ADGENIUS_VIDEO: 4,
     COLLAGE: 2, // Standart kolaj - 2 kredi
 };
 
