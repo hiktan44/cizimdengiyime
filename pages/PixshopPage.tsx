@@ -662,7 +662,23 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const handleUpscale = useCallback(async (size: '2K' | '4K') => {
     if (!currentImage) return;
 
-    if (!await checkCredits()) return;
+    // 4K için özel kredi kontrolü
+    if (size === '4K') {
+      if (!profile) {
+        setError('İşlem yapmak için giriş yapmalısınız.');
+        return false;
+      }
+      const result = await checkAndDeductCredits(profile.id, 'pixshop', CREDIT_COSTS.PIXSHOP_4K);
+      if (!result.success) {
+        setError(result.message || 'Yetersiz kredi. 4K upscale için 2 kredi gereklidir.');
+        if (onShowBuyCredits) onShowBuyCredits();
+        return;
+      }
+      onRefreshProfile();
+    } else {
+      // 2K için normal kredi kontrolü
+      if (!await checkCredits()) return;
+    }
 
     setIsLoading(true);
     setError(null);

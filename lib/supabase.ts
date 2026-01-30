@@ -78,12 +78,13 @@ export const CREDIT_COSTS = {
   PRODUCT_TO_MODEL: 1,
   VIDEO: 3,
   TECH_SKETCH: 1, // Teknik çizim maliyeti
-  PIXSHOP: 1, // Pixshop fotoğraf düzenleme maliyeti
+  PIXSHOP: 1, // Pixshop fotoğraf düzenleme maliyeti (rötuş, filtre, ayarlama, kırpma, 2K upscale)
+  PIXSHOP_4K: 2, // Pixshop 4K upscale maliyeti (ekstra işlem gücü gerektirir)
   FOTOMATIK_TRANSFORM: 1, // Fotomatik görüntü dönüştürme maliyeti
   FOTOMATIK_DESCRIBE: 1, // Fotomatik prompt üretme maliyeti
   ADGENIUS_IMAGE: 1, // AdGenius görsel maliyeti (her görsel için)
   ADGENIUS_VIDEO: 3, // AdGenius video maliyeti (her video için)
-  COLLAGE: 2, // Kolaj oluşturma maliyeti (2-6 görsel birleştirme)
+  COLLAGE: 2, // Kolaj oluşturma maliyeti (2-6 görsel birleştirme) - 2 kredi
 } as const;
 
 // Subscription plans
