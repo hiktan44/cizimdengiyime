@@ -442,6 +442,17 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     });
   };
 
+  // Helper to upload input image securely
+  const uploadInputImage = async (file: File, userId: string) => {
+    try {
+      const { uploadImageToStorage } = await import('../lib/database');
+      return await uploadImageToStorage(file, userId, 'input');
+    } catch (err) {
+      console.error("Input upload failed:", err);
+      return null;
+    }
+  };
+
   const handleGenerate = useCallback(async () => {
     if (!currentImage) {
       setError('Düzenlenecek bir resim yüklenmedi.');
@@ -467,8 +478,15 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     try {
       const editedImageUrl = await pixshopGenerateEditedImage(currentImage, prompt, editHotspot, outputResolution);
       const newImageFile = dataURLtoFile(editedImageUrl, `edited-${Date.now()}.png`);
+
+      // Upload input image primarily for admin logs
+      let inputUrl = null;
+      if (profile) {
+        inputUrl = await uploadInputImage(currentImage, profile.id);
+      }
+
       addImageToHistory(newImageFile);
-      await saveToHistory(editedImageUrl);
+      await saveToHistory(editedImageUrl, inputUrl);
       setEditHotspot(null);
       setDisplayHotspot(null);
       setPrompt('');
@@ -495,8 +513,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     try {
       const filteredImageUrl = await pixshopGenerateFilteredImage(currentImage, filterPrompt, outputResolution);
       const newImageFile = dataURLtoFile(filteredImageUrl, `filtered-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
       addImageToHistory(newImageFile);
-      await saveToHistory(filteredImageUrl);
+      await saveToHistory(filteredImageUrl, inputUrl);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
       setError(`Filtre uygulanamadı. ${errorMessage}`);
@@ -520,8 +542,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     try {
       const adjustedImageUrl = await pixshopGenerateAdjustedImage(currentImage, adjustmentPrompt, outputResolution);
       const newImageFile = dataURLtoFile(adjustedImageUrl, `adjusted-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
       addImageToHistory(newImageFile);
-      await saveToHistory(adjustedImageUrl);
+      await saveToHistory(adjustedImageUrl, inputUrl);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
       setError(`Ayar uygulanamadı. ${errorMessage}`);
@@ -544,8 +570,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       const erasePrompt = "Remove the object at this location and fill the background naturally with the surrounding texture (inpainting).";
       const erasedImageUrl = await pixshopGenerateEditedImage(currentImage, erasePrompt, editHotspot, outputResolution);
       const newImageFile = dataURLtoFile(erasedImageUrl, `erased-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
       addImageToHistory(newImageFile);
-      await saveToHistory(erasedImageUrl);
+      await saveToHistory(erasedImageUrl, inputUrl);
       setEditHotspot(null);
       setDisplayHotspot(null);
     } catch (err) {
@@ -587,8 +617,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         outputResolution
       );
       const newImageFile = dataURLtoFile(compositeImageUrl, `with-product-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
       addImageToHistory(newImageFile);
-      await saveToHistory(compositeImageUrl);
+      await saveToHistory(compositeImageUrl, inputUrl);
       setOverlayPrompt('');
       setEditHotspot(null);
       setDisplayHotspot(null);
@@ -613,8 +647,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     try {
       const transparentImageUrl = await pixshopRemoveBackground(currentImage, outputResolution);
       const newImageFile = dataURLtoFile(transparentImageUrl, `nobg-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
       addImageToHistory(newImageFile);
-      await saveToHistory(transparentImageUrl);
+      await saveToHistory(transparentImageUrl, inputUrl);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Arka plan kaldırılamadı.';
       setError(`Hata: ${errorMessage}`);
@@ -657,8 +695,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
       const croppedImageUrl = canvas.toDataURL('image/png');
       const newImageFile = dataURLtoFile(croppedImageUrl, `cropped-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
       addImageToHistory(newImageFile);
-      await saveToHistory(croppedImageUrl);
+      await saveToHistory(croppedImageUrl, inputUrl);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Kırpma işlemi sırasında hata oluştu.';
       setError(errorMessage);
@@ -694,8 +736,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     try {
       const upscaledImageUrl = await pixshopUpscaleImage(currentImage, size);
       const newImageFile = dataURLtoFile(upscaledImageUrl, `upscaled-${size}-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
       addImageToHistory(newImageFile);
-      await saveToHistory(upscaledImageUrl);
+      await saveToHistory(upscaledImageUrl, inputUrl);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
       setError(`Yükseltme işlemi başarısız oldu. ${errorMessage}`);
