@@ -249,6 +249,9 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const [overlayPrompt, setOverlayPrompt] = useState<string>('');
   const [overlayImageUrl, setOverlayImageUrl] = useState<string | null>(null);
 
+  // Output resolution selection (2K = 1 kredi, 4K = +1 kredi ekstra)
+  const [outputResolution, setOutputResolution] = useState<'2K' | '4K'>('2K');
+
   const imgRef = useRef<HTMLImageElement>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
@@ -402,9 +405,13 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       setError('İşlem yapmak için giriş yapmalısınız.');
       return false;
     }
-    const result = await checkAndDeductCredits(profile.id, 'pixshop');
+
+    // 4K seçiliyse ekstra kredi kontrolü
+    const creditCost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+    const result = await checkAndDeductCredits(profile.id, 'pixshop', creditCost);
+
     if (!result.success) {
-      setError(result.message || 'Yetersiz kredi.');
+      setError(result.message || `Yetersiz kredi. ${outputResolution} için ${creditCost} kredi gereklidir.`);
       if (onShowBuyCredits) onShowBuyCredits();
       return false;
     }
@@ -458,7 +465,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     setError(null);
 
     try {
-      const editedImageUrl = await pixshopGenerateEditedImage(currentImage, prompt, editHotspot);
+      const editedImageUrl = await pixshopGenerateEditedImage(currentImage, prompt, editHotspot, outputResolution);
       const newImageFile = dataURLtoFile(editedImageUrl, `edited-${Date.now()}.png`);
       addImageToHistory(newImageFile);
       await saveToHistory(editedImageUrl);
@@ -486,7 +493,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     setError(null);
 
     try {
-      const filteredImageUrl = await pixshopGenerateFilteredImage(currentImage, filterPrompt);
+      const filteredImageUrl = await pixshopGenerateFilteredImage(currentImage, filterPrompt, outputResolution);
       const newImageFile = dataURLtoFile(filteredImageUrl, `filtered-${Date.now()}.png`);
       addImageToHistory(newImageFile);
       await saveToHistory(filteredImageUrl);
@@ -511,7 +518,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     setError(null);
 
     try {
-      const adjustedImageUrl = await pixshopGenerateAdjustedImage(currentImage, adjustmentPrompt);
+      const adjustedImageUrl = await pixshopGenerateAdjustedImage(currentImage, adjustmentPrompt, outputResolution);
       const newImageFile = dataURLtoFile(adjustedImageUrl, `adjusted-${Date.now()}.png`);
       addImageToHistory(newImageFile);
       await saveToHistory(adjustedImageUrl);
@@ -535,7 +542,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
     try {
       const erasePrompt = "Remove the object at this location and fill the background naturally with the surrounding texture (inpainting).";
-      const erasedImageUrl = await pixshopGenerateEditedImage(currentImage, erasePrompt, editHotspot);
+      const erasedImageUrl = await pixshopGenerateEditedImage(currentImage, erasePrompt, editHotspot, outputResolution);
       const newImageFile = dataURLtoFile(erasedImageUrl, `erased-${Date.now()}.png`);
       addImageToHistory(newImageFile);
       await saveToHistory(erasedImageUrl);
@@ -576,7 +583,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         currentImage,
         overlayImage,
         overlayPrompt,
-        editHotspot || undefined
+        editHotspot || undefined,
+        outputResolution
       );
       const newImageFile = dataURLtoFile(compositeImageUrl, `with-product-${Date.now()}.png`);
       addImageToHistory(newImageFile);
@@ -603,7 +611,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     setError(null);
 
     try {
-      const transparentImageUrl = await pixshopRemoveBackground(currentImage);
+      const transparentImageUrl = await pixshopRemoveBackground(currentImage, outputResolution);
       const newImageFile = dataURLtoFile(transparentImageUrl, `nobg-${Date.now()}.png`);
       addImageToHistory(newImageFile);
       await saveToHistory(transparentImageUrl);
@@ -765,7 +773,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     setError(null);
 
     try {
-      const transparentImageUrl = await pixshopRemoveBackground(currentImage);
+      const transparentImageUrl = await pixshopRemoveBackground(currentImage, outputResolution);
 
       const img = new Image();
       img.src = transparentImageUrl;
@@ -955,9 +963,38 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-6 animate-fade-in">
         {/* Credit Info */}
         {profile && (
-          <div className="w-full flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2">
-            <span className="text-sm text-slate-400">Her işlem <span className="text-cyan-400 font-bold">{CREDIT_COSTS.PIXSHOP} kredi</span> harcar</span>
-            <span className="text-sm text-slate-300">Mevcut: <span className="text-cyan-400 font-bold">{profile.credits}</span> kredi</span>
+          <div className="w-full flex flex-col gap-3">
+            <div className="w-full flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2">
+              <span className="text-sm text-slate-400">Her işlem <span className="text-cyan-400 font-bold">{outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP} kredi</span> harcar</span>
+              <span className="text-sm text-slate-300">Mevcut: <span className="text-cyan-400 font-bold">{profile.credits}</span> kredi</span>
+            </div>
+
+            {/* Resolution Selector */}
+            <div className="w-full bg-slate-800/30 border border-slate-700/50 rounded-lg px-4 py-3">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm text-slate-300 font-medium">Çıktı Çözünürlüğü:</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setOutputResolution('2K')}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${outputResolution === '2K'
+                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                      }`}
+                  >
+                    2K <span className="text-xs opacity-75">(1 kredi)</span>
+                  </button>
+                  <button
+                    onClick={() => setOutputResolution('4K')}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${outputResolution === '4K'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                      }`}
+                  >
+                    4K <span className="text-xs opacity-75">(2 kredi)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

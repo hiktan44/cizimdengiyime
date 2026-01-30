@@ -86,7 +86,8 @@ const safetySettings = [
 export const pixshopGenerateEditedImage = async (
     originalImage: File,
     userPrompt: string,
-    hotspot: { x: number, y: number }
+    hotspot: { x: number, y: number },
+    resolution: '2K' | '4K' = '2K'
 ): Promise<string> => {
     console.log('Starting generative edit at:', hotspot);
     checkApiKey();
@@ -113,7 +114,7 @@ Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: $
             safetySettings,
             responseModalities: [Modality.IMAGE],
             imageConfig: {
-                imageSize: "4K",
+                imageSize: resolution, // 2K veya 4K
                 aspectRatio: "3:4"
             }
         },
@@ -132,6 +133,7 @@ Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: $
 export const pixshopGenerateFilteredImage = async (
     originalImage: File,
     filterPrompt: string,
+    resolution: '2K' | '4K' = '2K'
 ): Promise<string> => {
     console.log(`Starting filter generation: ${filterPrompt}`);
     checkApiKey();
@@ -152,7 +154,7 @@ Do not change the content or composition, only apply the visual style.`;
             safetySettings,
             responseModalities: [Modality.IMAGE],
             imageConfig: {
-                imageSize: "4K",
+                imageSize: resolution,
                 aspectRatio: "3:4"
             }
         },
@@ -171,6 +173,7 @@ Do not change the content or composition, only apply the visual style.`;
 export const pixshopGenerateAdjustedImage = async (
     originalImage: File,
     adjustmentPrompt: string,
+    resolution: '2K' | '4K' = '2K'
 ): Promise<string> => {
     console.log(`Starting global adjustment generation: ${adjustmentPrompt}`);
     checkApiKey();
@@ -195,7 +198,7 @@ Request: "${adjustmentPrompt}"
             safetySettings,
             responseModalities: [Modality.IMAGE],
             imageConfig: {
-                imageSize: "4K",
+                imageSize: resolution,
                 aspectRatio: "3:4"
             }
         },
@@ -211,7 +214,8 @@ Request: "${adjustmentPrompt}"
  * @returns A promise that resolves to the data URL of the image with background removed.
  */
 export const pixshopRemoveBackground = async (
-    originalImage: File
+    originalImage: File,
+    resolution: '2K' | '4K' = '2K'
 ): Promise<string> => {
     console.log('Starting background removal...');
     checkApiKey();
@@ -233,7 +237,7 @@ The output MUST be a transparent PNG.`;
             safetySettings,
             responseModalities: [Modality.IMAGE],
             imageConfig: {
-                imageSize: "4K",
+                imageSize: resolution,
                 aspectRatio: "3:4"
             }
         },
@@ -290,7 +294,8 @@ export const pixshopAddProductOrLogo = async (
     originalImage: File,
     overlayImage: File,
     userPrompt: string,
-    hotspot?: { x: number, y: number }
+    hotspot?: { x: number, y: number },
+    resolution: '2K' | '4K' = '2K'
 ): Promise<string> => {
     console.log('Starting product/logo addition...');
     checkApiKey();
@@ -325,8 +330,8 @@ ${hotspotText}
             safetySettings,
             responseModalities: [Modality.IMAGE],
             imageConfig: {
-                imageSize: "4K", // 4K çıktı için - giriş çözünürlüğünü korur
-                aspectRatio: "3:4" // Varsayılan aspect ratio
+                imageSize: resolution,
+                aspectRatio: "3:4"
             }
         },
     });
