@@ -761,7 +761,7 @@ const GenList = ({
             onClick={() => setFilterType('all')}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap border ${filterType === 'all' ? 'bg-white text-black border-white' : 'bg-transparent text-slate-400 border-slate-700 hover:border-slate-500'}`}
           >
-            Tümü ({userGenerations.length})
+            Tümü ({(userGenerations || []).length})
           </button>
           {analytics.map(([type, count]) => (
             <button
