@@ -760,17 +760,88 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
                     <p className="text-slate-400 text-center py-4">{t.modal.noOps}</p>
                   ) : (
                     userGenerations.map((gen) => (
-                      <div key={gen.id} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="text-sm font-semibold text-cyan-400">
-                              {gen.type === 'sketch_to_product' ? t.modal.sketchToProduct :
-                                gen.type === 'product_to_model' ? t.modal.productToModel :
-                                  gen.type === 'tech_sketch' ? t.modal.techSketch : t.modal.video}
-                            </span>
-                            <span className="text-xs text-slate-400 ml-3">{new Date(gen.created_at).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
+                      <div key={gen.id} className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 transition hover:bg-slate-800">
+                        <div className="flex flex-col gap-4">
+                          {/* Header: Type, ID, Date, Cost */}
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="text-sm font-bold text-cyan-400">
+                                {gen.type === 'sketch_to_product' ? t.modal.sketchToProduct :
+                                  gen.type === 'product_to_model' ? t.modal.productToModel :
+                                    gen.type === 'tech_sketch' ? t.modal.techSketch :
+                                      gen.type === 'video' ? t.modal.video :
+                                        gen.type}
+                              </span>
+                              <div className="text-xs text-slate-500 font-mono mt-0.5">{gen.id.slice(0, 8)}...</div>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-sm text-white font-medium block">{gen.credits_used} {t.modal.credit}</span>
+                              <span className="text-xs text-slate-400 block">{new Date(gen.created_at).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
+                            </div>
                           </div>
-                          <span className="text-sm text-white">{gen.credits_used} {t.modal.credit}</span>
+
+                          {/* Images Grid */}
+                          <div className="grid grid-cols-2 gap-3 mt-2">
+                            {/* Input Image */}
+                            {gen.input_image_url && (
+                              <div className="relative group">
+                                <div className="text-xs text-slate-400 mb-1">Giriş Görseli</div>
+                                <div className="aspect-[3/4] rounded-lg overflow-hidden bg-slate-900 border border-slate-700">
+                                  <img
+                                    src={gen.input_image_url}
+                                    alt="Input"
+                                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                  />
+                                </div>
+                                <a href={gen.input_image_url} target="_blank" rel="noreferrer" className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                </a>
+                              </div>
+                            )}
+
+                            {/* Output Image/Video */}
+                            {(gen.output_image_url || gen.output_video_url) ? (
+                              <div className="relative group">
+                                <div className="text-xs text-green-400 mb-1 font-medium">Çıktı Görseli/Gen</div>
+                                <div className="aspect-[3/4] rounded-lg overflow-hidden bg-slate-900 border border-green-900/30">
+                                  {gen.output_video_url ? (
+                                    <video
+                                      src={gen.output_video_url}
+                                      controls
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <img
+                                      src={gen.output_image_url!}
+                                      alt="Output"
+                                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                    />
+                                  )}
+                                </div>
+                                <a href={gen.output_video_url || gen.output_image_url!} target="_blank" rel="noreferrer" className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="aspect-[3/4] rounded-lg bg-orange-900/10 border border-orange-500/30 flex items-center justify-center p-4 text-center">
+                                <div>
+                                  <span className="text-2xl mb-2 block">⚠️</span>
+                                  <span className="text-xs text-orange-300 font-medium">Çıktı Oluşmadı</span>
+                                  <p className="text-[10px] text-orange-400 mt-1">İşlem başarısız veya beklemede</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Settings Info (Optional) */}
+                          {gen.settings && Object.keys(gen.settings).length > 0 && (
+                            <div className="mt-2 text-xs text-slate-500 bg-slate-900/50 p-2 rounded">
+                              <span className="font-semibold block mb-1">Ayarlar:</span>
+                              <pre className="whitespace-pre-wrap font-mono text-[10px]">
+                                {JSON.stringify(gen.settings, null, 2)}
+                              </pre>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))

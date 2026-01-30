@@ -432,7 +432,7 @@ export const getAllUsersActivity = async (): Promise<UserActivity[]> => {
           full_name: profile.full_name,
           phone_number: profile.phone_number || null,
           credits: profile.credits,
-          is_admin: profile.is_admin || false,
+          is_admin: profile.subscription_tier === 'admin',
           total_generations: generations?.length || 0,
           total_credits_used: totalCreditsUsed,
           created_at: profile.created_at,
