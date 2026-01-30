@@ -262,7 +262,13 @@ export const pixshopUpscaleImage = async (
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const originalImagePart = await fileToPart(originalImage);
-    const prompt = `Upscale this image to ${size} resolution. Increase resolution while maintaining fidelity. Sharpen details, reduce noise.`;
+    const prompt = `Upscale this image to ${size} resolution. Increase resolution while maintaining fidelity. Sharpen details, reduce noise.
+    
+*** CRITICAL LOGO/TEXT PRESERVATION RULES ***:
+1. PROTECT LOGOS: If there are any logos, brand marks, or text overlays in the image, they MUST remain crystal clear and sharp at ${size} resolution.
+2. NO LOGO DISTORTION: Do not blur, warp, or degrade any logos, watermarks, or text elements during upscaling.
+3. ENHANCE CLARITY: Logos and text should become SHARPER and MORE READABLE at higher resolution, not blurrier.
+4. MAINTAIN POSITIONING: Keep all logos and overlays in their exact original positions and proportions.`;
 
     const textPart = { text: prompt };
 

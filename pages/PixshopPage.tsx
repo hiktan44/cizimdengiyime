@@ -977,8 +977,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                   <button
                     onClick={() => setOutputResolution('2K')}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${outputResolution === '2K'
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                      : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
                       }`}
                   >
                     2K <span className="text-xs opacity-75">(1 kredi)</span>
@@ -986,8 +986,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                   <button
                     onClick={() => setOutputResolution('4K')}
                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${outputResolution === '4K'
-                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
-                        : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                      : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
                       }`}
                   >
                     4K <span className="text-xs opacity-75">(2 kredi)</span>
@@ -1324,6 +1324,33 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                 <p className="text-xs text-gray-500 mt-2">
                   💡 İpucu: Resimde bir nokta seçerek hassas konum belirleyebilirsiniz (opsiyonel)
                 </p>
+              </div>
+
+              {/* Resolution Selector */}
+              <div className="w-full max-w-2xl flex items-center justify-between bg-gray-900/50 border border-gray-700 rounded-xl p-4">
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-gray-200">Çıktı Kalitesi</span>
+                  <span className="text-xs text-gray-400">4K için +1 kredi eklenir</span>
+                </div>
+                <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+                  <button
+                    onClick={() => setOutputResolution('2K')}
+                    className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${outputResolution === '2K'
+                      ? 'bg-gray-600 text-white shadow-sm'
+                      : 'text-gray-400 hover:text-white'}`}
+                  >
+                    2K (Standart)
+                  </button>
+                  <button
+                    onClick={() => setOutputResolution('4K')}
+                    className={`px-4 py-2 rounded-md text-sm font-semibold transition-all flex items-center gap-1 ${outputResolution === '4K'
+                      ? 'bg-purple-600 text-white shadow-sm'
+                      : 'text-gray-400 hover:text-white'}`}
+                  >
+                    <span>4K (Ultra)</span>
+                    <span className="text-[10px] bg-white/20 px-1 rounded">PRO</span>
+                  </button>
+                </div>
               </div>
 
               {/* Add Button */}
