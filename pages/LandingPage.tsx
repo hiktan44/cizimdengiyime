@@ -10,6 +10,7 @@ import { HeroVideoCarousel } from '../components/HeroVideoCarousel';
 interface LandingPageProps {
   onGetStarted: () => void;
   onSignIn: () => void;
+  onNavigate?: (page: 'privacy-policy' | 'kvkk' | 'terms-of-service' | 'cookie-policy' | 'refund-policy' | 'ai-usage-notice') => void;
   isLoggedIn?: boolean;
   userName?: string | null;
   userRole?: 'admin' | 'user' | null;
@@ -617,6 +618,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const {
     onGetStarted,
     onSignIn,
+    onNavigate,
     isLoggedIn = false,
     userName,
     userRole,
@@ -2039,42 +2041,42 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
             {/* Legal Links */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full max-w-5xl">
-              <a
-                href="/privacy-policy"
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              <button
+                onClick={() => onNavigate?.('privacy-policy')}
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer`}
               >
                 Gizlilik Politikası
-              </a>
-              <a
-                href="/kvkk"
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              </button>
+              <button
+                onClick={() => onNavigate?.('kvkk')}
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer`}
               >
                 KVKK Aydınlatma Metni
-              </a>
-              <a
-                href="/terms-of-service"
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              </button>
+              <button
+                onClick={() => onNavigate?.('terms-of-service')}
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer`}
               >
                 Kullanım Koşulları
-              </a>
-              <a
-                href="/cookie-policy"
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              </button>
+              <button
+                onClick={() => onNavigate?.('cookie-policy')}
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer`}
               >
                 Çerez Politikası
-              </a>
-              <a
-                href="/refund-policy"
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              </button>
+              <button
+                onClick={() => onNavigate?.('refund-policy')}
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer`}
               >
                 İade ve İptal
-              </a>
-              <a
-                href="/ai-usage-notice"
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm flex items-center justify-center gap-1`}
+              </button>
+              <button
+                onClick={() => onNavigate?.('ai-usage-notice')}
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm flex items-center justify-center gap-1 cursor-pointer`}
               >
                 <span>🤖</span> AI Kullanımı
-              </a>
+              </button>
             </div>
 
             {/* Contact Info */}

@@ -55,6 +55,12 @@ import { AdgeniusPage } from './pages/AdgeniusPage';
 import { CollagePage } from './pages/CollagePage';
 import { WhatsAppPanel } from './components/WhatsAppPanel';
 import { trackEvent, ANALYTICS_EVENTS } from './utils/analytics';
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
+import { KVKKPage } from './pages/KVKKPage';
+import { TermsOfServicePage } from './pages/TermsOfServicePage';
+import { CookiePolicyPage } from './pages/CookiePolicyPage';
+import { RefundPolicyPage } from './pages/RefundPolicyPage';
+import { AIUsageNoticePage } from './pages/AIUsageNoticePage';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -1758,7 +1764,7 @@ const ToolPage: React.FC<{
 
 const App: React.FC = () => {
     const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, sendPasswordResetEmail, updatePassword, signOut, refreshProfile, retryAuth } = useAuth();
-    const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin'>('landing');
+    const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin' | 'privacy-policy' | 'kvkk' | 'terms-of-service' | 'cookie-policy' | 'refund-policy' | 'ai-usage-notice'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -2184,6 +2190,7 @@ const App: React.FC = () => {
                 <LandingPage
                     onGetStarted={handleGetStarted}
                     onSignIn={handleSignIn}
+                    onNavigate={(page) => setCurrentPage(page)}
                     isLoggedIn={!!user}
                     userName={profile?.full_name}
                     userRole={isAdmin ? 'admin' : (user ? 'user' : null)}
@@ -2266,6 +2273,44 @@ const App: React.FC = () => {
                     onRefreshProfile={refreshProfile}
                     logoMediaUrl={logoMediaUrl}
                     onLogoMediaUpload={(f) => handleFileUpload(f, 'logo_media')}
+                />
+            )}
+
+            {/* Legal Pages */}
+            {currentPage === 'privacy-policy' && (
+                <PrivacyPolicyPage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    theme={theme}
+                />
+            )}
+            {currentPage === 'kvkk' && (
+                <KVKKPage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    theme={theme}
+                />
+            )}
+            {currentPage === 'terms-of-service' && (
+                <TermsOfServicePage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    theme={theme}
+                />
+            )}
+            {currentPage === 'cookie-policy' && (
+                <CookiePolicyPage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    theme={theme}
+                />
+            )}
+            {currentPage === 'refund-policy' && (
+                <RefundPolicyPage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    theme={theme}
+                />
+            )}
+            {currentPage === 'ai-usage-notice' && (
+                <AIUsageNoticePage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    theme={theme}
                 />
             )}
 
