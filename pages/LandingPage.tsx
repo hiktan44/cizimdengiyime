@@ -1003,7 +1003,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* How It Works - 3 Steps */}
-      <section className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
+      <section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
         <div className="max-w-7xl mx-auto relative z-10">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.howItWorks.title}
@@ -1056,7 +1056,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Before/After Showcase */}
-      <section className="relative py-20 px-6 z-10">
+      <section id="showcase" className="relative py-20 px-6 z-10">
         <div className="max-w-7xl mx-auto relative z-10">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.showcase.title}
@@ -1154,7 +1154,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Features */}
-      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-slate-50'} z-10 relative`}>
+      <section id="features" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-slate-50'} z-10 relative`}>
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
             {t.features.title}
@@ -1957,7 +1957,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* FAQ Section */}
-      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-rose-50/40'} z-10 relative`}>
+      <section id="faq" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-rose-50/40'} z-10 relative`}>
         <div className="max-w-4xl mx-auto">
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
             {t.faq.title}
