@@ -67,7 +67,7 @@ export const PrivacyPolicyPage: React.FC<PrivacyPolicyPageProps> = ({ onNavigate
                         <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-2`}>
                             <li><strong>Ödeme Altyapısı:</strong> Stripe (ödeme işlemleri için)</li>
                             <li><strong>Cloud Hizmetleri:</strong> Supabase, Google Cloud (veri depolama için)</li>
-                            <li><strong>AI Servisleri:</strong> Google Gemini API (görsel işleme için)</li>
+                            <li><strong>AI Servisleri:</strong> Google AI (görsel ve video işleme için)</li>
                             <li><strong>Analitik Araçları:</strong> Google Analytics (kullanım istatistikleri için)</li>
                         </ul>
                         <p className={`${secondaryTextClass} mt-4`}>

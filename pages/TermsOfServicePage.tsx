@@ -173,7 +173,7 @@ export const TermsOfServicePage: React.FC<TermsOfServicePageProps> = ({ onNaviga
                             <div>
                                 <h3 className="font-semibold text-lg mb-2">7.3. Üçüncü Taraf Hizmetleri</h3>
                                 <p>
-                                    Platformumuz Google Gemini, Stripe gibi üçüncü taraf hizmetleri kullanır.
+                                    Platformumuz Google AI, Stripe gibi üçüncü taraf hizmetleri kullanır.
                                     Bu hizmetlerin kesintilerinden sorumlu değiliz.
                                 </p>
                             </div>

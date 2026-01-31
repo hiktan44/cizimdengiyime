@@ -149,8 +149,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
   ];
 
   const videoOptions: { id: VideoModel; name: string; description: string; icon: React.FC<any> }[] = [
-    { id: 'veo-3.1-generate-preview', name: 'Yüksek Kalite (High Quality)', description: 'Sinematik kalite, en iyi detaylar (Yavaş)', icon: Sparkles },
-    { id: 'veo-3.1-fast-generate-preview', name: 'Hızlı (Fast)', description: 'Hızlı üretim, standart kalite', icon: Zap },
+    { id: 'veo-3.1-generate-preview', name: 'Yüksek Kalite', description: 'Sinematik kalite, en iyi detaylar (Yavaş)', icon: Sparkles },
+    { id: 'veo-3.1-fast-generate-preview', name: 'Hızlı', description: 'Hızlı üretim, standart kalite', icon: Zap },
   ];
 
   const aspectRatios: { id: AspectRatio, label: string, icon: any }[] = [
