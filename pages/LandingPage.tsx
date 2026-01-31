@@ -2033,12 +2033,69 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* Footer */}
       <footer className={`py-12 px-6 border-t ${theme === 'dark' ? 'border-slate-700 bg-slate-900/80' : 'border-slate-200 bg-white'} z-10 relative`}>
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-center gap-6">
+          <div className="flex flex-col items-center gap-8">
             {/* Logo */}
             <Logo className="h-16 md:h-[120px]" theme={theme} />
 
+            {/* Legal Links */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full max-w-5xl">
+              <a
+                href="/privacy-policy"
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              >
+                Gizlilik Politikası
+              </a>
+              <a
+                href="/kvkk"
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              >
+                KVKK Aydınlatma Metni
+              </a>
+              <a
+                href="/terms-of-service"
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              >
+                Kullanım Koşulları
+              </a>
+              <a
+                href="/cookie-policy"
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              >
+                Çerez Politikası
+              </a>
+              <a
+                href="/refund-policy"
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm`}
+              >
+                İade ve İptal
+              </a>
+              <a
+                href="/ai-usage-notice"
+                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm flex items-center justify-center gap-1`}
+              >
+                <span>🤖</span> AI Kullanımı
+              </a>
+            </div>
+
+            {/* Contact Info */}
+            <div className={`${secondaryTextClass} text-center text-sm space-y-1`}>
+              <p>
+                <strong>İletişim:</strong>{' '}
+                <a href="mailto:info@fasheone.com" className="text-cyan-500 hover:underline">
+                  info@fasheone.com
+                </a>
+              </p>
+              <p>
+                <a href="https://fasheone.com" className="text-cyan-500 hover:underline">
+                  fasheone.com
+                </a>
+              </p>
+            </div>
+
             {/* Copyright */}
-            <p className={`${secondaryTextClass} text-center`}>&copy; 2024 Fasheone. Tüm hakları saklıdır.</p>
+            <p className={`${secondaryTextClass} text-center text-sm`}>
+              &copy; 2024 Fasheone. Tüm hakları saklıdır.
+            </p>
           </div>
         </div>
       </footer>
