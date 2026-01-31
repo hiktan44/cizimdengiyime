@@ -2047,10 +2047,12 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full max-w-5xl">
               <button
                 onClick={() => {
+                  console.log('🔍 Privacy Policy clicked, onNavigate:', onNavigate);
                   if (onNavigate) {
                     onNavigate('privacy-policy');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                   } else {
-                    console.log('onNavigate is not defined');
+                    console.error('❌ onNavigate is undefined!');
                   }
                 }}
                 className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
