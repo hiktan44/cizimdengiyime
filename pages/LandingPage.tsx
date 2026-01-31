@@ -870,8 +870,22 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
   return (
     <div className="min-h-screen relative">
-      {/* Fixed gradient background - covers entire page */}
-      <div className="fixed inset-0 bg-gradient-to-b from-green-400 via-yellow-400 via-orange-400 to-orange-500 -z-10"></div>
+      {/* Fixed gradient background with smooth animation */}
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          background: 'linear-gradient(45deg, #4ade80, #facc15, #fb923c, #f97316)',
+          backgroundSize: '400% 400%',
+          animation: 'gradientShift 15s ease infinite'
+        }}
+      ></div>
+      <style>{`
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
       {/* Subtle animated overlay */}
       <div className="fixed inset-0 bg-gradient-to-br from-green-300/10 via-yellow-300/10 to-orange-400/10 animate-pulse pointer-events-none -z-5"></div>
 
