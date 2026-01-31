@@ -524,7 +524,7 @@ export const getUserGenerations = async (userId: string) => {
 
     if (error) {
       if (error.code === '42501' || error.message?.includes('row-level security')) {
-        throw new Error('İşlem kayıtlarına erişim sağlanamadı. Lütfen "FIX_ADMIN_ACCESS_VIA_RPC.sql" dosyasını Supabase SQL Editor''de çalıştırın.');
+        throw new Error('İşlem kayıtlarına erişim sağlanamadı. Lütfen "FIX_ADMIN_ACCESS_VIA_RPC.sql" dosyasını Supabase SQL Editor\'de çalıştırın.');
       }
       throw error;
     }
