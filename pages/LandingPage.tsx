@@ -869,9 +869,11 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const whatsappSubtitle = language === 'tr' ? 'Hemen yazin' : 'Message now';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-400 via-yellow-400 via-orange-400 to-orange-500 relative overflow-hidden">
+    <div className="min-h-screen relative">
+      {/* Fixed gradient background - covers entire page */}
+      <div className="fixed inset-0 bg-gradient-to-b from-green-400 via-yellow-400 via-orange-400 to-orange-500 -z-10"></div>
       {/* Subtle animated overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-green-300/10 via-yellow-300/10 to-orange-400/10 animate-pulse pointer-events-none z-0"></div>
+      <div className="fixed inset-0 bg-gradient-to-br from-green-300/10 via-yellow-300/10 to-orange-400/10 animate-pulse pointer-events-none -z-5"></div>
 
       {/* Header */}
       <header className={`fixed top-0 left-0 right-0 z-[100] w-full ${theme === 'dark' ? 'bg-slate-900/95' : 'bg-white/95'} backdrop-blur-md border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} shadow-xl transition-all duration-300`}>
