@@ -2043,37 +2043,37 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full max-w-5xl">
               <button
                 onClick={() => onNavigate?.('privacy-policy')}
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none`}
+                className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 Gizlilik Politikası
               </button>
               <button
                 onClick={() => onNavigate?.('kvkk')}
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none`}
+                className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 KVKK Aydınlatma Metni
               </button>
               <button
                 onClick={() => onNavigate?.('terms-of-service')}
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none`}
+                className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 Kullanım Koşulları
               </button>
               <button
                 onClick={() => onNavigate?.('cookie-policy')}
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none`}
+                className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 Çerez Politikası
               </button>
               <button
                 onClick={() => onNavigate?.('refund-policy')}
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none`}
+                className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 İade ve İptal
               </button>
               <button
                 onClick={() => onNavigate?.('ai-usage-notice')}
-                className={`${secondaryTextClass} hover:text-cyan-500 transition-colors text-center text-sm flex items-center justify-center gap-1 cursor-pointer bg-transparent border-none`}
+                className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm flex items-center justify-center gap-1 cursor-pointer bg-transparent border-none p-0`}
               >
                 <span>🤖</span> AI Kullanımı
               </button>
