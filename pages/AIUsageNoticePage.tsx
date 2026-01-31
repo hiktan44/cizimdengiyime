@@ -1,10 +1,8 @@
 import React from 'react';
 
-interface AIUsageNoticePage
-
-Props {
+interface AIUsageNoticePageProps {
     onNavigateHome: () => void;
-    theme ?: 'light' | 'dark';
+    theme?: 'light' | 'dark';
 }
 
 export const AIUsageNoticePage: React.FC<AIUsageNoticePageProps> = ({ onNavigateHome, theme = 'dark' }) => {
