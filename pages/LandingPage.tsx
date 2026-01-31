@@ -52,6 +52,40 @@ const translations = {
       step2Desc: 'Hazır şablonlar ve seçeneklerle istediğin stili belirle, prompt kullanmana gerek yok',
       step3Title: 'Oluştur & İndir',
       step3Desc: 'Profesyonel sonuçları hemen indir, video oluştur, sosyal medyada paylaş',
+      useCases: {
+        title: 'Güçlü Özellikler',
+        subtitle: 'Her İhtiyaca Özel Çözümler',
+        collage: {
+          title: 'Kolaj Oluşturma',
+          desc: 'Tek bir üründen birden fazla varyasyon oluşturun. Farklı renkler, pozlar ve arka planlarla zengin kataloglar hazırlayın. 4-16 görseli tek bir kolajda birleştirerek e-ticaret ve sosyal medya için etkileyici içerikler üretin.',
+          features: [
+            'Otomatik grid düzeni ve profesyonel tasarım',
+            'Farklı renk ve stil varyasyonları',
+            'E-ticaret katalogları için ideal format',
+            'Sosyal medya paylaşımları için optimize edilmiş boyutlar'
+          ]
+        },
+        adMedia: {
+          title: 'Reklam Medyası',
+          desc: 'Profesyonel reklam kampanyaları için stüdyo kalitesinde görseller ve videolar üretin. Farklı mekanlar, modeller ve senaryolarla markanızı öne çıkarın. AI ile saniyeler içinde billboard, dergi ve dijital reklam içerikleri oluşturun.',
+          features: [
+            'Stüdyo çekimi kalitesinde model görselleri',
+            'Özelleştirilebilir arka plan ve mekan seçenekleri',
+            '5-10 saniyelik sinematik video içerikler',
+            'Marka kimliğine uygun stil ve atmosfer kontrolü'
+          ]
+        },
+        ecommerce: {
+          title: 'E-ticaret Çözümleri',
+          desc: 'Online mağazanız için eksiksiz görsel içerik paketi hazırlayın. Ürün fotoğrafları, model görselleri, teknik çizimler ve tanıtım videoları tek platformda. Katalog hazırlama sürenizi %90 azaltın, maliyetleri minimize edin.',
+          features: [
+            'Hayalet manken ve model görselleri',
+            'Farklı açılardan ürün fotoğrafları',
+            'Teknik çizim ve ölçü tabloları',
+            'Toplu işleme ile hızlı katalog hazırlama'
+          ]
+        }
+      }
     },
     hero: {
       title: 'Çizimden Gerçeğe,',
@@ -1153,6 +1187,91 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             >
               {t.showcase.tryNow}
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases - Güçlü Özellikler */}
+      <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.howItWorks.useCases.title}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
+              {t.howItWorks.useCases.subtitle}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Kolaj Oluşturma */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-blue-500' : 'border-slate-200 hover:border-blue-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7H4V5zM10 5a1 1 0 011-1h4a1 1 0 011 1v7h-6V5zM16 5a1 1 0 011-1h2a1 1 0 011 1v7h-4V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3H4v-3zM10 16a1 1 0 011-1h4a1 1 0 011 1v3h-6v-3zM16 16a1 1 0 011-1h2a1 1 0 011 1v3h-4v-3z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.howItWorks.useCases.collage.title}
+              </h3>
+              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
+                {t.howItWorks.useCases.collage.desc}
+              </p>
+              <ul className="space-y-3">
+                {t.howItWorks.useCases.collage.features.map((feature: string, idx: number) => (
+                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                    <span className="text-blue-500 mt-1 flex-shrink-0">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Reklam Medyası */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-purple-500' : 'border-slate-200 hover:border-purple-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.howItWorks.useCases.adMedia.title}
+              </h3>
+              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
+                {t.howItWorks.useCases.adMedia.desc}
+              </p>
+              <ul className="space-y-3">
+                {t.howItWorks.useCases.adMedia.features.map((feature: string, idx: number) => (
+                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                    <span className="text-purple-500 mt-1 flex-shrink-0">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* E-ticaret Çözümleri */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-green-500' : 'border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.howItWorks.useCases.ecommerce.title}
+              </h3>
+              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
+                {t.howItWorks.useCases.ecommerce.desc}
+              </p>
+              <ul className="space-y-3">
+                {t.howItWorks.useCases.ecommerce.features.map((feature: string, idx: number) => (
+                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                    <span className="text-green-500 mt-1 flex-shrink-0">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
