@@ -257,6 +257,10 @@ const translations = {
       feature4Desc: 'Düşük çözünürlüklü fotoğraflarınıza hayat verin. Yapay zeka destekli yükseltme teknolojimizle görsellerinizi 2K veya 4K kalitesine saniyeler içinde taşıyın.',
       feature5Title: 'Tasarımcı Dostu Çıktılar',
       feature5Desc: 'Arka plan kaldırma özelliği ile nesnelerinizi anında ayırın. Çalışmalarınızı şeffaf arka planlı yüksek kaliteli SVG formatında dışa aktarın.',
+      feature6Title: 'Yüz Değiştirme (Face Swap)',
+      feature6Desc: 'Profesyonel yüz değiştirme teknolojisi ile fotoğraflardaki yüzleri doğal ve gerçekçi şekilde değiştirin. Model çekimlerinde, kataloglarda veya sosyal medya içeriklerinde kullanın.',
+      feature7Title: 'Logo ve Aksesuar Ekleme',
+      feature7Desc: 'Fotoğraflarınıza logo, marka etiketleri veya aksesuar ekleyin. AI, eklediğiniz öğeleri doğal perspektif ve ışıklandırma ile görüntüye entegre eder.',
       whyTitle: 'Neden Pixshop?',
       why1: 'Zaman Kazanın: Saatler süren manuel düzenleme işlemlerini saniyelere indirin.',
       why2: 'Teknik Bilgi Gerektirmez: Photoshop bilmenize gerek yok, sadece yazmanız yeterli.',
@@ -1394,6 +1398,170 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pixshop Detailed Features */}
+      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-purple-900/20 to-slate-900' : 'bg-gradient-to-b from-white via-purple-50/30 to-white'} z-10 relative`}>
+        <div className="max-w-7xl mx-auto">
+          {/* Hero */}
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.pixshop.heroTitle}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
+              {t.pixshop.heroSubtitle}
+            </p>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {/* Feature 1 - Akıllı Rötuş */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-cyan-500' : 'border-slate-200 hover:border-cyan-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature1Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature1Desc}
+              </p>
+            </div>
+
+            {/* Feature 2 - Yaratıcı Filtreler */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-purple-500' : 'border-slate-200 hover:border-purple-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature2Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature2Desc}
+              </p>
+            </div>
+
+            {/* Feature 3 - Atmosfer Ayarları */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-orange-500' : 'border-slate-200 hover:border-orange-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature3Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature3Desc}
+              </p>
+            </div>
+
+            {/* Feature 4 - Upscale */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-green-500' : 'border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature4Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature4Desc}
+              </p>
+            </div>
+
+            {/* Feature 5 - Tasarımcı Çıktılar */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-blue-500' : 'border-slate-200 hover:border-blue-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature5Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature5Desc}
+              </p>
+            </div>
+
+            {/* Feature 6 - Face Swap */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-pink-500' : 'border-slate-200 hover:border-pink-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature6Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature6Desc}
+              </p>
+            </div>
+
+            {/* Feature 7 - Logo/Aksesuar */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-yellow-500' : 'border-slate-200 hover:border-yellow-400'} transition-all duration-300 shadow-lg group md:col-span-2 lg:col-span-1`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature7Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature7Desc}
+              </p>
+            </div>
+          </div>
+
+          {/* Why Pixshop */}
+          <div className={`bg-gradient-to-r ${theme === 'dark' ? 'from-purple-900/30 to-cyan-900/30 border-purple-500/30' : 'from-purple-50 to-cyan-50 border-purple-200'} border rounded-2xl p-8`}>
+            <h3 className={`text-3xl font-bold ${textClass} mb-6 text-center`}>
+              {t.pixshop.whyTitle}
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">⚡</span>
+                <p className={descriptionTextClass}>{t.pixshop.why1}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">🎯</span>
+                <p className={descriptionTextClass}>{t.pixshop.why2}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">🎨</span>
+                <p className={descriptionTextClass}>{t.pixshop.why3}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">📱</span>
+                <p className={descriptionTextClass}>{t.pixshop.why4}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <h3 className={`text-3xl font-bold ${textClass} mb-4`}>
+              {t.pixshop.cta}
+            </h3>
+            <p className={`${descriptionTextClass} mb-8 max-w-2xl mx-auto`}>
+              {t.pixshop.ctaSubtitle}
+            </p>
+            <button
+              onClick={() => navigate('/pixshop')}
+              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:from-purple-700 hover:to-cyan-700 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+            >
+              {t.pixshop.tryButton}
+            </button>
           </div>
         </div>
       </section>
