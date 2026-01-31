@@ -859,8 +859,8 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     : 'bg-gradient-to-br from-blue-100 via-white via-purple-50 to-orange-100';
 
   const textClass = theme === 'dark' ? 'text-white' : 'text-slate-900';
-  const secondaryTextClass = theme === 'dark' ? 'text-slate-400' : 'text-slate-700';
-  const descriptionTextClass = theme === 'dark' ? 'text-slate-300' : 'text-slate-800';
+  const secondaryTextClass = 'text-black font-medium';
+  const descriptionTextClass = 'text-black font-semibold';
   const cardBg = theme === 'dark' ? 'bg-slate-900/50 border-slate-700' : 'bg-white/80 border-slate-200';
   const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined;
   const whatsappMessage = language === 'tr'
@@ -1760,7 +1760,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             <h2 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 mb-6 uppercase tracking-tighter">
               {t.collage.title}
             </h2>
-            <p className="text-xl text-black max-w-4xl mx-auto leading-relaxed font-semibold">
+            <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto leading-relaxed`}>
               {t.collage.description}
             </p>
           </div>
