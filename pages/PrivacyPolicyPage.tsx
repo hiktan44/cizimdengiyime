@@ -12,8 +12,8 @@ export const PrivacyPolicyPage: React.FC<PrivacyPolicyPageProps> = ({ onNavigate
     const cardBg = theme === 'dark' ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200';
 
     return (
-        <div className={`min-h-screen ${bgClass}`}>
-            <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <div className={`min-h-screen ${bgClass} relative z-50`} style={{ border: '5px solid red' }}>
+            <div className="container mx-auto px-4 py-12 max-w-4xl relative z-50" style={{ border: '3px solid yellow' }}>
                 {/* Header */}
                 <div className="mb-8">
                     <button
