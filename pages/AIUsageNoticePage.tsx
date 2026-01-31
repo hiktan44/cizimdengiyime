@@ -73,14 +73,23 @@ export const AIUsageNoticePage: React.FC<AIUsageNoticePageProps> = ({ onNavigate
                         <h2 className={`text-2xl font-bold ${textClass} mb-4`}>2. AI Modelleri ve Sağlayıcılar</h2>
                         <div className={`${secondaryTextClass} space-y-4`}>
                             <div>
-                                <h3 className="font-semibold text-lg mb-2">2.1. Kullanılan AI Modelleri</h3>
-                                <ul className="list-disc list-inside space-y-1">
-                                    <li><strong>Gemini 3 Pro Image Preview:</strong> Yüksek kaliteli görsel üretimi ve düzenleme</li>
-                                    <li><strong>Gemini 3 Flash Preview:</strong> Hızlı görsel analiz ve işleme</li>
-                                    <li><strong>Gemini 3 Pro Preview:</strong> Metin üretimi ve içerik analizi</li>
-                                    <li><strong>Veo 3.1 Generate Preview:</strong> Yüksek kaliteli video üretimi</li>
-                                    <li><strong>Veo 3.1 Fast Generate Preview:</strong> Hızlı video üretimi ve düzenleme</li>
+                                <h3 className="font-semibold text-lg mb-2">2.1. AI Teknolojisi Sağlayıcıları</h3>
+                                <p className="mb-3">
+                                    Fasheone, <strong>Google AI</strong> teknolojilerini kullanmaktadır:
+                                </p>
+                                <ul className="list-disc list-inside space-y-2">
+                                    <li>
+                                        <strong>Google Gemini AI:</strong> Görsel üretimi, analiz ve düzenleme işlemleri için kullanılır.
+                                        Yüksek kaliteli görsel sentezi ve hızlı işleme yetenekleri sunar.
+                                    </li>
+                                    <li>
+                                        <strong>Google Veo:</strong> Video üretimi ve düzenleme işlemleri için kullanılır.
+                                        Profesyonel kalitede video sentezi sağlar.
+                                    </li>
                                 </ul>
+                                <p className="text-sm mt-4 text-slate-400">
+                                    ℹ️ <em>Not: Model versiyonları Google tarafından otomatik olarak güncellenir ve iyileştirilir.</em>
+                                </p>
                             </div>
 
                             <div>
