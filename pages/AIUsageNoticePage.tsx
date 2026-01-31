@@ -75,9 +75,11 @@ export const AIUsageNoticePage: React.FC<AIUsageNoticePageProps> = ({ onNavigate
                             <div>
                                 <h3 className="font-semibold text-lg mb-2">2.1. Kullanılan AI Modelleri</h3>
                                 <ul className="list-disc list-inside space-y-1">
-                                    <li><strong>Google Gemini 2.0 Flash Experimental:</strong> Görsel üretimi ve analiz</li>
-                                    <li><strong>Imagen 3:</strong> Yüksek kaliteli görsel sentezi</li>
-                                    <li><strong>Veo 2:</strong> Video üretimi ve düzenleme</li>
+                                    <li><strong>Gemini 3 Pro Image Preview:</strong> Yüksek kaliteli görsel üretimi ve düzenleme</li>
+                                    <li><strong>Gemini 3 Flash Preview:</strong> Hızlı görsel analiz ve işleme</li>
+                                    <li><strong>Gemini 3 Pro Preview:</strong> Metin üretimi ve içerik analizi</li>
+                                    <li><strong>Veo 3.1 Generate Preview:</strong> Yüksek kaliteli video üretimi</li>
+                                    <li><strong>Veo 3.1 Fast Generate Preview:</strong> Hızlı video üretimi ve düzenleme</li>
                                 </ul>
                             </div>
 
