@@ -2045,37 +2045,73 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             {/* Legal Links */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 w-full max-w-5xl">
               <button
-                onClick={() => onNavigate?.('privacy-policy')}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('privacy-policy');
+                  } else {
+                    console.log('onNavigate is not defined');
+                  }
+                }}
                 className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 Gizlilik Politikası
               </button>
               <button
-                onClick={() => onNavigate?.('kvkk')}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('kvkk');
+                  } else {
+                    console.log('onNavigate is not defined');
+                  }
+                }}
                 className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 KVKK Aydınlatma Metni
               </button>
               <button
-                onClick={() => onNavigate?.('terms-of-service')}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('terms-of-service');
+                  } else {
+                    console.log('onNavigate is not defined');
+                  }
+                }}
                 className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 Kullanım Koşulları
               </button>
               <button
-                onClick={() => onNavigate?.('cookie-policy')}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('cookie-policy');
+                  } else {
+                    console.log('onNavigate is not defined');
+                  }
+                }}
                 className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 Çerez Politikası
               </button>
               <button
-                onClick={() => onNavigate?.('refund-policy')}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('refund-policy');
+                  } else {
+                    console.log('onNavigate is not defined');
+                  }
+                }}
                 className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm cursor-pointer bg-transparent border-none p-0`}
               >
                 İade ve İptal
               </button>
               <button
-                onClick={() => onNavigate?.('ai-usage-notice')}
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('ai-usage-notice');
+                  } else {
+                    console.log('onNavigate is not defined');
+                  }
+                }}
                 className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-700'} hover:text-cyan-500 transition-colors text-center text-sm flex items-center justify-center gap-1 cursor-pointer bg-transparent border-none p-0`}
               >
                 <span>🤖</span> AI Kullanımı
