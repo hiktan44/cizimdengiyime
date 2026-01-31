@@ -87,6 +87,10 @@ const translations = {
       feature3Desc: 'Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün.',
       feature4Title: 'Teknik Çizim (Tech Pack)',
       feature4Desc: 'Ürün fotoğraflarınızı üretim için detaylı teknik çizimlere dönüştürün.',
+      feature5Title: 'Pixshop - Fotoğraf Düzenleme',
+      feature5Desc: 'AI destekli profesyonel rötuş, filtre, ayarlama ve 4K upscaling. Yüz değiştirme ve logo ekleme.',
+      feature6Title: 'Fotomatik - Toplu İşleme',
+      feature6Desc: 'Birden fazla görseli aynı anda işleyin. Arka plan kaldırma, toplu düzenleme ve hızlı katalog hazırlama.',
       aiPromptTitle: 'AI Prompt ile Sınırsız Özelleştirme',
       customBg: 'Özel Arka Plan & Mekan',
       customBgDesc: 'Hazır lokasyonların yanı sıra, kendi arka plan görselinizi yükleyin veya AI\'a prompt verin.',
@@ -1159,7 +1163,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
             {t.features.title}
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition`}>
               <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1184,8 +1188,8 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               </p>
             </div>
 
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-orange-500 transition`}>
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-6">
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-blue-500 transition`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
@@ -1205,6 +1209,30 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               <h3 className={`text-xl font-bold ${textClass} mb-3`}>{t.features.feature4Title}</h3>
               <p className={secondaryTextClass}>
                 {t.features.feature4Desc}
+              </p>
+            </div>
+
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-orange-500 transition`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className={`text-xl font-bold ${textClass} mb-3`}>{t.features.feature5Title}</h3>
+              <p className={secondaryTextClass}>
+                {t.features.feature5Desc}
+              </p>
+            </div>
+
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-teal-500 transition`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+              </div>
+              <h3 className={`text-xl font-bold ${textClass} mb-3`}>{t.features.feature6Title}</h3>
+              <p className={secondaryTextClass}>
+                {t.features.feature6Desc}
               </p>
             </div>
           </div>
