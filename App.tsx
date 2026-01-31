@@ -2280,37 +2280,31 @@ const App: React.FC = () => {
             {currentPage === 'privacy-policy' && (
                 <PrivacyPolicyPage
                     onNavigateHome={() => setCurrentPage('landing')}
-                    theme={theme}
                 />
             )}
             {currentPage === 'kvkk' && (
                 <KVKKPage
                     onNavigateHome={() => setCurrentPage('landing')}
-                    theme={theme}
                 />
             )}
             {currentPage === 'terms-of-service' && (
                 <TermsOfServicePage
                     onNavigateHome={() => setCurrentPage('landing')}
-                    theme={theme}
                 />
             )}
             {currentPage === 'cookie-policy' && (
                 <CookiePolicyPage
                     onNavigateHome={() => setCurrentPage('landing')}
-                    theme={theme}
                 />
             )}
             {currentPage === 'refund-policy' && (
                 <RefundPolicyPage
                     onNavigateHome={() => setCurrentPage('landing')}
-                    theme={theme}
                 />
             )}
             {currentPage === 'ai-usage-notice' && (
                 <AIUsageNoticePage
                     onNavigateHome={() => setCurrentPage('landing')}
-                    theme={theme}
                 />
             )}
 
