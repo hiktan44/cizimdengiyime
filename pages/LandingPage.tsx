@@ -1478,954 +1478,952 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
-    </section>
-
-      {/* Pixshop Detailed Features */ }
-  <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-purple-900/20 to-slate-900' : 'bg-gradient-to-b from-white via-purple-50/30 to-white'} z-10 relative`}>
-    <div className="max-w-7xl mx-auto">
-      {/* Hero */}
-      <div className="text-center mb-16">
-        <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
-          {t.pixshop.heroTitle}
-        </h2>
-        <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
-          {t.pixshop.heroSubtitle}
-        </p>
-      </div>
-
-      {/* Features Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-        {/* Feature 1 - Akıllı Rötuş */}
-        <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-cyan-500' : 'border-slate-200 hover:border-cyan-400'} transition-all duration-300 shadow-lg group`}>
-          <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
+      {/* Pixshop Detailed Features */}
+      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-purple-900/20 to-slate-900' : 'bg-gradient-to-b from-white via-purple-50/30 to-white'} z-10 relative`}>
+        <div className="max-w-7xl mx-auto">
+          {/* Hero */}
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.pixshop.heroTitle}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
+              {t.pixshop.heroSubtitle}
+            </p>
           </div>
-          <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-            {t.pixshop.feature1Title}
-          </h3>
-          <p className={`${descriptionTextClass} leading-relaxed`}>
-            {t.pixshop.feature1Desc}
-          </p>
-        </div>
 
-        {/* Feature 2 - Yaratıcı Filtreler */}
-        <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-purple-500' : 'border-slate-200 hover:border-purple-400'} transition-all duration-300 shadow-lg group`}>
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-            </svg>
-          </div>
-          <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-            {t.pixshop.feature2Title}
-          </h3>
-          <p className={`${descriptionTextClass} leading-relaxed`}>
-            {t.pixshop.feature2Desc}
-          </p>
-        </div>
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            {/* Feature 1 - Akıllı Rötuş */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-cyan-500' : 'border-slate-200 hover:border-cyan-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature1Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature1Desc}
+              </p>
+            </div>
 
-        {/* Feature 3 - Atmosfer Ayarları */}
-        <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-orange-500' : 'border-slate-200 hover:border-orange-400'} transition-all duration-300 shadow-lg group`}>
-          <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-          </div>
-          <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-            {t.pixshop.feature3Title}
-          </h3>
-          <p className={`${descriptionTextClass} leading-relaxed`}>
-            {t.pixshop.feature3Desc}
-          </p>
-        </div>
+            {/* Feature 2 - Yaratıcı Filtreler */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-purple-500' : 'border-slate-200 hover:border-purple-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature2Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature2Desc}
+              </p>
+            </div>
 
-        {/* Feature 4 - Upscale */}
-        <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-green-500' : 'border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
-          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
-          </div>
-          <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-            {t.pixshop.feature4Title}
-          </h3>
-          <p className={`${descriptionTextClass} leading-relaxed`}>
-            {t.pixshop.feature4Desc}
-          </p>
-        </div>
+            {/* Feature 3 - Atmosfer Ayarları */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-orange-500' : 'border-slate-200 hover:border-orange-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature3Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature3Desc}
+              </p>
+            </div>
 
-        {/* Feature 5 - Tasarımcı Çıktılar */}
-        <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-blue-500' : 'border-slate-200 hover:border-blue-400'} transition-all duration-300 shadow-lg group`}>
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-            {t.pixshop.feature5Title}
-          </h3>
-          <p className={`${descriptionTextClass} leading-relaxed`}>
-            {t.pixshop.feature5Desc}
-          </p>
-        </div>
+            {/* Feature 4 - Upscale */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-green-500' : 'border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature4Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature4Desc}
+              </p>
+            </div>
 
-        {/* Feature 6 - Face Swap */}
-        <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-pink-500' : 'border-slate-200 hover:border-pink-400'} transition-all duration-300 shadow-lg group`}>
-          <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-          </div>
-          <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-            {t.pixshop.feature6Title}
-          </h3>
-          <p className={`${descriptionTextClass} leading-relaxed`}>
-            {t.pixshop.feature6Desc}
-          </p>
-        </div>
+            {/* Feature 5 - Tasarımcı Çıktılar */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-blue-500' : 'border-slate-200 hover:border-blue-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature5Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature5Desc}
+              </p>
+            </div>
 
-        {/* Feature 7 - Logo/Aksesuar */}
-        <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-yellow-500' : 'border-slate-200 hover:border-yellow-400'} transition-all duration-300 shadow-lg group md:col-span-2 lg:col-span-1`}>
-          <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-          </div>
-          <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-            {t.pixshop.feature7Title}
-          </h3>
-          <p className={`${descriptionTextClass} leading-relaxed`}>
-            {t.pixshop.feature7Desc}
-          </p>
-        </div>
-      </div>
+            {/* Feature 6 - Face Swap */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-pink-500' : 'border-slate-200 hover:border-pink-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature6Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature6Desc}
+              </p>
+            </div>
 
-      {/* Why Pixshop */}
-      <div className={`bg-gradient-to-r ${theme === 'dark' ? 'from-purple-900/30 to-cyan-900/30 border-purple-500/30' : 'from-purple-50 to-cyan-50 border-purple-200'} border rounded-2xl p-8`}>
-        <h3 className={`text-3xl font-bold ${textClass} mb-6 text-center`}>
-          {t.pixshop.whyTitle}
-        </h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="flex items-start gap-4">
-            <span className="text-3xl">⚡</span>
-            <p className={descriptionTextClass}>{t.pixshop.why1}</p>
+            {/* Feature 7 - Logo/Aksesuar */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-yellow-500' : 'border-slate-200 hover:border-yellow-400'} transition-all duration-300 shadow-lg group md:col-span-2 lg:col-span-1`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.pixshop.feature7Title}
+              </h3>
+              <p className={`${descriptionTextClass} leading-relaxed`}>
+                {t.pixshop.feature7Desc}
+              </p>
+            </div>
           </div>
-          <div className="flex items-start gap-4">
-            <span className="text-3xl">🎯</span>
-            <p className={descriptionTextClass}>{t.pixshop.why2}</p>
-          </div>
-          <div className="flex items-start gap-4">
-            <span className="text-3xl">🎨</span>
-            <p className={descriptionTextClass}>{t.pixshop.why3}</p>
-          </div>
-          <div className="flex items-start gap-4">
-            <span className="text-3xl">📱</span>
-            <p className={descriptionTextClass}>{t.pixshop.why4}</p>
-          </div>
-        </div>
-      </div>
 
-      {/* CTA */}
-      <div className="text-center mt-12">
-        <h3 className={`text-3xl font-bold ${textClass} mb-4`}>
-          {t.pixshop.cta}
-        </h3>
-        <p className={`${descriptionTextClass} mb-8 max-w-2xl mx-auto`}>
-          {t.pixshop.ctaSubtitle}
-        </p>
-        <button
-          onClick={() => navigate('/pixshop')}
-          className="px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-base md:text-lg hover:from-purple-700 hover:to-cyan-700 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
-        >
-          {t.pixshop.tryButton}
-        </button>
-      </div>
-    </div>
-  </section>
-
-  {/* AdGenius Section */ }
-  <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
-    <div className="max-w-7xl mx-auto">
-      {/* Hero Content */}
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 mb-6">
-          {t.adgenius?.title || 'AdGenius AI'}
-        </h2>
-        <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto`}>
-          {t.adgenius?.description}
-        </p>
-      </div>
-
-      {/* Visual Showcase (Main + Collage) */}
-      <div className="mb-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left: Main Image */}
-          <div className="space-y-4">
-            <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title1 || '📍 Profesyonel Model Çekimi'}</h3>
-            <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
-              {demoAdGeniusMain ? (
-                <img
-                  src={demoAdGeniusMain}
-                  alt="AdGenius Main"
-                  className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
-                />
-              ) : (
-                <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
-                  Ana Görsel Yüklenmedi
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                <p className="text-white text-sm">{t.adgenius?.showcase?.hover1 || 'Üst düzey prodüksiyon kalitesi, sıfır maliyet.'}</p>
+          {/* Why Pixshop */}
+          <div className={`bg-gradient-to-r ${theme === 'dark' ? 'from-purple-900/30 to-cyan-900/30 border-purple-500/30' : 'from-purple-50 to-cyan-50 border-purple-200'} border rounded-2xl p-8`}>
+            <h3 className={`text-3xl font-bold ${textClass} mb-6 text-center`}>
+              {t.pixshop.whyTitle}
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">⚡</span>
+                <p className={descriptionTextClass}>{t.pixshop.why1}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">🎯</span>
+                <p className={descriptionTextClass}>{t.pixshop.why2}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">🎨</span>
+                <p className={descriptionTextClass}>{t.pixshop.why3}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">📱</span>
+                <p className={descriptionTextClass}>{t.pixshop.why4}</p>
               </div>
             </div>
           </div>
 
-          {/* Right: Collage Image */}
-          <div className="space-y-4">
-            <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title2 || '✨ Akıllı Reklam Varyasyonları'}</h3>
-            <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
-              {demoAdGeniusCollage ? (
-                <img
-                  src={demoAdGeniusCollage}
-                  alt="AdGenius Collage"
-                  className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
-                />
-              ) : (
-                <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
-                  Kolaj Görseli Yüklenmedi
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
-                <p className="text-white text-sm">{t.adgenius?.showcase?.hover2 || 'Tek bir üründen onlarca kampanya konsepti.'}</p>
-              </div>
-            </div>
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <h3 className={`text-3xl font-bold ${textClass} mb-4`}>
+              {t.pixshop.cta}
+            </h3>
+            <p className={`${descriptionTextClass} mb-8 max-w-2xl mx-auto`}>
+              {t.pixshop.ctaSubtitle}
+            </p>
+            <button
+              onClick={() => navigate('/pixshop')}
+              className="px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-base md:text-lg hover:from-purple-700 hover:to-cyan-700 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+            >
+              {t.pixshop.tryButton}
+            </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Features & Benefits Detail Boxes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-        {/* Features */}
-        <div>
-          <h3 className={`text-3xl font-bold ${textClass} mb-8 text-center md:text-left`}>{t.adgenius?.featuresTitle}</h3>
-          <div className="space-y-4">
-            {t.adgenius?.features?.map((feature: any, idx: number) => (
-              <div key={idx} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700 hover:border-cyan-500/50' : 'bg-slate-50 border-slate-200 hover:border-cyan-400'} transition-all duration-300 shadow-lg group`}>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform text-lg">
-                    {idx === 0 ? '🧠' : idx === 1 ? '📸' : idx === 2 ? '🌍' : idx === 3 ? '🎨' : idx === 4 ? '🎬' : '🏷️'}
+      {/* AdGenius Section */}
+      <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto">
+          {/* Hero Content */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 mb-6">
+              {t.adgenius?.title || 'AdGenius AI'}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto`}>
+              {t.adgenius?.description}
+            </p>
+          </div>
+
+          {/* Visual Showcase (Main + Collage) */}
+          <div className="mb-20">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Main Image */}
+              <div className="space-y-4">
+                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title1 || '📍 Profesyonel Model Çekimi'}</h3>
+                <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
+                  {demoAdGeniusMain ? (
+                    <img
+                      src={demoAdGeniusMain}
+                      alt="AdGenius Main"
+                      className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
+                      Ana Görsel Yüklenmedi
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+                    <p className="text-white text-sm">{t.adgenius?.showcase?.hover1 || 'Üst düzey prodüksiyon kalitesi, sıfır maliyet.'}</p>
                   </div>
-                  <h4 className={`text-xl font-bold ${textClass}`}>{feature.title}</h4>
                 </div>
-                <ul className="space-y-2">
+              </div>
+
+              {/* Right: Collage Image */}
+              <div className="space-y-4">
+                <h3 className={`text-2xl font-bold ${textClass} mb-4 text-center lg:text-left`}>{t.adgenius?.showcase?.title2 || '✨ Akıllı Reklam Varyasyonları'}</h3>
+                <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 relative group">
+                  {demoAdGeniusCollage ? (
+                    <img
+                      src={demoAdGeniusCollage}
+                      alt="AdGenius Collage"
+                      className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
+                      Kolaj Görseli Yüklenmedi
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8">
+                    <p className="text-white text-sm">{t.adgenius?.showcase?.hover2 || 'Tek bir üründen onlarca kampanya konsepti.'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Features & Benefits Detail Boxes */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+            {/* Features */}
+            <div>
+              <h3 className={`text-3xl font-bold ${textClass} mb-8 text-center md:text-left`}>{t.adgenius?.featuresTitle}</h3>
+              <div className="space-y-4">
+                {t.adgenius?.features?.map((feature: any, idx: number) => (
+                  <div key={idx} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700 hover:border-cyan-500/50' : 'bg-slate-50 border-slate-200 hover:border-cyan-400'} transition-all duration-300 shadow-lg group`}>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform text-lg">
+                        {idx === 0 ? '🧠' : idx === 1 ? '📸' : idx === 2 ? '🌍' : idx === 3 ? '🎨' : idx === 4 ? '🎬' : '🏷️'}
+                      </div>
+                      <h4 className={`text-xl font-bold ${textClass}`}>{feature.title}</h4>
+                    </div>
+                    <ul className="space-y-2">
+                      {feature.items.map((item: string, i: number) => (
+                        <li key={i} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                          <span className="text-cyan-500 mt-1">✓</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Benefits */}
+            <div>
+              <h3 className={`text-3xl font-bold ${textClass} mb-8 text-center md:text-left`}>{t.adgenius?.benefitsTitle}</h3>
+              <div className="space-y-4">
+                {t.adgenius?.benefits?.map((benefit: any, idx: number) => (
+                  <div key={idx} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700 hover:border-green-500/50' : 'bg-slate-50 border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform text-lg">
+                        {idx === 0 ? '⚡' : idx === 1 ? '💰' : idx === 2 ? '💎' : '🎯'}
+                      </div>
+                      <h4 className={`text-lg font-bold ${textClass}`}>{benefit.title}</h4>
+                    </div>
+                    <p className={`${descriptionTextClass} text-sm leading-relaxed`}>{benefit.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Collage Section */}
+      <section className={`py-24 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-slate-50/50'} overflow-hidden`}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20 relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10"></div>
+            <h2 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 mb-6 uppercase tracking-tighter">
+              {t.collage.title}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto leading-relaxed`}>
+              {t.collage.description}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+            {t.collage.features.map((feature: any, idx: number) => (
+              <div key={idx} className={`${cardBg} p-8 rounded-[2rem] border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 group relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-8 shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                  <span className="text-3xl">
+                    {idx === 0 ? '🖼️' : idx === 1 ? '✨' : idx === 2 ? '🎨' : '🎬'}
+                  </span>
+                </div>
+                <h3 className={`text-2xl font-black ${textClass} mb-5 tracking-tight uppercase`}>{feature.title}</h3>
+                <ul className="space-y-4">
                   {feature.items.map((item: string, i: number) => (
-                    <li key={i} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
-                      <span className="text-cyan-500 mt-1">✓</span>
-                      <span>{item}</span>
+                    <li key={i} className={`${descriptionTextClass} text-sm flex items-start gap-4 leading-relaxed group/item`}>
+                      <span className="text-blue-500 mt-1 font-black group-hover/item:translate-x-1 transition-transform">▸</span>
+                      <span className="font-medium">{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Benefits */}
-        <div>
-          <h3 className={`text-3xl font-bold ${textClass} mb-8 text-center md:text-left`}>{t.adgenius?.benefitsTitle}</h3>
-          <div className="space-y-4">
-            {t.adgenius?.benefits?.map((benefit: any, idx: number) => (
-              <div key={idx} className={`p-6 rounded-2xl border ${theme === 'dark' ? 'bg-slate-800/40 border-slate-700 hover:border-green-500/50' : 'bg-slate-50 border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform text-lg">
-                    {idx === 0 ? '⚡' : idx === 1 ? '💰' : idx === 2 ? '💎' : '🎯'}
+          <div className={`${cardBg} rounded-[2.5rem] p-12 border border-slate-700/50 relative overflow-hidden shadow-2xl`}>
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] -mr-64 -mt-64"></div>
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[120px] -ml-64 -mb-64"></div>
+            <div className="relative z-10">
+              <h3 className={`text-3xl font-black ${textClass} mb-12 text-center tracking-tight uppercase`}>
+                {t.collage.benefitsTitle}
+              </h3>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+                {t.collage.benefits.map((benefit: any, idx: number) => (
+                  <div key={idx} className="space-y-4 group">
+                    <div className="w-8 h-1 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-full group-hover:w-16 transition-all duration-500"></div>
+                    <h4 className={`text-lg font-black text-blue-400 uppercase tracking-tight`}>
+                      {benefit.title}
+                    </h4>
+                    <p className={`${descriptionTextClass} text-[13px] leading-relaxed font-medium opacity-80 uppercase tracking-tighter`}>
+                      {benefit.desc}
+                    </p>
                   </div>
-                  <h4 className={`text-lg font-bold ${textClass}`}>{benefit.title}</h4>
+                ))}
+              </div>
+              <div className="mt-16 pt-8 border-t border-slate-700/20 text-center">
+                <div className="inline-block px-10 py-3 bg-blue-500/10 rounded-full border border-blue-500/20">
+                  <p className="text-blue-400 font-black tracking-[0.3em] text-[10px] uppercase italic drop-shadow-sm">
+                    ⚡ {t.collage.creditInfo}
+                  </p>
                 </div>
-                <p className={`${descriptionTextClass} text-sm leading-relaxed`}>{benefit.desc}</p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  {/* Collage Section */ }
-  <section className={`py-24 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-slate-50/50'} overflow-hidden`}>
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center mb-20 relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10"></div>
-        <h2 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 mb-6 uppercase tracking-tighter">
-          {t.collage.title}
-        </h2>
-        <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto leading-relaxed`}>
-          {t.collage.description}
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-        {t.collage.features.map((feature: any, idx: number) => (
-          <div key={idx} className={`${cardBg} p-8 rounded-[2rem] border border-slate-700/50 hover:border-blue-500/50 transition-all duration-500 group relative overflow-hidden`}>
-            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-8 shadow-2xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-              <span className="text-3xl">
-                {idx === 0 ? '🖼️' : idx === 1 ? '✨' : idx === 2 ? '🎨' : '🎬'}
-              </span>
-            </div>
-            <h3 className={`text-2xl font-black ${textClass} mb-5 tracking-tight uppercase`}>{feature.title}</h3>
-            <ul className="space-y-4">
-              {feature.items.map((item: string, i: number) => (
-                <li key={i} className={`${descriptionTextClass} text-sm flex items-start gap-4 leading-relaxed group/item`}>
-                  <span className="text-blue-500 mt-1 font-black group-hover/item:translate-x-1 transition-transform">▸</span>
-                  <span className="font-medium">{item}</span>
-                </li>
-              ))}
-            </ul>
+      {/* Pixshop Section */}
+      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-b from-slate-50 via-white to-slate-50'}`}>
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Hero */}
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.pixshop.heroTitle}
+            </h2>
+            <p className={`text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
+              {t.pixshop.heroSubtitle}
+            </p>
           </div>
-        ))}
-      </div>
 
-      <div className={`${cardBg} rounded-[2.5rem] p-12 border border-slate-700/50 relative overflow-hidden shadow-2xl`}>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[120px] -mr-64 -mt-64"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[120px] -ml-64 -mb-64"></div>
-        <div className="relative z-10">
-          <h3 className={`text-3xl font-black ${textClass} mb-12 text-center tracking-tight uppercase`}>
-            {t.collage.benefitsTitle}
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {t.collage.benefits.map((benefit: any, idx: number) => (
-              <div key={idx} className="space-y-4 group">
-                <div className="w-8 h-1 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-full group-hover:w-16 transition-all duration-500"></div>
-                <h4 className={`text-lg font-black text-blue-400 uppercase tracking-tight`}>
-                  {benefit.title}
+          {/* Features Grid */}
+          <div className="mb-16">
+            <h3 className={`text-3xl font-bold ${textClass} text-center mb-12`}>
+              {t.pixshop.featuresTitle}
+            </h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Feature 1: Smart Retouch */}
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-cyan-500 transition`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </div>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature1Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature1Desc}</p>
+              </div>
+
+              {/* Feature 2: Creative Filters */}
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-purple-500 transition`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
+                </div>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature2Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature2Desc}</p>
+              </div>
+
+              {/* Feature 3: Professional Atmosphere */}
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-orange-500 transition`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature3Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature3Desc}</p>
+              </div>
+
+              {/* Feature 4: Upscale */}
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-green-500 transition`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                </div>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature4Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature4Desc}</p>
+              </div>
+
+              {/* Feature 5: Designer Outputs */}
+              <div className={`${cardBg} rounded-2xl p-6 hover:border-indigo-500 transition`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center mb-4">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                </div>
+                <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature5Title}</h4>
+                <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature5Desc}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Why Pixshop */}
+          <div className={`${cardBg} rounded-2xl p-8 mb-12`}>
+            <h3 className={`text-3xl font-bold ${textClass} text-center mb-8`}>
+              {t.pixshop.whyTitle}
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className={descriptionTextClass}>{t.pixshop.why1}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className={descriptionTextClass}>{t.pixshop.why2}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className={descriptionTextClass}>{t.pixshop.why3}</p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className={descriptionTextClass}>{t.pixshop.why4}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center">
+            <h3 className={`text-3xl font-bold ${textClass} mb-4`}>
+              {t.pixshop.cta}
+            </h3>
+            <p className={`text-lg ${secondaryTextClass} mb-8`}>
+              {t.pixshop.ctaSubtitle}
+            </p>
+            <button
+              onClick={handleGetStarted}
+              className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition"
+            >
+              {t.pixshop.tryButton}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Fotomatik Section */}
+      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900' : 'bg-gradient-to-b from-indigo-50 via-white to-purple-50'}`}>
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Hero */}
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.fotomatik.heroTitle}
+            </h2>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* Feature 1: AI Transform */}
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-indigo-500 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-indigo-500/20">
+                01
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature1Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature1Desc}</p>
+            </div>
+
+            {/* Feature 2: Visual Analysis */}
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-blue-500 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-blue-500/20">
+                02
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature2Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature2Desc}</p>
+            </div>
+
+            {/* Feature 3: Auto-Enhance */}
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-cyan-500/20">
+                03
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature3Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature3Desc}</p>
+            </div>
+
+            {/* Feature 4: Precise Editor */}
+            <div className={`${cardBg} rounded-2xl p-8 hover:border-rose-500 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-rose-500/20">
+                04
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature4Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature4Desc}</p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <button
+              onClick={handleGetStarted}
+              className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-indigo-500/50 transition transform hover:scale-105"
+            >
+              {t.fotomatik.cta}
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+
+      {/* Tech Pack Section */}
+      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-900' : 'bg-gradient-to-b from-emerald-50 via-white to-green-50'}`}>
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Hero */}
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.techpack.heroTitle}
+            </h2>
+            <p className={`text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
+              {t.techpack.heroSubtitle}
+            </p>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* Feature 1 */}
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-emerald-500 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-emerald-500/20">
+                01
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature1Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature1Desc}</p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-teal-500 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-teal-500/20">
+                02
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature2Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature2Desc}</p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-lime-500 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-lime-500 to-green-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-lime-500/20">
+                03
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature3Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature3Desc}</p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className={`${cardBg} border rounded-2xl p-8 hover:border-green-400 transition`}>
+              <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-green-400/20">
+                04
+              </div>
+              <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature4Title}</h4>
+              <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature4Desc}</p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-12">
+            <button
+              onClick={handleGetStarted}
+              className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-emerald-500/50 transition transform hover:scale-105"
+            >
+              {t.techpack.cta}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing - Credit Packages Only */}
+      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-cyan-50/40'} z-10 relative`} id="pricing">
+        <div className="max-w-7xl mx-auto">
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
+            {t.pricing.creditPackagesTitle}
+          </h2>
+          <p className={`${secondaryTextClass} text-center mb-12`}>
+            {t.pricing.creditPackagesSubtitle}
+          </p>
+
+          {/* Credit Packages */}
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
+              <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.small.credits}</div>
+              <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
+              <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.small.price}₺</div>
+              <div className={`text-sm ${secondaryTextClass} mb-6`}>
+                1 {t.pricing.credit} = {(creditPackages.small.price / creditPackages.small.credits).toFixed(2)}₺
+              </div>
+              <button
+                onClick={handleGetStarted}
+                className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
+              >
+                {t.pricing.buyNow}
+              </button>
+            </div>
+
+            <div className={`bg-gradient-to-b ${theme === 'dark' ? 'from-cyan-900/50 to-slate-900/50' : 'from-cyan-100 to-white'} border-2 border-cyan-500 rounded-2xl p-8 text-center relative`}>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                {t.pricing.popular}
+              </div>
+              <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.medium.credits}</div>
+              <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
+              <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.medium.price}₺</div>
+              <div className={`text-sm ${secondaryTextClass} mb-6`}>
+                1 {t.pricing.credit} = {(creditPackages.medium.price / creditPackages.medium.credits).toFixed(2)}₺
+              </div>
+              <button
+                onClick={handleGetStarted}
+                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
+              >
+                {t.pricing.buyNow}
+              </button>
+            </div>
+
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
+              <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.large.credits}</div>
+              <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
+              <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.large.price}₺</div>
+              <div className={`text-sm ${secondaryTextClass} mb-6`}>
+                1 {t.pricing.credit} = {(creditPackages.large.price / creditPackages.large.credits).toFixed(2)}₺
+              </div>
+              <button
+                onClick={handleGetStarted}
+                className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
+              >
+                {t.pricing.buyNow}
+              </button>
+            </div>
+          </div>
+
+          {/* Info Box */}
+          <div className={`mt-12 ${theme === 'dark' ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-cyan-50 border-cyan-200'} border rounded-2xl p-6 max-w-4xl mx-auto`}>
+            <div className="flex items-start gap-4">
+              <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <h4 className={`text-lg font-semibold ${textClass} mb-3`}>
+                  {t.pricing.creditUsage}
                 </h4>
-                <p className={`${descriptionTextClass} text-[13px] leading-relaxed font-medium opacity-80 uppercase tracking-tighter`}>
-                  {benefit.desc}
-                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h5 className="text-cyan-400 font-semibold text-sm mb-2">
+                      {t.pricing.liveModelVideo}
+                    </h5>
+                    <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
+                      <li>• {t.pricing.sketchToProduct}</li>
+                      <li>• {t.pricing.productToModel}</li>
+                      <li>• {t.pricing.videoGeneration}</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 className="text-cyan-400 font-semibold text-sm mb-2">
+                      {t.pricing.otherModules}
+                    </h5>
+                    <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
+                      <li>• {t.pricing.techDrawing}</li>
+                      <li>• {t.pricing.pixshopEdit}</li>
+                      <li>• {t.pricing.fotomatik}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className={`mt-4 pt-4 border-t ${theme === 'dark' ? 'border-cyan-500/20' : 'border-cyan-200'}`}>
+                  <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
+                    <li>✨ {t.pricing.freeCredits}</li>
+                    <li>♾️ {t.pricing.creditsNeverExpire}</li>
+                  </ul>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
-          <div className="mt-16 pt-8 border-t border-slate-700/20 text-center">
-            <div className="inline-block px-10 py-3 bg-blue-500/10 rounded-full border border-blue-500/20">
-              <p className="text-blue-400 font-black tracking-[0.3em] text-[10px] uppercase italic drop-shadow-sm">
-                ⚡ {t.collage.creditInfo}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 px-6 z-10 relative">
+        <div className="max-w-7xl mx-auto">
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
+            {t.testimonials.title}
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className={`${cardBg} rounded-2xl p-8`}>
+              <div className="flex items-center gap-2 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className={`${descriptionTextClass} mb-6`}>
+                {t.testimonials.quote1}
               </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full"></div>
+                <div>
+                  <div className={`font-semibold ${textClass}`}>{t.testimonials.name1}</div>
+                  <div className={`text-sm ${secondaryTextClass}`}>Fashion Designer</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${cardBg} rounded-2xl p-8`}>
+              <div className="flex items-center gap-2 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className={`${descriptionTextClass} mb-6`}>
+                {t.testimonials.quote2}
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full"></div>
+                <div>
+                  <div className={`font-semibold ${textClass}`}>{t.testimonials.name2}</div>
+                  <div className={`text-sm ${secondaryTextClass}`}>Brand Owner</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${cardBg} rounded-2xl p-8`}>
+              <div className="flex items-center gap-2 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <p className={`${descriptionTextClass} mb-6`}>
+                {t.testimonials.quote3}
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-600 rounded-full"></div>
+                <div>
+                  <div className={`font-semibold ${textClass}`}>{t.testimonials.name3}</div>
+                  <div className={`text-sm ${secondaryTextClass}`}>E-commerce Manager</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  {/* Pixshop Section */ }
-  <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-b from-slate-50 via-white to-slate-50'}`}>
-    <div className="max-w-7xl mx-auto relative z-10">
-      {/* Hero */}
-      <div className="text-center mb-16">
-        <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
-          {t.pixshop.heroTitle}
-        </h2>
-        <p className={`text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
-          {t.pixshop.heroSubtitle}
-        </p>
-      </div>
+      {/* Why Best Fashion - Comparison */}
+      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-purple-50/40'} z-10 relative`}>
+        <div className="max-w-5xl mx-auto">
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
+            {t.comparison.title}
+          </h2>
+          <p className={`${secondaryTextClass} text-center mb-16`}>
+            {t.comparison.subtitle}
+          </p>
 
-      {/* Features Grid */}
-      <div className="mb-16">
-        <h3 className={`text-3xl font-bold ${textClass} text-center mb-12`}>
-          {t.pixshop.featuresTitle}
-        </h3>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Feature 1: Smart Retouch */}
-          <div className={`${cardBg} rounded-2xl p-6 hover:border-cyan-500 transition`}>
-            <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-            </div>
-            <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature1Title}</h4>
-            <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature1Desc}</p>
-          </div>
-
-          {/* Feature 2: Creative Filters */}
-          <div className={`${cardBg} rounded-2xl p-6 hover:border-purple-500 transition`}>
-            <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-              </svg>
-            </div>
-            <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature2Title}</h4>
-            <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature2Desc}</p>
-          </div>
-
-          {/* Feature 3: Professional Atmosphere */}
-          <div className={`${cardBg} rounded-2xl p-6 hover:border-orange-500 transition`}>
-            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature3Title}</h4>
-            <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature3Desc}</p>
-          </div>
-
-          {/* Feature 4: Upscale */}
-          <div className={`${cardBg} rounded-2xl p-6 hover:border-green-500 transition`}>
-            <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-              </svg>
-            </div>
-            <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature4Title}</h4>
-            <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature4Desc}</p>
-          </div>
-
-          {/* Feature 5: Designer Outputs */}
-          <div className={`${cardBg} rounded-2xl p-6 hover:border-indigo-500 transition`}>
-            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center mb-4">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
-            </div>
-            <h4 className={`text-xl font-bold ${textClass} mb-3`}>{t.pixshop.feature5Title}</h4>
-            <p className={`${secondaryTextClass} text-sm`}>{t.pixshop.feature5Desc}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Why Pixshop */}
-      <div className={`${cardBg} rounded-2xl p-8 mb-12`}>
-        <h3 className={`text-3xl font-bold ${textClass} text-center mb-8`}>
-          {t.pixshop.whyTitle}
-        </h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className={descriptionTextClass}>{t.pixshop.why1}</p>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className={descriptionTextClass}>{t.pixshop.why2}</p>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className={descriptionTextClass}>{t.pixshop.why3}</p>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className={descriptionTextClass}>{t.pixshop.why4}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="text-center">
-        <h3 className={`text-3xl font-bold ${textClass} mb-4`}>
-          {t.pixshop.cta}
-        </h3>
-        <p className={`text-lg ${secondaryTextClass} mb-8`}>
-          {t.pixshop.ctaSubtitle}
-        </p>
-        <button
-          onClick={handleGetStarted}
-          className="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition"
-        >
-          {t.pixshop.tryButton}
-        </button>
-      </div>
-    </div>
-  </section>
-
-  {/* Fotomatik Section */ }
-  <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900' : 'bg-gradient-to-b from-indigo-50 via-white to-purple-50'}`}>
-    <div className="max-w-7xl mx-auto relative z-10">
-      {/* Hero */}
-      <div className="text-center mb-16">
-        <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
-          {t.fotomatik.heroTitle}
-        </h2>
-      </div>
-
-      {/* Features Grid */}
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
-        {/* Feature 1: AI Transform */}
-        <div className={`${cardBg} rounded-2xl p-8 hover:border-indigo-500 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-indigo-500/20">
-            01
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature1Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature1Desc}</p>
-        </div>
-
-        {/* Feature 2: Visual Analysis */}
-        <div className={`${cardBg} rounded-2xl p-8 hover:border-blue-500 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-blue-500/20">
-            02
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature2Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature2Desc}</p>
-        </div>
-
-        {/* Feature 3: Auto-Enhance */}
-        <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-cyan-500/20">
-            03
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature3Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature3Desc}</p>
-        </div>
-
-        {/* Feature 4: Precise Editor */}
-        <div className={`${cardBg} rounded-2xl p-8 hover:border-rose-500 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-rose-500 to-orange-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-rose-500/20">
-            04
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.fotomatik.feature4Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.fotomatik.feature4Desc}</p>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="text-center mt-12">
-        <button
-          onClick={handleGetStarted}
-          className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-indigo-500/50 transition transform hover:scale-105"
-        >
-          {t.fotomatik.cta}
-        </button>
-      </div>
-    </div>
-  </section>
-
-
-
-  {/* Tech Pack Section */ }
-  <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-900' : 'bg-gradient-to-b from-emerald-50 via-white to-green-50'}`}>
-    <div className="max-w-7xl mx-auto relative z-10">
-      {/* Hero */}
-      <div className="text-center mb-16">
-        <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
-          {t.techpack.heroTitle}
-        </h2>
-        <p className={`text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
-          {t.techpack.heroSubtitle}
-        </p>
-      </div>
-
-      {/* Features Grid */}
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
-        {/* Feature 1 */}
-        <div className={`${cardBg} border rounded-2xl p-8 hover:border-emerald-500 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-emerald-500/20">
-            01
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature1Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature1Desc}</p>
-        </div>
-
-        {/* Feature 2 */}
-        <div className={`${cardBg} border rounded-2xl p-8 hover:border-teal-500 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-teal-500/20">
-            02
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature2Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature2Desc}</p>
-        </div>
-
-        {/* Feature 3 */}
-        <div className={`${cardBg} border rounded-2xl p-8 hover:border-lime-500 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-lime-500 to-green-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-lime-500/20">
-            03
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature3Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature3Desc}</p>
-        </div>
-
-        {/* Feature 4 */}
-        <div className={`${cardBg} border rounded-2xl p-8 hover:border-green-400 transition`}>
-          <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center mb-6 text-white font-bold text-2xl shadow-lg shadow-green-400/20">
-            04
-          </div>
-          <h4 className={`text-xl font-bold ${textClass} mb-4`}>{t.techpack.feature4Title}</h4>
-          <p className={`${secondaryTextClass} leading-relaxed`}>{t.techpack.feature4Desc}</p>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="text-center mt-12">
-        <button
-          onClick={handleGetStarted}
-          className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-emerald-500/50 transition transform hover:scale-105"
-        >
-          {t.techpack.cta}
-        </button>
-      </div>
-    </div>
-  </section>
-
-  {/* Pricing - Credit Packages Only */ }
-  <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-cyan-50/40'} z-10 relative`} id="pricing">
-    <div className="max-w-7xl mx-auto">
-      <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
-        {t.pricing.creditPackagesTitle}
-      </h2>
-      <p className={`${secondaryTextClass} text-center mb-12`}>
-        {t.pricing.creditPackagesSubtitle}
-      </p>
-
-      {/* Credit Packages */}
-      <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
-          <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.small.credits}</div>
-          <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
-          <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.small.price}₺</div>
-          <div className={`text-sm ${secondaryTextClass} mb-6`}>
-            1 {t.pricing.credit} = {(creditPackages.small.price / creditPackages.small.credits).toFixed(2)}₺
-          </div>
-          <button
-            onClick={handleGetStarted}
-            className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
-          >
-            {t.pricing.buyNow}
-          </button>
-        </div>
-
-        <div className={`bg-gradient-to-b ${theme === 'dark' ? 'from-cyan-900/50 to-slate-900/50' : 'from-cyan-100 to-white'} border-2 border-cyan-500 rounded-2xl p-8 text-center relative`}>
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-            {t.pricing.popular}
-          </div>
-          <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.medium.credits}</div>
-          <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
-          <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.medium.price}₺</div>
-          <div className={`text-sm ${secondaryTextClass} mb-6`}>
-            1 {t.pricing.credit} = {(creditPackages.medium.price / creditPackages.medium.credits).toFixed(2)}₺
-          </div>
-          <button
-            onClick={handleGetStarted}
-            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-3 rounded-lg font-semibold transition"
-          >
-            {t.pricing.buyNow}
-          </button>
-        </div>
-
-        <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
-          <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.large.credits}</div>
-          <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
-          <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.large.price}₺</div>
-          <div className={`text-sm ${secondaryTextClass} mb-6`}>
-            1 {t.pricing.credit} = {(creditPackages.large.price / creditPackages.large.credits).toFixed(2)}₺
-          </div>
-          <button
-            onClick={handleGetStarted}
-            className={`w-full ${theme === 'dark' ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 text-slate-900'} px-6 py-3 rounded-lg font-semibold transition`}
-          >
-            {t.pricing.buyNow}
-          </button>
-        </div>
-      </div>
-
-      {/* Info Box */}
-      <div className={`mt-12 ${theme === 'dark' ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-cyan-50 border-cyan-200'} border rounded-2xl p-6 max-w-4xl mx-auto`}>
-        <div className="flex items-start gap-4">
-          <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div className="flex-1">
-            <h4 className={`text-lg font-semibold ${textClass} mb-3`}>
-              {t.pricing.creditUsage}
-            </h4>
+          <div className="space-y-4">
+            {/* Row 1 */}
             <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <h5 className="text-cyan-400 font-semibold text-sm mb-2">
-                  {t.pricing.liveModelVideo}
-                </h5>
-                <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
-                  <li>• {t.pricing.sketchToProduct}</li>
-                  <li>• {t.pricing.productToModel}</li>
-                  <li>• {t.pricing.videoGeneration}</li>
-                </ul>
+              <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-red-400 mb-2">❌</div>
+                <p className={descriptionTextClass}>{t.comparison.needPrompts}</p>
               </div>
-              <div>
-                <h5 className="text-cyan-400 font-semibold text-sm mb-2">
-                  {t.pricing.otherModules}
-                </h5>
-                <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
-                  <li>• {t.pricing.techDrawing}</li>
-                  <li>• {t.pricing.pixshopEdit}</li>
-                  <li>• {t.pricing.fotomatik}</li>
-                </ul>
+              <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-green-400 mb-2">✅</div>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.readyOptions}</p>
               </div>
             </div>
-            <div className={`mt-4 pt-4 border-t ${theme === 'dark' ? 'border-cyan-500/20' : 'border-cyan-200'}`}>
-              <ul className={`space-y-1 ${descriptionTextClass} text-sm`}>
-                <li>✨ {t.pricing.freeCredits}</li>
-                <li>♾️ {t.pricing.creditsNeverExpire}</li>
-              </ul>
+
+            {/* Row 2 */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-red-400 mb-2">❌</div>
+                <p className={descriptionTextClass}>{t.comparison.multipleTools}</p>
+              </div>
+              <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-green-400 mb-2">✅</div>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.onePlatform}</p>
+              </div>
+            </div>
+
+            {/* Row 3 */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-red-400 mb-2">❌</div>
+                <p className={descriptionTextClass}>{t.comparison.expensive}</p>
+              </div>
+              <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-green-400 mb-2">✅</div>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.lowCost}</p>
+              </div>
+            </div>
+
+            {/* Row 4 */}
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-red-400 mb-2">❌</div>
+                <p className={descriptionTextClass}>{t.comparison.incorrectPlacement}</p>
+              </div>
+              <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
+                <div className="text-green-400 mb-2">✅</div>
+                <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.allDetails}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-3 rounded-full font-bold text-lg">
+              <span>🚀</span>
+              <span>{t.comparison.faster}</span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  {/* Testimonials */ }
-  <section className="py-20 px-6 z-10 relative">
-    <div className="max-w-7xl mx-auto">
-      <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
-        {t.testimonials.title}
-      </h2>
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className={`${cardBg} rounded-2xl p-8`}>
-          <div className="flex items-center gap-2 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-          </div>
-          <p className={`${descriptionTextClass} mb-6`}>
-            {t.testimonials.quote1}
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full"></div>
-            <div>
-              <div className={`font-semibold ${textClass}`}>{t.testimonials.name1}</div>
-              <div className={`text-sm ${secondaryTextClass}`}>Fashion Designer</div>
+      {/* Social Proof Stats */}
+      <section className="py-20 px-6 z-10 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            <div className={`${cardBg} rounded-2xl p-8`}>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-2">10K+</div>
+              <div className={secondaryTextClass}>{t.stats.videosCreated}</div>
+            </div>
+            <div className={`${cardBg} rounded-2xl p-8`}>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2">50K+</div>
+              <div className={secondaryTextClass}>{t.stats.imagesCreated}</div>
+            </div>
+            <div className={`${cardBg} rounded-2xl p-8`}>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600 mb-2">98%</div>
+              <div className={secondaryTextClass}>{t.stats.satisfiedUsers}</div>
+            </div>
+            <div className={`${cardBg} rounded-2xl p-8`}>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600 mb-2">24/7</div>
+              <div className={secondaryTextClass}>{t.stats.platformAccess}</div>
             </div>
           </div>
         </div>
+      </section>
 
-        <div className={`${cardBg} rounded-2xl p-8`}>
-          <div className="flex items-center gap-2 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
+      {/* FAQ Section */}
+      <section id="faq" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-rose-50/40'} z-10 relative`}>
+        <div className="max-w-4xl mx-auto">
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
+            {t.faq.title}
+          </h2>
+          <div className="space-y-4">
+            <details className={`${cardBg} rounded-xl p-6 group`}>
+              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+                <span>{t.faq.q1}</span>
+                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <p className={`mt-4 ${secondaryTextClass}`}>
+                {t.faq.a1}
+              </p>
+            </details>
+
+            <details className={`${cardBg} rounded-xl p-6 group`}>
+              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+                <span>{t.faq.q2}</span>
+                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <p className={`mt-4 ${secondaryTextClass}`}>
+                {t.faq.a2}
+              </p>
+            </details>
+
+            <details className={`${cardBg} rounded-xl p-6 group`}>
+              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+                <span>{t.faq.q3}</span>
+                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <p className={`mt-4 ${secondaryTextClass}`}>
+                {t.faq.a3}
+              </p>
+            </details>
+
+            <details className={`${cardBg} rounded-xl p-6 group`}>
+              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+                <span>{t.faq.q4}</span>
+                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <p className={`mt-4 ${secondaryTextClass}`}>
+                {t.faq.a4}
+              </p>
+            </details>
           </div>
-          <p className={`${descriptionTextClass} mb-6`}>
-            {t.testimonials.quote2}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-r from-cyan-900/80 to-blue-900/80' : 'bg-gradient-to-r from-cyan-100 to-blue-100'} z-10 relative`}>
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-6`}>
+            {t.cta.title}
+          </h2>
+          <p className={`text-xl ${descriptionTextClass} mb-8`}>
+            {t.cta.subtitle}
           </p>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full"></div>
-            <div>
-              <div className={`font-semibold ${textClass}`}>{t.testimonials.name2}</div>
-              <div className={`text-sm ${secondaryTextClass}`}>Brand Owner</div>
-            </div>
-          </div>
+          <button
+            onClick={handleGetStarted}
+            className={`${theme === 'dark' ? 'bg-white text-slate-900' : 'bg-cyan-600 text-white'} px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition`}
+          >
+            {t.cta.button}
+          </button>
         </div>
+      </section>
 
-        <div className={`${cardBg} rounded-2xl p-8`}>
-          <div className="flex items-center gap-2 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            ))}
-          </div>
-          <p className={`${descriptionTextClass} mb-6`}>
-            {t.testimonials.quote3}
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-600 rounded-full"></div>
-            <div>
-              <div className={`font-semibold ${textClass}`}>{t.testimonials.name3}</div>
-              <div className={`text-sm ${secondaryTextClass}`}>E-commerce Manager</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* Why Best Fashion - Comparison */ }
-  <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-purple-50/40'} z-10 relative`}>
-    <div className="max-w-5xl mx-auto">
-      <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
-        {t.comparison.title}
-      </h2>
-      <p className={`${secondaryTextClass} text-center mb-16`}>
-        {t.comparison.subtitle}
-      </p>
-
-      <div className="space-y-4">
-        {/* Row 1 */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-red-400 mb-2">❌</div>
-            <p className={descriptionTextClass}>{t.comparison.needPrompts}</p>
-          </div>
-          <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-green-400 mb-2">✅</div>
-            <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.readyOptions}</p>
-          </div>
-        </div>
-
-        {/* Row 2 */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-red-400 mb-2">❌</div>
-            <p className={descriptionTextClass}>{t.comparison.multipleTools}</p>
-          </div>
-          <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-green-400 mb-2">✅</div>
-            <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.onePlatform}</p>
-          </div>
-        </div>
-
-        {/* Row 3 */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-red-400 mb-2">❌</div>
-            <p className={descriptionTextClass}>{t.comparison.expensive}</p>
-          </div>
-          <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-green-400 mb-2">✅</div>
-            <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.lowCost}</p>
-          </div>
-        </div>
-
-        {/* Row 4 */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className={`${theme === 'dark' ? 'bg-red-900/20 border-red-500/30' : 'bg-red-50 border-red-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-red-400 mb-2">❌</div>
-            <p className={descriptionTextClass}>{t.comparison.incorrectPlacement}</p>
-          </div>
-          <div className={`${theme === 'dark' ? 'bg-green-900/20 border-green-500/30' : 'bg-green-50 border-green-200'} border rounded-xl p-6 text-center`}>
-            <div className="text-green-400 mb-2">✅</div>
-            <p className={`${theme === 'dark' ? 'text-white' : 'text-slate-900'} font-semibold`}>{t.comparison.allDetails}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-12 text-center">
-        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-3 rounded-full font-bold text-lg">
-          <span>🚀</span>
-          <span>{t.comparison.faster}</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* Social Proof Stats */ }
-  <section className="py-20 px-6 z-10 relative">
-    <div className="max-w-7xl mx-auto">
-      <div className="grid md:grid-cols-4 gap-8 text-center">
-        <div className={`${cardBg} rounded-2xl p-8`}>
-          <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-2">10K+</div>
-          <div className={secondaryTextClass}>{t.stats.videosCreated}</div>
-        </div>
-        <div className={`${cardBg} rounded-2xl p-8`}>
-          <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2">50K+</div>
-          <div className={secondaryTextClass}>{t.stats.imagesCreated}</div>
-        </div>
-        <div className={`${cardBg} rounded-2xl p-8`}>
-          <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600 mb-2">98%</div>
-          <div className={secondaryTextClass}>{t.stats.satisfiedUsers}</div>
-        </div>
-        <div className={`${cardBg} rounded-2xl p-8`}>
-          <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600 mb-2">24/7</div>
-          <div className={secondaryTextClass}>{t.stats.platformAccess}</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* FAQ Section */ }
-  <section id="faq" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-rose-50/40'} z-10 relative`}>
-    <div className="max-w-4xl mx-auto">
-      <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
-        {t.faq.title}
-      </h2>
-      <div className="space-y-4">
-        <details className={`${cardBg} rounded-xl p-6 group`}>
-          <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-            <span>{t.faq.q1}</span>
-            <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p className={`mt-4 ${secondaryTextClass}`}>
-            {t.faq.a1}
-          </p>
-        </details>
-
-        <details className={`${cardBg} rounded-xl p-6 group`}>
-          <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-            <span>{t.faq.q2}</span>
-            <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p className={`mt-4 ${secondaryTextClass}`}>
-            {t.faq.a2}
-          </p>
-        </details>
-
-        <details className={`${cardBg} rounded-xl p-6 group`}>
-          <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-            <span>{t.faq.q3}</span>
-            <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p className={`mt-4 ${secondaryTextClass}`}>
-            {t.faq.a3}
-          </p>
-        </details>
-
-        <details className={`${cardBg} rounded-xl p-6 group`}>
-          <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
-            <span>{t.faq.q4}</span>
-            <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <p className={`mt-4 ${secondaryTextClass}`}>
-            {t.faq.a4}
-          </p>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  {/* CTA */ }
-  <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-r from-cyan-900/80 to-blue-900/80' : 'bg-gradient-to-r from-cyan-100 to-blue-100'} z-10 relative`}>
-    <div className="max-w-4xl mx-auto text-center">
-      <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-6`}>
-        {t.cta.title}
-      </h2>
-      <p className={`text-xl ${descriptionTextClass} mb-8`}>
-        {t.cta.subtitle}
-      </p>
-      <button
-        onClick={handleGetStarted}
-        className={`${theme === 'dark' ? 'bg-white text-slate-900' : 'bg-cyan-600 text-white'} px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition`}
-      >
-        {t.cta.button}
-      </button>
-    </div>
-  </section>
-
-  {/* Footer */ }
+      {/* Footer */}
       <footer className={`py-16 px-6 border-t ${theme === 'dark' ? 'border-slate-700 bg-slate-900/95' : 'border-slate-200 bg-slate-50'} z-10 relative`}>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
