@@ -1760,7 +1760,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             <h2 className="text-4xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 mb-6 uppercase tracking-tighter">
               {t.collage.title}
             </h2>
-            <p className={`text-xl ${descriptionTextClass} max-w-4xl mx-auto leading-relaxed`}>
+            <p className="text-xl text-black max-w-4xl mx-auto leading-relaxed font-semibold">
               {t.collage.description}
             </p>
           </div>
