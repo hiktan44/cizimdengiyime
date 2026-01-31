@@ -1040,54 +1040,86 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
-      {/* How It Works - 3 Steps */}
-      <section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
-            {t.howItWorks.title}
-          </h2>
-          <p className={`${secondaryTextClass} text-center mb-16`}>
-            {t.howItWorks.subtitle}
-          </p>
+      {/* Use Cases - Güçlü Özellikler */}
+      <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.howItWorks.useCases.title}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
+              {t.howItWorks.useCases.subtitle}
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Step 1 */}
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
-              <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-4xl font-black text-white">01</span>
+            {/* Kolaj Oluşturma */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-blue-500' : 'border-slate-200 hover:border-blue-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7H4V5zM10 5a1 1 0 011-1h4a1 1 0 011 1v7h-6V5zM16 5a1 1 0 011-1h2a1 1 0 011 1v7h-4V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3H4v-3zM10 16a1 1 0 011-1h4a1 1 0 011 1v3h-6v-3zM16 16a1 1 0 011-1h2a1 1 0 011 1v3h-4v-3z" />
+                </svg>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {t.howItWorks.step1Title}
+                {t.howItWorks.useCases.collage.title}
               </h3>
-              <p className={secondaryTextClass}>
-                {t.howItWorks.step1Desc}
+              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
+                {t.howItWorks.useCases.collage.desc}
               </p>
+              <ul className="space-y-3">
+                {t.howItWorks.useCases.collage.features.map((feature: string, idx: number) => (
+                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                    <span className="text-blue-500 mt-1 flex-shrink-0">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Step 2 */}
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-4xl font-black text-white">02</span>
+            {/* Reklam Medyası */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-purple-500' : 'border-slate-200 hover:border-purple-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {t.howItWorks.step2Title}
+                {t.howItWorks.useCases.adMedia.title}
               </h3>
-              <p className={secondaryTextClass}>
-                {t.howItWorks.step2Desc}
+              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
+                {t.howItWorks.useCases.adMedia.desc}
               </p>
+              <ul className="space-y-3">
+                {t.howItWorks.useCases.adMedia.features.map((feature: string, idx: number) => (
+                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                    <span className="text-purple-500 mt-1 flex-shrink-0">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Step 3 */}
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-orange-500 transition`}>
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-4xl font-black text-white">03</span>
+            {/* E-ticaret Çözümleri */}
+            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-green-500' : 'border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {t.howItWorks.step3Title}
+                {t.howItWorks.useCases.ecommerce.title}
               </h3>
-              <p className={secondaryTextClass}>
-                {t.howItWorks.step3Desc}
+              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
+                {t.howItWorks.useCases.ecommerce.desc}
               </p>
+              <ul className="space-y-3">
+                {t.howItWorks.useCases.ecommerce.features.map((feature: string, idx: number) => (
+                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
+                    <span className="text-green-500 mt-1 flex-shrink-0">✓</span>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -1191,86 +1223,54 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
-      {/* Use Cases - Güçlü Özellikler */}
-      <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
-              {t.howItWorks.useCases.title}
-            </h2>
-            <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
-              {t.howItWorks.useCases.subtitle}
-            </p>
-          </div>
+      {/* How It Works - 3 Steps */}
+      <section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
+            {t.howItWorks.title}
+          </h2>
+          <p className={`${secondaryTextClass} text-center mb-16`}>
+            {t.howItWorks.subtitle}
+          </p>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Kolaj Oluşturma */}
-            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-blue-500' : 'border-slate-200 hover:border-blue-400'} transition-all duration-300 shadow-lg group`}>
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7H4V5zM10 5a1 1 0 011-1h4a1 1 0 011 1v7h-6V5zM16 5a1 1 0 011-1h2a1 1 0 011 1v7h-4V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3H4v-3zM10 16a1 1 0 011-1h4a1 1 0 011 1v3h-6v-3zM16 16a1 1 0 011-1h2a1 1 0 011 1v3h-4v-3z" />
-                </svg>
+            {/* Step 1 */}
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
+              <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl font-black text-white">01</span>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {t.howItWorks.useCases.collage.title}
+                {t.howItWorks.step1Title}
               </h3>
-              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
-                {t.howItWorks.useCases.collage.desc}
+              <p className={secondaryTextClass}>
+                {t.howItWorks.step1Desc}
               </p>
-              <ul className="space-y-3">
-                {t.howItWorks.useCases.collage.features.map((feature: string, idx: number) => (
-                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
-                    <span className="text-blue-500 mt-1 flex-shrink-0">✓</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
 
-            {/* Reklam Medyası */}
-            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-purple-500' : 'border-slate-200 hover:border-purple-400'} transition-all duration-300 shadow-lg group`}>
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+            {/* Step 2 */}
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl font-black text-white">02</span>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {t.howItWorks.useCases.adMedia.title}
+                {t.howItWorks.step2Title}
               </h3>
-              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
-                {t.howItWorks.useCases.adMedia.desc}
+              <p className={secondaryTextClass}>
+                {t.howItWorks.step2Desc}
               </p>
-              <ul className="space-y-3">
-                {t.howItWorks.useCases.adMedia.features.map((feature: string, idx: number) => (
-                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
-                    <span className="text-purple-500 mt-1 flex-shrink-0">✓</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
 
-            {/* E-ticaret Çözümleri */}
-            <div className={`${cardBg} rounded-2xl p-8 border ${theme === 'dark' ? 'border-slate-700 hover:border-green-500' : 'border-slate-200 hover:border-green-400'} transition-all duration-300 shadow-lg group`}>
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+            {/* Step 3 */}
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-orange-500 transition`}>
+              <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl font-black text-white">03</span>
               </div>
               <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
-                {t.howItWorks.useCases.ecommerce.title}
+                {t.howItWorks.step3Title}
               </h3>
-              <p className={`${descriptionTextClass} mb-6 leading-relaxed`}>
-                {t.howItWorks.useCases.ecommerce.desc}
+              <p className={secondaryTextClass}>
+                {t.howItWorks.step3Desc}
               </p>
-              <ul className="space-y-3">
-                {t.howItWorks.useCases.ecommerce.features.map((feature: string, idx: number) => (
-                  <li key={idx} className={`${descriptionTextClass} text-sm flex items-start gap-3`}>
-                    <span className="text-green-500 mt-1 flex-shrink-0">✓</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </div>
