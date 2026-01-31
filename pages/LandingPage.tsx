@@ -1037,7 +1037,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
           <button
             onClick={handleGetStarted}
-            className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105 relative z-40"
+            className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-6 py-3 md:px-10 md:py-5 rounded-xl font-bold text-base md:text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105 relative z-40"
           >
             {isLoggedIn ? t.header.continueUsing : t.hero.cta}
           </button>
@@ -1132,7 +1132,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* Before/After Showcase */}
       <section id="showcase" className="relative py-20 px-6 z-10">
         <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.showcase.title}
           </h2>
           <p className={`${secondaryTextClass} text-center mb-16`}>
@@ -1230,7 +1230,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* How It Works - 3 Steps */}
       <section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
         <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.howItWorks.title}
           </h2>
           <p className={`${secondaryTextClass} text-center mb-16`}>
@@ -1283,7 +1283,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* Features */}
       <section id="features" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-slate-50'} z-10 relative`}>
         <div className="max-w-7xl mx-auto">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
             {t.features.title}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1558,7 +1558,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </p>
             <button
               onClick={() => navigate('/pixshop')}
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:from-purple-700 hover:to-cyan-700 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+              className="px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-base md:text-lg hover:from-purple-700 hover:to-cyan-700 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
             >
               {t.pixshop.tryButton}
             </button>
@@ -2006,7 +2006,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* Pricing - Credit Packages Only */}
       <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-cyan-50/40'} z-10 relative`} id="pricing">
         <div className="max-w-7xl mx-auto">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.pricing.creditPackagesTitle}
           </h2>
           <p className={`${secondaryTextClass} text-center mb-12`}>
@@ -2111,7 +2111,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* Testimonials */}
       <section className="py-20 px-6 z-10 relative">
         <div className="max-w-7xl mx-auto">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
             {t.testimonials.title}
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -2181,7 +2181,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* Why Best Fashion - Comparison */}
       <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-purple-50/40'} z-10 relative`}>
         <div className="max-w-5xl mx-auto">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-4`}>
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.comparison.title}
           </h2>
           <p className={`${secondaryTextClass} text-center mb-16`}>
@@ -2274,7 +2274,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* FAQ Section */}
       <section id="faq" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-rose-50/40'} z-10 relative`}>
         <div className="max-w-4xl mx-auto">
-          <h2 className={`text-4xl font-bold ${textClass} text-center mb-16`}>
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
             {t.faq.title}
           </h2>
           <div className="space-y-4">
