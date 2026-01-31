@@ -869,9 +869,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const whatsappSubtitle = language === 'tr' ? 'Hemen yazin' : 'Message now';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-500 via-red-500 via-pink-500 via-purple-600 to-indigo-700 relative overflow-hidden">
-      {/* Animated gradient overlay for extra depth and richness */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-400/20 via-red-400/20 via-pink-400/20 via-purple-500/20 to-indigo-600/20 animate-pulse pointer-events-none z-0"></div>
+    <div className="min-h-screen bg-gradient-to-b from-green-400 via-yellow-400 via-orange-400 to-orange-500 relative overflow-hidden">
+      {/* Subtle animated overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-green-300/10 via-yellow-300/10 to-orange-400/10 animate-pulse pointer-events-none z-0"></div>
 
       {/* Header */}
       <header className={`fixed top-0 left-0 right-0 z-[100] w-full ${theme === 'dark' ? 'bg-slate-900/95' : 'bg-white/95'} backdrop-blur-md border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} shadow-xl transition-all duration-300`}>
@@ -1105,7 +1105,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Use Cases - Güçlü Özellikler */}
-      <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-gradient-to-br from-emerald-900 via-green-900 to-teal-900' : 'bg-gradient-to-br from-emerald-50 via-green-100 to-teal-50'}`}>
+      <section className="py-20 px-6 z-10 relative">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
@@ -1479,7 +1479,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Pixshop Detailed Features */}
-      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-purple-900/20 to-slate-900' : 'bg-gradient-to-b from-white via-purple-50/30 to-white'} z-10 relative`}>
+      <section className="py-20 px-6 z-10 relative">
         <div className="max-w-7xl mx-auto">
           {/* Hero */}
           <div className="text-center mb-16">
@@ -1643,7 +1643,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* AdGenius Section */}
-      <section className={`py-20 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-900' : 'bg-white'}`}>
+      <section className="py-20 px-6 z-10 relative">
         <div className="max-w-7xl mx-auto">
           {/* Hero Content */}
           <div className="text-center mb-16">
@@ -1751,7 +1751,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Collage Section */}
-      <section className={`py-24 px-6 z-10 relative ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-slate-50/50'} overflow-hidden`}>
+      <section className="py-24 px-6 z-10 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20 relative">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10"></div>
@@ -1818,7 +1818,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Pixshop Section */}
-      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-b from-slate-50 via-white to-slate-50'}`}>
+      <section className="relative py-20 px-6 z-10">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Hero */}
           <div className="text-center mb-16">
@@ -1953,7 +1953,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Fotomatik Section */}
-      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900' : 'bg-gradient-to-b from-indigo-50 via-white to-purple-50'}`}>
+      <section className="relative py-20 px-6 z-10">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Hero */}
           <div className="text-center mb-16">
@@ -2016,7 +2016,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
       {/* Tech Pack Section */}
-      <section className={`relative py-20 px-6 z-10 ${theme === 'dark' ? 'bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-900' : 'bg-gradient-to-b from-emerald-50 via-white to-green-50'}`}>
+      <section className="relative py-20 px-6 z-10">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Hero */}
           <div className="text-center mb-16">
@@ -2080,7 +2080,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Pricing - Credit Packages Only */}
-      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-cyan-50/40'} z-10 relative`} id="pricing">
+      <section className="py-20 px-6 z-10 relative" id="pricing">
         <div className="max-w-7xl mx-auto">
           <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.pricing.creditPackagesTitle}
@@ -2255,7 +2255,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Why Best Fashion - Comparison */}
-      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-purple-50/40'} z-10 relative`}>
+      <section className="py-20 px-6 z-10 relative">
         <div className="max-w-5xl mx-auto">
           <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
             {t.comparison.title}
@@ -2406,7 +2406,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* CTA */}
-      <section className={`py-20 px-6 ${theme === 'dark' ? 'bg-gradient-to-r from-cyan-900/80 to-blue-900/80' : 'bg-gradient-to-r from-cyan-100 to-blue-100'} z-10 relative`}>
+      <section className="py-20 px-6 z-10 relative">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-6`}>
             {t.cta.title}
