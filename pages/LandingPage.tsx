@@ -29,6 +29,8 @@ interface LandingPageProps {
   adGeniusMainUrl?: string;
   adGeniusCollageUrl?: string;
   logoMediaUrl?: string;
+  theme?: 'light' | 'dark';
+  setTheme?: (theme: 'light' | 'dark') => void;
 }
 
 type Language = 'tr' | 'en';
@@ -636,6 +638,8 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     heroVideo3Url,
     adGeniusMainUrl,
     adGeniusCollageUrl,
+    theme: propTheme,
+    setTheme: propSetTheme,
   } = props;
   // State for DB content
   const [heroVideos, setHeroVideos] = useState<string[]>([]);
@@ -737,18 +741,13 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     const saved = localStorage.getItem('language') as Language;
     return saved || detectDefaultLanguage();
   });
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('theme') as Theme;
-    return saved || 'dark';
-  });
+  // Use theme from props or fallback to 'dark'
+  const theme = propTheme || 'dark';
+  const setTheme = propSetTheme || (() => { });
 
   useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
-
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-  }, [theme]);
 
   const t = translations[language];
 
@@ -2161,18 +2160,6 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                 Hukuki
               </h3>
-
-              {/* DEBUG TEST BUTTON */}
-              <button
-                onClick={() => {
-                  alert('✅ Button çalışıyor! onNavigate: ' + (onNavigate ? 'VAR' : 'YOK'));
-                  console.log('🧪 TEST: onNavigate =', onNavigate);
-                  console.log('🧪 TEST: typeof onNavigate =', typeof onNavigate);
-                }}
-                className="bg-red-500 text-white px-4 py-2 rounded font-bold mb-4"
-              >
-                🧪 TEST BUTONU
-              </button>
 
               <ul className="space-y-3">
                 <li>
