@@ -148,7 +148,6 @@ const ToolPage: React.FC<{
         const [location, setLocation] = useStickyState('Podyum', 'fasheone_location');
 
         // New Options
-        const [theme, setTheme] = useStickyState<'light' | 'dark'>('dark', 'fasheone_theme');
         const [ageRange, setAgeRange] = useStickyState('Adult', 'fasheone_ageRange'); // New: Child, Teen, Adult, Elderly
         const [gender, setGender] = useStickyState('Female', 'fasheone_gender'); // New: Male, Female
         const [hairColor, setHairColor] = useStickyState('Doğal', 'fasheone_hairColor');
@@ -2213,8 +2212,6 @@ const App: React.FC = () => {
                     adGeniusMainUrl={adGeniusMainUrl}
                     adGeniusCollageUrl={adGeniusCollageUrl}
                     logoMediaUrl={logoMediaUrl}
-                    theme={theme}
-                    setTheme={setTheme}
                 />
             )}
             {currentPage === 'tool' && user && profile && (
