@@ -258,6 +258,18 @@ const translations = {
       fotomatik: 'Fotomatik: 1 kredi',
       freeCredits: 'Yeni üyeler 10 ücretsiz kredi ile başlar',
       creditsNeverExpire: 'Krediler hiç bitmez, istediğiniz zaman kullanın',
+      enterprise: 'Kurumsal',
+      enterpriseTitle: 'Kurumsal Çözümler',
+      enterpriseSubtitle: 'Büyük ekipler ve şirketler için özel çözümler',
+      contactUs: 'İletişime Geç',
+      customCredits: 'Özel Kredi Paketi',
+      unlimitedUsers: 'Sınırsız Kullanıcı',
+      prioritySupport: 'Öncelikli Destek',
+      dedicatedAccount: 'Özel Hesap Yöneticisi',
+      customIntegration: 'Özel Entegrasyon',
+      apiAccess: 'API Erişimi',
+      customTraining: 'Özel Eğitim',
+      sla: 'SLA Garantisi',
     },
     testimonials: {
       title: 'Kullanıcı Yorumları',
@@ -516,6 +528,18 @@ const translations = {
       fotomatik: 'Fotomatik: 1 credit',
       freeCredits: 'New members start with 10 free credits',
       creditsNeverExpire: 'Credits never expire, use them anytime',
+      enterprise: 'Enterprise',
+      enterpriseTitle: 'Enterprise Solutions',
+      enterpriseSubtitle: 'Custom solutions for large teams and companies',
+      contactUs: 'Contact Us',
+      customCredits: 'Custom Credit Package',
+      unlimitedUsers: 'Unlimited Users',
+      prioritySupport: 'Priority Support',
+      dedicatedAccount: 'Dedicated Account Manager',
+      customIntegration: 'Custom Integration',
+      apiAccess: 'API Access',
+      customTraining: 'Custom Training',
+      sla: 'SLA Guarantee',
     },
     testimonials: {
       title: 'Testimonials',
@@ -2126,7 +2150,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                             </p>
 
                             {/* Credit Packages */}
-                            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                               <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
                                 <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.small.credits}</div>
                                 <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
@@ -2173,6 +2197,71 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                                 >
                                   {t.pricing.buyNow}
                                 </button>
+                              </div>
+
+                              {/* Enterprise Card */}
+                              <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-500/20 border-2 border-purple-500/50 shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                  {t.pricing.enterprise}
+                                </div>
+                                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+                                <div className="relative z-10">
+                                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-pink-600 rounded-2xl flex items-center justify-center mb-4 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                  </div>
+                                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
+                                    {t.pricing.enterpriseTitle}
+                                  </div>
+                                  <div className="text-sm text-black font-semibold mb-6">
+                                    {t.pricing.enterpriseSubtitle}
+                                  </div>
+                                  <ul className="space-y-3 mb-6 text-left">
+                                    <li className="flex items-center gap-2 text-black font-medium text-sm">
+                                      <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      {t.pricing.customCredits}
+                                    </li>
+                                    <li className="flex items-center gap-2 text-black font-medium text-sm">
+                                      <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      {t.pricing.unlimitedUsers}
+                                    </li>
+                                    <li className="flex items-center gap-2 text-black font-medium text-sm">
+                                      <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      {t.pricing.prioritySupport}
+                                    </li>
+                                    <li className="flex items-center gap-2 text-black font-medium text-sm">
+                                      <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      {t.pricing.dedicatedAccount}
+                                    </li>
+                                    <li className="flex items-center gap-2 text-black font-medium text-sm">
+                                      <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      {t.pricing.apiAccess}
+                                    </li>
+                                    <li className="flex items-center gap-2 text-black font-medium text-sm">
+                                      <svg className="w-5 h-5 text-purple-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      {t.pricing.sla}
+                                    </li>
+                                  </ul>
+                                  <button
+                                    onClick={() => window.location.href = 'mailto:info@fasheone.com?subject=Enterprise%20Plan%20Inquiry'}
+                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
+                                  >
+                                    {t.pricing.contactUs}
+                                  </button>
+                                </div>
                               </div>
                             </div>
 
