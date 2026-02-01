@@ -898,7 +898,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       <div
         className="fixed inset-0 -z-10"
         style={{
-          background: 'linear-gradient(45deg, #4ade80, #facc15, #fb923c, #f97316)',
+          background: 'linear-gradient(135deg, #3C3F4A 0%, #A67C52 25%, #2C3E50 50%, #9FA86A 75%, #C4B5B8 100%)',
           backgroundSize: '400% 400%',
           animation: 'gradientShift 15s ease infinite'
         }}
@@ -911,7 +911,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         }
       `}</style>
       {/* Subtle animated overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-green-300/10 via-yellow-300/10 to-orange-400/10 animate-pulse pointer-events-none -z-5"></div>
+      <div className="fixed inset-0 bg-gradient-to-br from-slate-800/10 via-amber-700/10 to-rose-300/10 animate-pulse pointer-events-none -z-5"></div>
 
       {/* Header */}
       <header className={`fixed top-0 left-0 right-0 z-[100] w-full ${theme === 'dark' ? 'bg-slate-900/95' : 'bg-white/95'} backdrop-blur-md border-b ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'} shadow-xl transition-all duration-300`}>
