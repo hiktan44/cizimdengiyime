@@ -1385,7 +1385,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                               </div>
                             </div>
                           </div>
-                        </section>
+                        </div>
 
                         {/* Before/After Showcase */}
                         <section id="showcase" className="relative py-20 px-6 z-10">
@@ -2832,6 +2832,16 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                           title="WhatsApp"
                           subtitle={whatsappSubtitle}
                         />
-                      </div >
-                      );
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  );
 };
+
+export default LandingPage;
