@@ -7,9 +7,17 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     // Use temp directory to avoid external volume permission issues
     const tempDir = path.join(os.tmpdir(), 'vite-cache-fasheone');
+    const buildDir = path.join(os.tmpdir(), 'vite-build-fasheone');
 
     return {
         cacheDir: tempDir,
+        build: {
+            outDir: 'dist', // Keep dist in project
+            emptyOutDir: true,
+            rollupOptions: {
+                cache: false, // Disable rollup cache to avoid permission issues
+            }
+        },
         server: {
             port: 3005,
             host: '0.0.0.0',
