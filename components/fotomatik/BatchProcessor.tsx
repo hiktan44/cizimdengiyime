@@ -202,19 +202,37 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
         const completedImages = images.filter(img => img.status === 'completed' && img.processedUrl);
         if (completedImages.length === 0) return;
 
-        // Download each image individually
+        // Download each image as real PNG file
         for (let i = 0; i < completedImages.length; i++) {
             const img = completedImages[i];
-            const link = document.createElement('a');
-            link.href = img.processedUrl!;
-            link.download = `processed-${i + 1}-${Date.now()}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
 
-            // Small delay between downloads
-            if (i < completedImages.length - 1) {
-                await new Promise(r => setTimeout(r, 300));
+            try {
+                // Convert base64 to blob
+                const base64Data = img.processedUrl!.split(',')[1];
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let j = 0; j < byteCharacters.length; j++) {
+                    byteNumbers[j] = byteCharacters.charCodeAt(j);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'image/png' });
+
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `fotomatik-${operation}-${i + 1}-${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                // Small delay between downloads
+                if (i < completedImages.length - 1) {
+                    await new Promise(r => setTimeout(r, 300));
+                }
+            } catch (error) {
+                console.error('Download error:', error);
             }
         }
     };
