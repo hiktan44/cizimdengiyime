@@ -203,30 +203,54 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
         setIsProcessing(false);
     };
 
-    const downloadAll = async () => {
+    const downloadAll = async (format: 'png' | 'jpg' = 'png') => {
         const completedImages = images.filter(img => img.status === 'completed' && img.processedUrl);
         if (completedImages.length === 0) return;
 
-        // Download each image as real PNG file
+        // Download each image using canvas for better compatibility
         for (let i = 0; i < completedImages.length; i++) {
             const img = completedImages[i];
 
             try {
-                // Convert base64 to blob
-                const base64Data = img.processedUrl!.split(',')[1];
-                const byteCharacters = atob(base64Data);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let j = 0; j < byteCharacters.length; j++) {
-                    byteNumbers[j] = byteCharacters.charCodeAt(j);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'image/png' });
+                // Create image element
+                const image = new Image();
+                image.crossOrigin = 'anonymous';
 
-                // Create download link
+                await new Promise((resolve, reject) => {
+                    image.onload = resolve;
+                    image.onerror = reject;
+                    image.src = img.processedUrl!;
+                });
+
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+                const ctx = canvas.getContext('2d')!;
+
+                // For JPG, add white background
+                if (format === 'jpg') {
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                // Draw image
+                ctx.drawImage(image, 0, 0);
+
+                // Convert to blob
+                const blob = await new Promise<Blob>((resolve) => {
+                    canvas.toBlob(
+                        (blob) => resolve(blob!),
+                        format === 'png' ? 'image/png' : 'image/jpeg',
+                        0.95 // JPG quality
+                    );
+                });
+
+                // Download
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `fotomatik-${operation}-${i + 1}-${Date.now()}.png`;
+                link.download = `fotomatik-${operation}-${i + 1}-${Date.now()}.${format}`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -453,13 +477,22 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                     </button>
 
                     {completedCount > 0 && (
-                        <button
-                            onClick={downloadAll}
-                            disabled={isProcessing}
-                            className="px-8 py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all disabled:opacity-50"
-                        >
-                            📥 {completedCount > 1 ? `${completedCount} Görseli İndir (ZIP)` : 'İndir'}
-                        </button>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => downloadAll('png')}
+                                disabled={isProcessing}
+                                className="px-6 py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all disabled:opacity-50"
+                            >
+                                📥 PNG {completedCount > 1 ? `(${completedCount})` : ''}
+                            </button>
+                            <button
+                                onClick={() => downloadAll('jpg')}
+                                disabled={isProcessing}
+                                className="px-6 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-all disabled:opacity-50"
+                            >
+                                📥 JPG {completedCount > 1 ? `(${completedCount})` : ''}
+                            </button>
+                        </div>
                     )}
                 </div>
             )}
