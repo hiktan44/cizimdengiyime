@@ -26,6 +26,7 @@ interface BatchImage {
 
 interface BatchProcessorProps {
     onCreditsRequired: (count: number) => Promise<boolean>;
+    onDeductCredit: () => Promise<void>; // Her resim için 1 kredi düş
     onSaveToHistory: (outputUrl: string, settings: Record<string, any>) => Promise<void>;
     creditCost: number;
     userCredits: number;
@@ -36,6 +37,7 @@ type CatalogStyle = 'ecommerce' | 'social' | 'minimal';
 
 export const BatchProcessor: React.FC<BatchProcessorProps> = ({
     onCreditsRequired,
+    onDeductCredit,
     onSaveToHistory,
     creditCost,
     userCredits
@@ -171,6 +173,9 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                 setImages(prev => prev.map(p =>
                     p.id === img.id ? { ...p, status: 'completed' as const, processedUrl: result } : p
                 ));
+
+                // Deduct credit for this image
+                await onDeductCredit();
 
                 // Save to history
                 await onSaveToHistory(result, {

@@ -810,6 +810,13 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
               }
               return true;
             }}
+            onDeductCredit={async () => {
+              if (!profile) return;
+              const result = await checkAndDeductCredits(profile.id, 'fotomatik_transform');
+              if (result.success) {
+                onRefreshProfile();
+              }
+            }}
             onSaveToHistory={async (outputUrl: string, settings: Record<string, any>) => {
               if (!profile) return;
               const uploadedUrl = await uploadBase64ToStorage(outputUrl, profile.id, 'output');
@@ -822,7 +829,6 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 null,
                 { ...settings, mode: 'batch' }
               );
-              onRefreshProfile();
               trackEvent(ANALYTICS_EVENTS.GENERATE_FOTOMATIK, {
                 type: 'batch',
                 operation: settings.operation,
