@@ -238,3 +238,181 @@ export const fotomatikSuggestEnhancements = async (
   }
 };
 
+// ==========================================
+// TOPLU İŞLEME FONKSİYONLARI
+// ==========================================
+
+export type BatchOperationType = 'remove_bg' | 'retouch' | 'enhance' | 'catalog';
+
+export interface BatchImageResult {
+  id: string;
+  originalUrl: string;
+  processedUrl: string | null;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  error?: string;
+}
+
+/**
+ * Tekil arka plan kaldırma (Gemini ile)
+ */
+export const fotomatikRemoveBackground = async (
+  imageBase64: string,
+  mimeType: string
+): Promise<string> => {
+  checkApiKey();
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-image-preview',
+      contents: {
+        parts: [
+          {
+            text: "Remove the background from this image completely, leaving only the main subject. Make the background pure white or transparent. Preserve all details of the main subject with clean edges. Perfect for e-commerce product photography.",
+          },
+          {
+            inlineData: {
+              mimeType: mimeType,
+              data: imageBase64,
+            },
+          },
+        ],
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: '1:1',
+          imageSize: '2K',
+        }
+      }
+    });
+
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (!parts) throw new Error("No content returned from Gemini");
+
+    for (const part of parts) {
+      if (part.inlineData && part.inlineData.data) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
+    }
+
+    throw new Error("Background removal failed - no image returned");
+  } catch (error: any) {
+    console.error("Background Removal Error:", error);
+    throw new Error(error.message || "Arka plan kaldırılamadı");
+  }
+};
+
+/**
+ * Tekil retouch işlemi (ürün fotoğrafı iyileştirme)
+ */
+export const fotomatikRetouch = async (
+  imageBase64: string,
+  mimeType: string,
+  retouchLevel: 'light' | 'medium' | 'heavy' = 'medium'
+): Promise<string> => {
+  checkApiKey();
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+  const levelPrompts = {
+    light: "Slightly improve colors, fix minor lighting issues, keep natural look.",
+    medium: "Professional retouch: fix lighting, enhance colors, remove blemishes, sharpen details. E-commerce quality.",
+    heavy: "Full professional studio retouch: perfect lighting, vibrant colors, remove all imperfections, magazine quality."
+  };
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-image-preview',
+      contents: {
+        parts: [
+          {
+            text: `Professional product photo retouch. ${levelPrompts[retouchLevel]} Maintain product authenticity while making it look professionally photographed.`,
+          },
+          {
+            inlineData: {
+              mimeType: mimeType,
+              data: imageBase64,
+            },
+          },
+        ],
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: '1:1',
+          imageSize: '2K',
+        }
+      }
+    });
+
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (!parts) throw new Error("No content returned from Gemini");
+
+    for (const part of parts) {
+      if (part.inlineData && part.inlineData.data) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
+    }
+
+    throw new Error("Retouch failed - no image returned");
+  } catch (error: any) {
+    console.error("Retouch Error:", error);
+    throw new Error(error.message || "Retouch işlemi başarısız");
+  }
+};
+
+/**
+ * Katalog hazırlama (beyaz arka plan + profesyonel görünüm)
+ */
+export const fotomatikCatalogPrep = async (
+  imageBase64: string,
+  mimeType: string,
+  style: 'ecommerce' | 'social' | 'minimal' = 'ecommerce'
+): Promise<string> => {
+  checkApiKey();
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+  const stylePrompts = {
+    ecommerce: "Transform into professional e-commerce product photo: pure white background, perfect lighting, soft shadows beneath product, crisp details. Ready for Amazon/Shopify listing.",
+    social: "Transform into social media ready product photo: clean background, trendy look, good contrast, lifestyle feel while maintaining focus on product.",
+    minimal: "Transform into minimal product photo: white or very light gray background, ultra clean, no distractions, premium luxury feel."
+  };
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-image-preview',
+      contents: {
+        parts: [
+          {
+            text: stylePrompts[style],
+          },
+          {
+            inlineData: {
+              mimeType: mimeType,
+              data: imageBase64,
+            },
+          },
+        ],
+      },
+      config: {
+        imageConfig: {
+          aspectRatio: '1:1',
+          imageSize: '2K',
+        }
+      }
+    });
+
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (!parts) throw new Error("No content returned from Gemini");
+
+    for (const part of parts) {
+      if (part.inlineData && part.inlineData.data) {
+        return `data:image/png;base64,${part.inlineData.data}`;
+      }
+    }
+
+    throw new Error("Catalog prep failed - no image returned");
+  } catch (error: any) {
+    console.error("Catalog Prep Error:", error);
+    throw new Error(error.message || "Katalog hazırlama başarısız");
+  }
+};
+

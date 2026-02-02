@@ -1,6 +1,7 @@
 /**
  * Fotomatik Page - Görüntü Dönüştürme ve Prompt Üretme Aracı
  * Kredi sistemi ve geçmiş kayıt entegrasyonuyla
+ * + Toplu İşleme Özelliği
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -8,6 +9,7 @@ import { fotomatikGenerateEditedImage, fotomatikGenerateImagePrompt, fotomatikSu
 import { UploadArea } from '../components/fotomatik/UploadArea';
 import { ResultArea } from '../components/fotomatik/ResultArea';
 import { ImageEditor } from '../components/fotomatik/ImageEditor';
+import { BatchProcessor } from '../components/fotomatik/BatchProcessor';
 import { FotomatikAppStatus, FotomatikImageFile } from '../types/fotomatik';
 import { processFile } from '../components/fotomatik/fileUtils';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
@@ -21,7 +23,7 @@ interface FotomatikPageProps {
   onShowBuyCredits?: () => void;
 }
 
-type FotomatikMode = 'transform' | 'describe' | 'enhance';
+type FotomatikMode = 'transform' | 'describe' | 'enhance' | 'batch';
 type EnhanceMode = 'balanced' | 'vibrant' | 'crisp' | 'cinematic';
 type Language = 'tr' | 'en';
 
@@ -31,6 +33,7 @@ const translations = {
       transform: '🎨 Dönüştür',
       describe: '📝 Açıkla',
       enhance: '✨ İyileştir',
+      batch: '📦 Toplu İşlem',
     },
     enhanceModes: {
       balanced: { label: 'DENGELİ', desc: 'Standart profesyonel görünüm' },
@@ -86,6 +89,7 @@ const translations = {
       transform: '🎨 Transform',
       describe: '📝 Describe',
       enhance: '✨ Enhance',
+      batch: '📦 Batch Process',
     },
     enhanceModes: {
       balanced: { label: 'BALANCED', desc: 'Standard professional look' },
@@ -443,6 +447,15 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
           >
             {t.modes.enhance}
           </button>
+          <button
+            onClick={() => { setMode('batch'); handleReset(); }}
+            className={`px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all duration-300 ${mode === 'batch'
+              ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/30'
+              : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+              }`}
+          >
+            {t.modes.batch}
+          </button>
         </div>
 
         {/* Credit Info */}
@@ -780,6 +793,45 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
               )}
             </div>
           </div>
+        )}
+
+        {/* Batch Mode */}
+        {mode === 'batch' && (
+          <BatchProcessor
+            onCreditsRequired={async (count: number) => {
+              if (!profile) {
+                setErrorMessage(t.messages.loginRequired);
+                return false;
+              }
+              if (profile.credits < count) {
+                setErrorMessage(t.messages.insufficientCredits);
+                if (onShowBuyCredits) onShowBuyCredits();
+                return false;
+              }
+              return true;
+            }}
+            onSaveToHistory={async (outputUrl: string, settings: Record<string, any>) => {
+              if (!profile) return;
+              const uploadedUrl = await uploadBase64ToStorage(outputUrl, profile.id, 'output');
+              await saveGeneration(
+                profile.id,
+                'fotomatik_transform',
+                CREDIT_COSTS.FOTOMATIK_TRANSFORM,
+                null,
+                uploadedUrl,
+                null,
+                { ...settings, mode: 'batch' }
+              );
+              onRefreshProfile();
+              trackEvent(ANALYTICS_EVENTS.GENERATE_FOTOMATIK, {
+                type: 'batch',
+                operation: settings.operation,
+                userId: profile.id
+              });
+            }}
+            creditCost={CREDIT_COSTS.FOTOMATIK_TRANSFORM}
+            userCredits={profile?.credits || 0}
+          />
         )}
 
         {/* Image Editor Modal */}

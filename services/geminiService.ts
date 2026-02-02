@@ -11,6 +11,60 @@ const checkApiKey = () => {
     }
 };
 
+// Model fallback listesi - 503 hatası durumunda sırayla denenecek
+const IMAGE_MODELS = [
+    'gemini-3-pro-image-preview',
+    'gemini-3-pro-preview',
+    'gemini-2.0-flash-preview-image-generation',
+    'imagen-3.0-generate-002'
+] as const;
+
+// Retry helper fonksiyonu - 503 hatalarında otomatik yeniden deneme
+const withRetry = async <T>(
+    fn: (model: string) => Promise<T>,
+    maxRetries: number = 3,
+    delayMs: number = 2000
+): Promise<T> => {
+    let lastError: Error | null = null;
+
+    for (let modelIndex = 0; modelIndex < IMAGE_MODELS.length; modelIndex++) {
+        const model = IMAGE_MODELS[modelIndex];
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                console.log(`🔄 Model: ${model}, Deneme: ${attempt}/${maxRetries}`);
+                return await fn(model);
+            } catch (error: any) {
+                lastError = error;
+                const errorMessage = error?.message || String(error);
+                const statusCode = error?.status || (errorMessage.includes('503') ? 503 :
+                    errorMessage.includes('429') ? 429 :
+                        errorMessage.includes('overloaded') ? 503 : null);
+
+                console.warn(`⚠️ Hata (${model}, deneme ${attempt}): ${errorMessage}`);
+
+                // 503 veya 429 hatalarında retry yap
+                if (statusCode === 503 || statusCode === 429 || errorMessage.includes('overloaded') || errorMessage.includes('UNAVAILABLE')) {
+                    if (attempt < maxRetries) {
+                        const waitTime = delayMs * attempt; // Exponential backoff
+                        console.log(`⏳ ${waitTime}ms bekleniyor...`);
+                        await new Promise(resolve => setTimeout(resolve, waitTime));
+                        continue;
+                    }
+                    // Son deneme de başarısız, sonraki modele geç
+                    console.log(`🔀 Model değiştiriliyor: ${model} -> ${IMAGE_MODELS[modelIndex + 1] || 'SON MODEL'}`);
+                    break;
+                }
+
+                // Diğer hatalar için direkt throw
+                throw error;
+            }
+        }
+    }
+
+    throw lastError || new Error('Tüm modeller denendi ancak başarısız oldu.');
+};
+
 // Simple hash function (djb2 algorithm)
 const hashString = (str: string): number => {
     let hash = 5381;
@@ -167,30 +221,32 @@ BAŞKA RENK KULLANMA.` : '';
     Sonuç, Vogue veya Harper's Bazaar gibi dergilerde veya Lüks E-Ticaret (Farfetch, Net-a-Porter) sitelerinde kullanılacak kalitede, 8K, RAW PHOTO, HİPER-GERÇEKÇİ bir ürün fotoğrafı olmalıdır.` + colorClosing;
 
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
-            contents: {
-                parts: [
-                    imagePart,
-                    { text: prompt },
-                ],
-            },
-            config: {
-                responseModalities: [Modality.IMAGE],
-            },
-        });
+        return await withRetry(async (model) => {
+            const response = await ai.models.generateContent({
+                model: model,
+                contents: {
+                    parts: [
+                        imagePart,
+                        { text: prompt },
+                    ],
+                },
+                config: {
+                    responseModalities: [Modality.IMAGE],
+                },
+            });
 
-        const candidate = response.candidates?.[0];
-        const parts = candidate?.content?.parts;
+            const candidate = response.candidates?.[0];
+            const parts = candidate?.content?.parts;
 
-        if (parts) {
-            for (const part of parts) {
-                if (part.inlineData) {
-                    return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+            if (parts) {
+                for (const part of parts) {
+                    if (part.inlineData) {
+                        return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    }
                 }
             }
-        }
-        throw new Error("Ürün görseli oluşturulamadı.");
+            throw new Error("Ürün görseli oluşturulamadı.");
+        });
     } catch (e) {
         console.error("Ürün Oluşturma Hatası:", e);
         throw e;
@@ -662,10 +718,10 @@ export const generateImage = async (
        - Cartoonish, 3D Render, Plastik Görünüm, Aşırı Pürüzsüz Cilt, Yamuk Eller, Fazla Parmaklar, Bulanık Yüz Hatları.
        
     ${fabricType ? `7. ÖZEL KUMAŞ TALİMATI: Kumaş tipi "${fabricType}". ${fabricType === 'Deri'
-                ? 'DERİ DOKU DETAYLARI (KRİTİK): Deri yüzeyinde doğal doku çizgileri (grain pattern), hafif parlaklık ve mat alanlar, dikiş detayları NET görünmeli. Işık derinin üzerinde gerçekçi bir şekilde yansımalı. Deri kalınlığı ve ağırlığı hissedilmeli. Yüzeyde doğal kırışıklıklar ve doku varyasyonları olmalı.'
-                : fabricType === 'Triko'
-                    ? 'TRİKO DOKU DETAYLARI (KRİTİK): Örgü yapısı (knit texture) ve iplik detayları AÇIKÇA görünmeli. Her bir örgü ilmeği seçilebilir netlikte olmalı. Trikonun yumuşak, esnek yapısı ve doğal kıvrımları hissedilmeli. Işık örgü dokusunun üzerinde gerçekçi gölgeler oluşturmalı.'
-                    : `Bu kumaşın ışığı yansıtma ve kırışma özelliklerini tam olarak yansıt.`
+            ? 'DERİ DOKU DETAYLARI (KRİTİK): Deri yüzeyinde doğal doku çizgileri (grain pattern), hafif parlaklık ve mat alanlar, dikiş detayları NET görünmeli. Işık derinin üzerinde gerçekçi bir şekilde yansımalı. Deri kalınlığı ve ağırlığı hissedilmeli. Yüzeyde doğal kırışıklıklar ve doku varyasyonları olmalı.'
+            : fabricType === 'Triko'
+                ? 'TRİKO DOKU DETAYLARI (KRİTİK): Örgü yapısı (knit texture) ve iplik detayları AÇIKÇA görünmeli. Her bir örgü ilmeği seçilebilir netlikte olmalı. Trikonun yumuşak, esnek yapısı ve doğal kıvrımları hissedilmeli. Işık örgü dokusunun üzerinde gerçekçi gölgeler oluşturmalı.'
+                : `Bu kumaşın ışığı yansıtma ve kırışma özelliklerini tam olarak yansıt.`
             }` : ''}
     ${fabricFinish ? `8. KUMAŞ YÜZEYİ: "${fabricFinish}" bitişi.` : ''}
     
