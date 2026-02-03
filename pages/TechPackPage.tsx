@@ -4,6 +4,7 @@ import { uploadBase64ToStorage, saveGeneration, checkAndDeductCredits } from '..
 import { CREDIT_COSTS } from '../lib/supabase';
 import { WhatsAppPanel } from '../components/WhatsAppPanel';
 import jsPDF from 'jspdf';
+import { GoogleGenAI } from '@google/genai';
 
 interface TechPackPageProps {
     profile: any;
@@ -75,12 +76,82 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 return;
             }
 
-            // Use uploaded images directly (no AI generation needed)
+            // AI analiz yap - Sadece TEXT bilgi (measurements + specifications)
+            const imageToAnalyze = frontImage || backImage;
+            let measurements = '';
+            let specifications = '';
+
+            if (imageToAnalyze) {
+                try {
+                    // Generate TEXT analysis using AI (gemini-3-pro-preview for text)
+                    const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+                    const base64Data = imageToAnalyze.split(',')[1];
+                    const mimeType = imageToAnalyze.split(';')[0].split(':')[1];
+
+                    const imagePart = {
+                        inlineData: { data: base64Data, mimeType }
+                    };
+
+                    const analysisPrompt = `Bu kıyafeti analiz et ve SADECE metin olarak detaylı teknik spesifikasyon hazırla:
+
+1. ÖLÇÜLER (cm cinsinden):
+- Göğüs/Beden genişliği: [tahmin et]
+- Omuz genişliği: [tahmin et]  
+- Kol boyu: [tahmin et]
+- Ürün boyu: [tahmin et]
+- Etek genişliği: [tahmin et]
+- Yaka ölçüleri: [varsa]
+- Kol ağzı ölçüleri: [varsa]
+- Koltuk derinliği: [tahmin et]
+
+2. KUMAŞ VE MALZEME:
+- Ana kumaş: [türü ve ağırlığı]
+- Astar: [varsa]
+- Ara malzeme: [varsa]
+
+3. DİKİŞ DETAYLARI:
+- Dikiş türleri: [301, 401, 504 vb.]
+- Dikiş payları: [standart veya özel]
+- Üst dikiş detayları: [genişlik ve renk]
+
+4. TASARIM ÖZELLİKLERİ:
+- Yaka tipi ve yapısı: [detaylı açıklama]
+- Kol tipi ve yapısı: [detaylı açıklama]
+- Kapama türü: [düğme, fermuar vb.]
+- Cep detayları: [tip, yerleşim, yapı]
+- Etek bitimi: [tip ve ölçü]
+- Kol ağzı bitimi: [varsa]
+
+5. AKSESUAR VE DONANIM:
+- Düğme: [tip, boyut, adet]
+- Fermuar: [tip ve uzunluk, varsa]
+- İplik rengi: [uyumlu veya kontrast]
+
+Profesyonel tech pack formatında sun. SADECE METIN döndür, görsel oluşturma.`;
+
+                    const response = await ai.models.generateContent({
+                        model: 'gemini-3-pro-preview',
+                        contents: {
+                            parts: [imagePart, { text: analysisPrompt }]
+                        }
+                    });
+
+                    const fullText = response.text || '';
+                    const sections = fullText.split(/2\.\s*KUMAŞ VE MALZEME:/i);
+                    measurements = sections[0].replace(/1\.\s*ÖLÇÜLER.*?:/i, '').trim();
+                    specifications = sections[1] ? '2. KUMAŞ VE MALZEME:' + sections[1] : fullText;
+                } catch (error) {
+                    console.error('AI analiz hatası:', error);
+                    measurements = 'Analiz yapılamadı';
+                    specifications = 'Analiz yapılamadı';
+                }
+            }
+
             const techPackResult = {
                 frontView: frontImage || '',
                 backView: backImage || '',
-                measurements: '',
-                specifications: ''
+                measurements,
+                specifications
             };
             setResult(techPackResult);
 
