@@ -101,35 +101,28 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
         if (!result) return;
 
         try {
-            // Create PDF with multiple pages for full content
+            // Load custom font first
+            const loadFont = () => {
+                return new Promise<void>((resolve) => {
+                    const link = document.createElement('link');
+                    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
+                    link.rel = 'stylesheet';
+                    link.onload = () => resolve();
+                    document.head.appendChild(link);
+                });
+            };
+
+            await loadFont();
+
+            // Create PDF
             const pdf = new jsPDF({
-                orientation: 'landscape',
+                orientation: 'portrait',
                 unit: 'mm',
                 format: 'a4'
             });
 
-            const pageWidth = 297;
-            const pageHeight = 210;
-            const margin = 15;
-            const lineHeight = 5;
-            let currentPage = 1;
-
-            // Helper to add new page
-            const addNewPage = () => {
-                pdf.addPage();
-                currentPage++;
-                return margin; // Reset Y position
-            };
-
-            // Page 1: Header + Images
-            pdf.setFillColor(30, 41, 59);
-            pdf.rect(0, 0, pageWidth, 20, 'F');
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(16);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('TECHNICAL SPECIFICATION SHEET', pageWidth / 2, 12, { align: 'center' });
-
-            pdf.setTextColor(0, 0, 0);
+            const pageWidth = 210; // A4 width
+            const pageHeight = 297; // A4 height
 
             // Load images
             const frontImg = new Image();
@@ -150,107 +143,213 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 })
             ]);
 
-            // Add images
-            const imgWidth = 80;
-            const imgHeight = 100;
-            const startY = 30;
+            // Page 1: Cover + Images
+            const canvas1 = document.createElement('canvas');
+            const ctx1 = canvas1.getContext('2d')!;
+            canvas1.width = pageWidth * 3.78; // 300 DPI
+            canvas1.height = pageHeight * 3.78;
 
-            pdf.addImage(frontImg, 'PNG', margin, startY, imgWidth, imgHeight, '', 'FAST');
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('ÖN GÖRÜNÜM', margin + imgWidth / 2, startY + imgHeight + 8, { align: 'center' });
+            // Background
+            ctx1.fillStyle = '#ffffff';
+            ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
 
-            const backX = margin + imgWidth + 15;
-            pdf.addImage(backImg, 'PNG', backX, startY, imgWidth, imgHeight, '', 'FAST');
-            pdf.text('ARKA GÖRÜNÜM', backX + imgWidth / 2, startY + imgHeight + 8, { align: 'center' });
+            // Gradient Header
+            const gradient = ctx1.createLinearGradient(0, 0, canvas1.width, 200);
+            gradient.addColorStop(0, '#6366f1'); // Indigo
+            gradient.addColorStop(1, '#8b5cf6'); // Purple
+            ctx1.fillStyle = gradient;
+            ctx1.fillRect(0, 0, canvas1.width, 200);
 
-            // Page 2: Full Measurements
-            let textY = addNewPage();
+            // Title
+            ctx1.fillStyle = '#ffffff';
+            ctx1.font = 'bold 56px Inter, Arial';
+            ctx1.textAlign = 'center';
+            ctx1.fillText('TEKNİK ÖZELLİKLER', canvas1.width / 2, 100);
+            ctx1.font = '32px Inter, Arial';
+            ctx1.fillText('Technical Specification Sheet', canvas1.width / 2, 150);
 
-            pdf.setFontSize(14);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('ÖLÇÜLER', margin, textY);
-            textY += 10;
+            // Date
+            ctx1.font = '24px Inter, Arial';
+            const date = new Date().toLocaleDateString('tr-TR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            ctx1.fillText(date, canvas1.width / 2, 185);
 
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'normal');
-            const measurements = result.measurements.split('\n'); // TÜM satırlar
+            // Images Section
+            const imgStartY = 250;
+            const imgWidth = 500;
+            const imgHeight = 650;
+            const spacing = 80;
 
-            measurements.forEach(line => {
-                if (line.trim()) {
-                    // Check if we need a new page
-                    if (textY > pageHeight - 20) {
-                        textY = addNewPage();
-                        // Repeat header on new page
-                        pdf.setFontSize(12);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.text('ÖLÇÜLER (devam)', margin, textY);
-                        textY += 8;
-                        pdf.setFontSize(9);
-                        pdf.setFont('helvetica', 'normal');
+            // Front View
+            const frontX = (canvas1.width - imgWidth * 2 - spacing) / 2;
+
+            // Border for image
+            ctx1.strokeStyle = '#e2e8f0';
+            ctx1.lineWidth = 3;
+            ctx1.strokeRect(frontX - 15, imgStartY - 15, imgWidth + 30, imgHeight + 80);
+
+            ctx1.drawImage(frontImg, frontX, imgStartY, imgWidth, imgHeight);
+
+            // Label
+            ctx1.fillStyle = '#1e293b';
+            ctx1.font = 'bold 32px Inter, Arial';
+            ctx1.textAlign = 'center';
+            ctx1.fillText('ÖN GÖRÜNÜM', frontX + imgWidth / 2, imgStartY + imgHeight + 50);
+
+            // Back View
+            const backX = frontX + imgWidth + spacing;
+
+            ctx1.strokeRect(backX - 15, imgStartY - 15, imgWidth + 30, imgHeight + 80);
+            ctx1.drawImage(backImg, backX, imgStartY, imgWidth, imgHeight);
+
+            ctx1.fillText('ARKA GÖRÜNÜM', backX + imgWidth / 2, imgStartY + imgHeight + 50);
+
+            // Add page 1 to PDF
+            const imgData1 = canvas1.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(imgData1, 'JPEG', 0, 0, pageWidth, pageHeight);
+
+            // Page 2: Measurements
+            pdf.addPage();
+            const canvas2 = document.createElement('canvas');
+            const ctx2 = canvas2.getContext('2d')!;
+            canvas2.width = pageWidth * 3.78;
+            canvas2.height = pageHeight * 3.78;
+
+            ctx2.fillStyle = '#ffffff';
+            ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
+
+            // Header
+            const gradient2 = ctx2.createLinearGradient(0, 0, canvas2.width, 150);
+            gradient2.addColorStop(0, '#6366f1');
+            gradient2.addColorStop(1, '#8b5cf6');
+            ctx2.fillStyle = gradient2;
+            ctx2.fillRect(0, 0, canvas2.width, 150);
+
+            ctx2.fillStyle = '#ffffff';
+            ctx2.font = 'bold 48px Inter, Arial';
+            ctx2.textAlign = 'center';
+            ctx2.fillText('ÖLÇÜLER', canvas2.width / 2, 95);
+
+            // Content
+            let y = 230;
+            const margin = 100;
+            const lineHeight = 45;
+
+            ctx2.textAlign = 'left';
+            ctx2.fillStyle = '#1e293b';
+            ctx2.font = '28px Inter, Arial';
+
+            const measurements = result.measurements.split('\n').filter(line => line.trim());
+            measurements.forEach((line, index) => {
+                if (y > canvas2.height - 100) return;
+
+                // Alternate row background
+                if (index % 2 === 0) {
+                    ctx2.fillStyle = '#f8fafc';
+                    ctx2.fillRect(margin - 20, y - 35, canvas2.width - 2 * margin + 40, lineHeight);
+                }
+
+                ctx2.fillStyle = '#1e293b';
+                ctx2.font = '28px Inter, Arial';
+
+                // Word wrap
+                const maxWidth = canvas2.width - 2 * margin;
+                const words = line.split(' ');
+                let currentLine = '';
+
+                words.forEach(word => {
+                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                    const metrics = ctx2.measureText(testLine);
+
+                    if (metrics.width > maxWidth && currentLine) {
+                        ctx2.fillText(currentLine, margin, y);
+                        y += lineHeight;
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
                     }
+                });
 
-                    // Word wrap long lines
-                    const maxWidth = pageWidth - 2 * margin;
-                    const lines = pdf.splitTextToSize(line, maxWidth);
-                    lines.forEach((wrappedLine: string) => {
-                        pdf.text(wrappedLine, margin, textY);
-                        textY += lineHeight;
-                    });
+                if (currentLine) {
+                    ctx2.fillText(currentLine, margin, y);
+                    y += lineHeight;
                 }
             });
 
-            // Page 3+: Full Specifications
-            textY += 10;
-            if (textY > pageHeight - 20) {
-                textY = addNewPage();
-            }
+            const imgData2 = canvas2.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(imgData2, 'JPEG', 0, 0, pageWidth, pageHeight);
 
-            pdf.setFontSize(14);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('SPESİFİKASYONLAR', margin, textY);
-            textY += 10;
+            // Page 3: Specifications
+            pdf.addPage();
+            const canvas3 = document.createElement('canvas');
+            const ctx3 = canvas3.getContext('2d')!;
+            canvas3.width = pageWidth * 3.78;
+            canvas3.height = pageHeight * 3.78;
 
-            pdf.setFontSize(9);
-            pdf.setFont('helvetica', 'normal');
-            const specs = result.specifications.split('\n'); // TÜM satırlar
+            ctx3.fillStyle = '#ffffff';
+            ctx3.fillRect(0, 0, canvas3.width, canvas3.height);
 
-            specs.forEach(line => {
-                if (line.trim()) {
-                    // Check if we need a new page
-                    if (textY > pageHeight - 20) {
-                        textY = addNewPage();
-                        // Repeat header on new page
-                        pdf.setFontSize(12);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.text('SPESİFİKASYONLAR (devam)', margin, textY);
-                        textY += 8;
-                        pdf.setFontSize(9);
-                        pdf.setFont('helvetica', 'normal');
+            // Header
+            const gradient3 = ctx3.createLinearGradient(0, 0, canvas3.width, 150);
+            gradient3.addColorStop(0, '#6366f1');
+            gradient3.addColorStop(1, '#8b5cf6');
+            ctx3.fillStyle = gradient3;
+            ctx3.fillRect(0, 0, canvas3.width, 150);
+
+            ctx3.fillStyle = '#ffffff';
+            ctx3.font = 'bold 48px Inter, Arial';
+            ctx3.textAlign = 'center';
+            ctx3.fillText('SPESİFİKASYONLAR', canvas3.width / 2, 95);
+
+            // Content
+            y = 230;
+            ctx3.textAlign = 'left';
+            ctx3.fillStyle = '#1e293b';
+            ctx3.font = '28px Inter, Arial';
+
+            const specs = result.specifications.split('\n').filter(line => line.trim());
+            specs.forEach((line, index) => {
+                if (y > canvas3.height - 100) return;
+
+                if (index % 2 === 0) {
+                    ctx3.fillStyle = '#f8fafc';
+                    ctx3.fillRect(margin - 20, y - 35, canvas3.width - 2 * margin + 40, lineHeight);
+                }
+
+                ctx3.fillStyle = '#1e293b';
+                ctx3.font = '28px Inter, Arial';
+
+                const maxWidth = canvas3.width - 2 * margin;
+                const words = line.split(' ');
+                let currentLine = '';
+
+                words.forEach(word => {
+                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                    const metrics = ctx3.measureText(testLine);
+
+                    if (metrics.width > maxWidth && currentLine) {
+                        ctx3.fillText(currentLine, margin, y);
+                        y += lineHeight;
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
                     }
+                });
 
-                    // Word wrap long lines
-                    const maxWidth = pageWidth - 2 * margin;
-                    const lines = pdf.splitTextToSize(line, maxWidth);
-                    lines.forEach((wrappedLine: string) => {
-                        pdf.text(wrappedLine, margin, textY);
-                        textY += lineHeight;
-                    });
+                if (currentLine) {
+                    ctx3.fillText(currentLine, margin, y);
+                    y += lineHeight;
                 }
             });
 
-            // Footer on last page
-            pdf.setFontSize(8);
-            pdf.setTextColor(150, 150, 150);
-            pdf.text(
-                `Generated by Fasheone - ${new Date().toLocaleDateString('tr-TR')} - Sayfa ${currentPage}`,
-                pageWidth / 2,
-                pageHeight - 8,
-                { align: 'center' }
-            );
+            const imgData3 = canvas3.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(imgData3, 'JPEG', 0, 0, pageWidth, pageHeight);
 
-            // Download PDF
-            pdf.save(`tech-pack-${Date.now()}.pdf`);
+            // Download
+            pdf.save(`fasheone-tech-pack-${Date.now()}.pdf`);
 
         } catch (error) {
             console.error('Download error:', error);
