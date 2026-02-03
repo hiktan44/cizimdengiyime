@@ -12,8 +12,7 @@ interface TechPackPageProps {
 }
 
 const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
-    const [frontImage, setFrontImage] = useState<string | null>(null);
-    const [backImage, setBackImage] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [result, setResult] = useState<{
         frontView: string;
@@ -22,33 +21,19 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
         specifications: string;
     } | null>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
-    const frontInputRef = useRef<HTMLInputElement>(null);
-    const backInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '';
     const whatsappMessage = encodeURIComponent('Merhaba! Tech Pack hakkında bilgi almak istiyorum.');
     const whatsappSubtitle = 'Teknik çizim desteği için';
 
-    const handleFrontImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         const reader = new FileReader();
         reader.onload = (event) => {
-            setFrontImage(event.target?.result as string);
-            setResult(null);
-            setErrorMessage('');
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleBackImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            setBackImage(event.target?.result as string);
+            setSelectedImage(event.target?.result as string);
             setResult(null);
             setErrorMessage('');
         };
@@ -56,8 +41,8 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
     };
 
     const handleGenerate = async () => {
-        if ((!frontImage && !backImage) || !profile) {
-            setErrorMessage('Lütfen en az bir görsel seçin ve giriş yapın.');
+        if (!selectedImage || !profile) {
+            setErrorMessage('Lütfen bir görsel seçin ve giriş yapın.');
             return;
         }
 
@@ -73,20 +58,14 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 return;
             }
 
-            // Generate tech pack - use front if available, otherwise back
-            const techPackResult = await generateTechPack(frontImage || backImage!);
-            // Override generated images with user-uploaded ones if available
-            const finalResult = {
-                ...techPackResult,
-                frontView: frontImage || techPackResult.frontView,
-                backView: backImage || techPackResult.backView
-            };
-            setResult(finalResult);
+            // Generate tech pack - AI will create FRONT and BACK technical drawings
+            const techPackResult = await generateTechPack(selectedImage);
+            setResult(techPackResult);
 
             // Save to history
-            const uploadedInput = await uploadBase64ToStorage(frontImage || backImage!, profile.id, 'input');
-            const uploadedFront = await uploadBase64ToStorage(finalResult.frontView, profile.id, 'output');
-            const uploadedBack = await uploadBase64ToStorage(finalResult.backView, profile.id, 'output');
+            const uploadedInput = await uploadBase64ToStorage(selectedImage, profile.id, 'input');
+            const uploadedFront = await uploadBase64ToStorage(techPackResult.frontView, profile.id, 'output');
+            const uploadedBack = await uploadBase64ToStorage(techPackResult.backView, profile.id, 'output');
 
             await saveGeneration(
                 profile.id,
@@ -133,21 +112,28 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
             const pageHeight = 210;
 
             // Load images
-            const frontImg = new Image();
-            const backImg = new Image();
+            const frontImg = new Image(); // AI teknik çizim (ön)
+            const schemaImg = new Image(); // Gerçek ürün resmi
+            const backImg = new Image(); // AI teknik çizim (arka)
             frontImg.crossOrigin = 'anonymous';
+            schemaImg.crossOrigin = 'anonymous';
             backImg.crossOrigin = 'anonymous';
 
             await Promise.all([
                 new Promise<void>((resolve, reject) => {
                     frontImg.onload = () => resolve();
                     frontImg.onerror = reject;
-                    frontImg.src = result.frontView;
+                    frontImg.src = result.frontView; // AI teknik çizim
+                }),
+                new Promise<void>((resolve, reject) => {
+                    schemaImg.onload = () => resolve();
+                    schemaImg.onerror = reject;
+                    schemaImg.src = selectedImage!; // Gerçek ürün resmi
                 }),
                 new Promise<void>((resolve, reject) => {
                     backImg.onload = () => resolve();
                     backImg.onerror = reject;
-                    backImg.src = result.backView;
+                    backImg.src = result.backView; // AI teknik çizim
                 })
             ]);
 
@@ -253,7 +239,7 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
             drawRect(5, imgY + 8, imgW, imgH);
             ctx1.drawImage(frontImg, 5 * scale, (imgY + 8) * scale, imgW * scale, imgH * scale);
 
-            // SCHEMA - FRONT IMAGE PLACED HERE
+            // SCHEMA - REAL PRODUCT IMAGE HERE
             ctx1.fillStyle = '#e5e7eb';
             drawRect(67, imgY, imgW, 8, true);
             ctx1.fillStyle = '#000000';
@@ -262,8 +248,8 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
             ctx1.strokeStyle = '#666666';
             ctx1.lineWidth = 1;
             drawRect(67, imgY + 8, imgW, imgH);
-            // Place front image in schema section
-            ctx1.drawImage(frontImg, 67 * scale, (imgY + 8) * scale, imgW * scale, imgH * scale);
+            // Place REAL product image in schema section
+            ctx1.drawImage(schemaImg, 67 * scale, (imgY + 8) * scale, imgW * scale, imgH * scale);
 
             // BACK
             ctx1.fillStyle = '#e5e7eb';
@@ -529,94 +515,55 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 {/* Main Content */}
                 <div className="grid lg:grid-cols-2 gap-8">
                     {/* Upload Section */}
-                    <div className="space-y-6">
-                        {/* Front Image Upload */}
-                        <div className="bg-slate-800/30 border-2 border-dashed border-slate-600 rounded-2xl p-6">
-                            <h2 className="text-xl font-bold mb-4 text-center">📸 Ön Görsel</h2>
+                    <div className="bg-slate-800/30 border-2 border-dashed border-slate-600 rounded-2xl p-8">
+                        <h2 className="text-2xl font-bold mb-6 text-center">Ürün Görseli Yükle</h2>
 
-                            <input
-                                ref={frontInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFrontImageSelect}
-                                className="hidden"
-                            />
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageSelect}
+                            className="hidden"
+                        />
 
-                            {!frontImage ? (
+                        {!selectedImage ? (
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full h-96 flex flex-col items-center justify-center gap-4 bg-slate-700/30 hover:bg-slate-700/50 border-2 border-slate-600 rounded-xl transition-all"
+                            >
+                                <span className="text-6xl">📸</span>
+                                <span className="text-xl font-semibold">Görsel Seç</span>
+                                <span className="text-sm text-slate-400">Ürün fotoğrafı yükleyin</span>
+                                <span className="text-xs text-slate-500 mt-2">AI teknik çizim oluşturacak</span>
+                            </button>
+                        ) : (
+                            <div className="relative">
+                                <img
+                                    src={selectedImage}
+                                    alt="Selected"
+                                    className="w-full h-96 object-contain rounded-xl bg-slate-900"
+                                />
                                 <button
-                                    onClick={() => frontInputRef.current?.click()}
-                                    className="w-full h-64 flex flex-col items-center justify-center gap-3 bg-slate-700/30 hover:bg-slate-700/50 border-2 border-slate-600 rounded-xl transition-all"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute top-4 right-4 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-all"
                                 >
-                                    <span className="text-4xl">🔼</span>
-                                    <span className="text-lg font-semibold">Ön G\u00f6rsel Se\u00e7</span>
+                                    🔄 Değiştir
                                 </button>
-                            ) : (
-                                <div className="relative">
-                                    <img
-                                        src={frontImage}
-                                        alt="Front"
-                                        className="w-full h-64 object-contain rounded-xl bg-slate-900"
-                                    />
-                                    <button
-                                        onClick={() => frontInputRef.current?.click()}
-                                        className="absolute top-2 right-2 bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-sm transition-all"
-                                    >
-                                        🔄 Değiştir
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
 
-                        {/* Back Image Upload */}
-                        <div className="bg-slate-800/30 border-2 border-dashed border-slate-600 rounded-2xl p-6">
-                            <h2 className="text-xl font-bold mb-4 text-center">📸 Arka Görsel</h2>
-
-                            <input
-                                ref={backInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleBackImageSelect}
-                                className="hidden"
-                            />
-
-                            {!backImage ? (
-                                <button
-                                    onClick={() => backInputRef.current?.click()}
-                                    className="w-full h-64 flex flex-col items-center justify-center gap-3 bg-slate-700/30 hover:bg-slate-700/50 border-2 border-slate-600 rounded-xl transition-all"
-                                >
-                                    <span className="text-4xl">🔽</span>
-                                    <span className="text-lg font-semibold">Arka G\u00f6rsel Se\u00e7</span>
-                                </button>
-                            ) : (
-                                <div className="relative">
-                                    <img
-                                        src={backImage}
-                                        alt="Back"
-                                        className="w-full h-64 object-contain rounded-xl bg-slate-900"
-                                    />
-                                    <button
-                                        onClick={() => backInputRef.current?.click()}
-                                        className="absolute top-2 right-2 bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded-lg text-sm transition-all"
-                                    >
-                                        🔄 Değiştir
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Generate Button */}
-                        {(frontImage || backImage) && !result && (
+                        {selectedImage && !result && (
                             <button
                                 onClick={handleGenerate}
                                 disabled={isProcessing || !profile}
-                                className="w-full py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold text-lg rounded-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full mt-6 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold text-lg rounded-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isProcessing ? '⚙️ İşleniyor...' : '🚀 Tech Pack Oluştur'}
                             </button>
                         )}
 
                         {errorMessage && (
-                            <div className="p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-200">
+                            <div className="mt-4 p-4 bg-red-500/20 border border-red-500 rounded-lg text-red-200">
                                 {errorMessage}
                             </div>
                         )}
