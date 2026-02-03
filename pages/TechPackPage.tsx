@@ -82,25 +82,30 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
             let measurements = '';
             let specifications = '';
 
-            // 1. Ön görselden teknik çizim oluştur
-            if (frontImage) {
-                try {
-                    const frontResult = await generateTechPack(frontImage);
-                    frontTechDrawing = frontResult.frontView; // AI teknik çizim
-                } catch (error) {
-                    console.error('Ön teknik çizim hatası:', error);
-                    frontTechDrawing = frontImage; // Fallback: gerçek resmi kullan
-                }
-            }
+            // Öncelik sırası: frontImage varsa onu kullan, yoksa backImage
+            const primaryImage = frontImage || backImage;
 
-            // 2. Arka görselden teknik çizim oluştur
-            if (backImage) {
+            if (primaryImage) {
                 try {
-                    const backResult = await generateTechPack(backImage);
-                    backTechDrawing = backResult.backView; // AI teknik çizim
+                    // generateTechPack hem ön hem arka çizim döndürür
+                    const techPackResult = await generateTechPack(primaryImage);
+
+                    // Ön çizim
+                    if (frontImage) {
+                        frontTechDrawing = techPackResult.frontView; // AI teknik çizim (ön)
+                    } else {
+                        // Sadece arka yüklendiyse, arka çizimi ön olarak kullan
+                        frontTechDrawing = techPackResult.backView;
+                    }
+
+                    // Arka çizim - her durumda arka çizimi al
+                    backTechDrawing = techPackResult.backView; // AI teknik çizim (arka)
+
                 } catch (error) {
-                    console.error('Arka teknik çizim hatası:', error);
-                    backTechDrawing = backImage; // Fallback: gerçek resmi kullan
+                    console.error('Teknik çizim hatası:', error);
+                    // Fallback: gerçek resimleri kullan
+                    frontTechDrawing = frontImage || backImage || '';
+                    backTechDrawing = backImage || frontImage || '';
                 }
             }
 
@@ -228,29 +233,47 @@ Profesyonel tech pack formatında sun. SADECE METIN döndür, görsel oluşturma
             const pageWidth = 297;
             const pageHeight = 210;
 
-            // Load images for PDF
-            const frontImg = new Image(); // AI teknik çizim (ön)  
-            const schemaImg = new Image(); // Gerçek ön fotoğraf
-            const backImg = new Image(); // AI teknik çizim (arka)
+            // Load images for PDF - Boş görselleri kontrol et
+            const frontImg = new Image();
+            const schemaImg = new Image();
+            const backImg = new Image();
             frontImg.crossOrigin = 'anonymous';
             schemaImg.crossOrigin = 'anonymous';
             backImg.crossOrigin = 'anonymous';
 
+            // Fallback görseller - boş olanlar için
+            const fallbackFront = result.frontView || frontImage || backImage || '';
+            const fallbackSchema = frontImage || result.frontView || backImage || '';
+            const fallbackBack = result.backView || backImage || frontImage || '';
+
+            if (!fallbackFront || !fallbackSchema || !fallbackBack) {
+                throw new Error('Teknik çizimler oluşturulamadı. Lütfen tekrar deneyin.');
+            }
+
             await Promise.all([
                 new Promise<void>((resolve, reject) => {
                     frontImg.onload = () => resolve();
-                    frontImg.onerror = reject;
-                    frontImg.src = result.frontView; // AI teknik çizim (ön)
+                    frontImg.onerror = () => {
+                        console.error('Ön görsel yüklenemedi');
+                        reject(new Error('Ön görsel yüklenemedi'));
+                    };
+                    frontImg.src = fallbackFront;
                 }),
                 new Promise<void>((resolve, reject) => {
                     schemaImg.onload = () => resolve();
-                    schemaImg.onerror = reject;
-                    schemaImg.src = frontImage || result.frontView; // GERÇEK ön fotoğraf
+                    schemaImg.onerror = () => {
+                        console.error('Schema görsel yüklenemedi');
+                        reject(new Error('Schema görsel yüklenemedi'));
+                    };
+                    schemaImg.src = fallbackSchema;
                 }),
                 new Promise<void>((resolve, reject) => {
                     backImg.onload = () => resolve();
-                    backImg.onerror = reject;
-                    backImg.src = result.backView; // AI teknik çizim (arka)
+                    backImg.onerror = () => {
+                        console.error('Arka görsel yüklenemedi');
+                        reject(new Error('Arka görsel yüklenemedi'));
+                    };
+                    backImg.src = fallbackBack;
                 })
             ]);
 
