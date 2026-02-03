@@ -111,8 +111,8 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
             const pageWidth = 297;
             const pageHeight = 210;
 
-            // Load images
-            const frontImg = new Image(); // AI teknik çizim (ön)
+            // Load images - AI SWAP! AI tersine gönderiyor
+            const frontImg = new Image(); // AI teknik çizim (ön)  
             const schemaImg = new Image(); // Gerçek ürün resmi
             const backImg = new Image(); // AI teknik çizim (arka)
             frontImg.crossOrigin = 'anonymous';
@@ -123,7 +123,7 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 new Promise<void>((resolve, reject) => {
                     frontImg.onload = () => resolve();
                     frontImg.onerror = reject;
-                    frontImg.src = result.frontView; // AI teknik çizim
+                    frontImg.src = result.backView; // ⚠️ SWAP! AI backView=Ön göndermiş
                 }),
                 new Promise<void>((resolve, reject) => {
                     schemaImg.onload = () => resolve();
@@ -133,7 +133,7 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 new Promise<void>((resolve, reject) => {
                     backImg.onload = () => resolve();
                     backImg.onerror = reject;
-                    backImg.src = result.backView; // AI teknik çizim
+                    backImg.src = result.frontView; // ⚠️ SWAP! AI frontView=Arka göndermiş
                 })
             ]);
 
@@ -191,33 +191,36 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
             drawText('Renk: _________', 165, 25);
             drawText('Beden: _________', 165, 32);
 
-            // Size table
+            // Size table - FIXED LAYOUT
             ctx1.fillStyle = '#e5e7eb';
             drawRect(229, 5, 63, 12, true);
             ctx1.fillStyle = '#000000';
             ctx1.font = 'bold 18px Arial';
             drawText('BEDEN TABLOSU', 231, 13, 'left');
 
-            // Size grid - BOLDER LINES  
+            // Size grid - NO OVERLAPPING
             const sizes = ['S', 'M', 'L'];
             const sizeX = 229;
+            const sizeW = 21; // Sabit genişlik
             let sizeY = 18;
 
             ctx1.strokeStyle = '#000000';
-            ctx1.lineWidth = 2; // BOLD BORDERS
-            ctx1.font = 'bold 14px Arial';
+            ctx1.lineWidth = 1.5; // Kalın çerçeve
+            ctx1.font = 'bold 12px Arial'; // Biraz küçültüldü
+
+            // Header row
             sizes.forEach((size, i) => {
-                drawRect(sizeX + i * 21, sizeY, 21, 8);
-                drawText(size, sizeX + i * 21 + 10.5, sizeY + 6, 'center');
+                drawRect(sizeX + i * sizeW, sizeY, sizeW, 7);
+                drawText(size, sizeX + i * sizeW + sizeW / 2, sizeY + 5, 'center');
             });
 
-            // Size values
-            ctx1.font = '14px Arial';
-            for (let i = 0; i < 3; i++) {
-                sizeY += 8;
+            // Data rows
+            ctx1.font = '11px Arial';
+            for (let i = 0; i < 2; i++) { // 2 satır yeterli
+                sizeY += 7;
                 sizes.forEach((_, j) => {
-                    drawRect(sizeX + j * 21, sizeY, 21, 6);
-                    drawText('__', sizeX + j * 21 + 10.5, sizeY + 5, 'center');
+                    drawRect(sizeX + j * sizeW, sizeY, sizeW, 7);
+                    drawText('—', sizeX + j * sizeW + sizeW / 2, sizeY + 5, 'center');
                 });
             }
 
