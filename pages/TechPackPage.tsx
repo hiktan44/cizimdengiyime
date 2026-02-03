@@ -101,22 +101,39 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
         if (!result) return;
 
         try {
-            // Create a combined tech pack image
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d')!;
+            // Create PDF with multiple pages for full content
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
 
-            // Set canvas size (A4 landscape: 2100x1485 pixels at 150 DPI)
-            canvas.width = 2100;
-            canvas.height = 1485;
+            const pageWidth = 297;
+            const pageHeight = 210;
+            const margin = 15;
+            const lineHeight = 5;
+            let currentPage = 1;
 
-            // White background
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Helper to add new page
+            const addNewPage = () => {
+                pdf.addPage();
+                currentPage++;
+                return margin; // Reset Y position
+            };
+
+            // Page 1: Header + Images
+            pdf.setFillColor(30, 41, 59);
+            pdf.rect(0, 0, pageWidth, 20, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(16);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('TECHNICAL SPECIFICATION SHEET', pageWidth / 2, 12, { align: 'center' });
+
+            pdf.setTextColor(0, 0, 0);
 
             // Load images
             const frontImg = new Image();
             const backImg = new Image();
-
             frontImg.crossOrigin = 'anonymous';
             backImg.crossOrigin = 'anonymous';
 
@@ -133,85 +150,104 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 })
             ]);
 
-            // Draw header
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, 0, canvas.width, 80);
-            ctx.fillStyle = '#FFFFFF';
-            ctx.font = 'bold 36px Arial';
-            ctx.fillText('TECHNICAL SPECIFICATION SHEET', 60, 50);
+            // Add images
+            const imgWidth = 80;
+            const imgHeight = 100;
+            const startY = 30;
 
-            // Calculate image dimensions
-            const imgWidth = 700;
-            const imgHeight = 900;
-            const startY = 120;
+            pdf.addImage(frontImg, 'PNG', margin, startY, imgWidth, imgHeight, '', 'FAST');
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('ÖN GÖRÜNÜM', margin + imgWidth / 2, startY + imgHeight + 8, { align: 'center' });
 
-            // Draw front view
-            const frontX = 100;
-            ctx.drawImage(frontImg, frontX, startY, imgWidth, imgHeight);
+            const backX = margin + imgWidth + 15;
+            pdf.addImage(backImg, 'PNG', backX, startY, imgWidth, imgHeight, '', 'FAST');
+            pdf.text('ARKA GÖRÜNÜM', backX + imgWidth / 2, startY + imgHeight + 8, { align: 'center' });
 
-            // Label for front view
-            ctx.fillStyle = '#000000';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText('ÖN GÖRÜNÜM', frontX, startY + imgHeight + 30);
+            // Page 2: Full Measurements
+            let textY = addNewPage();
 
-            // Draw back view
-            const backX = frontX + imgWidth + 100;
-            ctx.drawImage(backImg, backX, startY, imgWidth, imgHeight);
+            pdf.setFontSize(14);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('ÖLÇÜLER', margin, textY);
+            textY += 10;
 
-            // Label for back view
-            ctx.fillText('ARKA GÖRÜNÜM', backX, startY + imgHeight + 50);
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'normal');
+            const measurements = result.measurements.split('\n'); // TÜM satırlar
 
-            // Draw measurements and specs
-            const textX = backX + imgWidth + 60;
-            let textY = startY + 30;
-
-            ctx.font = 'bold 28px Arial';
-            ctx.fillText('ÖLÇÜLER', textX, textY);
-            textY += 45;
-
-            ctx.font = '18px Arial';
-            const measurements = result.measurements.split('\n').slice(0, 15); // Limit lines
             measurements.forEach(line => {
-                if (line.trim() && textY < startY + imgHeight) {
-                    const wrappedLines = wrapText(ctx, line, 400);
-                    wrappedLines.forEach(wrappedLine => {
-                        ctx.fillText(wrappedLine, textX, textY);
-                        textY += 25;
+                if (line.trim()) {
+                    // Check if we need a new page
+                    if (textY > pageHeight - 20) {
+                        textY = addNewPage();
+                        // Repeat header on new page
+                        pdf.setFontSize(12);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text('ÖLÇÜLER (devam)', margin, textY);
+                        textY += 8;
+                        pdf.setFontSize(9);
+                        pdf.setFont('helvetica', 'normal');
+                    }
+
+                    // Word wrap long lines
+                    const maxWidth = pageWidth - 2 * margin;
+                    const lines = pdf.splitTextToSize(line, maxWidth);
+                    lines.forEach((wrappedLine: string) => {
+                        pdf.text(wrappedLine, margin, textY);
+                        textY += lineHeight;
                     });
                 }
             });
 
-            textY += 35;
-            if (textY < startY + imgHeight) {
-                ctx.font = 'bold 28px Arial';
-                ctx.fillText('SPESİFİKASYONLAR', textX, textY);
-                textY += 45;
-
-                ctx.font = '18px Arial';
-                const specs = result.specifications.split('\n').slice(0, 15); // Limit lines
-                specs.forEach(line => {
-                    if (line.trim() && textY < startY + imgHeight + 50) {
-                        const wrappedLines = wrapText(ctx, line, 400);
-                        wrappedLines.forEach(wrappedLine => {
-                            ctx.fillText(wrappedLine, textX, textY);
-                            textY += 25;
-                        });
-                    }
-                });
+            // Page 3+: Full Specifications
+            textY += 10;
+            if (textY > pageHeight - 20) {
+                textY = addNewPage();
             }
 
-            // Convert canvas to PDF
-            const imgData = canvas.toDataURL('image/png', 1.0);
+            pdf.setFontSize(14);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('SPESİFİKASYONLAR', margin, textY);
+            textY += 10;
 
-            // Create PDF (A4 landscape: 297mm x 210mm)
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4'
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'normal');
+            const specs = result.specifications.split('\n'); // TÜM satırlar
+
+            specs.forEach(line => {
+                if (line.trim()) {
+                    // Check if we need a new page
+                    if (textY > pageHeight - 20) {
+                        textY = addNewPage();
+                        // Repeat header on new page
+                        pdf.setFontSize(12);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text('SPESİFİKASYONLAR (devam)', margin, textY);
+                        textY += 8;
+                        pdf.setFontSize(9);
+                        pdf.setFont('helvetica', 'normal');
+                    }
+
+                    // Word wrap long lines
+                    const maxWidth = pageWidth - 2 * margin;
+                    const lines = pdf.splitTextToSize(line, maxWidth);
+                    lines.forEach((wrappedLine: string) => {
+                        pdf.text(wrappedLine, margin, textY);
+                        textY += lineHeight;
+                    });
+                }
             });
 
-            // Add image to PDF (full page)
-            pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+            // Footer on last page
+            pdf.setFontSize(8);
+            pdf.setTextColor(150, 150, 150);
+            pdf.text(
+                `Generated by Fasheone - ${new Date().toLocaleDateString('tr-TR')} - Sayfa ${currentPage}`,
+                pageWidth / 2,
+                pageHeight - 8,
+                { align: 'center' }
+            );
 
             // Download PDF
             pdf.save(`tech-pack-${Date.now()}.pdf`);
@@ -220,31 +256,6 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
             console.error('Download error:', error);
             alert('İndirme sırasında bir hata oluştu. Lütfen tekrar deneyin.');
         }
-    };
-
-    // Helper function to wrap text
-    const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
-        const words = text.split(' ');
-        const lines: string[] = [];
-        let currentLine = '';
-
-        words.forEach(word => {
-            const testLine = currentLine + (currentLine ? ' ' : '') + word;
-            const metrics = ctx.measureText(testLine);
-
-            if (metrics.width > maxWidth && currentLine) {
-                lines.push(currentLine);
-                currentLine = word;
-            } else {
-                currentLine = testLine;
-            }
-        });
-
-        if (currentLine) {
-            lines.push(currentLine);
-        }
-
-        return lines;
     };
 
     return (
