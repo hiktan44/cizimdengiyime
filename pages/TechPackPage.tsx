@@ -108,8 +108,8 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 format: 'a4'
             });
 
-            const pageWidth = 297; // A4 landscape width
-            const pageHeight = 210; // A4 landscape height
+            const pageWidth = 297;
+            const pageHeight = 210;
 
             // Load images
             const frontImg = new Image();
@@ -130,74 +130,235 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 })
             ]);
 
-            // ========== PAGE 1: IMAGES ONLY ==========
+            // ========== PAGE 1: TECH PACK SHEET ==========
             const canvas1 = document.createElement('canvas');
             const ctx1 = canvas1.getContext('2d')!;
             canvas1.width = pageWidth * 3.78; // 300 DPI
             canvas1.height = pageHeight * 3.78;
 
-            // White background
             ctx1.fillStyle = '#ffffff';
             ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
 
-            // Simple header bar
-            ctx1.fillStyle = '#1e293b';
-            ctx1.fillRect(0, 0, canvas1.width, 80);
+            const scale = 3.78; // mm to pixels
+            const drawRect = (x: number, y: number, w: number, h: number, fill = false) => {
+                if (fill) ctx1.fillRect(x * scale, y * scale, w * scale, h * scale);
+                else ctx1.strokeRect(x * scale, y * scale, w * scale, h * scale);
+            };
+            const drawText = (text: string, x: number, y: number, align: 'left' | 'center' | 'right' = 'left') => {
+                ctx1.textAlign = align;
+                ctx1.fillText(text, x * scale, y * scale);
+            };
 
-            ctx1.fillStyle = '#ffffff';
-            ctx1.font = 'bold 42px Arial';
-            ctx1.textAlign = 'left';
-            ctx1.fillText('FİCHA DE PRODUCTO - TEKNİK ÖZELLİKLER', 50, 55);
-
-            // Date on right
-            ctx1.font = '24px Arial';
-            ctx1.textAlign = 'right';
-            const date = new Date().toLocaleDateString('tr-TR');
-            ctx1.fillText(date, canvas1.width - 50, 55);
-
-            // Two large images side by side
-            const imgMargin = 100;
-            const imgStartY = 120;
-            const availableWidth = canvas1.width - imgMargin * 3; // space for 2 images + 3 margins
-            const imgWidth = availableWidth / 2;
-            const imgHeight = canvas1.height - imgStartY - 150; // leave space for labels
-
-            // Front view
-            const frontX = imgMargin;
-
-            // Draw white background box
-            ctx1.fillStyle = '#ffffff';
-            ctx1.fillRect(frontX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
-
-            // Draw border
-            ctx1.strokeStyle = '#cbd5e1';
+            // Border
+            ctx1.strokeStyle = '#000000';
             ctx1.lineWidth = 2;
-            ctx1.strokeRect(frontX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
+            drawRect(3, 3, 291, 204);
 
-            // Draw image
-            ctx1.drawImage(frontImg, frontX, imgStartY, imgWidth, imgHeight);
+            // Header section
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(5, 5, 100, 12, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 20px Arial';
+            drawText('FİRMA BİLGİLERİ', 7, 13);
 
-            // Label below
-            ctx1.fillStyle = '#1e293b';
-            ctx1.font = 'bold 32px Arial';
-            ctx1.textAlign = 'center';
-            ctx1.fillText('FRENTE (ÖN)', frontX + imgWidth / 2, imgStartY + imgHeight + 45);
+            ctx1.strokeStyle = '#666666';
+            ctx1.lineWidth = 1;
+            drawRect(5, 18, 100, 20);
+            ctx1.font = '16px Arial';
+            drawText('Firma: Fasheone', 7, 25);
+            drawText('Model No: _________', 7, 32);
+            drawText('Sezon: FW 2026', 7, 39);
 
-            // Back view
-            const backX = imgMargin * 2 + imgWidth;
+            // Product info
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(107, 5, 120, 12, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 20px Arial';
+            drawText('ÜRÜN BİLGİLERİ', 109, 13);
 
-            ctx1.fillStyle = '#ffffff';
-            ctx1.fillRect(backX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
+            ctx1.strokeStyle = '#666666';
+            drawRect(107, 18, 120, 20);
+            ctx1.font = '16px Arial';
+            drawText('Stil No: _________', 109, 25);
+            drawText('Model: Klasik', 109, 32);
+            drawText('Renk: _________', 165, 25);
+            drawText('Beden: _________', 165, 32);
 
-            ctx1.strokeStyle = '#cbd5e1';
-            ctx1.lineWidth = 2;
-            ctx1.strokeRect(backX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
+            // Size table
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(229, 5, 63, 12, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 18px Arial';
+            drawText('BEDEN TABLOSU', 231, 13, 'left');
 
-            ctx1.drawImage(backImg, backX, imgStartY, imgWidth, imgHeight);
+            // Size grid
+            const sizes = ['S', 'M', 'L'];
+            const sizeX = 229;
+            let sizeY = 18;
 
-            ctx1.fillStyle = '#1e293b';
-            ctx1.font = 'bold 32px Arial';
-            ctx1.fillText('ESPALDA (ARKA)', backX + imgWidth / 2, imgStartY + imgHeight + 45);
+            ctx1.font = 'bold 14px Arial';
+            sizes.forEach((size, i) => {
+                drawRect(sizeX + i * 21, sizeY, 21, 8);
+                drawText(size, sizeX + i * 21 + 10.5, sizeY + 6, 'center');
+            });
+
+            // Size values
+            ctx1.font = '14px Arial';
+            for (let i = 0; i < 3; i++) {
+                sizeY += 8;
+                sizes.forEach((_, j) => {
+                    drawRect(sizeX + j * 21, sizeY, 21, 6);
+                    drawText('__', sizeX + j * 21 + 10.5, sizeY + 5, 'center');
+                });
+            }
+
+            // Small product image placeholder
+            ctx1.strokeStyle = '#000000';
+            drawRect(229, 44, 30, 35);
+            ctx1.font = '12px Arial';
+            drawText('ÜRÜN', 244, 62, 'center');
+            drawText('RESMİ', 244, 70, 'center');
+
+            // Main images section
+            const imgY = 42;
+            const imgW = 60;
+            const imgH = 75;
+
+            // FRONT
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(5, imgY, imgW, 8, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 18px Arial';
+            drawText('FRONT', 35, imgY + 6, 'center');
+
+            ctx1.strokeStyle = '#666666';
+            drawRect(5, imgY + 8, imgW, imgH);
+            ctx1.drawImage(frontImg, 5 * scale, (imgY + 8) * scale, imgW * scale, imgH * scale);
+
+            // SCHEMA (middle - empty for annotations)
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(67, imgY, imgW, 8, true);
+            ctx1.fillStyle = '#000000';
+            drawText('SCHEMA', 97, imgY + 6, 'center');
+
+            ctx1.strokeStyle = '#666666';
+            drawRect(67, imgY + 8, imgW, imgH);
+            ctx1.font = '14px Arial';
+            drawText('Detay notları', 97, imgY + 45, 'center');
+            drawText('buraya...', 97, imgY + 55, 'center');
+
+            // BACK
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(129, imgY, imgW, 8, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 18px Arial';
+            drawText('BACK', 159, imgY + 6, 'center');
+
+            ctx1.strokeStyle = '#666666';
+            drawRect(129, imgY + 8, imgW, imgH);
+            ctx1.drawImage(backImg, 129 * scale, (imgY + 8) * scale, imgW * scale, imgH * scale);
+
+            // Measurements Table
+            const tableY = 125;
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(5, tableY, 284, 8, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 16px Arial';
+            drawText('ÖLÇÜ TABLOSU', 8, tableY + 6);
+
+            // Table headers
+            const cols = [
+                { x: 5, w: 50, label: 'PARÇA' },
+                { x: 55, w: 20, label: 'KOD' },
+                { x: 75, w: 50, label: 'ÜRÜN BİLGİSİ' },
+                { x: 125, w: 40, label: 'ÖLÇÜ (CM)' },
+                { x: 165, w: 60, label: 'TÜKETİM MİKTARI' },
+                { x: 225, w: 64, label: 'RENK / MALZEME' }
+            ];
+
+            ctx1.font = 'bold 12px Arial';
+            cols.forEach(col => {
+                drawRect(col.x, tableY + 8, col.w, 6);
+                drawText(col.label, col.x + 2, tableY + 13);
+            });
+
+            // Sample rows (from measurements if available)
+            const measurementLines = result.measurements.split('\n').filter(l => l.trim()).slice(0, 5);
+            let rowY = tableY + 14;
+
+            ctx1.font = '11px Arial';
+            measurementLines.forEach((line) => {
+                drawRect(5, rowY, 50, 6);
+                drawRect(55, rowY, 20, 6);
+                drawRect(75, rowY, 50, 6);
+                drawRect(125, rowY, 40, 6);
+                drawRect(165, rowY, 60, 6);
+                drawRect(225, rowY, 64, 6);
+
+                // Truncate if too long
+                const text = line.length > 45 ? line.substring(0, 45) + '...' : line;
+                drawText(text, 7, rowY + 5);
+
+                rowY += 6;
+            });
+
+            // Add empty rows to fill space
+            for (let i = measurementLines.length; i < 5; i++) {
+                drawRect(5, rowY, 50, 6);
+                drawRect(55, rowY, 20, 6);
+                drawRect(75, rowY, 50, 6);
+                drawRect(125, rowY, 40, 6);
+                drawRect(165, rowY, 60, 6);
+                drawRect(225, rowY, 64, 6);
+                rowY += 6;
+            }
+
+            // Color variants section
+            const colorY = 165;
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(5, colorY, 140, 6, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 14px Arial';
+            drawText('RENK VARYANTları', 8, colorY + 5);
+
+            // Color boxes
+            for (let i = 0; i < 6; i++) {
+                const x = 5 + i * 23;
+                drawRect(x, colorY + 7, 22, 15);
+                ctx1.font = '10px Arial';
+                drawText(`Renk ${i + 1}`, x + 11, colorY + 24, 'center');
+            }
+
+            // Material info
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(148, colorY, 72, 6, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 14px Arial';
+            drawText('KUMAŞ / MALZEME', 150, colorY + 5);
+
+            drawRect(148, colorY + 7, 72, 28);
+            ctx1.font = '11px Arial';
+            drawText('Ana Kumaş: ________', 150, colorY + 12);
+            drawText('Astar: ________', 150, colorY + 20);
+            drawText('Detay: ________', 150, colorY + 28);
+            drawText('Diğer: ________', 150, colorY + 36);
+
+            // Notes section
+            ctx1.fillStyle = '#e5e7eb';
+            drawRect(223, colorY, 66, 6, true);
+            ctx1.fillStyle = '#000000';
+            ctx1.font = 'bold 14px Arial';
+            drawText('NOTLAR', 225, colorY + 5);
+
+            drawRect(223, colorY + 7, 66, 28);
+            ctx1.font = '10px Arial';
+            drawText('Dikkat edilecek', 225, colorY + 12);
+            drawText('hususlar...', 225, colorY + 20);
+
+            // Footer
+            ctx1.font = '10px Arial';
+            ctx1.fillStyle = '#666666';
+            drawText(`Generated by Fasheone - ${new Date().toLocaleDateString('tr-TR')}`, 148, 206, 'center');
 
             // Add page 1 to PDF
             const imgData1 = canvas1.toDataURL('image/jpeg', 0.95);
@@ -234,7 +395,7 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 ctx.font = '26px Arial';
 
                 content.forEach((line, index) => {
-                    if (y > canvas.height - 80) return; // Stop if near bottom
+                    if (y > canvas.height - 80) return;
 
                     // Zebra striping
                     if (index % 2 === 0) {
@@ -271,21 +432,24 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 return canvas.toDataURL('image/jpeg', 0.95);
             };
 
-            // Add measurements pages
+            // Add detail pages for remaining measurements
             const measurements = result.measurements.split('\n').filter(l => l.trim());
-            const measurementsPerPage = 20;
+            if (measurements.length > 5) {
+                const remaining = measurements.slice(5);
+                const perPage = 20;
 
-            for (let i = 0; i < measurements.length; i += measurementsPerPage) {
-                pdf.addPage();
-                const chunk = measurements.slice(i, i + measurementsPerPage);
-                const pageNum = Math.floor(i / measurementsPerPage) + 1;
-                const totalPages = Math.ceil(measurements.length / measurementsPerPage);
-                const title = totalPages > 1
-                    ? `ÖLÇÜLER (${pageNum}/${totalPages})`
-                    : 'ÖLÇÜLER';
+                for (let i = 0; i < remaining.length; i += perPage) {
+                    pdf.addPage();
+                    const chunk = remaining.slice(i, i + perPage);
+                    const pageNum = Math.floor(i / perPage) + 1;
+                    const totalPages = Math.ceil(remaining.length / perPage);
+                    const title = totalPages > 1
+                        ? `DETAYLI ÖLÇÜLER (${pageNum}/${totalPages})`
+                        : 'DETAYLI ÖLÇÜLER';
 
-                const imgData = createTextPage(title, chunk);
-                pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+                    const imgData = createTextPage(title, chunk);
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+                }
             }
 
             // Add specifications pages
