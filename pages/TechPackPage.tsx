@@ -101,28 +101,15 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
         if (!result) return;
 
         try {
-            // Load custom font first
-            const loadFont = () => {
-                return new Promise<void>((resolve) => {
-                    const link = document.createElement('link');
-                    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
-                    link.rel = 'stylesheet';
-                    link.onload = () => resolve();
-                    document.head.appendChild(link);
-                });
-            };
-
-            await loadFont();
-
-            // Create PDF
+            // Create PDF - Landscape A4
             const pdf = new jsPDF({
-                orientation: 'portrait',
+                orientation: 'landscape',
                 unit: 'mm',
                 format: 'a4'
             });
 
-            const pageWidth = 210; // A4 width
-            const pageHeight = 297; // A4 height
+            const pageWidth = 297; // A4 landscape width
+            const pageHeight = 210; // A4 landscape height
 
             // Load images
             const frontImg = new Image();
@@ -143,210 +130,180 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 })
             ]);
 
-            // Page 1: Cover + Images
+            // ========== PAGE 1: IMAGES ONLY ==========
             const canvas1 = document.createElement('canvas');
             const ctx1 = canvas1.getContext('2d')!;
             canvas1.width = pageWidth * 3.78; // 300 DPI
             canvas1.height = pageHeight * 3.78;
 
-            // Background
+            // White background
             ctx1.fillStyle = '#ffffff';
             ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
 
-            // Gradient Header
-            const gradient = ctx1.createLinearGradient(0, 0, canvas1.width, 200);
-            gradient.addColorStop(0, '#6366f1'); // Indigo
-            gradient.addColorStop(1, '#8b5cf6'); // Purple
-            ctx1.fillStyle = gradient;
-            ctx1.fillRect(0, 0, canvas1.width, 200);
+            // Simple header bar
+            ctx1.fillStyle = '#1e293b';
+            ctx1.fillRect(0, 0, canvas1.width, 80);
 
-            // Title
             ctx1.fillStyle = '#ffffff';
-            ctx1.font = 'bold 56px Inter, Arial';
-            ctx1.textAlign = 'center';
-            ctx1.fillText('TEKNİK ÖZELLİKLER', canvas1.width / 2, 100);
-            ctx1.font = '32px Inter, Arial';
-            ctx1.fillText('Technical Specification Sheet', canvas1.width / 2, 150);
+            ctx1.font = 'bold 42px Arial';
+            ctx1.textAlign = 'left';
+            ctx1.fillText('FİCHA DE PRODUCTO - TEKNİK ÖZELLİKLER', 50, 55);
 
-            // Date
-            ctx1.font = '24px Inter, Arial';
-            const date = new Date().toLocaleDateString('tr-TR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            ctx1.fillText(date, canvas1.width / 2, 185);
+            // Date on right
+            ctx1.font = '24px Arial';
+            ctx1.textAlign = 'right';
+            const date = new Date().toLocaleDateString('tr-TR');
+            ctx1.fillText(date, canvas1.width - 50, 55);
 
-            // Images Section
-            const imgStartY = 250;
-            const imgWidth = 500;
-            const imgHeight = 650;
-            const spacing = 80;
+            // Two large images side by side
+            const imgMargin = 100;
+            const imgStartY = 120;
+            const availableWidth = canvas1.width - imgMargin * 3; // space for 2 images + 3 margins
+            const imgWidth = availableWidth / 2;
+            const imgHeight = canvas1.height - imgStartY - 150; // leave space for labels
 
-            // Front View
-            const frontX = (canvas1.width - imgWidth * 2 - spacing) / 2;
+            // Front view
+            const frontX = imgMargin;
 
-            // Border for image
-            ctx1.strokeStyle = '#e2e8f0';
-            ctx1.lineWidth = 3;
-            ctx1.strokeRect(frontX - 15, imgStartY - 15, imgWidth + 30, imgHeight + 80);
+            // Draw white background box
+            ctx1.fillStyle = '#ffffff';
+            ctx1.fillRect(frontX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
 
+            // Draw border
+            ctx1.strokeStyle = '#cbd5e1';
+            ctx1.lineWidth = 2;
+            ctx1.strokeRect(frontX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
+
+            // Draw image
             ctx1.drawImage(frontImg, frontX, imgStartY, imgWidth, imgHeight);
 
-            // Label
+            // Label below
             ctx1.fillStyle = '#1e293b';
-            ctx1.font = 'bold 32px Inter, Arial';
+            ctx1.font = 'bold 32px Arial';
             ctx1.textAlign = 'center';
-            ctx1.fillText('ÖN GÖRÜNÜM', frontX + imgWidth / 2, imgStartY + imgHeight + 50);
+            ctx1.fillText('FRENTE (ÖN)', frontX + imgWidth / 2, imgStartY + imgHeight + 45);
 
-            // Back View
-            const backX = frontX + imgWidth + spacing;
+            // Back view
+            const backX = imgMargin * 2 + imgWidth;
 
-            ctx1.strokeRect(backX - 15, imgStartY - 15, imgWidth + 30, imgHeight + 80);
+            ctx1.fillStyle = '#ffffff';
+            ctx1.fillRect(backX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
+
+            ctx1.strokeStyle = '#cbd5e1';
+            ctx1.lineWidth = 2;
+            ctx1.strokeRect(backX - 10, imgStartY - 10, imgWidth + 20, imgHeight + 70);
+
             ctx1.drawImage(backImg, backX, imgStartY, imgWidth, imgHeight);
 
-            ctx1.fillText('ARKA GÖRÜNÜM', backX + imgWidth / 2, imgStartY + imgHeight + 50);
+            ctx1.fillStyle = '#1e293b';
+            ctx1.font = 'bold 32px Arial';
+            ctx1.fillText('ESPALDA (ARKA)', backX + imgWidth / 2, imgStartY + imgHeight + 45);
 
             // Add page 1 to PDF
             const imgData1 = canvas1.toDataURL('image/jpeg', 0.95);
             pdf.addImage(imgData1, 'JPEG', 0, 0, pageWidth, pageHeight);
 
-            // Page 2: Measurements
-            pdf.addPage();
-            const canvas2 = document.createElement('canvas');
-            const ctx2 = canvas2.getContext('2d')!;
-            canvas2.width = pageWidth * 3.78;
-            canvas2.height = pageHeight * 3.78;
+            // ========== PAGE 2+: TEXT CONTENT ==========
+            const createTextPage = (title: string, content: string[]) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d')!;
+                canvas.width = pageWidth * 3.78;
+                canvas.height = pageHeight * 3.78;
 
-            ctx2.fillStyle = '#ffffff';
-            ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
+                // Background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Header
-            const gradient2 = ctx2.createLinearGradient(0, 0, canvas2.width, 150);
-            gradient2.addColorStop(0, '#6366f1');
-            gradient2.addColorStop(1, '#8b5cf6');
-            ctx2.fillStyle = gradient2;
-            ctx2.fillRect(0, 0, canvas2.width, 150);
+                // Header
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(0, 0, canvas.width, 100);
 
-            ctx2.fillStyle = '#ffffff';
-            ctx2.font = 'bold 48px Inter, Arial';
-            ctx2.textAlign = 'center';
-            ctx2.fillText('ÖLÇÜLER', canvas2.width / 2, 95);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 48px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(title, canvas.width / 2, 65);
 
-            // Content
-            let y = 230;
-            const margin = 100;
-            const lineHeight = 45;
+                // Content area
+                let y = 180;
+                const margin = 80;
+                const lineHeight = 42;
+                const maxWidth = canvas.width - 2 * margin;
 
-            ctx2.textAlign = 'left';
-            ctx2.fillStyle = '#1e293b';
-            ctx2.font = '28px Inter, Arial';
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#1e293b';
+                ctx.font = '26px Arial';
 
-            const measurements = result.measurements.split('\n').filter(line => line.trim());
-            measurements.forEach((line, index) => {
-                if (y > canvas2.height - 100) return;
+                content.forEach((line, index) => {
+                    if (y > canvas.height - 80) return; // Stop if near bottom
 
-                // Alternate row background
-                if (index % 2 === 0) {
-                    ctx2.fillStyle = '#f8fafc';
-                    ctx2.fillRect(margin - 20, y - 35, canvas2.width - 2 * margin + 40, lineHeight);
-                }
+                    // Zebra striping
+                    if (index % 2 === 0) {
+                        ctx.fillStyle = '#f8fafc';
+                        ctx.fillRect(margin - 30, y - 32, canvas.width - 2 * margin + 60, lineHeight);
+                    }
 
-                ctx2.fillStyle = '#1e293b';
-                ctx2.font = '28px Inter, Arial';
+                    ctx.fillStyle = '#1e293b';
+                    ctx.font = '26px Arial';
 
-                // Word wrap
-                const maxWidth = canvas2.width - 2 * margin;
-                const words = line.split(' ');
-                let currentLine = '';
+                    // Word wrap
+                    const words = line.split(' ');
+                    let currentLine = '';
 
-                words.forEach(word => {
-                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
-                    const metrics = ctx2.measureText(testLine);
+                    words.forEach(word => {
+                        const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                        const metrics = ctx.measureText(testLine);
 
-                    if (metrics.width > maxWidth && currentLine) {
-                        ctx2.fillText(currentLine, margin, y);
+                        if (metrics.width > maxWidth && currentLine) {
+                            ctx.fillText(currentLine, margin, y);
+                            y += lineHeight;
+                            currentLine = word;
+                        } else {
+                            currentLine = testLine;
+                        }
+                    });
+
+                    if (currentLine) {
+                        ctx.fillText(currentLine, margin, y);
                         y += lineHeight;
-                        currentLine = word;
-                    } else {
-                        currentLine = testLine;
                     }
                 });
 
-                if (currentLine) {
-                    ctx2.fillText(currentLine, margin, y);
-                    y += lineHeight;
-                }
-            });
+                return canvas.toDataURL('image/jpeg', 0.95);
+            };
 
-            const imgData2 = canvas2.toDataURL('image/jpeg', 0.95);
-            pdf.addImage(imgData2, 'JPEG', 0, 0, pageWidth, pageHeight);
+            // Add measurements pages
+            const measurements = result.measurements.split('\n').filter(l => l.trim());
+            const measurementsPerPage = 20;
 
-            // Page 3: Specifications
-            pdf.addPage();
-            const canvas3 = document.createElement('canvas');
-            const ctx3 = canvas3.getContext('2d')!;
-            canvas3.width = pageWidth * 3.78;
-            canvas3.height = pageHeight * 3.78;
+            for (let i = 0; i < measurements.length; i += measurementsPerPage) {
+                pdf.addPage();
+                const chunk = measurements.slice(i, i + measurementsPerPage);
+                const pageNum = Math.floor(i / measurementsPerPage) + 1;
+                const totalPages = Math.ceil(measurements.length / measurementsPerPage);
+                const title = totalPages > 1
+                    ? `ÖLÇÜLER (${pageNum}/${totalPages})`
+                    : 'ÖLÇÜLER';
 
-            ctx3.fillStyle = '#ffffff';
-            ctx3.fillRect(0, 0, canvas3.width, canvas3.height);
+                const imgData = createTextPage(title, chunk);
+                pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+            }
 
-            // Header
-            const gradient3 = ctx3.createLinearGradient(0, 0, canvas3.width, 150);
-            gradient3.addColorStop(0, '#6366f1');
-            gradient3.addColorStop(1, '#8b5cf6');
-            ctx3.fillStyle = gradient3;
-            ctx3.fillRect(0, 0, canvas3.width, 150);
+            // Add specifications pages
+            const specs = result.specifications.split('\n').filter(l => l.trim());
+            const specsPerPage = 20;
 
-            ctx3.fillStyle = '#ffffff';
-            ctx3.font = 'bold 48px Inter, Arial';
-            ctx3.textAlign = 'center';
-            ctx3.fillText('SPESİFİKASYONLAR', canvas3.width / 2, 95);
+            for (let i = 0; i < specs.length; i += specsPerPage) {
+                pdf.addPage();
+                const chunk = specs.slice(i, i + specsPerPage);
+                const pageNum = Math.floor(i / specsPerPage) + 1;
+                const totalPages = Math.ceil(specs.length / specsPerPage);
+                const title = totalPages > 1
+                    ? `SPESİFİKASYONLAR (${pageNum}/${totalPages})`
+                    : 'SPESİFİKASYONLAR';
 
-            // Content
-            y = 230;
-            ctx3.textAlign = 'left';
-            ctx3.fillStyle = '#1e293b';
-            ctx3.font = '28px Inter, Arial';
-
-            const specs = result.specifications.split('\n').filter(line => line.trim());
-            specs.forEach((line, index) => {
-                if (y > canvas3.height - 100) return;
-
-                if (index % 2 === 0) {
-                    ctx3.fillStyle = '#f8fafc';
-                    ctx3.fillRect(margin - 20, y - 35, canvas3.width - 2 * margin + 40, lineHeight);
-                }
-
-                ctx3.fillStyle = '#1e293b';
-                ctx3.font = '28px Inter, Arial';
-
-                const maxWidth = canvas3.width - 2 * margin;
-                const words = line.split(' ');
-                let currentLine = '';
-
-                words.forEach(word => {
-                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
-                    const metrics = ctx3.measureText(testLine);
-
-                    if (metrics.width > maxWidth && currentLine) {
-                        ctx3.fillText(currentLine, margin, y);
-                        y += lineHeight;
-                        currentLine = word;
-                    } else {
-                        currentLine = testLine;
-                    }
-                });
-
-                if (currentLine) {
-                    ctx3.fillText(currentLine, margin, y);
-                    y += lineHeight;
-                }
-            });
-
-            const imgData3 = canvas3.toDataURL('image/jpeg', 0.95);
-            pdf.addImage(imgData3, 'JPEG', 0, 0, pageWidth, pageHeight);
+                const imgData = createTextPage(title, chunk);
+                pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+            }
 
             // Download
             pdf.save(`fasheone-tech-pack-${Date.now()}.pdf`);
