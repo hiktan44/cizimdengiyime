@@ -1318,3 +1318,170 @@ export const generateProductCollage = async (
         throw e;
     }
 };
+
+/**
+ * Tech Pack Generation - Professional technical drawings with measurements
+ */
+export const generateTechPack = async (
+    productImage: string
+): Promise<{
+    frontView: string;
+    backView: string;
+    measurements: string;
+    specifications: string;
+}> => {
+    checkApiKey();
+
+    try {
+        const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+        // Extract base64 data
+        const base64Data = productImage.split(',')[1];
+        const mimeType = productImage.split(';')[0].split(':')[1];
+
+        const imagePart = {
+            inlineData: {
+                data: base64Data,
+                mimeType: mimeType
+            }
+        };
+
+        // Generate FRONT VIEW technical flat sketch
+        const frontPrompt = `Bu ürün fotoğrafını analiz et ve ÖN GÖRÜNÜM için profesyonel bir 'Teknik Çizim' (Technical Flat Sketch) oluştur.
+
+Kurallar:
+1. Stil: Sadece siyah kontur çizgileri (clean line art). Gölgelendirme, renk veya doku YOK.
+2. Detay: Dikiş yerleri (topstitching), fermuarlar, cepler, ribana detayları, düğmeler, yaka, kol ağzı net bir şekilde çizilmeli.
+3. Ölçü Çizgileri: Önemli ölçü noktalarını gösteren dimension lines ekle (göğüs genişliği, omuz genişliği, kol boyu, ürün boyu).
+4. Perspektif: Ürün tamamen önden, düz (flat) ve simetrik bir şekilde çizilmeli.
+5. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
+6. Kalite: Vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
+7. Etiketler: Önemli detayları etiketle (örn: "Düğme", "Cep", "Fermuar", "Dikiş").`;
+
+        const frontResponse = await ai.models.generateContent({
+            model: 'gemini-3-pro-image-preview',
+            contents: {
+                parts: [imagePart, { text: frontPrompt }]
+            },
+            config: {
+                responseModalities: [Modality.IMAGE],
+                temperature: 0.4,
+            }
+        });
+
+        const frontParts = frontResponse.candidates?.[0]?.content?.parts;
+        let frontView = '';
+        if (frontParts) {
+            for (const part of frontParts) {
+                if (part.inlineData) {
+                    frontView = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    break;
+                }
+            }
+        }
+
+        // Generate BACK VIEW technical flat sketch
+        const backPrompt = `Bu ürün fotoğrafını analiz et ve ARKA GÖRÜNÜM için profesyonel bir 'Teknik Çizim' (Technical Flat Sketch) oluştur.
+
+Kurallar:
+1. Stil: Sadece siyah kontur çizgileri (clean line art). Gölgelendirme, renk veya doku YOK.
+2. Detay: Arka dikiş yerleri, yaka arkası, kol arkası, arka cepler (varsa), arka patleti net bir şekilde çizilmeli.
+3. Ölçü Çizgileri: Önemli ölçü noktalarını gösteren dimension lines ekle.
+4. Perspektif: Ürün tamamen arkadan, düz (flat) ve simetrik bir şekilde çizilmeli.
+5. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
+6. Kalite: Vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
+7. Etiketler: Önemli detayları etiketle (örn: "Arka Dikiş", "Yaka Arkası", "Kol Arkası").`;
+
+        const backResponse = await ai.models.generateContent({
+            model: 'gemini-3-pro-image-preview',
+            contents: {
+                parts: [imagePart, { text: backPrompt }]
+            },
+            config: {
+                responseModalities: [Modality.IMAGE],
+                temperature: 0.4,
+            }
+        });
+
+        const backParts = backResponse.candidates?.[0]?.content?.parts;
+        let backView = '';
+        if (backParts) {
+            for (const part of backParts) {
+                if (part.inlineData) {
+                    backView = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    break;
+                }
+            }
+        }
+
+        // Generate comprehensive technical specifications using TEXT model
+        const specsPrompt = `Bu kıyafeti analiz et ve detaylı teknik spesifikasyon hazırla:
+
+1. ÖLÇÜLER (cm cinsinden):
+- Göğüs/Beden genişliği: [tahmin et]
+- Omuz genişliği: [tahmin et]
+- Kol boyu: [tahmin et]
+- Ürün boyu: [tahmin et]
+- Etek genişliği: [tahmin et]
+- Yaka ölçüleri: [varsa]
+- Kol ağzı ölçüleri: [varsa]
+- Koltuk derinliği: [tahmin et]
+
+2. KUMAŞ VE MALZEME:
+- Ana kumaş: [türü ve ağırlığı]
+- Astar: [varsa]
+- Ara malzeme: [varsa]
+
+3. DİKİŞ DETAYLARI:
+- Dikiş türleri: [301, 401, 504 vb.]
+- Dikiş payları: [standart veya özel]
+- Üst dikiş detayları: [genişlik ve renk]
+
+4. TASARIM ÖZELLİKLERİ:
+- Yaka tipi ve yapısı: [detaylı açıklama]
+- Kol tipi ve yapısı: [detaylı açıklama]
+- Kapama türü: [düğme, fermuar vb.]
+- Cep detayları: [tip, yerleşim, yapı]
+- Etek bitimi: [tip ve ölçü]
+- Kol ağzı bitimi: [varsa]
+
+5. AKSESUAR VE DONANIM:
+- Düğme: [tip, boyut, adet]
+- Fermuar: [tip ve uzunluk, varsa]
+- İplik rengi: [uyumlu veya kontrast]
+
+Profesyonel tech pack formatında sun.`;
+
+        const specsResponse = await ai.models.generateContent({
+            model: 'gemini-3-pro-preview',
+            contents: {
+                parts: [imagePart, { text: specsPrompt }]
+            },
+            config: {
+                temperature: 0.3,
+            }
+        });
+
+        const specsText = specsResponse.text || '';
+
+        // Split measurements and specifications
+        const sections = specsText.split(/2\.\s*KUMAŞ VE MALZEME:/i);
+        const measurements = sections[0].replace(/1\.\s*ÖLÇÜLER.*?:/i, '').trim();
+        const specifications = sections[1] ? '2. KUMAŞ VE MALZEME:' + sections[1] : specsText;
+
+        if (!frontView || !backView) {
+            throw new Error('Tech pack görselleri oluşturulamadı');
+        }
+
+        return {
+            frontView,
+            backView,
+            measurements,
+            specifications
+        };
+
+    } catch (error: any) {
+        console.error('Tech Pack Generation Error:', error);
+        throw new Error(error.message || 'Tech pack oluşturulurken bir hata oluştu');
+    }
+};

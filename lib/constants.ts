@@ -5,6 +5,7 @@ export const CREDIT_COSTS = {
     PRODUCT_TO_MODEL: 1,
     VIDEO: 3,
     TECH_SKETCH: 1, // Teknik çizim maliyeti
+    TECH_PACK: 3, // Tech Pack (ön/arka görünüm + ölçüler + spesifikasyonlar)
     PIXSHOP: 1, // Pixshop fotoğraf düzenleme maliyeti (rötuş, filtre, ayarlama, kırpma, 2K upscale)
     PIXSHOP_4K: 2, // Pixshop 4K upscale maliyeti (ekstra işlem gücü gerektirir)
     FOTOMATIK_TRANSFORM: 1, // Fotomatik görüntü dönüştürme maliyeti

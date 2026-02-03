@@ -14,7 +14,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     flowType: 'pkce',
-    debug: true, // Geçici - debug için
+    debug: false, // Production için kapalı
   },
   global: {
     headers: {
