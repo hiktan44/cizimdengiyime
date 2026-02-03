@@ -76,14 +76,38 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
                 return;
             }
 
-            // AI analiz yap - Sadece TEXT bilgi (measurements + specifications)
-            const imageToAnalyze = frontImage || backImage;
+            // AI TEKNİK ÇİZİM + TEXT ANALİZ
+            let frontTechDrawing = '';
+            let backTechDrawing = '';
             let measurements = '';
             let specifications = '';
 
+            // 1. Ön görselden teknik çizim oluştur
+            if (frontImage) {
+                try {
+                    const frontResult = await generateTechPack(frontImage);
+                    frontTechDrawing = frontResult.frontView; // AI teknik çizim
+                } catch (error) {
+                    console.error('Ön teknik çizim hatası:', error);
+                    frontTechDrawing = frontImage; // Fallback: gerçek resmi kullan
+                }
+            }
+
+            // 2. Arka görselden teknik çizim oluştur
+            if (backImage) {
+                try {
+                    const backResult = await generateTechPack(backImage);
+                    backTechDrawing = backResult.backView; // AI teknik çizim
+                } catch (error) {
+                    console.error('Arka teknik çizim hatası:', error);
+                    backTechDrawing = backImage; // Fallback: gerçek resmi kullan
+                }
+            }
+
+            // 3. TEXT analiz (ölçüler + spesifikasyonlar)
+            const imageToAnalyze = frontImage || backImage;
             if (imageToAnalyze) {
                 try {
-                    // Generate TEXT analysis using AI (gemini-3-pro-preview for text)
                     const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
                     const base64Data = imageToAnalyze.split(',')[1];
                     const mimeType = imageToAnalyze.split(';')[0].split(':')[1];
@@ -148,8 +172,8 @@ Profesyonel tech pack formatında sun. SADECE METIN döndür, görsel oluşturma
             }
 
             const techPackResult = {
-                frontView: frontImage || '',
-                backView: backImage || '',
+                frontView: frontTechDrawing || frontImage || '',
+                backView: backTechDrawing || backImage || '',
                 measurements,
                 specifications
             };
@@ -204,9 +228,9 @@ Profesyonel tech pack formatında sun. SADECE METIN döndür, görsel oluşturma
             const pageWidth = 297;
             const pageHeight = 210;
 
-            // Load images - AI SWAP! AI tersine gönderiyor
+            // Load images for PDF
             const frontImg = new Image(); // AI teknik çizim (ön)  
-            const schemaImg = new Image(); // Gerçek ürün resmi
+            const schemaImg = new Image(); // Gerçek ön fotoğraf
             const backImg = new Image(); // AI teknik çizim (arka)
             frontImg.crossOrigin = 'anonymous';
             schemaImg.crossOrigin = 'anonymous';
@@ -216,17 +240,17 @@ Profesyonel tech pack formatında sun. SADECE METIN döndür, görsel oluşturma
                 new Promise<void>((resolve, reject) => {
                     frontImg.onload = () => resolve();
                     frontImg.onerror = reject;
-                    frontImg.src = result.frontView; // Ön görsel (kullanıcı yükledi)
+                    frontImg.src = result.frontView; // AI teknik çizim (ön)
                 }),
                 new Promise<void>((resolve, reject) => {
                     schemaImg.onload = () => resolve();
                     schemaImg.onerror = reject;
-                    schemaImg.src = result.frontView; // Orta da ön görseli göster
+                    schemaImg.src = frontImage || result.frontView; // GERÇEK ön fotoğraf
                 }),
                 new Promise<void>((resolve, reject) => {
                     backImg.onload = () => resolve();
                     backImg.onerror = reject;
-                    backImg.src = result.backView; // Arka görsel (kullanıcı yükledi)
+                    backImg.src = result.backView; // AI teknik çizim (arka)
                 })
             ]);
 
