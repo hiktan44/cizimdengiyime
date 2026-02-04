@@ -10,7 +10,7 @@ import { analyzeProductImage, generateAdPrompts, generateAdImage, generateAdVide
 import { ProductAnalysis, AdPrompt, GenerationResult, FormData, AppStep, AdStyle, ImageModel, VideoModel, GenerationMode, AspectRatio } from './adgenius';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
-import { WhatsAppPanel } from '../components/WhatsAppPanel';
+
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 import { Sparkles, Upload, BrainCircuit, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
 
@@ -168,11 +168,6 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
   }, []);
 
   const t = translations[language];
-  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined;
-  const whatsappMessage = language === 'tr'
-    ? 'Merhaba, AdGenius konusunda destek almak istiyorum.'
-    : 'Hi, I would like help with AdGenius.';
-  const whatsappSubtitle = language === 'tr' ? 'Hemen yazın' : 'Message now';
 
   const [step, setStep] = useState<AppStep>('upload');
   const [formData, setFormData] = useState<FormData>({
@@ -721,13 +716,6 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
           </div>
         </div>
       )}
-
-      <WhatsAppPanel
-        phoneNumber={whatsappNumber}
-        message={whatsappMessage}
-        title="WhatsApp"
-        subtitle={whatsappSubtitle}
-      />
 
 
     </div>

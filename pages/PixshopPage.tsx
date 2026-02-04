@@ -16,7 +16,6 @@ import StartScreen from '../components/pixshop/StartScreen';
 import { UndoIcon, RedoIcon, EyeIcon, ZoomInIcon, ZoomOutIcon, ArrowsPointingOutIcon, DownloadIcon, MagicWandIcon, EraserIcon, SplitIcon } from '../components/pixshop/icons';
 import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
-import { WhatsAppPanel } from '../components/WhatsAppPanel';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 
 interface PixshopPageProps {
@@ -210,11 +209,6 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
   const t = translations[language];
   const TABS = getTabs(language);
-  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined;
-  const whatsappMessage = language === 'tr'
-    ? 'Merhaba, Pixshop konusunda destek almak istiyorum.'
-    : 'Hi, I would like help with Pixshop.';
-  const whatsappSubtitle = language === 'tr' ? 'Hemen yazin' : 'Message now';
 
   // Hotspot for API
   const [editHotspot, setEditHotspot] = useState<{ x: number, y: number } | null>(null);
@@ -1498,12 +1492,6 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       <main className={`flex-grow w-full max-w-[1600px] mx-auto flex justify-center ${currentImage ? 'items-start' : 'items-center'}`}>
         {renderContent()}
       </main>
-      <WhatsAppPanel
-        phoneNumber={whatsappNumber}
-        message={whatsappMessage}
-        title="WhatsApp"
-        subtitle={whatsappSubtitle}
-      />
     </div>
   );
 };

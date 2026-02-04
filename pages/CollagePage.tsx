@@ -7,7 +7,6 @@ import React, { useState, useCallback } from 'react';
 import { Profile, CREDIT_COSTS } from '../lib/supabase';
 import { checkAndDeductCredits, saveGeneration } from '../lib/database';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
-import { WhatsAppPanel } from '../components/WhatsAppPanel';
 import { Layout } from '../components/Layout';
 import { VideoSettingsModal } from '../components/VideoSettingsModal';
 import { VideoGenerationSettings, generateVideoFromImage, generateProductCollage } from '../services/geminiService';
@@ -90,9 +89,6 @@ const magicTranslations = {
     }
 };
 
-const whatsappNumber = '+905326121347';
-const whatsappMessage = 'Merhaba, Kolaj Stüdyosu hakkında bilgi almak istiyorum.';
-const whatsappSubtitle = 'Sorularınız için bize ulaşın';
 
 export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
     const [language] = useState<Language>(() => {
@@ -1108,12 +1104,6 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                 onGenerate={handleVideoGeneration}
             />
 
-            <WhatsAppPanel
-                phoneNumber={whatsappNumber}
-                message={whatsappMessage}
-                title="WhatsApp"
-                subtitle={whatsappSubtitle}
-            />
 
             {/* Product Image Enlarge Modal */}
             {

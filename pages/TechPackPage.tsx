@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { generateTechPack } from '../services/geminiService';
 import { uploadBase64ToStorage, saveGeneration, checkAndDeductCredits } from '../lib/database';
 import { CREDIT_COSTS } from '../lib/supabase';
-import { WhatsAppPanel } from '../components/WhatsAppPanel';
 import jsPDF from 'jspdf';
 import { GoogleGenAI } from '@google/genai';
 
@@ -28,9 +27,6 @@ const TechPackPage: React.FC<TechPackPageProps> = ({ profile, onRefreshProfile, 
     const frontInputRef = useRef<HTMLInputElement>(null);
     const backInputRef = useRef<HTMLInputElement>(null);
 
-    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '';
-    const whatsappMessage = encodeURIComponent('Merhaba! Tech Pack hakkında bilgi almak istiyorum.');
-    const whatsappSubtitle = 'Teknik çizim desteği için';
 
     const handleFrontImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -807,12 +803,6 @@ Profesyonel tech pack formatında sun. SADECE METIN döndür, görsel oluşturma
                 </div>
             </div>
 
-            <WhatsAppPanel
-                phoneNumber={whatsappNumber}
-                message={whatsappMessage}
-                title="WhatsApp"
-                subtitle={whatsappSubtitle}
-            />
         </div>
     );
 };
