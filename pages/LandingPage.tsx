@@ -458,6 +458,100 @@ const translations = {
       step2Desc: 'Choose your style with ready templates and options, no prompts needed',
       step3Title: 'Generate & Download',
       step3Desc: 'Download professional results instantly, create videos, share on social media',
+      useCases: {
+        title: 'Powerful Features',
+        subtitle: 'Solutions for Every Need',
+        feature1: {
+          title: 'Sketch to Product',
+          desc: 'Transform your fashion sketches into ultra-realistic ghost mannequin product photos. Upload your simple charcoal or digital technical drawings, AI detects fabric, stitching and details to create professional product images.',
+          features: [
+            'Automatic fabric texture and color analysis',
+            'Stitch and detail preservation',
+            'Studio quality lighting',
+            'Optimized outputs for E-commerce'
+          ]
+        },
+        feature2: {
+          title: 'Live Model',
+          desc: 'See your products on real models. Get studio-quality results with AI models featuring different skin tones, hairstyles, and poses. Eliminate physical model costs.',
+          features: [
+            'Various ethnicity and body type options',
+            '12+ different professional poses',
+            'Customizable background and setting',
+            'Brand identity with consistent model usage'
+          ]
+        },
+        feature3: {
+          title: 'Video Generation',
+          desc: 'Transform your visuals into 5-10 second professional videos. Create cinematic videos for your model walking, turning, or posing. Perfect content for social media and e-commerce.',
+          features: [
+            'Cinematic camera movements',
+            'Slow-motion effects',
+            'Social media formats (Reels, TikTok, Shorts)',
+            'High resolution 2K/4K output'
+          ]
+        },
+        feature4: {
+          title: 'Technical Drawing (Tech Pack)',
+          desc: 'Transform your product photos into detailed technical drawings for production. AI automatically detects stitch paths and pattern pieces on the product providing clear lines.',
+          features: [
+            'Automatic stitch and pattern analysis',
+            'Production-ready technical drawings',
+            'Measurement and detail preservation',
+            'Ideal format for supplier sharing'
+          ]
+        },
+        feature5: {
+          title: 'Pixshop - Photo Editing',
+          desc: 'AI-powered professional retouching, filters, adjustments, and 4K upscaling. Perfect your photos in seconds with face swap and logo addition features. No Photoshop knowledge required.',
+          features: [
+            'Smart retouching and color correction',
+            'Professional filter and atmosphere settings',
+            '2K/4K upscaling technology',
+            'Face swap and logo/accessory addition'
+          ]
+        },
+        feature6: {
+          title: 'Fotomatik - Batch Processing',
+          desc: 'Process multiple images simultaneously. Background removal, batch editing, and quick catalog preparation. Reduce manual tasks from hours to minutes.',
+          features: [
+            'Batch background removal',
+            'Automatic image enhancement',
+            'Quick catalog preparation',
+            'Prompt engineering and analysis'
+          ]
+        },
+        collage: {
+          title: 'Collage Creation',
+          desc: 'Create multiple variations from a single product. Prepare rich catalogs with different colors, poses, and backgrounds. Produce impressive content for e-commerce and social media by combining 4-16 images in a single collage.',
+          features: [
+            'Automatic grid layout and professional design',
+            'Different color and style variations',
+            'Ideal format for e-commerce catalogs',
+            'Optimized sizes for social media posts'
+          ]
+        },
+        adMedia: {
+          title: 'Ad Media',
+          desc: 'Produce studio-quality visuals and videos for professional ad campaigns. Highlight your brand with different settings, models, and scenarios. Create billboard, magazine, and digital ad content in seconds with AI.',
+          features: [
+            'Studio-quality model visuals',
+            'Customizable background and setting options',
+            '5-10 second cinematic video content',
+            'Style and atmosphere control suitable for brand identity'
+          ]
+        },
+        ecommerce: {
+          title: 'E-commerce Solutions',
+          desc: 'Prepare a complete visual content package for your online store. Product photos, model visuals, technical drawings, and promotional videos in one platform. Reduce your catalog preparation time by 90% and minimize costs.',
+          features: [
+            'Ghost mannequin and model visuals',
+            'Product photos from different angles',
+            'Technical drawing and size charts',
+            'Quick catalog preparation with batch processing'
+          ]
+        }
+      }
     },
     hero: {
       title: 'From Sketch to Reality,',
