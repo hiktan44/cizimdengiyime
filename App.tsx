@@ -54,7 +54,7 @@ import { FotomatikPage } from './pages/FotomatikPage';
 import { AdgeniusPage } from './pages/AdgeniusPage';
 import { CollagePage } from './pages/CollagePage';
 import TechPackPage from './pages/TechPackPage';
-import { WhatsAppPanel } from './components/WhatsAppPanel';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { trackEvent, ANALYTICS_EVENTS } from './utils/analytics';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { KVKKPage } from './pages/KVKKPage';
@@ -760,11 +760,9 @@ const ToolPage: React.FC<{
 
         return (
             <div className="min-h-screen flex flex-col bg-slate-900">
-                <WhatsAppPanel
+                <FloatingWhatsApp
                     phoneNumber={import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined}
-                    message="Merhaba, Canli Model ve Teknik Cizim konusunda destek almak istiyorum."
-                    title="WhatsApp"
-                    subtitle="Hemen yazin"
+                    message="Merhaba, Canlı Model ve Teknik Çizim konusunda destek almak istiyorum."
                 />
                 <Header
                     isLoggedIn={isLoggedIn}
