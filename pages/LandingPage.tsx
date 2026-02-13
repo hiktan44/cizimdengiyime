@@ -969,6 +969,14 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Scroll to top button visibility
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const t = translations[language];
 
   const bgClass = theme === 'dark'
@@ -2939,6 +2947,29 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           </div>
         </div>
       </footer >
+
+      {/* Scroll to Top Button */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={`fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 group ${showScrollTop
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 translate-y-10 pointer-events-none'
+          } ${theme === 'dark'
+            ? 'bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-cyan-500/30 hover:shadow-cyan-400/50'
+            : 'bg-gradient-to-br from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 shadow-cyan-600/30 hover:shadow-cyan-500/50'
+          }`}
+        aria-label="Sayfanın başına dön"
+      >
+        <svg
+          className="w-6 h-6 text-white group-hover:-translate-y-0.5 transition-transform duration-300"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth={2.5}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+        </svg>
+      </button>
     </div >
   );
 };
