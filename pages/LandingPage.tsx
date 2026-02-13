@@ -2951,7 +2951,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       {/* Scroll to Top Button */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-8 right-8 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 group ${showScrollTop
+        className={`fixed bottom-28 right-6 z-[130] w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 group ${showScrollTop
             ? 'opacity-100 translate-y-0 pointer-events-auto'
             : 'opacity-0 translate-y-10 pointer-events-none'
           } ${theme === 'dark'
@@ -2961,7 +2961,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         aria-label="Sayfanın başına dön"
       >
         <svg
-          className="w-6 h-6 text-white group-hover:-translate-y-0.5 transition-transform duration-300"
+          className="w-5 h-5 text-white group-hover:-translate-y-0.5 transition-transform duration-300"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
