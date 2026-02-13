@@ -73,9 +73,15 @@ export const analyzeProductImage = async (file: File): Promise<ProductAnalysis> 
       // New fields for E-commerce text
       eticaret_baslik: { type: Type.STRING, description: "SEO friendly impressive product title" },
       eticaret_aciklama: { type: Type.STRING, description: "Persuasive marketing description paragraph" },
-      eticaret_ozellikler: { type: Type.ARRAY, items: { type: Type.STRING }, description: "List of bullet points for product page" }
+      eticaret_ozellikler: { type: Type.ARRAY, items: { type: Type.STRING }, description: "List of bullet points for product page" },
+      // Detail preservation fields
+      urun_uzerindeki_yazilar: { type: Type.ARRAY, items: { type: Type.STRING }, description: "ALL text, letters, numbers, words found on the product surface. Transcribe each text element EXACTLY character by character. If no text, return empty array." },
+      urun_uzerindeki_logolar: { type: Type.ARRAY, items: { type: Type.STRING }, description: "ALL logos/brand marks found on the product. Describe each logo in detail: shape, colors, position, size. If no logo, return empty array." },
+      urun_uzerindeki_etiketler: { type: Type.ARRAY, items: { type: Type.STRING }, description: "ALL visible tags, labels, badges on the product. If none, return empty array." },
+      urun_uzerindeki_baskialar: { type: Type.ARRAY, items: { type: Type.STRING }, description: "ALL prints, graphics, embroideries, patches on the product. Describe each in detail. If none, return empty array." },
+      ozel_detaylar: { type: Type.ARRAY, items: { type: Type.STRING }, description: "ALL special construction details: zipper style/color, button type/count/material, stitch patterns, hardware (buckles/clasps), pockets, seam lines, decorative elements. Be extremely thorough." }
     },
-    required: ["urun_adi", "urun_kategorisi", "ana_renk", "malzeme", "stil", "eticaret_baslik", "eticaret_aciklama", "eticaret_ozellikler"]
+    required: ["urun_adi", "urun_kategorisi", "ana_renk", "malzeme", "stil", "eticaret_baslik", "eticaret_aciklama", "eticaret_ozellikler", "urun_uzerindeki_yazilar", "urun_uzerindeki_logolar", "ozel_detaylar"]
   };
 
   const response = await ai.models.generateContent({
@@ -89,22 +95,30 @@ export const analyzeProductImage = async (file: File): Promise<ProductAnalysis> 
           }
         },
         {
-          text: `Bu görseldeki ürünü **Profesyonel E-Ticaret İçerik Yazarı** ve **Kıdemli Moda Tasarımcısı** kimliğiyle analiz et.
-          
-          Görevin iki aşamalıdır:
-          1. Görsel Üretimi İçin Teknik Analiz: Renk, doku ve kalıp detaylarını çıkar.
-          2. Satış Odaklı İçerik Üretimi: Bu ürünü Trendyol, Amazon veya lüks bir butik sitesinde satmak için gereken metinleri yaz.
+          text: `Bu görseldeki ürünü **Profesyonel E-Ticaret İçerik Yazarı**, **Kıdemli Moda Tasarımcısı** ve **Detay Uzmanı** kimliğiyle analiz et.
+           
+           Görevin ÜÇ aşamalıdır:
+           1. Görsel Üretimi İçin Teknik Analiz: Renk, doku ve kalıp detaylarını çıkar.
+           2. Satış Odaklı İçerik Üretimi: Bu ürünü Trendyol, Amazon veya lüks bir butik sitesinde satmak için gereken metinleri yaz.
+           3. **KRİTİK - DETAY TESPİTİ:** Ürün üzerindeki TÜM yazıları, logoları, etiketleri, baskıları ve özel detayları tespit et.
 
-          **Teknik Analiz Kuralları:**
-          - Renkleri Pantone hassasiyetinde tanımla.
-          - Kumaş dokusunu ve kalıp özelliklerini (Slim-fit, Oversize, Reglan kol vb.) teknik terimlerle belirt.
+           **Teknik Analiz Kuralları:**
+           - Renkleri Pantone hassasiyetinde tanımla.
+           - Kumaş dokusunu ve kalıp özelliklerini (Slim-fit, Oversize, Reglan kol vb.) teknik terimlerle belirt.
 
-          **E-Ticaret Metni Kuralları (Ciddi ve Profesyonel Ton):**
-          - **Başlık (eticaret_baslik):** SEO uyumlu, markayı ve ürünün en can alıcı özelliğini içeren çarpıcı bir başlık.
-          - **Açıklama (eticaret_aciklama):** Müşteriyi satın almaya ikna eden akıcı bir paragraf.
-          - **Özellikler (eticaret_ozellikler):** Müşterinin hızlıca okuyabileceği, fayda odaklı 5-7 adet madde işareti.
+           **E-Ticaret Metni Kuralları (Ciddi ve Profesyonel Ton):**
+           - **Başlık (eticaret_baslik):** SEO uyumlu, markayı ve ürünün en can alıcı özelliğini içeren çarpıcı bir başlık.
+           - **Açıklama (eticaret_aciklama):** Müşteriyi satın almaya ikna eden akıcı bir paragraf.
+           - **Özellikler (eticaret_ozellikler):** Müşterinin hızlıca okuyabileceği, fayda odaklı 5-7 adet madde işareti.
 
-          Çıktı tamamen JSON formatında olmalıdır.`
+           **DETAY TESPİTİ KURALLARI (ÇOK ÖNEMLİ):**
+           - **urun_uzerindeki_yazilar:** Ürün üzerinde görünen HER YAZI, HARF, RAKAM ve KELIME'yi karakter karakter, BÜYÜK/küçük harf ayrımıyla birebir yazınız. Yazı konumunu da belirtiniz (örn: "Nike" - göğüs sol üst, "AIR MAX" - taban).
+           - **urun_uzerindeki_logolar:** Her logoyu detaylı tanımlayın: şekli, renkleri, konumu, boyutu, stili (baskı/nakış/kabartma). Örnek: "Nike Swoosh - siyah, göğüs sol, 3cm, nakış".
+           - **urun_uzerindeki_etiketler:** Görünür etiketler, boyun etiketi, fiyat etiketi, beden etiketi vb.
+           - **urun_uzerindeki_baskialar:** Baskılar, grafikler, nakışlar, yamalar, desenler hakkında detaylı bilgi.
+           - **ozel_detaylar:** Fermuar (renk, tip), düğme (sayı, malzeme, renk), dikiş desenleri, metal aksesuarlar (toka, kopça), cep tipleri, yaka detayları, manşet detayları gibi TÜM yapısal öğeleri listeleyin.
+
+           Çıktı tamamen JSON formatında olmalıdır.`
         }
       ]
     },
@@ -203,28 +217,64 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
   3. CONSISTENCY: Do not generate random faces. Use the Seed to lock facial structure.
   4. NO DRIFTING: Even if the pose changes, the person's identity (face, race, age) MUST remain 100% frozen.
 
-  CHARACTER & CLOTHING CONTINUITY (ABSOLUTE RULES):
-  1. CHARACTER CONSISTENCY: You MUST render the EXACT SAME PERSON in every frame. Facial features, hair texture/style, and body proportions must be 100% identical as if shot in the same session.
-  2. CLOTHING FIDELITY: The clothing piece (${analysis.urun_adi}) must be the EXACT SAME garment from the reference image. Do not change seams, buttons, drapery patterns, or structural details.
-  3. NO DRIFT: Do not allow the model's face or the garment's design to drift or vary between different poses.
+   CHARACTER & CLOTHING CONTINUITY (ABSOLUTE RULES):
+   1. CHARACTER CONSISTENCY: You MUST render the EXACT SAME PERSON in every frame. Facial features, hair texture/style, and body proportions must be 100% identical as if shot in the same session.
+   2. CLOTHING FIDELITY: The clothing piece (${analysis.urun_adi}) must be the EXACT SAME garment from the reference image. Do not change seams, buttons, drapery patterns, or structural details.
+   3. NO DRIFT: Do not allow the model's face or the garment's design to drift or vary between different poses.
 
-  TASK: ${brandInstruction} Visualize the product from reference image worn by the specific model described below.
-  
-  PRODUCT PRESERVATION RULES (ABSOLUTE):
-  1. CRITICAL: The product design, cut, and silhouette MUST BE 100% IDENTICAL to the reference image. No exceptions.
-  2. ZERO ALTERATION: Do not change neckline, sleeve length, pocket placement, stitch lines, or hem of the product. It must be the exact same physical unit.
-  3. COLOR/TEXTURE FIDELITY: The product color/texture MUST match the reference (or the specific transformation requested below) exactly.
-  4. MATERIAL: Emphasize the ${analysis.malzeme} texture with extreme high-fidelity detail.
-  
-  MODEL IDENTIFICATION:
-  - Reference Model: **${consistentModelDesc}**
-  
-  TECHNICAL QUALITY: ${selectedStyle}. 8k resolution, hyper-realistic, sharp focus, professional three-point lighting, clean textures.
-  
-  ${textRenderingInstruction}
-  
-  ${userCustomInstruction}
-  `;
+   TASK: ${brandInstruction} Visualize the product from reference image worn by the specific model described below.
+   
+   PRODUCT PRESERVATION RULES (ABSOLUTE):
+   1. CRITICAL: The product design, cut, and silhouette MUST BE 100% IDENTICAL to the reference image. No exceptions.
+   2. ZERO ALTERATION: Do not change neckline, sleeve length, pocket placement, stitch lines, or hem of the product. It must be the exact same physical unit.
+   3. COLOR/TEXTURE FIDELITY: The product color/texture MUST match the reference (or the specific transformation requested below) exactly.
+   4. MATERIAL: Emphasize the ${analysis.malzeme} texture with extreme high-fidelity detail.
+   
+   *** CRITICAL: TEXT, LOGO & DETAIL FIDELITY (HIGHEST PRIORITY) ***
+   The following details from the reference image MUST be reproduced with PIXEL-PERFECT accuracy:
+   ${analysis.urun_uzerindeki_yazilar?.length > 0 ? `
+   TEXT ON PRODUCT (REPRODUCE EXACTLY - ZERO SPELLING ERRORS):
+   ${analysis.urun_uzerindeki_yazilar.map((t: string, i: number) => `   ${i + 1}. "${t}" - Reproduce this text CHARACTER BY CHARACTER. Every letter, every number, every space must be EXACTLY as shown. NO misspelling, NO rearranging, NO omitting any character.`).join('\n')}
+   TEXT RENDERING RULES:
+   - Each character must be the EXACT same font style, weight, and size as in the reference.
+   - Text color must match the original precisely.
+   - Text position/placement on the garment must be identical.
+   - If text is curved, angled, or styled, replicate that exact styling.
+   - DOUBLE-CHECK every letter before finalizing. Spelling errors are UNACCEPTABLE.
+   ` : ''}
+   ${analysis.urun_uzerindeki_logolar?.length > 0 ? `
+   LOGOS ON PRODUCT (REPRODUCE WITH SURGICAL PRECISION):
+   ${analysis.urun_uzerindeki_logolar.map((l: string, i: number) => `   ${i + 1}. ${l} - This logo must be reproduced with pixel-level fidelity. Every curve, every color, every proportion must match the reference exactly.`).join('\n')}
+   LOGO RENDERING RULES:
+   - Logo proportions (width:height ratio) must be EXACT.
+   - Logo colors must be IDENTICAL to the reference (no approximation).
+   - Logo placement and size relative to the garment must match perfectly.
+   - Internal details of logos (small elements, thin lines, dots) must NOT be lost or simplified.
+   - If a logo has text inside it, that text must be spelled correctly.
+   ` : ''}
+   ${analysis.ozel_detaylar?.length > 0 ? `
+   CONSTRUCTION DETAILS (PRESERVE ALL):
+   ${analysis.ozel_detaylar.map((d: string, i: number) => `   ${i + 1}. ${d}`).join('\n')}
+   - Every zipper, button, stitch pattern, hardware piece, and structural element must be visible and accurate.
+   ` : ''}
+   ${analysis.urun_uzerindeki_baskialar?.length > 0 ? `
+   PRINTS & GRAPHICS (EXACT REPRODUCTION):
+   ${analysis.urun_uzerindeki_baskialar.map((b: string, i: number) => `   ${i + 1}. ${b} - Reproduce with full fidelity including colors, gradients, and fine details.`).join('\n')}
+   ` : ''}
+   ${analysis.urun_uzerindeki_etiketler?.length > 0 ? `
+   VISIBLE LABELS/TAGS:
+   ${analysis.urun_uzerindeki_etiketler.map((e: string, i: number) => `   ${i + 1}. ${e}`).join('\n')}
+   ` : ''}
+   
+   MODEL IDENTIFICATION:
+   - Reference Model: **${consistentModelDesc}**
+   
+   TECHNICAL QUALITY: ${selectedStyle}. 8k resolution, hyper-realistic, sharp focus, professional three-point lighting, clean textures.
+   
+   ${textRenderingInstruction}
+   
+   ${userCustomInstruction}
+   `;
 
   // Pre-process Color Variations
   let colorList: string[] = [];
@@ -481,12 +531,46 @@ export const generateAdImage = async (
       });
     }
 
-    let finalPrompt = promptText;
+    // MASTER DETAIL FIDELITY INSTRUCTION (appended to ALL prompts)
+    const detailFidelityBlock = `
+    
+    *** ABSOLUTE DETAIL FIDELITY RULES (APPLY TO EVERY GENERATION) ***
+    STUDY the reference image(s) with EXTREME attention to detail before generating:
+    
+    1. TEXT FIDELITY (ZERO TOLERANCE FOR ERRORS):
+       - ANY text, letters, numbers, words visible on the product MUST be reproduced CHARACTER BY CHARACTER.
+       - Spelling must be 100% correct - double-check every single letter.
+       - Font style, font weight, font size, text color, and text placement must EXACTLY match the reference.
+       - If text is curved, embossed, printed, or embroidered, replicate that exact technique.
+       - Common error to AVOID: Do NOT hallucinate, add, remove, or misspell any text.
+    
+    2. LOGO FIDELITY (SURGICAL PRECISION):
+       - Every logo, brand mark, emblem, or symbol must be reproduced with pixel-level accuracy.
+       - Logo proportions (aspect ratio) must be EXACT - do not stretch or compress.
+       - Logo colors must be IDENTICAL to the reference.  
+       - Internal details of logos (thin lines, small dots, curves, negative space) must NOT be simplified or lost.
+       - Logo placement and size relative to the garment must be precisely maintained.
+    
+    3. CONSTRUCTION DETAIL FIDELITY:
+       - ALL buttons (count, material, color, size, placement) must match exactly.
+       - ALL zippers (color, type, length, pull style) must be accurate.
+       - Stitch patterns, seam lines, and topstitching must be visible and correct.
+       - Hardware (buckles, clasps, rivets, grommets, snaps) must be reproduced faithfully.
+       - Pockets (type, position, flap style) must match the reference precisely.
+       - Collar/neckline shape, cuffs, hems must be identical.
+    
+    4. PRINT/GRAPHIC FIDELITY:
+       - Any prints, graphics, embroideries, or patches must be reproduced in full detail.
+       - Colors, gradients, and fine lines within prints must be accurate.
+       - Scale and position of graphics on the garment must match exactly.
+    `;
+
+    let finalPrompt = promptText + detailFidelityBlock;
 
     // Logic for Multi-Image Prompts
     if (optionalImageB64 && patternImageB64) {
       finalPrompt = `TASK: Use three reference images provided.
-      IMAGE 1: MAIN PRODUCT.
+      IMAGE 1: MAIN PRODUCT - Study ALL text, logos, and details on this product carefully.
       IMAGE 2: SECONDARY REFERENCE (Back view or Accessory).
       IMAGE 3: PATTERN/TEXTURE REFERENCE.
       
@@ -497,19 +581,24 @@ export const generateAdImage = async (
          - Apply the PATTERN from Image 3 onto the fabric of the product in Image 1.
          - GEOMETRY PRESERVATION: The pattern must curve and distort perfectly around the folds, creases, and body shape of the model.
          - LIGHTING INTEGRATION: The pattern must respond to the scene's lighting (gloss, shadows, ambient occlusion) exactly like the original material.
+      4. DETAIL PRESERVATION: Even with pattern applied, preserve all logos, text, labels, and hardware from Image 1 exactly as they appear.
+      ${detailFidelityBlock}
       
       SCENE DESCRIPTION:
       ${promptText}`;
     } else if (optionalImageB64) {
       finalPrompt = `TASK: Use two reference images provided.
-      IMAGE 1: MAIN PRODUCT.
+      IMAGE 1: MAIN PRODUCT - Study ALL text, logos, and details on this product carefully.
       IMAGE 2: SECONDARY REFERENCE (Back view or Accessory).
       Instruction: Incorporate elements from both images naturally into the scene.
+      CRITICAL: All text, logos, labels, and construction details from Image 1 MUST be preserved exactly.
+      ${detailFidelityBlock}
+      
       SCENE DESCRIPTION:
       ${promptText}`;
     } else if (patternImageB64) {
       finalPrompt = `TASK: Virtual Try-On / Texture Replacement.
-      IMAGE 1: MAIN PRODUCT (Model wearing original item).
+      IMAGE 1: MAIN PRODUCT (Model wearing original item) - Study ALL text, logos, and details carefully.
       IMAGE 2: PATTERN SWATCH (Texture Source).
       
       CRITICAL EXECUTION TASK:
@@ -518,6 +607,8 @@ export const generateAdImage = async (
       3. PRESERVE GEOMETRY: Keep all original folds, creases, seams, buttons, and the exact silhouette of the clothing.
       4. MATERIAL PHYSICS: The new pattern must behave like the original fabric (e.g., if silk, keep shine; if cotton, keep matte look).
       5. LIGHTING: Ensure the pattern has correct shadows and highlights based on the environment.
+      6. DETAIL PRESERVATION: Even with new pattern, ALL logos, text, labels, buttons, zippers, hardware must remain EXACTLY as in Image 1.
+      ${detailFidelityBlock}
       
       SCENE DESCRIPTION:
       ${promptText}`;

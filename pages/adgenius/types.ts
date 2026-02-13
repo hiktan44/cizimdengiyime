@@ -15,6 +15,12 @@ export interface ProductAnalysis {
   eticaret_baslik: string;
   eticaret_aciklama: string;
   eticaret_ozellikler: string[];
+  // Detail preservation fields
+  urun_uzerindeki_yazilar: string[]; // All text/writing found on the product
+  urun_uzerindeki_logolar: string[]; // All logos found on the product
+  urun_uzerindeki_etiketler: string[]; // Tags, labels, badges on the product
+  urun_uzerindeki_baskialar: string[]; // Prints, graphics, embroidery on the product
+  ozel_detaylar: string[]; // Special details: zippers, buttons, stitching patterns, hardware
 }
 
 export type AdStyle =
