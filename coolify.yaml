@@ -1,0 +1,44 @@
+# Coolify Configuration File
+# Bu dosya Coolify v4+ için otomatik deployment yapılandırmasıdır
+
+version: "1.0"
+
+services:
+  # Backend API Service
+  backend:
+    type: nodejs
+    name: cizimdengiyime-backend
+    buildPath: ./server
+    buildCommand: npm install
+    startCommand: npm start
+    port: 3001
+    healthCheckPath: /api/health
+    healthCheckMethod: GET
+    healthCheckInterval: 30
+    healthCheckTimeout: 10
+    healthCheckRetries: 3
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+    domains:
+      - type: auto
+        port: 3001
+    
+  # Frontend Service
+  frontend:
+    type: static
+    name: cizimdengiyime-frontend
+    buildPath: ./
+    buildCommand: npm install && npm run build
+    publishDirectory: dist
+    port: 80
+    healthCheckPath: /health
+    healthCheckMethod: GET
+    healthCheckInterval: 30
+    domains:
+      - type: auto
+        port: 80
+    redirects:
+      - from: "/*"
+        to: "/index.html"
+        status: 200

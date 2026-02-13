@@ -1,0 +1,1793 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Fasheone Mobile API",
+        "description": "Fasheone AI Moda Platformu için kapsamlı REST API. Mobil uygulamalar, üçüncü parti entegrasyonlar ve B2B kullanım için tasarlanmıştır.\n\n## Özellikler\n- 🔐 Supabase Authentication\n- 🎨 AI Görsel Oluşturma (Gemini AI)\n- 💳 Stripe Ödeme Entegrasyonu\n- 👑 Admin Dashboard API\n\n## Kredi Sistemi\nTüm AI işlemleri kredi harcar. Kullanıcılar kredi satın alabilir veya abonelik planlarına geçebilir.",
+        "version": "1.0.0",
+        "contact": {
+            "name": "Fasheone Support",
+            "email": "support@fasheone.com",
+            "url": "https://fasheone.com"
+        },
+        "license": {
+            "name": "Proprietary",
+            "url": "https://fasheone.com/terms"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://api.fasheone.com/api/v1",
+            "description": "Production Server"
+        },
+        {
+            "url": "http://localhost:3002/api/v1",
+            "description": "Development Server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Kimlik doğrulama işlemleri"
+        },
+        {
+            "name": "User",
+            "description": "Kullanıcı profili ve geçmişi"
+        },
+        {
+            "name": "Generation",
+            "description": "AI görsel oluşturma servisleri"
+        },
+        {
+            "name": "Payment",
+            "description": "Ödeme ve kredi işlemleri"
+        },
+        {
+            "name": "Admin",
+            "description": "Yönetici işlemleri (Admin yetkisi gerektirir)"
+        }
+    ],
+    "paths": {
+        "/health": {
+            "get": {
+                "tags": [
+                    "System"
+                ],
+                "summary": "API Sağlık Kontrolü",
+                "description": "API'nin çalışıp çalışmadığını ve bağlı servislerin durumunu kontrol eder.",
+                "responses": {
+                    "200": {
+                        "description": "API çalışıyor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "OK"
+                                        },
+                                        "version": {
+                                            "type": "string",
+                                            "example": "1.0.0"
+                                        },
+                                        "timestamp": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "services": {
+                                            "type": "object",
+                                            "properties": {
+                                                "supabase": {
+                                                    "type": "boolean"
+                                                },
+                                                "gemini": {
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/signup": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Yeni Kullanıcı Kaydı",
+                "description": "Email ve şifre ile yeni kullanıcı oluşturur. Başlangıçta 5 ücretsiz kredi verilir.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 6,
+                                        "example": "securepassword123"
+                                    },
+                                    "fullName": {
+                                        "type": "string",
+                                        "example": "Ahmet Yılmaz"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kayıt başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthSuccess"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Geçersiz veri veya kullanıcı zaten mevcut",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Kullanıcı Girişi",
+                "description": "Email ve şifre ile giriş yapar. Access token ve refresh token döner.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "securepassword123"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Giriş başarılı",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Geçersiz kimlik bilgileri",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Token Yenileme",
+                "description": "Refresh token kullanarak yeni access token alır.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "refreshToken"
+                                ],
+                                "properties": {
+                                    "refreshToken": {
+                                        "type": "string",
+                                        "example": "v1.MjNiNzI4..."
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token yenilendi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenRefresh"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Geçersiz veya süresi dolmuş refresh token"
+                    }
+                }
+            }
+        },
+        "/user/profile": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Profil Bilgisi",
+                "description": "Giriş yapmış kullanıcının profil bilgilerini döner.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profil bilgisi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserProfile"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Yetkilendirme gerekli"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Profil Güncelleme",
+                "description": "Kullanıcının profil bilgilerini günceller.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "fullName": {
+                                        "type": "string"
+                                    },
+                                    "avatarUrl": {
+                                        "type": "string",
+                                        "format": "uri"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profil güncellendi"
+                    }
+                }
+            }
+        },
+        "/user/generations": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Üretim Geçmişi",
+                "description": "Kullanıcının AI ile oluşturduğu görsellerin listesi.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "sketch_to_product",
+                                "product_to_model",
+                                "video",
+                                "tech_sketch",
+                                "pixshop",
+                                "fotomatik_transform",
+                                "fotomatik_describe",
+                                "adgenius_campaign_image",
+                                "collage"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Üretim listesi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "generations": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Generation"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        },
+                                        "limit": {
+                                            "type": "integer"
+                                        },
+                                        "offset": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generation/costs": {
+            "get": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Kredi Maliyetleri",
+                "description": "Her AI işleminin kredi maliyetini döner.",
+                "responses": {
+                    "200": {
+                        "description": "Maliyet listesi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreditCosts"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generation/sketch-to-product": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Eskiz → Ürün Dönüşümü",
+                "description": "Moda eskizini fotorealistik ürün görselinine dönüştürür.\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "Eskiz görseli (PNG, JPG, WEBP)"
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "description": "İstenen renk (opsiyonel)",
+                                        "example": "Kırmızı"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Görsel oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenerationResult"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Yetersiz kredi veya geçersiz görsel"
+                    }
+                }
+            }
+        },
+        "/generation/product-to-model": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Ürün → Canlı Model",
+                "description": "Ürün görselini canlı model üzerinde gösterir.\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "Ürün görseli"
+                                    },
+                                    "clothingType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Üst",
+                                            "Alt",
+                                            "Elbise",
+                                            "Dış Giyim",
+                                            "Alt & Üst",
+                                            "Takım Elbise"
+                                        ],
+                                        "description": "Kıyafet tipi"
+                                    },
+                                    "color": {
+                                        "type": "string",
+                                        "description": "Ana renk"
+                                    },
+                                    "ethnicity": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Farklı",
+                                            "Türk",
+                                            "Avrupalı",
+                                            "İskandinav",
+                                            "Akdeniz",
+                                            "Asyalı",
+                                            "Afrikalı",
+                                            "Latin",
+                                            "Orta Doğulu"
+                                        ],
+                                        "description": "Model etnik kökeni"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Female",
+                                            "Male"
+                                        ],
+                                        "description": "Cinsiyet"
+                                    },
+                                    "ageRange": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Child",
+                                            "Teen",
+                                            "Adult",
+                                            "Elderly"
+                                        ],
+                                        "description": "Yaş grubu"
+                                    },
+                                    "bodyType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Standart",
+                                            "İnce",
+                                            "Kıvrımlı",
+                                            "Atletik",
+                                            "Büyük Beden",
+                                            "Battal Beden"
+                                        ],
+                                        "description": "Vücut tipi"
+                                    },
+                                    "pose": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Rastgele",
+                                            "Ayakta",
+                                            "Yürürken",
+                                            "Eller Belde",
+                                            "Otururken"
+                                        ],
+                                        "description": "Poz"
+                                    },
+                                    "hairColor": {
+                                        "type": "string",
+                                        "description": "Saç rengi"
+                                    },
+                                    "hairStyle": {
+                                        "type": "string",
+                                        "description": "Saç stili"
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Podyum",
+                                            "Stüdyo",
+                                            "Sokak",
+                                            "Doğal Mekan",
+                                            "Lüks Mağaza"
+                                        ],
+                                        "description": "Mekan"
+                                    },
+                                    "lighting": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Doğal",
+                                            "Stüdyo",
+                                            "Gün Batımı",
+                                            "Dramatik",
+                                            "Neon"
+                                        ],
+                                        "description": "Işıklandırma"
+                                    },
+                                    "cameraAngle": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Normal",
+                                            "Alt Açı",
+                                            "Üst Açı",
+                                            "Geniş Açı",
+                                            "Portre"
+                                        ],
+                                        "description": "Kamera açısı"
+                                    },
+                                    "aspectRatio": {
+                                        "type": "string",
+                                        "enum": [
+                                            "3:4",
+                                            "9:16",
+                                            "4:5",
+                                            "1:1",
+                                            "16:9"
+                                        ],
+                                        "description": "En boy oranı"
+                                    },
+                                    "customPrompt": {
+                                        "type": "string",
+                                        "description": "Özel istek/talimat"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Model görseli oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenerationResult"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generation/video": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Görsel → Video",
+                "description": "Statik görselden video oluşturur.\n\n**Maliyet:** 3 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "prompt": {
+                                        "type": "string",
+                                        "description": "Video açıklaması"
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "enum": [
+                                            5,
+                                            8
+                                        ],
+                                        "description": "Video süresi (saniye)"
+                                    },
+                                    "aspectRatio": {
+                                        "type": "string",
+                                        "enum": [
+                                            "16:9",
+                                            "9:16"
+                                        ],
+                                        "description": "En boy oranı"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Video işleme alındı"
+                    }
+                }
+            }
+        },
+        "/generation/tech-sketch": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Teknik Çizim Oluşturma",
+                "description": "Ürün fotoğrafından teknik flat sketch oluşturur.\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "style": {
+                                        "type": "string",
+                                        "enum": [
+                                            "blackwhite",
+                                            "colored"
+                                        ],
+                                        "default": "blackwhite"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Teknik çizim oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenerationResult"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generation/pixshop/edit": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Pixshop - Fotoğraf Düzenleme",
+                "description": "AI ile fotoğraf düzenleme.\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image",
+                                    "prompt"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "prompt": {
+                                        "type": "string",
+                                        "description": "Düzenleme talimatı",
+                                        "example": "Arka planı mavi yap"
+                                    },
+                                    "hotspotX": {
+                                        "type": "number",
+                                        "description": "Odak noktası X koordinatı (0-1)"
+                                    },
+                                    "hotspotY": {
+                                        "type": "number",
+                                        "description": "Odak noktası Y koordinatı (0-1)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Düzenleme tamamlandı"
+                    }
+                }
+            }
+        },
+        "/generation/pixshop/remove-bg": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Pixshop - Arka Plan Kaldırma",
+                "description": "Görseldeki arka planı kaldırır.\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Arka plan kaldırıldı"
+                    }
+                }
+            }
+        },
+        "/generation/fotomatik/transform": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Fotomatik - Görüntü Dönüştürme",
+                "description": "Görseli prompt'a göre dönüştürür.\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image",
+                                    "prompt"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "prompt": {
+                                        "type": "string"
+                                    },
+                                    "aspectRatio": {
+                                        "type": "string",
+                                        "default": "1:1"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Dönüşüm tamamlandı"
+                    }
+                }
+            }
+        },
+        "/generation/fotomatik/describe": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Fotomatik - Prompt Üretme",
+                "description": "Görselden AI prompt'ları üretir (Midjourney, Stable Diffusion formatlarında).\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Prompt'lar üretildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PromptResult"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generation/adgenius/analyze": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "AdGenius - Ürün Analizi",
+                "description": "E-ticaret ürününü analiz eder.\n\n**Maliyet:** ÜCRETSİZ",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Analiz sonucu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductAnalysis"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/generation/adgenius/image": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "AdGenius - Reklam Görseli",
+                "description": "Profesyonel reklam görseli oluşturur.\n\n**Maliyet:** 1 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "prompt": {
+                                        "type": "string"
+                                    },
+                                    "style": {
+                                        "type": "string"
+                                    },
+                                    "aspectRatio": {
+                                        "type": "string",
+                                        "default": "1:1"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reklam görseli oluşturuldu"
+                    }
+                }
+            }
+        },
+        "/generation/collage": {
+            "post": {
+                "tags": [
+                    "Generation"
+                ],
+                "summary": "Kolaj Oluşturma",
+                "description": "Birden fazla görseli birleştirerek kolaj oluşturur.\n\n**Maliyet:** 2 kredi",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "images"
+                                ],
+                                "properties": {
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        },
+                                        "minItems": 2,
+                                        "maxItems": 6,
+                                        "description": "2-6 arası görsel"
+                                    },
+                                    "prompt": {
+                                        "type": "string",
+                                        "description": "Kompozisyon talimatı"
+                                    },
+                                    "aspectRatio": {
+                                        "type": "string",
+                                        "enum": [
+                                            "1:1",
+                                            "16:9",
+                                            "9:16",
+                                            "3:4",
+                                            "4:3"
+                                        ],
+                                        "default": "16:9"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kolaj oluşturuldu"
+                    }
+                }
+            }
+        },
+        "/payment/packages": {
+            "get": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Kredi Paketleri",
+                "description": "Satın alınabilir kredi paketleri ve abonelik planları.",
+                "responses": {
+                    "200": {
+                        "description": "Paket listesi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaymentPackages"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payment/exchange-rate": {
+            "get": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Döviz Kuru",
+                "description": "Güncel TCMB EUR/TRY kuru.",
+                "responses": {
+                    "200": {
+                        "description": "Kur bilgisi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "currency": {
+                                            "type": "string",
+                                            "example": "EUR"
+                                        },
+                                        "rate": {
+                                            "type": "number",
+                                            "example": 35.42
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/payment/create-intent": {
+            "post": {
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Ödeme Başlat",
+                "description": "Stripe PaymentIntent oluşturur.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "amountTL",
+                                    "credits"
+                                ],
+                                "properties": {
+                                    "packageId": {
+                                        "type": "string",
+                                        "example": "medium"
+                                    },
+                                    "amountTL": {
+                                        "type": "number",
+                                        "example": 500
+                                    },
+                                    "credits": {
+                                        "type": "integer",
+                                        "example": 100
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment intent oluşturuldu",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "clientSecret": {
+                                            "type": "string"
+                                        },
+                                        "amountEUR": {
+                                            "type": "string"
+                                        },
+                                        "rate": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Tüm Kullanıcılar",
+                "description": "Kayıtlı tüm kullanıcıların listesi.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 50
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Email veya isim araması"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kullanıcı listesi"
+                    },
+                    "403": {
+                        "description": "Admin yetkisi gerekli"
+                    }
+                }
+            }
+        },
+        "/admin/transactions": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Tüm İşlemler",
+                "description": "Tüm ödeme ve kredi işlemleri.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "İşlem listesi"
+                    }
+                }
+            }
+        },
+        "/admin/generations": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Tüm Üretimler",
+                "description": "Tüm AI üretimlerinin listesi.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Üretim tipi filtresi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Üretim listesi"
+                    }
+                }
+            }
+        },
+        "/admin/stats": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Dashboard İstatistikleri",
+                "description": "Genel istatistikler ve raporlar.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "İstatistikler",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AdminStats"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{userId}/credits": {
+            "put": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Kullanıcı Kredisi Güncelle",
+                "description": "Bir kullanıcının kredi miktarını günceller.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "credits"
+                                ],
+                                "properties": {
+                                    "credits": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "example": "Bonus kredi"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kredi güncellendi"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Supabase JWT token"
+            }
+        },
+        "schemas": {
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "description": "Hata mesajı"
+                    }
+                }
+            },
+            "AuthSuccess": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "user": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email"
+                            }
+                        }
+                    }
+                }
+            },
+            "LoginResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "session": {
+                        "type": "object",
+                        "properties": {
+                            "access_token": {
+                                "type": "string"
+                            },
+                            "refresh_token": {
+                                "type": "string"
+                            },
+                            "expires_at": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "user": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "fullName": {
+                                "type": "string"
+                            },
+                            "avatarUrl": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "profile": {
+                        "type": "object",
+                        "properties": {
+                            "credits": {
+                                "type": "integer"
+                            },
+                            "subscriptionTier": {
+                                "type": "string"
+                            },
+                            "isAdmin": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                }
+            },
+            "TokenRefresh": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "session": {
+                        "type": "object",
+                        "properties": {
+                            "access_token": {
+                                "type": "string"
+                            },
+                            "refresh_token": {
+                                "type": "string"
+                            },
+                            "expires_at": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            },
+            "UserProfile": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "fullName": {
+                        "type": "string"
+                    },
+                    "avatarUrl": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "credits": {
+                        "type": "integer"
+                    },
+                    "subscriptionTier": {
+                        "type": "string",
+                        "enum": [
+                            "free",
+                            "starter",
+                            "pro",
+                            "premium"
+                        ]
+                    },
+                    "subscriptionStart": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "subscriptionEnd": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "isAdmin": {
+                        "type": "boolean"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "Generation": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "credits_used": {
+                        "type": "integer"
+                    },
+                    "input_image_url": {
+                        "type": "string"
+                    },
+                    "output_image_url": {
+                        "type": "string"
+                    },
+                    "output_video_url": {
+                        "type": "string"
+                    },
+                    "settings": {
+                        "type": "object"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "CreditCosts": {
+                "type": "object",
+                "properties": {
+                    "SKETCH_TO_PRODUCT": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "PRODUCT_TO_MODEL": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "VIDEO": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "TECH_SKETCH": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "PIXSHOP": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "FOTOMATIK_TRANSFORM": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "FOTOMATIK_DESCRIBE": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "ADGENIUS_IMAGE": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "ADGENIUS_VIDEO": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "COLLAGE": {
+                        "type": "integer",
+                        "example": 2
+                    }
+                }
+            },
+            "GenerationResult": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "image": {
+                        "type": "string",
+                        "description": "Base64 data URL"
+                    },
+                    "creditsRemaining": {
+                        "type": "integer"
+                    }
+                }
+            },
+            "PromptResult": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "prompts": {
+                        "type": "object",
+                        "properties": {
+                            "tr": {
+                                "type": "string"
+                            },
+                            "en": {
+                                "type": "string"
+                            },
+                            "midjourney": {
+                                "type": "string"
+                            },
+                            "stableDiffusion": {
+                                "type": "object",
+                                "properties": {
+                                    "positive": {
+                                        "type": "string"
+                                    },
+                                    "negative": {
+                                        "type": "string"
+                                    },
+                                    "params": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "tips": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "ProductAnalysis": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "analysis": {
+                        "type": "object",
+                        "properties": {
+                            "productType": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "features": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "targetAudience": {
+                                "type": "string"
+                            },
+                            "suggestedStyles": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "colors": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "PaymentPackages": {
+                "type": "object",
+                "properties": {
+                    "packages": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "credits": {
+                                    "type": "integer"
+                                },
+                                "priceTL": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    },
+                    "subscriptions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "credits": {
+                                    "type": "integer"
+                                },
+                                "priceTL": {
+                                    "type": "number"
+                                },
+                                "monthly": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "AdminStats": {
+                "type": "object",
+                "properties": {
+                    "totalUsers": {
+                        "type": "integer"
+                    },
+                    "todayGenerations": {
+                        "type": "integer"
+                    },
+                    "monthlyRevenue": {
+                        "type": "number"
+                    },
+                    "generationBreakdown": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

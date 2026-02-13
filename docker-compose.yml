@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Backend API (Express.js)
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: cizimdengiyime-backend
+    ports:
+      - "3001:3001"
+    environment:
+      # Supabase
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      
+      # PayTR
+      - PAYTR_MERCHANT_KEY=${PAYTR_MERCHANT_KEY}
+      - PAYTR_MERCHANT_SALT=${PAYTR_MERCHANT_SALT}
+      - PAYTR_MERCHANT_ID=${PAYTR_MERCHANT_ID}
+      - VITE_PAYTR_MERCHANT_KEY=${VITE_PAYTR_MERCHANT_KEY}
+      - VITE_PAYTR_MERCHANT_SALT=${VITE_PAYTR_MERCHANT_SALT}
+      - VITE_PAYTR_MERCHANT_ID=${VITE_PAYTR_MERCHANT_ID}
+      
+      # Port
+      - PORT=3001
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend (Vite/React)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+        - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+        - VITE_GOOGLE_AI_API_KEY=${VITE_GOOGLE_AI_API_KEY}
+        - VITE_PAYTR_MERCHANT_ID=${VITE_PAYTR_MERCHANT_ID}
+        - VITE_PAYTR_MERCHANT_KEY=${VITE_PAYTR_MERCHANT_KEY}
+        - VITE_PAYTR_MERCHANT_SALT=${VITE_PAYTR_MERCHANT_SALT}
+        - VITE_BACKEND_API_URL=http://backend:3001
+    container_name: cizimdengiyime-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  app-network:
+    driver: bridge

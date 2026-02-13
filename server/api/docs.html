@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fasheone API Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css">
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+        }
+
+        .swagger-ui {
+            background: #0f172a;
+        }
+
+        .swagger-ui .topbar {
+            display: none;
+        }
+
+        .custom-header {
+            background: linear-gradient(135deg, #06b6d4 0%, #a855f7 100%);
+            padding: 20px 40px;
+            color: white;
+        }
+
+        .custom-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .custom-header p {
+            margin: 8px 0 0;
+            opacity: 0.9;
+        }
+
+        .info-cards {
+            display: flex;
+            gap: 20px;
+            padding: 20px 40px;
+            background: #1e293b;
+            flex-wrap: wrap;
+        }
+
+        .info-card {
+            background: #334155;
+            border-radius: 12px;
+            padding: 16px 20px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .info-card h3 {
+            margin: 0 0 8px;
+            color: #06b6d4;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .info-card p {
+            margin: 0;
+            color: #e2e8f0;
+            font-size: 13px;
+        }
+
+        .info-card code {
+            background: #0f172a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #22d3ee;
+        }
+
+        /* Dark theme overrides */
+        .swagger-ui .opblock-tag {
+            color: #e2e8f0 !important;
+            border-bottom: 1px solid #334155 !important;
+        }
+
+        .swagger-ui .opblock {
+            background: #1e293b !important;
+            border: 1px solid #334155 !important;
+        }
+
+        .swagger-ui .opblock .opblock-summary {
+            border-bottom: 1px solid #334155 !important;
+        }
+
+        .swagger-ui .opblock .opblock-summary-description {
+            color: #94a3b8 !important;
+        }
+
+        .swagger-ui .opblock-body pre {
+            background: #0f172a !important;
+            color: #e2e8f0 !important;
+        }
+
+        .swagger-ui .model-box {
+            background: #1e293b !important;
+        }
+
+        .swagger-ui table tbody tr td {
+            color: #e2e8f0 !important;
+        }
+
+        .swagger-ui .parameter__name {
+            color: #22d3ee !important;
+        }
+
+        .swagger-ui .parameter__type {
+            color: #a855f7 !important;
+        }
+
+        .swagger-ui input,
+        .swagger-ui textarea {
+            background: #0f172a !important;
+            border: 1px solid #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        .swagger-ui .btn {
+            background: #06b6d4 !important;
+            color: white !important;
+        }
+
+        .swagger-ui .response-col_status {
+            color: #22c55e !important;
+        }
+
+        .swagger-ui .opblock-tag-section h3 {
+            color: #e2e8f0;
+        }
+
+        .swagger-ui .info .title {
+            color: #e2e8f0;
+        }
+
+        .swagger-ui .info .description p {
+            color: #94a3b8;
+        }
+
+        .swagger-ui .scheme-container {
+            background: #1e293b;
+        }
+
+        .swagger-ui select {
+            background: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="custom-header">
+        <h1>📱 Fasheone Mobile API</h1>
+        <p>AI Moda Platformu REST API Dokümantasyonu - v1.0.0</p>
+    </div>
+
+    <div class="info-cards">
+        <div class="info-card">
+            <h3>🔗 Base URL</h3>
+            <p>Production: <code>https://api.fasheone.com/api/v1</code></p>
+            <p style="margin-top: 8px;">Development: <code>http://localhost:3002/api/v1</code></p>
+        </div>
+        <div class="info-card">
+            <h3>🔐 Authentication</h3>
+            <p>Bearer Token kullanın:</p>
+            <p><code>Authorization: Bearer YOUR_TOKEN</code></p>
+        </div>
+        <div class="info-card">
+            <h3>💳 Kredi Sistemi</h3>
+            <p>Görsel: <strong>1 kredi</strong> | Video: <strong>3 kredi</strong></p>
+            <p>Yeni kullanıcılara <strong>5 ücretsiz</strong> kredi!</p>
+        </div>
+        <div class="info-card">
+            <h3>📚 Ek Kaynaklar</h3>
+            <p><a href="API_DOCS.md" style="color: #22d3ee;">📖 Türkçe Kullanım Kılavuzu</a></p>
+            <p><a href="openapi.json" style="color: #22d3ee;">📄 OpenAPI JSON</a></p>
+        </div>
+    </div>
+
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+    <script>
+        window.onload = function () {
+            SwaggerUIBundle({
+                url: "openapi.json",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIBundle.SwaggerUIStandalonePreset
+                ],
+                layout: "BaseLayout",
+                defaultModelsExpandDepth: 1,
+                defaultModelExpandDepth: 1,
+                displayRequestDuration: true,
+                filter: true,
+                showExtensions: true,
+                showCommonExtensions: true,
+                syntaxHighlight: {
+                    activate: true,
+                    theme: "monokai"
+                }
+            });
+        };
+    </script>
+</body>
+
+</html>
