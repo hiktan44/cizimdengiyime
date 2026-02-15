@@ -159,7 +159,7 @@ const getLocationPromptFragment = (location: string): string => {
             return 'Model, lüks bir moda mağazasının şık ve modern iç mekanında durmalıdır.';
         case 'Podyum':
         default:
-            return 'Model, spot ışıkları altında profesyonel bir moda podyumunda durmalıdır.';
+            return 'Model, profesyonel bir stüdyo ortamında doğal bir şekilde hafifçe dönerek ve poz vererek kıyafetini sergilemelidir. Hareketler abartısız, akıcı ve gerçekçi olmalıdır. Arka plan gerçek bir profesyonel video çekimi atmosferinde olmalıdır.';
     }
 };
 

@@ -74,7 +74,7 @@ const trLanding = {
       },
       feature3: {
         title: 'Video Oluşturma',
-        desc: 'Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
+        desc: 'Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün. Modelinizi doğal şekilde döndürün, poz verdirin ve sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
         features: [
           'Sinematik kamera hareketleri',
           'Yavaş çekim (slow-motion) efektleri',
@@ -164,7 +164,7 @@ const trLanding = {
     step2Before: 'ÜRÜN',
     step2After: 'MODEL',
     step3: '3. Görsel → Video',
-    step3Desc: 'Statik görsellerle sınırlı kalmayın. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
+    step3Desc: 'Statik görsellerle sınırlı kalmayın. Modelinizi doğal şekilde döndürün, poz verdirin ve sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
     professionalVideo: 'Profesyonel Video',
     tryNow: 'Şimdi Deneyin',
   },
