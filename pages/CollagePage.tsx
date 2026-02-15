@@ -540,8 +540,9 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             return;
         }
 
-        // Check credits
-        const result = await checkAndDeductCredits(profile.id, 'video');
+        // Check credits based on quality
+        const videoOpType = settings.quality === 'high' ? 'video_high' : 'video_fast';
+        const result = await checkAndDeductCredits(profile.id, videoOpType);
         if (!result.success) {
             alert(t.insufficientCredits);
             if (onShowBuyCredits) onShowBuyCredits();
@@ -556,10 +557,11 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             setGeneratedVideoUrl(videoUrl);
 
             // Save to database
+            const videoCreditCost = settings.quality === 'high' ? CREDIT_COSTS.VIDEO_HIGH : CREDIT_COSTS.VIDEO_FAST;
             await saveGeneration(
                 profile.id,
-                'video',
-                CREDIT_COSTS.VIDEO,
+                videoOpType,
+                videoCreditCost,
                 null,
                 null,
                 videoUrl,

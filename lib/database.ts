@@ -2,7 +2,7 @@ import { supabase, CREDIT_COSTS, Generation } from '../lib/supabase';
 
 export const checkAndDeductCredits = async (
   userId: string,
-  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'tech_pack' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage'
+  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'video_fast' | 'video_high' | 'tech_sketch' | 'tech_pack' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage'
 ): Promise<{ success: boolean; message?: string; remainingCredits?: number }> => {
   try {
     // Get user profile
@@ -21,6 +21,8 @@ export const checkAndDeductCredits = async (
       'sketch_to_product': 'SKETCH_TO_PRODUCT',
       'product_to_model': 'PRODUCT_TO_MODEL',
       'video': 'VIDEO',
+      'video_fast': 'VIDEO_FAST',
+      'video_high': 'VIDEO_HIGH',
       'tech_sketch': 'TECH_SKETCH',
       'tech_pack': 'TECH_PACK',
       'pixshop': 'PIXSHOP',
@@ -66,7 +68,7 @@ export const checkAndDeductCredits = async (
 
 export const saveGeneration = async (
   userId: string,
-  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'tech_sketch' | 'tech_pack' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage',
+  type: 'sketch_to_product' | 'product_to_model' | 'video' | 'video_fast' | 'video_high' | 'tech_sketch' | 'tech_pack' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage',
   creditsUsed: number,
   inputImageUrl: string | null,
   outputImageUrl: string | null,

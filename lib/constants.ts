@@ -3,7 +3,9 @@
 export const CREDIT_COSTS = {
     SKETCH_TO_PRODUCT: 1,
     PRODUCT_TO_MODEL: 1,
-    VIDEO: 3,
+    VIDEO_FAST: 3, // Video (hızlı - veo-3.1-fast)
+    VIDEO_HIGH: 4, // Video (yüksek kalite - veo-3.1-generate)
+    VIDEO: 3, // Geriye uyumluluk için (fast varsayılan)
     TECH_SKETCH: 1, // Teknik çizim maliyeti
     TECH_PACK: 3, // Tech Pack (ön/arka görünüm + ölçüler + spesifikasyonlar)
     PIXSHOP: 1, // Pixshop fotoğraf düzenleme maliyeti (rötuş, filtre, ayarlama, kırpma, 2K upscale)
@@ -11,7 +13,9 @@ export const CREDIT_COSTS = {
     FOTOMATIK_TRANSFORM: 1, // Fotomatik görüntü dönüştürme maliyeti
     FOTOMATIK_DESCRIBE: 1, // Fotomatik prompt üretme maliyeti
     ADGENIUS_IMAGE: 1, // AdGenius görsel maliyeti (her görsel için)
-    ADGENIUS_VIDEO: 3, // AdGenius video maliyeti (her video için)
+    ADGENIUS_VIDEO_FAST: 3, // AdGenius video fast (veo-3.1-fast)
+    ADGENIUS_VIDEO_HIGH: 4, // AdGenius video yüksek kalite (veo-3.1-generate)
+    ADGENIUS_VIDEO: 3, // Geriye uyumluluk (fast varsayılan)
     COLLAGE: 2, // Kolaj oluşturma maliyeti (2-6 görsel birleştirme) - 2 kredi
 } as const;
 

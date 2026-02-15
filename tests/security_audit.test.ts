@@ -11,8 +11,17 @@ describe('Security & Logic Verification', () => {
         it('should have correct costs for AdGenius', () => {
             // AdGenius Image: 1 Kredi
             expect(CREDIT_COSTS.ADGENIUS_IMAGE).toBe(1);
-            // AdGenius Video: 3 Kredi
-            expect(CREDIT_COSTS.ADGENIUS_VIDEO).toBe(3);
+            // AdGenius Video Fast: 3 Kredi
+            expect(CREDIT_COSTS.ADGENIUS_VIDEO_FAST).toBe(3);
+            // AdGenius Video High: 4 Kredi
+            expect(CREDIT_COSTS.ADGENIUS_VIDEO_HIGH).toBe(4);
+        });
+
+        it('should have correct costs for Video', () => {
+            // Video Fast: 3 Kredi
+            expect(CREDIT_COSTS.VIDEO_FAST).toBe(3);
+            // Video High: 4 Kredi
+            expect(CREDIT_COSTS.VIDEO_HIGH).toBe(4);
         });
 
         it('should have correct costs for Pixshop', () => {

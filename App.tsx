@@ -643,8 +643,9 @@ const ToolPage: React.FC<{
         const handleVideoGeneration = async (settings: VideoGenerationSettings) => {
             if (!generatedImageUrl) return;
 
-            // Check credits
-            const creditCheck = await checkAndDeductCredits(profile.id, 'video');
+            // Check credits based on quality
+            const videoOpType = settings.quality === 'high' ? 'video_high' : 'video_fast';
+            const creditCheck = await checkAndDeductCredits(profile.id, videoOpType);
             if (!creditCheck.success) {
                 alert(creditCheck.message);
                 return;
@@ -698,10 +699,11 @@ const ToolPage: React.FC<{
                 }, 600);
 
                 // Save to database
+                const videoCreditCost = settings.quality === 'high' ? CREDIT_COSTS.VIDEO_HIGH : CREDIT_COSTS.VIDEO_FAST;
                 await saveGeneration(
                     profile.id,
-                    'video',
-                    CREDIT_COSTS.VIDEO,
+                    videoOpType,
+                    videoCreditCost,
                     null,
                     null,
                     videoUrl,
