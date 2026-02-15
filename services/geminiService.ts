@@ -387,7 +387,7 @@ export const generateVideoFromImage = async (
     try {
         operation = await ai.models.generateVideos({
             model: modelName,
-            prompt: settings.prompt,
+            prompt: settings.prompt + ' No audio, no music, no sound effects. Silent video only.',
             image: {
                 imageBytes: imageBytes,
                 mimeType: mimeType,
@@ -396,6 +396,7 @@ export const generateVideoFromImage = async (
                 numberOfVideos: 1,
                 resolution: settings.resolution,
                 aspectRatio: settings.aspectRatio,
+                generateAudio: false,
             }
         });
     } catch (e: any) {

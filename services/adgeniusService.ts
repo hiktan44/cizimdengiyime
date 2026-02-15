@@ -745,11 +745,12 @@ export const generateAdVideo = async (
         imageBytes: cleanB64,
         mimeType: mimeType
       },
-      prompt: videoPrompt,
+      prompt: videoPrompt + ' No audio, no music, no sound effects. Silent video only.',
       config: {
         numberOfVideos: 1,
         resolution: '720p',
         aspectRatio: aspectRatio as any,
+        generateAudio: false,
       }
     });
   } catch (e: any) {
