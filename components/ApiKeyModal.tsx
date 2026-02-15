@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon } from './icons/XIcon';
+import { useI18n } from '../lib/i18n';
 
 interface ApiKeyModalProps {
     isOpen: boolean;
@@ -10,6 +11,8 @@ interface ApiKeyModalProps {
 
 export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, currentKey, onSave }) => {
     const [key, setKey] = useState(currentKey);
+    const { language } = useI18n();
+    const isEn = language === 'en';
 
     useEffect(() => {
         setKey(currentKey);
@@ -33,7 +36,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, curre
             >
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                        <span>🔑</span> API Anahtarı Ayarları
+                        <span>🔑</span> {isEn ? 'API Key Settings' : 'API Anahtarı Ayarları'}
                     </h2>
                     <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors">
                         <XIcon />
@@ -41,10 +44,12 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, curre
                 </div>
 
                 <p className="text-sm text-slate-400 mb-6">
-                    Uygulamanın doğru çalışması için geçerli bir API anahtarına ihtiyaç vardır. Deploy edilen ortamlarda .env dosyası okunamazsa anahtarı buradan manuel olarak girebilirsiniz.
+                    {isEn
+                        ? 'A valid API key is required for the application to work properly. If the .env file cannot be read in deployed environments, you can enter the key manually here.'
+                        : 'Uygulamanın doğru çalışması için geçerli bir API anahtarına ihtiyaç vardır. Deploy edilen ortamlarda .env dosyası okunamazsa anahtarı buradan manuel olarak girebilirsiniz.'}
                     <br /><br />
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">
-                        API Anahtarı Almak İçin Tıklayın
+                        {isEn ? 'Click here to get an API Key' : 'API Anahtarı Almak İçin Tıklayın'}
                     </a>
                 </p>
 
@@ -56,7 +61,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, curre
                             id="apiKey"
                             value={key}
                             onChange={(e) => setKey(e.target.value)}
-                            placeholder="API Anahtarınızı buraya girin..."
+                            placeholder={isEn ? 'Enter your API Key here...' : 'API Anahtarınızı buraya girin...'}
                             className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:ring-cyan-500 focus:border-cyan-500 transition font-mono text-sm"
                         />
                     </div>
@@ -67,13 +72,13 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, curre
                             onClick={onClose}
                             className="px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
                         >
-                            İptal
+                            {isEn ? 'Cancel' : 'İptal'}
                         </button>
                         <button
                             type="submit"
                             className="bg-cyan-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg shadow-cyan-600/30 hover:bg-cyan-500 transition-all"
                         >
-                            Kaydet
+                            {isEn ? 'Save' : 'Kaydet'}
                         </button>
                     </div>
                 </form>

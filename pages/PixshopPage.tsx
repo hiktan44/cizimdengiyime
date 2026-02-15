@@ -1323,17 +1323,18 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
             <div className="flex flex-col items-center gap-6 animate-fade-in">
               {/* Info Text */}
               <div className="w-full max-w-2xl bg-gradient-to-r from-purple-900/20 to-pink-900/20 border border-purple-500/30 rounded-xl p-4">
-                <h3 className="text-lg font-bold text-purple-300 mb-2">🎨 Logo & Ürün Ekleme</h3>
+                <h3 className="text-lg font-bold text-purple-300 mb-2">🎨 {language === 'tr' ? 'Logo & Ürün Ekleme' : 'Logo & Product Placement'}</h3>
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  Ana görselinize logo, marka işareti veya aksesuar (kravat, şal, takı vb.) ekleyin.
-                  AI, eklediğiniz öğeyi doğal bir şekilde entegre edecek ve profesyonel bir sonuç üretecektir.
+                  {language === 'tr'
+                    ? 'Ana görselinize logo, marka işareti veya aksesuar (kravat, şal, takı vb.) ekleyin. AI, eklediğiniz öğeyi doğal bir şekilde entegre edecek ve profesyonel bir sonuç üretecektir.'
+                    : 'Add a logo, brand mark, or accessory (tie, scarf, jewelry, etc.) to your main image. AI will naturally integrate the item and produce a professional result.'}
                 </p>
               </div>
 
               {/* Overlay Image Upload */}
               <div className="w-full max-w-2xl">
                 <label className="block text-sm font-semibold text-gray-300 mb-3">
-                  📤 Logo / Ürün Görseli Yükle
+                  📤 {language === 'tr' ? 'Logo / Ürün Görseli Yükle' : 'Upload Logo / Product Image'}
                 </label>
                 <div className="relative">
                   <input
@@ -1374,8 +1375,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                         <svg className="w-12 h-12 text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                        <p className="text-sm text-gray-400 font-medium">Logo veya Ürün Görseli Seçin</p>
-                        <p className="text-xs text-gray-500 mt-1">PNG, JPG, WEBP (Şeffaf arka plan önerilir)</p>
+                        <p className="text-sm text-gray-400 font-medium">{language === 'tr' ? 'Logo veya Ürün Görseli Seçin' : 'Select Logo or Product Image'}</p>
+                        <p className="text-xs text-gray-500 mt-1">{language === 'tr' ? 'PNG, JPG, WEBP (Şeffaf arka plan önerilir)' : 'PNG, JPG, WEBP (Transparent background recommended)'}</p>
                       </>
                     )}
                   </label>
@@ -1385,18 +1386,18 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
               {/* Prompt Input */}
               <div className="w-full max-w-2xl">
                 <label className="block text-sm font-semibold text-gray-300 mb-3">
-                  ✍️ Ne Eklemek İstiyorsunuz?
+                  ✍️ {language === 'tr' ? 'Ne Eklemek İstiyorsunuz?' : 'What do you want to add?'}
                 </label>
                 <textarea
                   value={overlayPrompt}
                   onChange={(e) => setOverlayPrompt(e.target.value)}
-                  placeholder="Örnek: 'Bu logoyu sağ üst köşeye ekle' veya 'Bu kravatı kişiye giydir'"
+                  placeholder={language === 'tr' ? 'Örnek: \"Bu logoyu sağ üst köşeye ekle\" veya \"Bu kravatı kişiye giydir\"' : 'Example: \"Add this logo to the top right corner\" or \"Put this tie on the person\"'}
                   rows={4}
                   className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-xl p-4 text-base focus:ring-2 focus:ring-purple-500 focus:outline-none transition resize-none"
                   disabled={isLoading}
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  💡 İpucu: Resimde bir nokta seçerek hassas konum belirleyebilirsiniz (opsiyonel)
+                  💡 {language === 'tr' ? 'İpucu: Resimde bir nokta seçerek hassas konum belirleyebilirsiniz (opsiyonel)' : 'Tip: You can select a point in the image for precise positioning (optional)'}
                 </p>
               </div>
 

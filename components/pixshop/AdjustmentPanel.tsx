@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { useI18n } from '../../lib/i18n';
 
 interface AdjustmentPanelProps {
   onApplyAdjustment: (prompt: string) => void;
@@ -20,6 +21,8 @@ interface SliderState {
 }
 
 const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, isLoading }) => {
+  const { language } = useI18n();
+  const isEn = language === 'en';
   const [selectedPresetPrompt, setSelectedPresetPrompt] = useState<string | null>(null);
   const [customPrompt, setCustomPrompt] = useState('');
   const [sliders, setSliders] = useState<SliderState>({
@@ -33,10 +36,10 @@ const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, is
   });
 
   const presets = [
-    { name: 'Arka Planı Bulanıklaştır', prompt: 'Apply a realistic depth-of-field effect, making the background blurry while keeping the main subject in sharp focus.' },
-    { name: 'Detayları Keskinleştir', prompt: 'Slightly enhance the sharpness and details of the image without making it look unnatural.' },
-    { name: 'Daha Sıcak Tonlar', prompt: 'Adjust the color temperature to give the image warmer, golden-hour style lighting.' },
-    { name: 'Stüdyo Işığı', prompt: 'Add dramatic, professional studio lighting to the main subject.' },
+    { name: isEn ? 'Blur Background' : 'Arka Planı Bulanıklaştır', prompt: 'Apply a realistic depth-of-field effect, making the background blurry while keeping the main subject in sharp focus.' },
+    { name: isEn ? 'Sharpen Details' : 'Detayları Keskinleştir', prompt: 'Slightly enhance the sharpness and details of the image without making it look unnatural.' },
+    { name: isEn ? 'Warmer Tones' : 'Daha Sıcak Tonlar', prompt: 'Adjust the color temperature to give the image warmer, golden-hour style lighting.' },
+    { name: isEn ? 'Studio Light' : 'Stüdyo Işığı', prompt: 'Add dramatic, professional studio lighting to the main subject.' },
   ];
 
   const handleSliderChange = (name: keyof SliderState, value: number) => {
@@ -45,10 +48,10 @@ const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, is
   };
 
   const handleResetSliders = () => {
-    setSliders({ 
-      brightness: 0, 
-      contrast: 0, 
-      saturation: 0, 
+    setSliders({
+      brightness: 0,
+      contrast: 0,
+      saturation: 0,
       exposure: 0,
       vibrance: 0,
       highlights: 0,
@@ -65,14 +68,14 @@ const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, is
     if (sliders.vibrance !== 0) parts.push(`vibrance ${sliders.vibrance > 0 ? 'boosted to enrich muted colors' : 'lowered'} by ${Math.abs(sliders.vibrance)}%`);
     if (sliders.highlights !== 0) parts.push(`highlights ${sliders.highlights > 0 ? 'brightened' : 'recovered/darkened'} by ${Math.abs(sliders.highlights)}%`);
     if (sliders.shadows !== 0) parts.push(`shadows ${sliders.shadows > 0 ? 'lifted for more detail' : 'deepened for more drama'} by ${Math.abs(sliders.shadows)}%`);
-    
+
     if (parts.length === 0) return '';
     return `Apply these manual photographic adjustments: ${parts.join(', ')}. Ensure a professional, balanced output.`;
   }, [sliders]);
 
   const activePrompt = useMemo(() => {
     if (selectedPresetPrompt) return selectedPresetPrompt;
-    
+
     const combined = [manualPromptPart, customPrompt].filter(Boolean).join('. ');
     return combined;
   }, [selectedPresetPrompt, manualPromptPart, customPrompt]);
@@ -119,7 +122,7 @@ const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, is
   return (
     <div className="w-full bg-gray-800/50 border border-gray-700 rounded-lg p-4 flex flex-col gap-6 animate-fade-in backdrop-blur-sm">
       <div>
-        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 px-1">Hazır Modlar</h3>
+        <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 px-1">{isEn ? 'Presets' : 'Hazır Modlar'}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {presets.map(preset => (
             <button
@@ -136,24 +139,24 @@ const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, is
 
       <div className="space-y-5 bg-black/20 p-5 rounded-xl border border-white/5">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">Manuel Ayarlar</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500">{isEn ? 'Manual Adjustments' : 'Manuel Ayarlar'}</h3>
           {hasAdjustments && (
-            <button 
+            <button
               onClick={handleResetSliders}
               className="text-xs text-blue-400 hover:text-blue-300 transition-colors font-semibold"
             >
-              Sıfırla
+              {isEn ? 'Reset' : 'Sıfırla'}
             </button>
           )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
-          {renderSlider('Parlaklık', 'brightness', 'text-yellow-400')}
-          {renderSlider('Kontrast', 'contrast', 'text-orange-400')}
-          {renderSlider('Doygunluk', 'saturation', 'text-pink-400')}
-          {renderSlider('Pozlama', 'exposure', 'text-blue-400')}
-          {renderSlider('Canlılık', 'vibrance', 'text-emerald-400')}
-          {renderSlider('Açık Tonlar', 'highlights', 'text-gray-100')}
-          {renderSlider('Gölgeler', 'shadows', 'text-gray-500')}
+          {renderSlider(isEn ? 'Brightness' : 'Parlaklık', 'brightness', 'text-yellow-400')}
+          {renderSlider(isEn ? 'Contrast' : 'Kontrast', 'contrast', 'text-orange-400')}
+          {renderSlider(isEn ? 'Saturation' : 'Doygunluk', 'saturation', 'text-pink-400')}
+          {renderSlider(isEn ? 'Exposure' : 'Pozlama', 'exposure', 'text-blue-400')}
+          {renderSlider(isEn ? 'Vibrance' : 'Canlılık', 'vibrance', 'text-emerald-400')}
+          {renderSlider(isEn ? 'Highlights' : 'Açık Tonlar', 'highlights', 'text-gray-100')}
+          {renderSlider(isEn ? 'Shadows' : 'Gölgeler', 'shadows', 'text-gray-500')}
         </div>
       </div>
 
@@ -162,7 +165,7 @@ const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, is
           type="text"
           value={customPrompt}
           onChange={handleCustomChange}
-          placeholder="Özel bir efekt veya ek düzeltme yazın..."
+          placeholder={isEn ? 'Type a custom effect or adjustment...' : 'Özel bir efekt veya ek düzeltme yazın...'}
           className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 focus:outline-none transition disabled:opacity-60 text-base placeholder:text-gray-600 shadow-inner"
           disabled={isLoading}
         />
@@ -175,11 +178,11 @@ const AdjustmentPanel: React.FC<AdjustmentPanelProps> = ({ onApplyAdjustment, is
               disabled={isLoading}
             >
               <div className="flex items-center justify-center gap-2">
-                <span>{isLoading ? 'Uygulanıyor...' : 'Değişiklikleri Yapay Zeka ile İşle'}</span>
+                <span>{isLoading ? (isEn ? 'Applying...' : 'Uygulanıyor...') : (isEn ? 'Process Changes with AI' : 'Değişiklikleri Yapay Zeka ile İşle')}</span>
                 {!isLoading && (
-                   <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                   </svg>
+                  <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
                 )}
               </div>
             </button>

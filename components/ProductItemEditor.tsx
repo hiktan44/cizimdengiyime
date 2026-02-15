@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { ProductItem } from '../services/geminiService';
+import { useI18n } from '../lib/i18n';
 
 interface ProductItemEditorProps {
     product: ProductItem;
@@ -9,6 +10,8 @@ interface ProductItemEditorProps {
 }
 
 export const ProductItemEditor: React.FC<ProductItemEditorProps> = ({ product, onUpdate, onRemove, onEnlarge }) => {
+    const { language } = useI18n();
+    const isEn = language === 'en';
     const handleImageChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -38,11 +41,11 @@ export const ProductItemEditor: React.FC<ProductItemEditorProps> = ({ product, o
                         />
                     ) : (
                         <div className="w-full h-full bg-slate-900 rounded-lg border border-slate-700 flex items-center justify-center">
-                            <span className="text-slate-600 text-[10px]">Görsel Yok</span>
+                            <span className="text-slate-600 text-[10px]">{isEn ? 'No Image' : 'Görsel Yok'}</span>
                         </div>
                     )}
                     <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity rounded-lg">
-                        <span className="text-[10px] font-bold text-white text-center px-1">Görseli Değiştir</span>
+                        <span className="text-[10px] font-bold text-white text-center px-1">{isEn ? 'Change Image' : 'Görseli Değiştir'}</span>
                         <input
                             type="file"
                             accept="image/*"
@@ -59,7 +62,7 @@ export const ProductItemEditor: React.FC<ProductItemEditorProps> = ({ product, o
                             type="text"
                             value={product.name}
                             onChange={(e) => onUpdate({ ...product, name: e.target.value })}
-                            placeholder="Ürün Adı"
+                            placeholder={isEn ? 'Product Name' : 'Ürün Adı'}
                             className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-purple-500 outline-none"
                         />
                     </div>
@@ -68,7 +71,7 @@ export const ProductItemEditor: React.FC<ProductItemEditorProps> = ({ product, o
                             type="text"
                             value={product.price || ''}
                             onChange={(e) => onUpdate({ ...product, price: e.target.value })}
-                            placeholder="Fiyat (Örn: 1499 TL)"
+                            placeholder={isEn ? 'Price (e.g., €29.90)' : 'Fiyat (Örn: 1499 TL)'}
                             className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-purple-500 outline-none"
                         />
                     </div>
@@ -78,7 +81,7 @@ export const ProductItemEditor: React.FC<ProductItemEditorProps> = ({ product, o
                 <button
                     onClick={onRemove}
                     className="self-start text-slate-500 hover:text-red-500 transition-colors"
-                    title="Kaldır"
+                    title={isEn ? 'Remove' : 'Kaldır'}
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -92,7 +95,7 @@ export const ProductItemEditor: React.FC<ProductItemEditorProps> = ({ product, o
                     <textarea
                         value={product.description || ''}
                         onChange={(e) => onUpdate({ ...product, description: e.target.value })}
-                        placeholder="Ürün Açıklaması (Opsiyonel)"
+                        placeholder={isEn ? 'Product Description (Optional)' : 'Ürün Açıklaması (Opsiyonel)'}
                         rows={2}
                         className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-white focus:ring-1 focus:ring-purple-500 outline-none resize-y min-h-[60px]"
                     />
