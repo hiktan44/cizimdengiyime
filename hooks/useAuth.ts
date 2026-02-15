@@ -280,9 +280,8 @@ export function useAuth() {
     try {
       console.log('🔵 Google ile giriş başlatılıyor...');
       // Mevcut sayfanın origin'ini kullan (localhost veya production)
-      // DEBUG: Hardcoded localhost URL
-      const redirectUrl = 'http://localhost:3005';
-      console.log('🔗 KULLANILAN REDIRECT URL (HARDCODED):', redirectUrl);
+      const redirectUrl = window.location.origin;
+      console.log('🔗 KULLANILAN REDIRECT URL:', redirectUrl);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

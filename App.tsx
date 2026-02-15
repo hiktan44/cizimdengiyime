@@ -2222,6 +2222,10 @@ const App: React.FC = () => {
 
     return (
         <>
+            <FloatingWhatsApp
+                phoneNumber={import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined}
+                message="Merhaba, Fasheone hakkında bilgi almak istiyorum."
+            />
             {currentPage === 'landing' && (
                 <LandingPage
                     onGetStarted={handleGetStarted}
