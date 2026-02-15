@@ -4,6 +4,55 @@ import { getSiteSettings } from '../lib/adminService';
 import { getStripe, createPaymentIntent } from '../lib/stripeService';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
+import { useTranslation, useI18n, TranslationRecord } from '../lib/i18n';
+
+// --- Translations ---
+const trBuyCredits = {
+  title: '💳 Kredi Satın Al',
+  subtitle: 'Stripe ile güvenli ödeme',
+  creditLabel: 'Kredi',
+  proceedToPayment: 'Ödemeye Geç',
+  preparing: 'Hazırlanıyor...',
+  paymentInitFailed: 'Ödeme başlatılamadı.',
+  amountToPay: 'Ödenecek Tutar:',
+  exchangeRate: 'Kur:',
+  completePayment: 'Ödemeyi Tamamla',
+  processing: 'İşleniyor...',
+  paymentSuccess: 'Ödeme başarılı!',
+  paymentProcessing: 'Ödeme işleniyor.',
+  paymentFailed: 'Ödeme başarısız oldu, lütfen tekrar deneyin.',
+  somethingWentWrong: 'Bir şeyler ters gitti.',
+  anErrorOccurred: 'Bir hata oluştu',
+  paymentError: 'Ödeme hatası',
+  unexpectedError: 'Beklenmedik bir hata oluştu.',
+  unexpectedErrorShort: 'Beklenmedik hata',
+  paymentSuccessful: 'Ödeme Başarılı!',
+};
+
+const buyCreditsTranslations: TranslationRecord<typeof trBuyCredits> = {
+  tr: trBuyCredits,
+  en: {
+    title: '💳 Buy Credits',
+    subtitle: 'Secure payment with Stripe',
+    creditLabel: 'Credits',
+    proceedToPayment: 'Proceed to Payment',
+    preparing: 'Preparing...',
+    paymentInitFailed: 'Payment could not be initiated.',
+    amountToPay: 'Amount to Pay:',
+    exchangeRate: 'Rate:',
+    completePayment: 'Complete Payment',
+    processing: 'Processing...',
+    paymentSuccess: 'Payment successful!',
+    paymentProcessing: 'Payment is processing.',
+    paymentFailed: 'Payment failed, please try again.',
+    somethingWentWrong: 'Something went wrong.',
+    anErrorOccurred: 'An error occurred',
+    paymentError: 'Payment error',
+    unexpectedError: 'An unexpected error occurred.',
+    unexpectedErrorShort: 'Unexpected error',
+    paymentSuccessful: 'Payment Successful!',
+  },
+};
 
 interface BuyCreditsModalProps {
   isOpen: boolean;
@@ -20,7 +69,8 @@ const CheckoutForm: React.FC<{
   credits: number;
   onSuccess: () => void;
   onError: (msg: string) => void;
-}> = ({ amountEUR, rate, credits, onSuccess, onError }) => {
+  t: typeof trBuyCredits;
+}> = ({ amountEUR, rate, credits, onSuccess, onError, t }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState<string | null>(null);
@@ -38,16 +88,16 @@ const CheckoutForm: React.FC<{
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent?.status) {
         case "succeeded":
-          setMessage("Ödeme başarılı!");
+          setMessage(t.paymentSuccess);
           break;
         case "processing":
-          setMessage("Ödeme işleniyor.");
+          setMessage(t.paymentProcessing);
           break;
         case "requires_payment_method":
-          setMessage("Ödeme başarısız oldu, lütfen tekrar deneyin.");
+          setMessage(t.paymentFailed);
           break;
         default:
-          setMessage("Bir şeyler ters gitti.");
+          setMessage(t.somethingWentWrong);
           break;
       }
     });
@@ -63,32 +113,29 @@ const CheckoutForm: React.FC<{
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: window.location.origin, // We will handle success via webhook usually, or UI redirect
-        receipt_email: undefined, // Passed in intent creation
+        return_url: window.location.origin,
+        receipt_email: undefined,
       },
-      redirect: "if_required", // Important to avoid redirect if not needed (e.g. card)
+      redirect: "if_required",
     });
 
     if (error) {
       if (error.type === "card_error" || error.type === "validation_error") {
-        setMessage(error.message || "Bir hata oluştu");
-        onError(error.message || "Ödeme hatası");
+        setMessage(error.message || t.anErrorOccurred);
+        onError(error.message || t.paymentError);
         trackEvent(ANALYTICS_EVENTS.PURCHASE_FAILURE, { error: error.message, type: error.type });
       } else {
-        setMessage("Beklenmedik bir hata oluştu.");
-        onError("Beklenmedik hata");
-        trackEvent(ANALYTICS_EVENTS.PURCHASE_FAILURE, { error: "Beklenmedik hata" });
+        setMessage(t.unexpectedError);
+        onError(t.unexpectedErrorShort);
+        trackEvent(ANALYTICS_EVENTS.PURCHASE_FAILURE, { error: t.unexpectedErrorShort });
       }
     } else {
-      // Success!
-      setMessage("Ödeme Başarılı!");
+      setMessage(t.paymentSuccessful);
       trackEvent(ANALYTICS_EVENTS.PURCHASE_SUCCESS, {
         amount: amountEUR,
         credits: credits,
         currency: 'EUR'
       });
-      // Explicitly wait a moment for webhook to process (optional) or just show success
-      // In a real app we might poll for status, but here we assume webhook works fast.
       setTimeout(() => {
         onSuccess();
       }, 1500);
@@ -100,17 +147,17 @@ const CheckoutForm: React.FC<{
   return (
     <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-slate-800/50 p-4 rounded-lg border border-slate-700 mb-4">
-        <p className="text-slate-300 text-sm mb-1">Ödenecek Tutar:</p>
+        <p className="text-slate-300 text-sm mb-1">{t.amountToPay}</p>
         <div className="flex items-end gap-2">
           <span className="text-3xl font-bold text-white">€{amountEUR}</span>
-          <span className="text-slate-400 text-sm mb-1">(Kur: {rate.toFixed(2)})</span>
+          <span className="text-slate-400 text-sm mb-1">({t.exchangeRate} {rate.toFixed(2)})</span>
         </div>
       </div>
 
       <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
 
       {message && (
-        <div className={`p-3 rounded text-sm ${message.includes('Başarılı') ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+        <div className={`p-3 rounded text-sm ${message.includes(t.paymentSuccessful) || message.includes(t.paymentSuccess) ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
           {message}
         </div>
       )}
@@ -123,10 +170,10 @@ const CheckoutForm: React.FC<{
         {isLoading ? (
           <>
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-            İşleniyor...
+            {t.processing}
           </>
         ) : (
-          "Ödemeyi Tamamla"
+          t.completePayment
         )}
       </button>
     </form>
@@ -141,6 +188,9 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
   userName,
   onSuccess,
 }) => {
+  const t = useTranslation(buyCreditsTranslations);
+  const { language } = useI18n();
+  const isEn = language === 'en';
   const [selectedPackage, setSelectedPackage] = useState<'SMALL' | 'MEDIUM' | 'LARGE'>('MEDIUM');
   const [loading, setLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -149,9 +199,9 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const [packages, setPackages] = useState({
-    SMALL: CREDIT_PACKAGES.SMALL,
-    MEDIUM: CREDIT_PACKAGES.MEDIUM,
-    LARGE: CREDIT_PACKAGES.LARGE,
+    SMALL: { ...CREDIT_PACKAGES.SMALL },
+    MEDIUM: { ...CREDIT_PACKAGES.MEDIUM },
+    LARGE: { ...CREDIT_PACKAGES.LARGE },
   });
 
   // Fetch credit packages
@@ -164,14 +214,17 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
             SMALL: {
               credits: settings.credit_package_small_credits || CREDIT_PACKAGES.SMALL.credits,
               price: settings.credit_package_small_price || CREDIT_PACKAGES.SMALL.price,
+              priceEUR: CREDIT_PACKAGES.SMALL.priceEUR,
             },
             MEDIUM: {
               credits: settings.credit_package_medium_credits || CREDIT_PACKAGES.MEDIUM.credits,
               price: settings.credit_package_medium_price || CREDIT_PACKAGES.MEDIUM.price,
+              priceEUR: CREDIT_PACKAGES.MEDIUM.priceEUR,
             },
             LARGE: {
               credits: settings.credit_package_large_credits || CREDIT_PACKAGES.LARGE.credits,
               price: settings.credit_package_large_price || CREDIT_PACKAGES.LARGE.price,
+              priceEUR: CREDIT_PACKAGES.LARGE.priceEUR,
             },
           });
         }
@@ -219,7 +272,7 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
 
     } catch (err: any) {
       console.error("Payment init error:", err);
-      setError(err.message || "Ödeme başlatılamadı.");
+      setError(err.message || t.paymentInitFailed);
       trackEvent(ANALYTICS_EVENTS.PURCHASE_FAILURE, { error: err.message || "Init failed", userId });
     } finally {
       setLoading(false);
@@ -234,8 +287,8 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-slate-900 border-b border-slate-700 p-6 flex items-center justify-between z-10">
           <div>
-            <h2 className="text-2xl font-bold text-white">💳 Kredi Satın Al</h2>
-            <p className="text-slate-400 text-sm mt-1">Stripe ile güvenli ödeme</p>
+            <h2 className="text-2xl font-bold text-white">{t.title}</h2>
+            <p className="text-slate-400 text-sm mt-1">{t.subtitle}</p>
           </div>
           <button
             onClick={onClose}
@@ -272,8 +325,10 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
                         }`}
                     >
                       <div className="text-3xl font-bold text-white mb-2">{pkg.credits}</div>
-                      <div className="text-sm text-slate-400 mb-4">Kredi</div>
-                      <div className="text-2xl font-bold text-cyan-400 mb-2">{pkg.price}₺</div>
+                      <div className="text-sm text-slate-400 mb-4">{t.creditLabel}</div>
+                      <div className="text-2xl font-bold text-cyan-400 mb-2">
+                        {isEn ? `€${pkg.priceEUR.toFixed(2)}` : `${pkg.price}₺`}
+                      </div>
                     </button>
                   );
                 })}
@@ -287,10 +342,10 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Hazırlanıyor...
+                    {t.preparing}
                   </span>
                 ) : (
-                  "Ödemeye Geç"
+                  t.proceedToPayment
                 )}
               </button>
             </>
@@ -307,6 +362,7 @@ export const BuyCreditsModal: React.FC<BuyCreditsModalProps> = ({
                     onClose();
                   }}
                   onError={(msg) => setError(msg)}
+                  t={t}
                 />
               </Elements>
             ) : (

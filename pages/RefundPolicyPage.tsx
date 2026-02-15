@@ -1,281 +1,309 @@
 import React from 'react';
+import { useI18n } from '../lib/i18n';
 
 interface RefundPolicyPageProps {
     onNavigateHome: () => void;
     theme?: 'light' | 'dark';
 }
 
+const tr = {
+    backHome: '← Ana Sayfaya Dön',
+    title: 'İade ve İptal Politikası',
+    subtitle: 'Kredi satın alma, iade koşulları ve iptal prosedürleri hakkında bilgi.',
+    s1Title: '1. Genel Bilgi',
+    s1Text: 'Fasheone platformunda satın alınan hizmetler, dijital içerik niteliğinde olup, kredi tabanlı bir sistem üzerinden sunulmaktadır. Bu politika, kredi satın alma işlemlerinin iade ve iptal koşullarını düzenler.',
+    s2Title: '2. Kredi Sistemi',
+    s2_1Title: '2.1. Kredi Paketleri',
+    s2_1Text: 'Platform üzerinde farklı miktarlarda kredi paketleri satın alabilirsiniz. Her AI işlemi belirli miktarda kredi tüketir.',
+    s2_2Title: '2.2. Kredi Kullanımı',
+    s2_2Items: [
+        'Krediler satın alma anında hesabınıza tanımlanır',
+        'Her AI görsel üretimi belirli miktarda kredi tüketir',
+        'Kullanılan krediler iade edilemez',
+        'Kredilerin geçerlilik süresi satın alma tarihinden itibaren 1 yıldır',
+    ],
+    s3Title: '3. İade Koşulları',
+    s3_1Title: '3.1. İade Edilebilir Durumlar',
+    s3_1Items: [
+        { bold: 'Teknik Arıza:', text: 'Platform kaynaklı teknik sorunlar nedeniyle kredi kaybı yaşandığında' },
+        { bold: 'Çift Ödeme:', text: 'Aynı işlem için mükerrer ödeme yapıldığında' },
+        { bold: 'Hizmetin Sunulamaması:', text: 'Satın alınan hizmetin platform tarafından sağlanamaması durumunda' },
+        { bold: 'Cayma Hakkı:', text: 'Satın alma tarihinden itibaren 14 gün içinde, krediler kullanılmamış ise' },
+    ],
+    s3_2Title: '3.2. İade Edilemez Durumlar',
+    s3_2Items: [
+        'Kullanılmış krediler (AI işlemi gerçekleştirilmiş)',
+        'Kullanıcı hatası nedeniyle yanlış ürün oluşturulması',
+        'Üretilen görsellerden memnun olmama (subjektif nedenler)',
+        'Hesap ihlali nedeniyle askıya alınan hesaplardaki krediler',
+        'Promosyon veya hediye olarak tanımlanan krediler',
+        'İndirimli kampanya ile alınan kredilerin tam fiyat üzerinden iadesi',
+    ],
+    s4Title: '4. İade Süreci',
+    s4Steps: [
+        { bold: 'Başvuru:', text: 'info@fasheone.com adresine iade talebi gönderin' },
+        { bold: 'Gerekli Bilgiler:', text: 'Hesap e-posta adresi, satın alma tarihi, işlem numarası, iade nedeni' },
+        { bold: 'İnceleme:', text: 'Talebiniz 3 iş günü içinde incelenir' },
+        { bold: 'Onay/Red:', text: 'Sonuç e-posta ile bildirilir' },
+        { bold: 'İade İşlemi:', text: 'Onaylanan iadeler 5-10 iş günü içinde gerçekleştirilir' },
+    ],
+    s5Title: '5. İade Yöntemleri',
+    s5Text: 'İadeler, aşağıdaki yöntemlerden biri ile gerçekleştirilir:',
+    s5Items: [
+        { bold: 'Orijinal Ödeme Yöntemi:', text: 'Ödemenin yapıldığı kart veya hesaba iade (tercih edilen yöntem)' },
+        { bold: 'Platform Kredisi:', text: 'İade tutarının platform kredisi olarak hesaba tanımlanması' },
+    ],
+    s6Title: '6. Abonelik İptali',
+    s6_1Title: '6.1. İptal Koşulları',
+    s6_1Items: [
+        'Aboneliğinizi istediğiniz zaman iptal edebilirsiniz',
+        'İptal işlemi, mevcut fatura döneminin sonunda geçerli olur',
+        'İptal sonrası kalan kredileriniz dönem sonuna kadar kullanılabilir',
+    ],
+    s6_2Title: '6.2. İptal Süreci',
+    s6_2Items: [
+        'Hesap ayarlarınızdan aboneliğinizi iptal edebilirsiniz',
+        'Veya info@fasheone.com adresine iptal talebi gönderebilirsiniz',
+        'İptal onayı e-posta ile gönderilecektir',
+    ],
+    s7Title: '7. Özel Durumlar',
+    s7_1Title: '7.1. Platform Kesintileri',
+    s7_1Text: 'Planlı bakım dışında yaşanan uzun süreli kesintilerde, etkilenen kullanıcılara kredi iadesi veya ek kredi tanımlaması yapılabilir.',
+    s7_2Title: '7.2. Hesap Silme',
+    s7_2Items: [
+        'Hesabınızı silmeden önce kullanılmamış kredilerinizi tüketmeniz önerilir',
+        'Hesap silindikten sonra kalan krediler iade edilemez',
+        'Hesap silme talebi 30 gün içinde geri alınabilir',
+    ],
+    s8Title: '8. Mücbir Sebepler',
+    s8Text: 'Doğal afet, savaş, terör, pandemi, devlet müdahalesi veya kontrol dışı diğer durumlar nedeniyle hizmetin sunulamaması halinde, Fasheone makul süre içinde alternatif çözümler sunmaya çalışacaktır.',
+    s9Title: '9. Tüketici Hakları',
+    s9Text: 'Bu politika, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve ilgili yönetmelikler çerçevesinde hazırlanmıştır. Tüketici haklarınız saklıdır.',
+    s9Items: [
+        { bold: 'Tüketici Hakları Derneği:', text: 'www.tuketici.org.tr' },
+        { bold: 'Tüketici Şikayet Hattı:', text: '175' },
+        { bold: 'e-Devlet Tüketici Şikayeti:', text: 'turkiye.gov.tr' },
+    ],
+    s10Title: '10. İletişim',
+    s10Text: 'İade ve iptal işlemleri hakkında sorularınız için:',
+    lastUpdate: 'Son güncelleme: Ocak 2025',
+};
+
+const en = {
+    backHome: '← Back to Home',
+    title: 'Refund and Cancellation Policy',
+    subtitle: 'Information about credit purchases, refund conditions, and cancellation procedures.',
+    s1Title: '1. General Information',
+    s1Text: 'Services purchased on the Fasheone platform are digital content provided through a credit-based system. This policy regulates the refund and cancellation conditions for credit purchase transactions.',
+    s2Title: '2. Credit System',
+    s2_1Title: '2.1. Credit Packages',
+    s2_1Text: 'You can purchase different amounts of credit packages on the platform. Each AI operation consumes a certain amount of credits.',
+    s2_2Title: '2.2. Credit Usage',
+    s2_2Items: [
+        'Credits are assigned to your account at the time of purchase',
+        'Each AI image generation consumes a certain amount of credits',
+        'Used credits cannot be refunded',
+        'Credits are valid for 1 year from the date of purchase',
+    ],
+    s3Title: '3. Refund Conditions',
+    s3_1Title: '3.1. Refundable Cases',
+    s3_1Items: [
+        { bold: 'Technical Failure:', text: 'When credit loss occurs due to platform-related technical issues' },
+        { bold: 'Double Payment:', text: 'When duplicate payment is made for the same transaction' },
+        { bold: 'Service Unavailability:', text: 'When the purchased service cannot be provided by the platform' },
+        { bold: 'Right of Withdrawal:', text: 'Within 14 days from the date of purchase, if credits have not been used' },
+    ],
+    s3_2Title: '3.2. Non-Refundable Cases',
+    s3_2Items: [
+        'Used credits (AI operation has been performed)',
+        'Incorrect product creation due to user error',
+        'Dissatisfaction with generated visuals (subjective reasons)',
+        'Credits in accounts suspended due to account violations',
+        'Credits defined as promotional or gifts',
+        'Refund of credits purchased at discounted campaign prices at full price',
+    ],
+    s4Title: '4. Refund Process',
+    s4Steps: [
+        { bold: 'Application:', text: 'Send a refund request to info@fasheone.com' },
+        { bold: 'Required Information:', text: 'Account email address, purchase date, transaction number, reason for refund' },
+        { bold: 'Review:', text: 'Your request will be reviewed within 3 business days' },
+        { bold: 'Approval/Rejection:', text: 'The result will be communicated via email' },
+        { bold: 'Refund Processing:', text: 'Approved refunds will be processed within 5-10 business days' },
+    ],
+    s5Title: '5. Refund Methods',
+    s5Text: 'Refunds are processed through one of the following methods:',
+    s5Items: [
+        { bold: 'Original Payment Method:', text: 'Refund to the card or account where the payment was made (preferred method)' },
+        { bold: 'Platform Credit:', text: 'Defining the refund amount as platform credit to the account' },
+    ],
+    s6Title: '6. Subscription Cancellation',
+    s6_1Title: '6.1. Cancellation Conditions',
+    s6_1Items: [
+        'You can cancel your subscription at any time',
+        'The cancellation takes effect at the end of the current billing period',
+        'Your remaining credits can be used until the end of the period after cancellation',
+    ],
+    s6_2Title: '6.2. Cancellation Process',
+    s6_2Items: [
+        'You can cancel your subscription from your account settings',
+        'Or you can send a cancellation request to info@fasheone.com',
+        'Cancellation confirmation will be sent via email',
+    ],
+    s7Title: '7. Special Cases',
+    s7_1Title: '7.1. Platform Outages',
+    s7_1Text: 'In case of prolonged outages outside of planned maintenance, affected users may receive credit refunds or additional credit allocations.',
+    s7_2Title: '7.2. Account Deletion',
+    s7_2Items: [
+        'It is recommended to use your unused credits before deleting your account',
+        'Remaining credits cannot be refunded after account deletion',
+        'Account deletion requests can be reversed within 30 days',
+    ],
+    s8Title: '8. Force Majeure',
+    s8Text: 'In case of inability to provide services due to natural disasters, war, terrorism, pandemic, government intervention, or other circumstances beyond control, Fasheone will endeavor to provide alternative solutions within a reasonable timeframe.',
+    s9Title: '9. Consumer Rights',
+    s9Text: 'This policy has been prepared in accordance with Consumer Protection Law No. 6502 and related regulations. Your consumer rights are reserved.',
+    s9Items: [
+        { bold: 'Consumer Rights Association:', text: 'www.tuketici.org.tr' },
+        { bold: 'Consumer Complaint Line:', text: '175' },
+        { bold: 'e-Government Consumer Complaint:', text: 'turkiye.gov.tr' },
+    ],
+    s10Title: '10. Contact',
+    s10Text: 'For questions about refund and cancellation transactions:',
+    lastUpdate: 'Last updated: January 2025',
+};
+
+const translations = { tr, en };
+
 export const RefundPolicyPage: React.FC<RefundPolicyPageProps> = ({ onNavigateHome, theme = 'dark' }) => {
     const bgClass = theme === 'dark' ? 'bg-slate-900' : 'bg-white';
     const textClass = theme === 'dark' ? 'text-white' : 'text-slate-900';
     const secondaryTextClass = theme === 'dark' ? 'text-slate-300' : 'text-slate-600';
     const cardBg = theme === 'dark' ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200';
+    const { t } = useI18n();
+    const p = t(translations);
 
     return (
         <div className={`min-h-screen ${bgClass}`}>
             <div className="container mx-auto px-4 py-12 max-w-4xl">
-                {/* Header */}
                 <div className="mb-8">
-                    <button
-                        onClick={onNavigateHome}
-                        className="text-cyan-500 hover:text-cyan-400 mb-4 flex items-center gap-2"
-                    >
-                        ← Ana Sayfaya Dön
-                    </button>
-                    <h1 className={`text-4xl font-bold ${textClass} mb-4`}>İade ve İptal Politikası</h1>
-                    <p className={secondaryTextClass}>Son Güncelleme: 31 Ocak 2026</p>
+                    <button onClick={onNavigateHome} className="text-cyan-500 hover:text-cyan-400 mb-4 flex items-center gap-2">{p.backHome}</button>
+                    <h1 className={`text-4xl font-bold ${textClass} mb-4`}>{p.title}</h1>
+                    <p className={secondaryTextClass}>{p.subtitle}</p>
                 </div>
 
-                {/* Content */}
                 <div className={`${cardBg} border rounded-2xl p-8 space-y-6`}>
                     <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>1. Genel Bilgiler</h2>
-                        <p className={secondaryTextClass}>
-                            Fasheone, dijital hizmet ve kredi satışı yapan bir SaaS platformudur. Bu politika,
-                            6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği
-                            kapsamında hazırlanmıştır.
-                        </p>
-                        <div className={`mt-4 p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg`}>
-                            <p className={`${secondaryTextClass} text-sm`}>
-                                <strong>Önemli:</strong> Dijital içerik ve hizmetler için cayma hakkı, hizmetin ifasına
-                                başlanmasıyla birlikte sona erer. Kredi satın alımlarında, açık rızanız ile cayma hakkınızdan
-                                feragat etmiş olursunuz.
-                            </p>
-                        </div>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s1Title}</h2>
+                        <p className={secondaryTextClass}>{p.s1Text}</p>
                     </section>
 
                     <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>2. Kredi Satın Alma ve İade</h2>
-                        <div className={`${secondaryTextClass} space-y-4`}>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s2Title}</h2>
+                        <div className="space-y-4">
                             <div>
-                                <h3 className="font-semibold text-lg mb-2">2.1. Satın Alma Süreci</h3>
-                                <ul className="list-disc list-inside space-y-1">
-                                    <li>Kredi paketleri Stripe üzerinden güvenli şekilde satın alınır</li>
-                                    <li>Ödeme onaylandıktan sonra krediler anında hesabınıza yüklenir</li>
-                                    <li>Satın alma işlemi tamamlandığında e-posta ile bilgilendirilirsiniz</li>
-                                </ul>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s2_1Title}</h3>
+                                <p className={secondaryTextClass}>{p.s2_1Text}</p>
                             </div>
-
                             <div>
-                                <h3 className="font-semibold text-lg mb-2">2.2. İade Koşulları</h3>
-                                <p className="mb-2">
-                                    Kredi iadesi <strong>yalnızca aşağıdaki durumlarda</strong> yapılabilir:
-                                </p>
-                                <ul className="list-disc list-inside space-y-2">
-                                    <li>
-                                        <strong>Teknik Hata:</strong> Ödeme alındı ancak krediler hesaba yüklenmedi
-                                        <span className="block text-sm mt-1 ml-6">→ 24 saat içinde tam iade</span>
-                                    </li>
-                                    <li>
-                                        <strong>Çift Ödeme:</strong> Aynı işlem için birden fazla ödeme alındı
-                                        <span className="block text-sm mt-1 ml-6">→ Fazla ödenen tutar iade edilir</span>
-                                    </li>
-                                    <li>
-                                        <strong>Yetkisiz İşlem:</strong> Hesabınız çalındı ve izniniz olmadan kredi satın alındı
-                                        <span className="block text-sm mt-1 ml-6">→ Kanıt sunulması halinde iade</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">2.3. İade Yapılamayan Durumlar</h3>
-                                <ul className="list-disc list-inside space-y-2">
-                                    <li>Krediler kullanılmaya başlandıysa (kısmi veya tam)</li>
-                                    <li>"Fikrim değişti" veya "kullanmayacağım" gibi nedenler</li>
-                                    <li>Satın alımdan 48 saat sonra yapılan talepler (teknik hata hariç)</li>
-                                    <li>Promosyon veya indirimli paketler (özel koşullar geçerlidir)</li>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s2_2Title}</h3>
+                                <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-1`}>
+                                    {p.s2_2Items.map((item, i) => <li key={i}>{item}</li>)}
                                 </ul>
                             </div>
                         </div>
                     </section>
 
                     <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>3. Hizmet İptali ve İade</h2>
-                        <div className={`${secondaryTextClass} space-y-4`}>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s3Title}</h2>
+                        <div className="space-y-4">
                             <div>
-                                <h3 className="font-semibold text-lg mb-2">3.1. Başarısız İşlemler</h3>
-                                <p>
-                                    AI hizmetlerimizde teknik bir sorun nedeniyle işlem başarısız olursa:
-                                </p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Harcanan krediler otomatik olarak hesabınıza iade edilir</li>
-                                    <li>İade işlemi 1-5 dakika içinde tamamlanır</li>
-                                    <li>E-posta ile bilgilendirilirsiniz</li>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s3_1Title}</h3>
+                                <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-2`}>
+                                    {p.s3_1Items.map((item, i) => <li key={i}><strong>{item.bold}</strong> {item.text}</li>)}
                                 </ul>
                             </div>
-
                             <div>
-                                <h3 className="font-semibold text-lg mb-2">3.2. Kalite Garantisi</h3>
-                                <p>
-                                    Üretilen görsellerin kalitesi beklentilerinizi karşılamıyorsa:
-                                </p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Farklı ayarlar ve promptlar deneyebilirsiniz (ek kredi harcanmaz)</li>
-                                    <li>Teknik destek ekibimizle iletişime geçebilirsiniz</li>
-                                    <li>AI teknolojisinin doğası gereği sonuçlar değişkenlik gösterebilir</li>
-                                </ul>
-                                <p className="mt-2 text-sm italic">
-                                    Not: "Beğenmedim" nedeniyle kredi iadesi yapılmaz, ancak teknik sorun varsa
-                                    destek ekibimiz yardımcı olur.
-                                </p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>4. İade Talep Süreci</h2>
-                        <div className={`${secondaryTextClass} space-y-4`}>
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">4.1. Başvuru Yöntemi</h3>
-                                <p>İade talebinde bulunmak için:</p>
-                                <ol className="list-decimal list-inside mt-2 space-y-2">
-                                    <li>
-                                        <strong>E-posta gönderin:</strong> info@fasheone.com
-                                        <ul className="list-disc list-inside ml-6 mt-1 text-sm">
-                                            <li>Konu: "İade Talebi - [Sipariş No]"</li>
-                                            <li>İçerik: İade nedeni, sipariş detayları, ekran görüntüleri (varsa)</li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <strong>Destek formu:</strong> Web sitemizden destek talebi oluşturun
-                                    </li>
-                                    <li>
-                                        <strong>Hesap paneli:</strong> "Siparişlerim" bölümünden iade talebi açın
-                                    </li>
-                                </ol>
-                            </div>
-
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">4.2. Değerlendirme Süreci</h3>
-                                <ul className="list-disc list-inside space-y-1">
-                                    <li><strong>İnceleme:</strong> Talebiniz 1-3 iş günü içinde incelenir</li>
-                                    <li><strong>Bilgilendirme:</strong> Sonuç e-posta ile bildirilir</li>
-                                    <li><strong>Onay:</strong> İade onaylanırsa işlem başlatılır</li>
-                                    <li><strong>Red:</strong> Red nedeni detaylı olarak açıklanır</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">4.3. İade Süresi</h3>
-                                <p>İade onaylandıktan sonra:</p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li><strong>Kredi İadesi:</strong> Anında hesabınıza yüklenir</li>
-                                    <li><strong>Para İadesi:</strong> 5-10 iş günü içinde ödeme yönteminize iade edilir</li>
-                                    <li><strong>Banka Süreci:</strong> Bankanızın işlem süresine bağlı olarak 2-3 gün daha sürebilir</li>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s3_2Title}</h3>
+                                <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-2`}>
+                                    {p.s3_2Items.map((item, i) => <li key={i}>{item}</li>)}
                                 </ul>
                             </div>
                         </div>
                     </section>
 
                     <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>5. Cayma Hakkı (Mesafeli Satış)</h2>
-                        <div className={`${secondaryTextClass} space-y-4`}>
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">5.1. Dijital İçerik İstisnası</h3>
-                                <p>
-                                    6502 sayılı Kanun'un 15. maddesi gereği, <strong>dijital içerik ve hizmetler</strong> için
-                                    cayma hakkı kullanılamaz. Fasheone hizmetleri bu kapsamdadır çünkü:
-                                </p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Anında teslim edilen dijital hizmetlerdir</li>
-                                    <li>Kullanıcı açık rızası ile hizmet ifasına başlanır</li>
-                                    <li>Krediler hesaba yüklenir yüklenmez kullanılabilir hale gelir</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">5.2. Açık Rıza Beyanı</h3>
-                                <p>
-                                    Kredi satın alırken, aşağıdaki beyanı onaylamış olursunuz:
-                                </p>
-                                <div className="mt-2 p-4 bg-slate-700/30 border border-slate-600 rounded-lg italic">
-                                    "Dijital içerik ve hizmet satın aldığımı, cayma hakkımın hizmetin ifasıyla birlikte
-                                    sona ereceğini kabul ediyorum. Kredilerin anında hesabıma yüklenmesini ve
-                                    kullanılabilir hale gelmesini talep ediyorum."
-                                </div>
-                            </div>
-                        </div>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s4Title}</h2>
+                        <ol className={`list-decimal list-inside ${secondaryTextClass} mt-2 space-y-2`}>
+                            {p.s4Steps.map((item, i) => <li key={i}><strong>{item.bold}</strong> {item.text}</li>)}
+                        </ol>
                     </section>
 
                     <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>6. Özel Durumlar</h2>
-                        <div className={`${secondaryTextClass} space-y-4`}>
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">6.1. Hesap Kapatma</h3>
-                                <p>
-                                    Hesabınızı kapatmak isterseniz:
-                                </p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Kullanılmamış kredileriniz için iade yapılmaz</li>
-                                    <li>Hesap kapatma talebi geri alınamaz</li>
-                                    <li>Tüm verileriniz KVKK uyarınca silinir</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">6.2. Hesap Askıya Alma/İptal</h3>
-                                <p>
-                                    Hesabınız kullanım koşullarını ihlal nedeniyle askıya alınır veya iptal edilirse:
-                                </p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Kalan krediler için iade yapılmaz</li>
-                                    <li>İhlal durumu kanıtlanırsa ödeme iadesi yapılmaz</li>
-                                    <li>İtiraz hakkınız saklıdır</li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h3 className="font-semibold text-lg mb-2">6.3. Platform Kapatılması</h3>
-                                <p>
-                                    Fasheone platformu kapatılırsa (olası olmayan bir durum):
-                                </p>
-                                <ul className="list-disc list-inside mt-2 space-y-1">
-                                    <li>Kullanılmamış krediler için tam iade yapılır</li>
-                                    <li>En az 30 gün önceden bildirim yapılır</li>
-                                    <li>İade işlemleri otomatik başlatılır</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>7. Tüketici Hakları</h2>
-                        <p className={secondaryTextClass}>
-                            Bu politikaya rağmen yasal haklarınız saklıdır. Şikayetleriniz için:
-                        </p>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s5Title}</h2>
+                        <p className={secondaryTextClass}>{p.s5Text}</p>
                         <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-2`}>
-                            <li>
-                                <strong>Tüketici Hakem Heyeti:</strong> İl/İlçe Tüketici Hakem Heyetleri
-                                <span className="block text-sm mt-1 ml-6">
-                                    (Uyuşmazlık değeri 2024 yılı için: 3.000 TL - 30.000 TL arası)
-                                </span>
-                            </li>
-                            <li>
-                                <strong>Tüketici Mahkemeleri:</strong> İkamet yeriniz veya işlemin yapıldığı yer mahkemeleri
-                            </li>
-                            <li>
-                                <strong>Tüketici Danışma Hattı:</strong> 175 (Ticaret Bakanlığı)
-                            </li>
+                            {p.s5Items.map((item, i) => <li key={i}><strong>{item.bold}</strong> {item.text}</li>)}
                         </ul>
                     </section>
 
                     <section>
-                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>8. İletişim</h2>
-                        <p className={secondaryTextClass}>
-                            İade ve iptal işlemleri için:
-                        </p>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s6Title}</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s6_1Title}</h3>
+                                <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-1`}>
+                                    {p.s6_1Items.map((item, i) => <li key={i}>{item}</li>)}
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s6_2Title}</h3>
+                                <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-1`}>
+                                    {p.s6_2Items.map((item, i) => <li key={i}>{item}</li>)}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s7Title}</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s7_1Title}</h3>
+                                <p className={secondaryTextClass}>{p.s7_1Text}</p>
+                            </div>
+                            <div>
+                                <h3 className={`text-xl font-semibold ${textClass} mb-2`}>{p.s7_2Title}</h3>
+                                <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-1`}>
+                                    {p.s7_2Items.map((item, i) => <li key={i}>{item}</li>)}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s8Title}</h2>
+                        <p className={secondaryTextClass}>{p.s8Text}</p>
+                    </section>
+
+                    <section>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s9Title}</h2>
+                        <p className={secondaryTextClass}>{p.s9Text}</p>
+                        <ul className={`list-disc list-inside ${secondaryTextClass} mt-2 space-y-2`}>
+                            {p.s9Items.map((item, i) => <li key={i}><strong>{item.bold}</strong> {item.text}</li>)}
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 className={`text-2xl font-bold ${textClass} mb-4`}>{p.s10Title}</h2>
+                        <p className={secondaryTextClass}>{p.s10Text}</p>
                         <ul className={`list-none ${secondaryTextClass} mt-2 space-y-2`}>
-                            <li><strong>E-posta:</strong> <a href="mailto:info@fasheone.com" className="text-cyan-500 hover:underline">info@fasheone.com</a></li>
+                            <li><strong>E-mail:</strong> <a href="mailto:info@fasheone.com" className="text-cyan-500 hover:underline">info@fasheone.com</a></li>
                             <li><strong>Web:</strong> <a href="https://fasheone.com" className="text-cyan-500 hover:underline">fasheone.com</a></li>
-                            <li><strong>Destek:</strong> Hesap panelinizdeki "Destek" bölümü</li>
                         </ul>
                     </section>
 
                     <section className="mt-8 pt-6 border-t border-slate-700">
-                        <p className={`${secondaryTextClass} text-sm italic`}>
-                            Bu politika, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler
-                            Yönetmeliği kapsamında hazırlanmıştır. Yasal haklarınız saklıdır.
-                        </p>
+                        <p className={`${secondaryTextClass} text-sm italic`}>{p.lastUpdate}</p>
                     </section>
                 </div>
             </div>

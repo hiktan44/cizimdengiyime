@@ -1,130 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { getAllUsersActivity, UserActivity, getUserGenerations, addCreditsToUser } from '../../lib/adminService';
+import { useI18n, useTranslation, TranslationRecord } from '../../lib/i18n';
 
-type Language = 'tr' | 'en';
+const trTranslations = {
+  search: 'Kullanıcı ara (email veya isim)...',
+  stats: { totalUsers: 'Toplam Kullanıcı', adminUsers: 'Admin Kullanıcı', totalCredits: 'Toplam Kredi', totalOperations: 'Toplam İşlem' },
+  table: { user: 'Kullanıcı', phone: 'Telefon', role: 'Rol', credits: 'Kredi', operations: 'İşlemler', spent: 'Harcanan', lastActivity: 'Son Aktivite', registrationDate: 'Kayıt Tarihi', admin: 'Admin', userRole: 'Kullanıcı', unnamed: 'İsimsiz', never: 'Hiç' },
+  actions: { exportCSV: 'Dışa Aktar (CSV)', columns: 'Sütunlar' },
+  modal: { title: 'Kullanıcı Detayları', email: 'Email', name: 'İsim', phone: 'Telefon Numarası', notSpecified: 'Belirtilmemiş', currentCredits: 'Mevcut Kredi', totalSpent: 'Toplam Harcanan', addCreditsTitle: 'Manuel Kredi Ekle', addCreditsBtn: 'Kredi Ekle', creditAmount: 'Kredi Miktarı', description: 'Açıklama (Opsiyonel)', descPlaceholder: 'Örn: Kampanya hediyesi', adding: 'Ekleniyor...', addCredits: 'Kredi Ekle', cancel: 'İptal', recentOps: 'Son İşlemler (Son 10)', loading: 'İşlemler yükleniyor...', noOps: 'Henüz işlem yok', sketchToProduct: 'Çizim → Ürün', productToModel: 'Ürün → Model', techSketch: 'Teknik Çizim', video: 'Video', credit: 'kredi', addedByAdmin: 'Admin tarafından eklendi', successMsg: 'kredi başarıyla eklendi!', errorMsg: 'Hata:', addError: 'Kredi eklenirken bir hata oluştu.' },
+  errors: { accessError: 'İşlem kayıtlarına erişim sağlanamadı. RLS policy güncellemesi gerekebilir.', loadError: 'İşlem kayıtları yüklenirken hata oluştu.', fixNote: 'FIX_ADMIN_GENERATIONS_RLS.sql dosyasını Supabase SQL Editor\'da çalıştırın.' },
+};
 
-const translations = {
-  tr: {
-    search: 'Kullanıcı ara (email veya isim)...',
-    stats: {
-      totalUsers: 'Toplam Kullanıcı',
-      adminUsers: 'Admin Kullanıcı',
-      totalCredits: 'Toplam Kredi',
-      totalOperations: 'Toplam İşlem',
-    },
-    table: {
-      user: 'Kullanıcı',
-      phone: 'Telefon',
-      role: 'Rol',
-      credits: 'Kredi',
-      operations: 'İşlemler',
-      spent: 'Harcanan',
-      lastActivity: 'Son Aktivite',
-      registrationDate: 'Kayıt Tarihi',
-      admin: 'Admin',
-      userRole: 'Kullanıcı',
-      unnamed: 'İsimsiz',
-      never: 'Hiç',
-    },
-    actions: {
-      exportCSV: 'Dışa Aktar (CSV)',
-      columns: 'Sütunlar',
-    },
-    modal: {
-      title: 'Kullanıcı Detayları',
-      email: 'Email',
-      name: 'İsim',
-      phone: 'Telefon Numarası',
-      notSpecified: 'Belirtilmemiş',
-      currentCredits: 'Mevcut Kredi',
-      totalSpent: 'Toplam Harcanan',
-      addCreditsTitle: 'Manuel Kredi Ekle',
-      addCreditsBtn: 'Kredi Ekle',
-      creditAmount: 'Kredi Miktarı',
-      description: 'Açıklama (Opsiyonel)',
-      descPlaceholder: 'Örn: Kampanya hediyesi',
-      adding: 'Ekleniyor...',
-      addCredits: 'Kredi Ekle',
-      cancel: 'İptal',
-      recentOps: 'Son İşlemler (Son 10)',
-      loading: 'İşlemler yükleniyor...',
-      noOps: 'Henüz işlem yok',
-      sketchToProduct: 'Çizim → Ürün',
-      productToModel: 'Ürün → Model',
-      techSketch: 'Teknik Çizim',
-      video: 'Video',
-      credit: 'kredi',
-      addedByAdmin: 'Admin tarafından eklendi',
-      successMsg: 'kredi başarıyla eklendi!',
-      errorMsg: 'Hata:',
-      addError: 'Kredi eklenirken bir hata oluştu.',
-    },
-    errors: {
-      accessError: 'İşlem kayıtlarına erişim sağlanamadı. RLS policy güncellemesi gerekebilir.',
-      loadError: 'İşlem kayıtları yüklenirken hata oluştu.',
-      fixNote: 'FIX_ADMIN_GENERATIONS_RLS.sql dosyasını Supabase SQL Editor\'da çalıştırın.',
-    },
-  },
+const translations: TranslationRecord<typeof trTranslations> = {
+  tr: trTranslations,
   en: {
     search: 'Search user (email or name)...',
-    stats: {
-      totalUsers: 'Total Users',
-      adminUsers: 'Admin Users',
-      totalCredits: 'Total Credits',
-      totalOperations: 'Total Operations',
-    },
-    table: {
-      user: 'User',
-      phone: 'Phone',
-      role: 'Role',
-      credits: 'Credits',
-      operations: 'Operations',
-      spent: 'Spent',
-      lastActivity: 'Last Activity',
-      registrationDate: 'Registration Date',
-      admin: 'Admin',
-      userRole: 'User',
-      unnamed: 'Unnamed',
-      never: 'Never',
-    },
-    actions: {
-      exportCSV: 'Export (CSV)',
-      columns: 'Columns',
-    },
-    modal: {
-      title: 'User Details',
-      email: 'Email',
-      name: 'Name',
-      phone: 'Phone Number',
-      notSpecified: 'Not specified',
-      currentCredits: 'Current Credits',
-      totalSpent: 'Total Spent',
-      addCreditsTitle: 'Add Credits Manually',
-      addCreditsBtn: 'Add Credits',
-      creditAmount: 'Credit Amount',
-      description: 'Description (Optional)',
-      descPlaceholder: 'Ex: Campaign gift',
-      adding: 'Adding...',
-      addCredits: 'Add Credits',
-      cancel: 'Cancel',
-      recentOps: 'Recent Operations (Last 10)',
-      loading: 'Loading operations...',
-      noOps: 'No operations yet',
-      sketchToProduct: 'Sketch → Product',
-      productToModel: 'Product → Model',
-      techSketch: 'Tech Drawing',
-      video: 'Video',
-      credit: 'credit',
-      addedByAdmin: 'Added by admin',
-      successMsg: 'credits added successfully!',
-      errorMsg: 'Error:',
-      addError: 'An error occurred while adding credits.',
-    },
-    errors: {
-      accessError: 'Cannot access operation records. RLS policy update may be required.',
-      loadError: 'Error loading operation records.',
-      fixNote: 'Run FIX_ADMIN_GENERATIONS_RLS.sql in Supabase SQL Editor.',
-    },
+    stats: { totalUsers: 'Total Users', adminUsers: 'Admin Users', totalCredits: 'Total Credits', totalOperations: 'Total Operations' },
+    table: { user: 'User', phone: 'Phone', role: 'Role', credits: 'Credits', operations: 'Operations', spent: 'Spent', lastActivity: 'Last Activity', registrationDate: 'Registration Date', admin: 'Admin', userRole: 'User', unnamed: 'Unnamed', never: 'Never' },
+    actions: { exportCSV: 'Export (CSV)', columns: 'Columns' },
+    modal: { title: 'User Details', email: 'Email', name: 'Name', phone: 'Phone Number', notSpecified: 'Not specified', currentCredits: 'Current Credits', totalSpent: 'Total Spent', addCreditsTitle: 'Add Credits Manually', addCreditsBtn: 'Add Credits', creditAmount: 'Credit Amount', description: 'Description (Optional)', descPlaceholder: 'Ex: Campaign gift', adding: 'Adding...', addCredits: 'Add Credits', cancel: 'Cancel', recentOps: 'Recent Operations (Last 10)', loading: 'Loading operations...', noOps: 'No operations yet', sketchToProduct: 'Sketch → Product', productToModel: 'Product → Model', techSketch: 'Tech Drawing', video: 'Video', credit: 'credit', addedByAdmin: 'Added by admin', successMsg: 'credits added successfully!', errorMsg: 'Error:', addError: 'An error occurred while adding credits.' },
+    errors: { accessError: 'Cannot access operation records. RLS policy update may be required.', loadError: 'Error loading operation records.', fixNote: 'Run FIX_ADMIN_GENERATIONS_RLS.sql in Supabase SQL Editor.' },
   },
 };
 
@@ -139,7 +34,8 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<UserActivity | null>(null);
   const [userGenerations, setUserGenerations] = useState<any[]>([]);
-  const [language, setLanguage] = useState<Language>('tr');
+  const { language } = useI18n();
+  const t = useTranslation(translations);
 
   // Credit addition state
   const [showAddCredit, setShowAddCredit] = useState(false);
@@ -219,11 +115,7 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
 
   useEffect(() => {
     loadUsers();
-    const savedLang = localStorage.getItem('fasheone_language') as Language;
-    if (savedLang) setLanguage(savedLang);
   }, []);
-
-  const t = translations[language];
 
   const loadUsers = async () => {
     try {
@@ -608,7 +500,7 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
             <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-900 z-10 shrink-0">
               <div>
                 <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  {selectedUser.full_name || t.modal.unnamed}
+                  {selectedUser.full_name || t.table.unnamed}
                   <span className="text-sm font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">{selectedUser.email}</span>
                 </h2>
                 <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">

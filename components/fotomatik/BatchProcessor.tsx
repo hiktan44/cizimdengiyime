@@ -1,6 +1,6 @@
 /**
  * Fotomatik Batch Processor Component
- * Toplu görsel işleme: arka plan kaldırma, retouch, katalog hazırlama
+ * Batch image processing: background removal, retouch, catalog preparation
  */
 
 import React, { useState, useCallback } from 'react';
@@ -24,9 +24,46 @@ interface BatchImage {
     error?: string;
 }
 
+interface BatchTranslations {
+    opRemoveBg?: string;
+    opRemoveBgDesc?: string;
+    opRetouch?: string;
+    opRetouchDesc?: string;
+    opCatalog?: string;
+    opCatalogDesc?: string;
+    retouchLabel?: string;
+    retouchLight?: string;
+    retouchMedium?: string;
+    retouchHeavy?: string;
+    catalogLabel?: string;
+    catalogEcommerce?: string;
+    catalogEcommerceDesc?: string;
+    catalogSocial?: string;
+    catalogSocialDesc?: string;
+    catalogMinimal?: string;
+    catalogMinimalDesc?: string;
+    uploadMax?: string;
+    uploadDrag?: string;
+    uploadFormats?: string;
+    imagesUploaded?: string;
+    completed?: string;
+    clearAll?: string;
+    errorDefault?: string;
+    progressProcessing?: string;
+    btnProcessing?: string;
+    btnCompleted?: string;
+    btnProcess?: string;
+    creditNeeded?: string;
+    creditHave?: string;
+    creditBuy?: string;
+    creditWillSpend?: string;
+    creditCurrent?: string;
+}
+
 interface BatchProcessorProps {
+    t?: BatchTranslations;
     onCreditsRequired: (count: number) => Promise<boolean>;
-    onDeductCredit: () => Promise<void>; // Her resim için 1 kredi düş
+    onDeductCredit: () => Promise<void>;
     onSaveToHistory: (outputUrl: string, settings: Record<string, any>) => Promise<void>;
     creditCost: number;
     userCredits: number;
@@ -36,12 +73,14 @@ type RetouchLevel = 'light' | 'medium' | 'heavy';
 type CatalogStyle = 'ecommerce' | 'social' | 'minimal';
 
 export const BatchProcessor: React.FC<BatchProcessorProps> = ({
+    t: tProp,
     onCreditsRequired,
     onDeductCredit,
     onSaveToHistory,
     creditCost,
     userCredits
 }) => {
+    const t: BatchTranslations = tProp || {};
     const [images, setImages] = useState<BatchImage[]>([]);
     const [operation, setOperation] = useState<BatchOperationType>('remove_bg');
     const [isProcessing, setIsProcessing] = useState(false);
@@ -54,20 +93,20 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
     const operations = [
         {
             id: 'remove_bg' as BatchOperationType,
-            label: '🎯 Arka Plan Kaldır',
-            desc: 'Görsellerin arka planını kaldırır',
+            label: t.opRemoveBg || '🎯 Remove Background',
+            desc: t.opRemoveBgDesc || 'Remove backgrounds from images',
             color: 'from-red-500 to-pink-600'
         },
         {
             id: 'retouch' as BatchOperationType,
-            label: '✨ Toplu Retouch',
-            desc: 'Profesyonel düzenleme ve iyileştirme',
+            label: t.opRetouch || '✨ Batch Retouch',
+            desc: t.opRetouchDesc || 'Professional editing and enhancement',
             color: 'from-purple-500 to-indigo-600'
         },
         {
             id: 'catalog' as BatchOperationType,
-            label: '📦 Katalog Hazırla',
-            desc: 'E-ticaret için optimize görsel',
+            label: t.opCatalog || '📦 Catalog Prep',
+            desc: t.opCatalogDesc || 'Optimize images for e-commerce',
             color: 'from-cyan-500 to-blue-600'
         },
     ];
@@ -207,12 +246,10 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
         const completedImages = images.filter(img => img.status === 'completed' && img.processedUrl);
         if (completedImages.length === 0) return;
 
-        // Download each image using canvas for better compatibility
         for (let i = 0; i < completedImages.length; i++) {
             const img = completedImages[i];
 
             try {
-                // Create image element
                 const image = new Image();
                 image.crossOrigin = 'anonymous';
 
@@ -222,31 +259,26 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                     image.src = img.processedUrl!;
                 });
 
-                // Create canvas
                 const canvas = document.createElement('canvas');
                 canvas.width = image.width;
                 canvas.height = image.height;
                 const ctx = canvas.getContext('2d')!;
 
-                // For JPG, add white background
                 if (format === 'jpg') {
                     ctx.fillStyle = '#FFFFFF';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
 
-                // Draw image
                 ctx.drawImage(image, 0, 0);
 
-                // Convert to blob
                 const blob = await new Promise<Blob>((resolve) => {
                     canvas.toBlob(
                         (blob) => resolve(blob!),
                         format === 'png' ? 'image/png' : 'image/jpeg',
-                        0.95 // JPG quality
+                        0.95
                     );
                 });
 
-                // Download
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -256,7 +288,6 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
 
-                // Small delay between downloads
                 if (i < completedImages.length - 1) {
                     await new Promise(r => setTimeout(r, 300));
                 }
@@ -294,7 +325,7 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
             {/* Operation-specific Options */}
             {operation === 'retouch' && (
                 <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-                    <label className="block text-sm font-medium text-slate-300 mb-3">Retouch Seviyesi</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-3">{t.retouchLabel || 'Retouch Level'}</label>
                     <div className="flex gap-3">
                         {(['light', 'medium', 'heavy'] as RetouchLevel[]).map((level) => (
                             <button
@@ -306,9 +337,9 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                                     }`}
                             >
-                                {level === 'light' && '🌱 Hafif'}
-                                {level === 'medium' && '⚡ Orta'}
-                                {level === 'heavy' && '🔥 Yoğun'}
+                                {level === 'light' && (t.retouchLight || '🌱 Light')}
+                                {level === 'medium' && (t.retouchMedium || '⚡ Medium')}
+                                {level === 'heavy' && (t.retouchHeavy || '🔥 Heavy')}
                             </button>
                         ))}
                     </div>
@@ -317,12 +348,12 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
 
             {operation === 'catalog' && (
                 <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
-                    <label className="block text-sm font-medium text-slate-300 mb-3">Katalog Stili</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-3">{t.catalogLabel || 'Catalog Style'}</label>
                     <div className="flex gap-3">
                         {([
-                            { id: 'ecommerce' as CatalogStyle, label: '🛒 E-Ticaret', desc: 'Amazon/Shopify' },
-                            { id: 'social' as CatalogStyle, label: '📱 Sosyal Medya', desc: 'Instagram/TikTok' },
-                            { id: 'minimal' as CatalogStyle, label: '✨ Minimal', desc: 'Lüks Markalar' },
+                            { id: 'ecommerce' as CatalogStyle, label: t.catalogEcommerce || '🛒 E-Commerce', desc: t.catalogEcommerceDesc || 'Amazon/Shopify' },
+                            { id: 'social' as CatalogStyle, label: t.catalogSocial || '📱 Social Media', desc: t.catalogSocialDesc || 'Instagram/TikTok' },
+                            { id: 'minimal' as CatalogStyle, label: t.catalogMinimal || '✨ Minimal', desc: t.catalogMinimalDesc || 'Luxury Brands' },
                         ]).map((style) => (
                             <button
                                 key={style.id}
@@ -363,11 +394,11 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                     <div className="text-5xl mb-4">📸</div>
                     <p className="text-xl font-bold text-slate-200 mb-2">
                         {images.length >= maxImages
-                            ? `Maksimum ${maxImages} görsel yüklenebilir`
-                            : 'Görselleri sürükleyin veya tıklayın'}
+                            ? (t.uploadMax || 'Maximum {count} images can be uploaded').replace('{count}', String(maxImages))
+                            : (t.uploadDrag || 'Drag & drop images or click to browse')}
                     </p>
                     <p className="text-sm text-slate-400">
-                        PNG, JPG, WEBP • Maks {maxImages} görsel • Her biri maks 10MB
+                        {(t.uploadFormats || 'PNG, JPG, WEBP • Max {count} images • Max 10MB each').replace('{count}', String(maxImages))}
                     </p>
                 </label>
             </div>
@@ -377,9 +408,9 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <span className="text-slate-300">
-                            <span className="font-bold text-cyan-400">{images.length}</span> görsel yüklendi
+                            <span className="font-bold text-cyan-400">{images.length}</span> {t.imagesUploaded || 'images uploaded'}
                             {completedCount > 0 && (
-                                <span className="ml-2 text-emerald-400">• {completedCount} tamamlandı</span>
+                                <span className="ml-2 text-emerald-400">• {completedCount} {t.completed || 'completed'}</span>
                             )}
                         </span>
                         <button
@@ -387,7 +418,7 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                             disabled={isProcessing}
                             className="text-sm text-red-400 hover:text-red-300 disabled:opacity-50"
                         >
-                            Tümünü Temizle
+                            {t.clearAll || 'Clear All'}
                         </button>
                     </div>
 
@@ -425,7 +456,7 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
 
                                 {img.status === 'error' && (
                                     <div className="absolute inset-0 bg-red-900/70 flex items-center justify-center p-2">
-                                        <span className="text-red-200 text-xs text-center">{img.error || 'Hata'}</span>
+                                        <span className="text-red-200 text-xs text-center">{img.error || (t.errorDefault || 'Error')}</span>
                                     </div>
                                 )}
 
@@ -448,7 +479,7 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
             {isProcessing && (
                 <div className="bg-slate-800/50 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-300">İşleniyor...</span>
+                        <span className="text-slate-300">{t.progressProcessing || 'Processing...'}</span>
                         <span className="text-cyan-400 font-bold">{progress.current} / {progress.total}</span>
                     </div>
                     <div className="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
@@ -469,10 +500,10 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                         className={`flex-1 py-4 bg-gradient-to-r ${operations.find(o => o.id === operation)?.color || 'from-cyan-500 to-blue-600'} text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                         {isProcessing
-                            ? `İşleniyor... (${progress.current}/${progress.total})`
+                            ? (t.btnProcessing || 'Processing... ({current}/{total})').replace('{current}', String(progress.current)).replace('{total}', String(progress.total))
                             : pendingCount === 0
-                                ? '✓ Tamamlandı'
-                                : `🚀 ${pendingCount} Görseli İşle (${estimatedCredits} Kredi)`
+                                ? (t.btnCompleted || '✓ Completed')
+                                : (t.btnProcess || '🚀 Process {count} Images ({credits} Credits)').replace('{count}', String(pendingCount)).replace('{credits}', String(estimatedCredits))
                         }
                     </button>
 
@@ -505,14 +536,16 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                     }`}>
                     {estimatedCredits > userCredits ? (
                         <>
-                            ⚠️ <span className="font-bold">{estimatedCredits} kredi</span> gerekiyor,
-                            <span className="font-bold"> {userCredits} krediniz</span> var.
-                            Lütfen kredi satın alın.
+                            ⚠️ <span className="font-bold">{(t.creditNeeded || '{needed} credits needed,').replace('{needed}', String(estimatedCredits))}</span>
+                            {' '}<span className="font-bold">{(t.creditHave || 'you have {have} credits.').replace('{have}', String(userCredits))}</span>
+                            {' '}{t.creditBuy || 'Please purchase credits.'}
                         </>
                     ) : (
                         <>
-                            Bu işlem toplam <span className="text-cyan-400 font-bold">{estimatedCredits} kredi</span> harcayacak.
-                            Mevcut: <span className="text-cyan-400 font-bold">{userCredits} kredi</span>
+                            {t.creditWillSpend || 'This operation will use'}{' '}
+                            <span className="text-cyan-400 font-bold">{estimatedCredits} {t.creditCurrent ? '' : 'credits'}</span>.
+                            {' '}{t.creditCurrent || 'Available:'}{' '}
+                            <span className="text-cyan-400 font-bold">{userCredits} {t.creditCurrent ? '' : 'credits'}</span>
                         </>
                     )}
                 </div>

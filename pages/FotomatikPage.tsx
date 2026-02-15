@@ -4,7 +4,8 @@
  * + Toplu İşleme Özelliği
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useI18n, useTranslation, TranslationRecord } from '../lib/i18n';
 import { fotomatikGenerateEditedImage, fotomatikGenerateImagePrompt, fotomatikSuggestEnhancements, PromptAnalysisResponse } from '../services/fotomatikService';
 import { UploadArea } from '../components/fotomatik/UploadArea';
 import { ResultArea } from '../components/fotomatik/ResultArea';
@@ -25,65 +26,122 @@ interface FotomatikPageProps {
 
 type FotomatikMode = 'transform' | 'describe' | 'enhance' | 'batch';
 type EnhanceMode = 'balanced' | 'vibrant' | 'crisp' | 'cinematic';
-type Language = 'tr' | 'en';
 
-const translations = {
-  tr: {
-    modes: {
-      transform: '🎨 Dönüştür',
-      describe: '📝 Açıkla',
-      enhance: '✨ İyileştir',
-      batch: '📦 Toplu İşlem',
-    },
-    enhanceModes: {
-      balanced: { label: 'DENGELİ', desc: 'Standart profesyonel görünüm' },
-      vibrant: { label: 'CANLI', desc: 'Renkleri ve tonları canlandırır' },
-      crisp: { label: 'KESKİN', desc: 'Detayları ve dokuyu belirginleştirir' },
-      cinematic: { label: 'SİNEMATİK', desc: 'Dramatik ışık ve gölge dengesi' },
-    },
-    aspectRatios: {
-      square: 'Kare (1:1)',
-      portrait: 'Portre (9:16)',
-      landscape: 'Manzara (16:9)',
-      vertical: 'Dikey (3:4)',
-      horizontal: 'Yatay (4:3)',
-    },
-    buttons: {
-      generate: 'Dönüştür',
-      describe: 'Açıkla',
-      autoEnhance: 'Otomatik İyileştir',
-      download: 'İndir',
-      copy: 'Kopyala',
-      copied: 'Kopyalandı!',
-    },
-    labels: {
-      prompt: 'Dönüşüm Promptu',
-      promptPlaceholder: 'Ne yapmak istiyorsunuz? Örn: Arka planı sahil manzarası yap...',
-      aspectRatio: 'En-Boy Oranı',
-      imageSize: 'Görüntü Boyutu',
-      enhanceMode: 'İyileştirme Modu',
-    },
-    prompts: {
-      turkish: 'Türkçe Prompt',
-      english: 'İngilizce Prompt',
-      midjourney: 'Midjourney Prompt',
-      stableDiffusion: 'Stable Diffusion Prompt',
-      positive: 'Pozitif',
-      negative: 'Negatif',
-      parameters: 'Parametreler',
-      expertTips: 'Uzman Önerileri',
-    },
-    messages: {
-      loginRequired: 'İşlem yapmak için giriş yapmalısınız.',
-      insufficientCredits: 'Yetersiz kredi.',
-      processing: 'İşleniyor...',
-      enhancing: 'İyileştiriliyor...',
-      describing: 'Analiz ediliyor...',
-      generating: 'Oluşturuluyor...',
-      success: 'İşlem başarılı!',
-      error: 'Bir hata oluştu',
-    },
+
+const trFotomatik = {
+  modes: {
+    transform: '🎨 Dönüştür',
+    describe: '📝 Açıkla',
+    enhance: '✨ İyileştir',
+    batch: '📦 Toplu İşlem',
   },
+  enhanceModes: {
+    balanced: { label: 'DENGELİ', desc: 'Standart profesyonel görünüm' },
+    vibrant: { label: 'CANLI', desc: 'Renkleri ve tonları canlandırır' },
+    crisp: { label: 'KESKİN', desc: 'Detayları ve dokuyu belirginleştirir' },
+    cinematic: { label: 'SİNEMATİK', desc: 'Dramatik ışık ve gölge dengesi' },
+  },
+  aspectRatios: {
+    square: 'Kare (1:1)',
+    portrait: 'Portre (9:16)',
+    landscape: 'Manzara (16:9)',
+    vertical: 'Dikey (3:4)',
+    horizontal: 'Yatay (4:3)',
+  },
+  buttons: {
+    generate: 'Dönüştür',
+    describe: 'Açıkla',
+    autoEnhance: 'Otomatik İyileştir',
+    download: 'İndir',
+    copy: 'Kopyala',
+    copied: 'Kopyalandı!',
+  },
+  labels: {
+    prompt: 'Dönüşüm Promptu',
+    promptPlaceholder: 'Ne yapmak istiyorsunuz? Örn: Arka planı sahil manzarası yap...',
+    aspectRatio: 'En-Boy Oranı',
+    imageSize: 'Görüntü Boyutu',
+    enhanceMode: 'İyileştirme Modu',
+  },
+  prompts: {
+    turkish: 'Türkçe Prompt',
+    english: 'İngilizce Prompt',
+    midjourney: 'Midjourney Prompt',
+    stableDiffusion: 'Stable Diffusion Prompt',
+    positive: 'Pozitif',
+    negative: 'Negatif',
+    parameters: 'Parametreler',
+    expertTips: 'Uzman Önerileri',
+  },
+  messages: {
+    loginRequired: 'İşlem yapmak için giriş yapmalısınız.',
+    insufficientCredits: 'Yetersiz kredi.',
+    processing: 'İşleniyor...',
+    enhancing: 'İyileştiriliyor...',
+    describing: 'Analiz ediliyor...',
+    generating: 'Oluşturuluyor...',
+    success: 'İşlem başarılı!',
+    error: 'Bir hata oluştu',
+    selectImageAndPrompt: 'Lütfen bir görüntü seçin ve bir istem girin.',
+    selectImage: 'Lütfen önce bir görüntü seçin.',
+    transformError: 'Görüntü dönüştürülürken bir hata oluştu.',
+    describeError: 'Prompt oluşturulurken bir hata oluştu.',
+    enhanceError: 'İyileştirme sırasında bir hata oluştu.',
+    pleaseUploadImage: 'Lütfen Görsel Yükleyin',
+  },
+  ui: {
+    subtitle: 'Yapay zeka ile fotoğraflarınızı dönüştürün veya detaylı prompt\'lar oluşturun.',
+    promptLabel: 'Dönüşüm İstemi',
+    promptPlaceholder: 'Ör: Bu fotoğraftaki kişiyi bir astronot yap, uzay arka planı ekle...',
+    aspectRatioLabel: 'En Boy Oranı',
+    resolutionLabel: 'Çözünürlük',
+    suggestedParams: 'Önerilen Parametreler',
+    expertTipsLabel: 'Uzman İpuçları',
+    promptGenerate: 'Prompt Üret',
+    creditCosts: 'Bu işlem',
+    creditUnit: 'kredi',
+    creditConsumes: 'harcar',
+    creditAvailable: 'Mevcut:',
+  },
+  batch: {
+    opRemoveBg: '🎯 Arka Plan Kaldır',
+    opRemoveBgDesc: 'Görsellerin arka planını kaldırır',
+    opRetouch: '✨ Toplu Retouch',
+    opRetouchDesc: 'Profesyonel düzenleme ve iyileştirme',
+    opCatalog: '📦 Katalog Hazırla',
+    opCatalogDesc: 'E-ticaret için optimize görsel',
+    retouchLabel: 'Retouch Seviyesi',
+    retouchLight: '🌱 Hafif',
+    retouchMedium: '⚡ Orta',
+    retouchHeavy: '🔥 Yoğun',
+    catalogLabel: 'Katalog Stili',
+    catalogEcommerce: '🛒 E-Ticaret',
+    catalogEcommerceDesc: 'Amazon/Shopify',
+    catalogSocial: '📱 Sosyal Medya',
+    catalogSocialDesc: 'Instagram/TikTok',
+    catalogMinimal: '✨ Minimal',
+    catalogMinimalDesc: 'Lüks Markalar',
+    uploadMax: 'Maksimum {count} görsel yüklenebilir',
+    uploadDrag: 'Görselleri sürükleyin veya tıklayın',
+    uploadFormats: 'PNG, JPG, WEBP • Maks {count} görsel • Her biri maks 10MB',
+    imagesUploaded: 'görsel yüklendi',
+    completed: 'tamamlandı',
+    clearAll: 'Tümünü Temizle',
+    errorDefault: 'Hata',
+    progressProcessing: 'İşleniyor...',
+    btnProcessing: 'İşleniyor... ({current}/{total})',
+    btnCompleted: '✓ Tamamlandı',
+    btnProcess: '🚀 {count} Görseli İşle ({credits} Kredi)',
+    creditNeeded: '{needed} kredi gerekiyor,',
+    creditHave: '{have} krediniz var.',
+    creditBuy: 'Lütfen kredi satın alın.',
+    creditWillSpend: 'Bu işlem toplam',
+    creditCurrent: 'Mevcut:',
+  },
+};
+
+const fotomatikTranslations: TranslationRecord<typeof trFotomatik> = {
+  tr: trFotomatik,
   en: {
     modes: {
       transform: '🎨 Transform',
@@ -138,15 +196,70 @@ const translations = {
       generating: 'Generating...',
       success: 'Operation successful!',
       error: 'An error occurred',
+      selectImageAndPrompt: 'Please select an image and enter a prompt.',
+      selectImage: 'Please select an image first.',
+      transformError: 'An error occurred while transforming the image.',
+      describeError: 'An error occurred while generating the prompt.',
+      enhanceError: 'An error occurred during enhancement.',
+      pleaseUploadImage: 'Please Upload Image',
+    },
+    ui: {
+      subtitle: 'Transform your photos or generate detailed prompts with AI.',
+      promptLabel: 'Transform Prompt',
+      promptPlaceholder: 'E.g., Turn the person in this photo into an astronaut, add a space background...',
+      aspectRatioLabel: 'Aspect Ratio',
+      resolutionLabel: 'Resolution',
+      suggestedParams: 'Suggested Parameters',
+      expertTipsLabel: 'Expert Tips',
+      promptGenerate: 'Generate Prompt',
+      creditCosts: 'This operation costs',
+      creditUnit: 'credits',
+      creditConsumes: '',
+      creditAvailable: 'Available:',
+    },
+    batch: {
+      opRemoveBg: '🎯 Remove Background',
+      opRemoveBgDesc: 'Remove backgrounds from images',
+      opRetouch: '✨ Batch Retouch',
+      opRetouchDesc: 'Professional editing and enhancement',
+      opCatalog: '📦 Catalog Prep',
+      opCatalogDesc: 'Optimize images for e-commerce',
+      retouchLabel: 'Retouch Level',
+      retouchLight: '🌱 Light',
+      retouchMedium: '⚡ Medium',
+      retouchHeavy: '🔥 Heavy',
+      catalogLabel: 'Catalog Style',
+      catalogEcommerce: '🛒 E-Commerce',
+      catalogEcommerceDesc: 'Amazon/Shopify',
+      catalogSocial: '📱 Social Media',
+      catalogSocialDesc: 'Instagram/TikTok',
+      catalogMinimal: '✨ Minimal',
+      catalogMinimalDesc: 'Luxury Brands',
+      uploadMax: 'Maximum {count} images can be uploaded',
+      uploadDrag: 'Drag & drop images or click to browse',
+      uploadFormats: 'PNG, JPG, WEBP • Max {count} images • Max 10MB each',
+      imagesUploaded: 'images uploaded',
+      completed: 'completed',
+      clearAll: 'Clear All',
+      errorDefault: 'Error',
+      progressProcessing: 'Processing...',
+      btnProcessing: 'Processing... ({current}/{total})',
+      btnCompleted: '✓ Completed',
+      btnProcess: '🚀 Process {count} Images ({credits} Credits)',
+      creditNeeded: '{needed} credits needed,',
+      creditHave: 'you have {have} credits.',
+      creditBuy: 'Please purchase credits.',
+      creditWillSpend: 'This operation will use',
+      creditCurrent: 'Available:',
     },
   },
 };
 
-const getEnhanceModes = (lang: Language) => [
-  { id: 'balanced' as EnhanceMode, label: translations[lang].enhanceModes.balanced.label, desc: translations[lang].enhanceModes.balanced.desc, icon: '✅', color: 'text-blue-400' },
-  { id: 'vibrant' as EnhanceMode, label: translations[lang].enhanceModes.vibrant.label, desc: translations[lang].enhanceModes.vibrant.desc, icon: '🎨', color: 'text-pink-400' },
-  { id: 'crisp' as EnhanceMode, label: translations[lang].enhanceModes.crisp.label, desc: translations[lang].enhanceModes.crisp.desc, icon: '🔺', color: 'text-orange-400' },
-  { id: 'cinematic' as EnhanceMode, label: translations[lang].enhanceModes.cinematic.label, desc: translations[lang].enhanceModes.cinematic.desc, icon: '🎬', color: 'text-purple-400' },
+const getEnhanceModes = (t: typeof trFotomatik) => [
+  { id: 'balanced' as EnhanceMode, label: t.enhanceModes.balanced.label, desc: t.enhanceModes.balanced.desc, icon: '✅', color: 'text-blue-400' },
+  { id: 'vibrant' as EnhanceMode, label: t.enhanceModes.vibrant.label, desc: t.enhanceModes.vibrant.desc, icon: '🎨', color: 'text-pink-400' },
+  { id: 'crisp' as EnhanceMode, label: t.enhanceModes.crisp.label, desc: t.enhanceModes.crisp.desc, icon: '🔺', color: 'text-orange-400' },
+  { id: 'cinematic' as EnhanceMode, label: t.enhanceModes.cinematic.label, desc: t.enhanceModes.cinematic.desc, icon: '🎬', color: 'text-purple-400' },
 ];
 
 export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
@@ -171,15 +284,9 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   const [enhancedImageUrl, setEnhancedImageUrl] = useState<string | null>(null);
 
   // Language
-  const [language, setLanguage] = useState<Language>('tr');
-
-  useEffect(() => {
-    const savedLang = localStorage.getItem('fasheone_language') as Language;
-    if (savedLang) setLanguage(savedLang);
-  }, []);
-
-  const t = translations[language];
-  const ENHANCE_MODES = getEnhanceModes(language);
+  const { language } = useI18n();
+  const t = useTranslation(fotomatikTranslations);
+  const ENHANCE_MODES = getEnhanceModes(t);
 
   const aspectRatios = [
     { label: t.aspectRatios.square, value: '1:1' },
@@ -233,7 +340,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Transform Mode - Generate Image
   const handleTransform = useCallback(async () => {
     if (!selectedImage || !prompt.trim()) {
-      setErrorMessage('Lütfen bir görüntü seçin ve bir istem girin.');
+      setErrorMessage(t.messages.selectImageAndPrompt);
       return;
     }
 
@@ -257,7 +364,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       await saveToHistory(result, 'fotomatik_transform', { prompt, aspectRatio, imageSize });
     } catch (error: any) {
       console.error('Transform Error:', error);
-      setErrorMessage(error.message || 'Görüntü dönüştürülürken bir hata oluştu.');
+      setErrorMessage(error.message || t.messages.transformError);
       setStatus(FotomatikAppStatus.ERROR);
     }
   }, [selectedImage, prompt, aspectRatio, imageSize, profile]);
@@ -265,7 +372,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Describe Mode - Generate Prompt
   const handleDescribe = useCallback(async () => {
     if (!selectedImage) {
-      setErrorMessage('Lütfen önce bir görüntü seçin.');
+      setErrorMessage(t.messages.selectImage);
       return;
     }
 
@@ -307,7 +414,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       }
     } catch (error: any) {
       console.error('Describe Error:', error);
-      setErrorMessage(error.message || 'Prompt oluşturulurken bir hata oluştu.');
+      setErrorMessage(error.message || t.messages.describeError);
       setStatus(FotomatikAppStatus.ERROR);
     }
   }, [selectedImage, profile]);
@@ -321,7 +428,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   // Enhance Mode - Apply Enhancements
   const handleEnhance = useCallback(async () => {
     if (!selectedImage) {
-      setErrorMessage('Lütfen önce bir görüntü seçin.');
+      setErrorMessage(t.messages.selectImage);
       return;
     }
 
@@ -372,7 +479,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       });
     } catch (error: any) {
       console.error('Enhance Error:', error);
-      setErrorMessage(error.message || (language === 'tr' ? 'İyileştirme sırasında bir hata oluştu.' : 'An error occurred during enhancement.'));
+      setErrorMessage(error.message || t.messages.enhanceError);
       setStatus(FotomatikAppStatus.ERROR);
     }
   }, [selectedImage, selectedEnhanceMode, profile]);
@@ -409,7 +516,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">Fotomatik</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Yapay zeka ile fotoğraflarınızı dönüştürün veya detaylı prompt'lar oluşturun.
+            {t.ui.subtitle}
           </p>
         </div>
 
@@ -422,7 +529,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
               : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
               }`}
           >
-            📝 Prompt Üret
+            📝 {t.ui.promptGenerate}
           </button>
           <button
             onClick={() => { setMode('transform'); handleReset(); }}
@@ -457,10 +564,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
         {profile && (
           <div className="max-w-4xl mx-auto flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 mb-6">
             <span className="text-sm text-slate-400">
-              {language === 'tr' ? 'Bu işlem' : 'This operation costs'} <span className="text-cyan-400 font-bold">{creditCost} {language === 'tr' ? 'kredi' : 'credits'}</span> {language === 'tr' ? 'harcar' : ''}
+              {t.ui.creditCosts} <span className="text-cyan-400 font-bold">{creditCost} {t.ui.creditUnit}</span> {t.ui.creditConsumes}
             </span>
             <span className="text-sm text-slate-300">
-              {language === 'tr' ? 'Mevcut:' : 'Available:'} <span className="text-cyan-400 font-bold">{profile.credits}</span> {language === 'tr' ? 'kredi' : 'credits'}
+              {t.ui.creditAvailable} <span className="text-cyan-400 font-bold">{profile.credits}</span> {t.ui.creditUnit}
             </span>
           </div>
         )}
@@ -492,7 +599,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 {/* Prompt Input */}
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Dönüşüm İstemi
+                    {t.ui.promptLabel}
                   </label>
                   <div className="relative">
                     <textarea
@@ -500,7 +607,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                       onChange={(e) => {
                         setPrompt(e.target.value);
                       }}
-                      placeholder="Ör: Bu fotoğraftaki kişiyi bir astronot yap, uzay arka planı ekle..."
+                      placeholder={t.ui.promptPlaceholder}
                       rows={4}
                       className="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none resize-y min-h-[120px]"
                     />
@@ -515,7 +622,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 {/* Aspect Ratio */}
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    En Boy Oranı
+                    {t.ui.aspectRatioLabel}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {aspectRatios.map((ratio) => (
@@ -536,7 +643,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 {/* Image Size */}
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Çözünürlük
+                    {t.ui.resolutionLabel}
                   </label>
                   <div className="flex gap-2">
                     {imageSizes.map((size) => (
@@ -560,7 +667,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                   disabled={status === FotomatikAppStatus.LOADING || !prompt.trim() || !selectedImage}
                   className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                 >
-                  {status === FotomatikAppStatus.LOADING ? t.messages.generating : !selectedImage ? 'Lütfen Görsel Yükleyin' : `✨ ${t.buttons.generate}`}
+                  {status === FotomatikAppStatus.LOADING ? t.messages.generating : !selectedImage ? t.messages.pleaseUploadImage : `✨ ${t.buttons.generate}`}
                 </button>
               </div>
             </div>
@@ -587,7 +694,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                 disabled={status === FotomatikAppStatus.LOADING || !selectedImage}
                 className="w-full py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
-                {status === FotomatikAppStatus.LOADING ? t.messages.describing : !selectedImage ? 'Lütfen Görsel Yükleyin' : `📝 ${t.buttons.describe}`}
+                {status === FotomatikAppStatus.LOADING ? t.messages.describing : !selectedImage ? t.messages.pleaseUploadImage : `📝 ${t.buttons.describe}`}
               </button>
 
               {/* Generated Prompts */}
@@ -614,7 +721,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                     {/* English Prompt */}
                     <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-slate-200">🇬🇧 English</span>
+                        <span className="font-semibold text-slate-200">🇬🇧 {t.prompts.english}</span>
                         <button
                           onClick={() => handleCopyPrompt('en', generatedPrompts.en)}
                           className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${copiedKey === 'en'
@@ -622,7 +729,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                             : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                             }`}
                         >
-                          {copiedKey === 'en' ? '✓ Copied' : 'Copy'}
+                          {copiedKey === 'en' ? `✓ ${t.buttons.copied}` : t.buttons.copy}
                         </button>
                       </div>
                       <p className="text-slate-300 text-sm leading-relaxed">{generatedPrompts.en}</p>
@@ -662,7 +769,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                               : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
                               }`}
                           >
-                            {copiedKey === 'sd-positive' ? '✓' : 'Copy'}
+                            {copiedKey === 'sd-positive' ? '✓' : t.buttons.copy}
                           </button>
                         </div>
                         <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.positive}</p>
@@ -677,13 +784,13 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                               : 'bg-cyan-700 text-cyan-200 hover:bg-cyan-600'
                               }`}
                           >
-                            {copiedKey === 'sd-negative' ? '✓' : 'Copy'}
+                            {copiedKey === 'sd-negative' ? '✓' : t.buttons.copy}
                           </button>
                         </div>
                         <p className="text-cyan-100 text-xs leading-relaxed font-mono">{generatedPrompts.stableDiffusion.negative}</p>
                       </div>
                       <div>
-                        <span className="text-xs font-semibold text-cyan-400">Önerilen Parametreler:</span>
+                        <span className="text-xs font-semibold text-cyan-400">{t.ui.suggestedParams}:</span>
                         <p className="text-cyan-100 text-xs mt-1">{generatedPrompts.stableDiffusion.params}</p>
                       </div>
                     </div>
@@ -692,7 +799,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                   {/* Expert Tips */}
                   {generatedPrompts.tips && generatedPrompts.tips.length > 0 && (
                     <div className="bg-orange-900/20 border border-orange-500/30 rounded-xl p-4">
-                      <span className="font-semibold text-orange-300 mb-3 block">💡 Uzman İpuçları</span>
+                      <span className="font-semibold text-orange-300 mb-3 block">💡 {t.ui.expertTipsLabel}</span>
                       <ul className="space-y-2">
                         {generatedPrompts.tips.map((tip, idx) => (
                           <li key={idx} className="text-orange-100 text-sm flex items-start gap-2">
@@ -753,7 +860,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
                   disabled={status === FotomatikAppStatus.LOADING || !selectedImage}
                   className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                 >
-                  {status === FotomatikAppStatus.LOADING ? t.messages.enhancing : !selectedImage ? 'Lütfen Görsel Yükleyin' : `⚡ ${t.buttons.autoEnhance}`}
+                  {status === FotomatikAppStatus.LOADING ? t.messages.enhancing : !selectedImage ? t.messages.pleaseUploadImage : `⚡ ${t.buttons.autoEnhance}`}
                 </button>
               </div>
             </div>
@@ -793,6 +900,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
         {/* Batch Mode */}
         {mode === 'batch' && (
           <BatchProcessor
+            t={t.batch}
             onCreditsRequired={async (count: number) => {
               if (!profile) {
                 setErrorMessage(t.messages.loginRequired);

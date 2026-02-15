@@ -1,78 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { getAllTransactions, AdminTransaction } from '../../lib/adminService';
+import { useI18n, useTranslation, TranslationRecord } from '../../lib/i18n';
 
-type Language = 'tr' | 'en';
+interface TransactionTranslations {
+  stats: { totalTransactions: string; totalRevenue: string; creditsGiven: string; successRate: string };
+  filter: { label: string; all: string; completed: string; pending: string; failed: string };
+  table: { user: string; type: string; amount: string; credits: string; status: string; paymentMethod: string; date: string; noTransactions: string; unnamed: string };
+  status: { completed: string; pending: string; failed: string };
+  type: { subscription: string; creditPackage: string };
+}
 
-const translations = {
+const translations: TranslationRecord<TransactionTranslations> = {
   tr: {
-    stats: {
-      totalTransactions: 'Toplam İşlem',
-      totalRevenue: 'Toplam Gelir',
-      creditsGiven: 'Verilen Kredi',
-      successRate: 'Başarı Oranı',
-    },
-    filter: {
-      label: 'Durum Filtrele:',
-      all: 'Tümü',
-      completed: 'Tamamlanan',
-      pending: 'Bekleyen',
-      failed: 'Başarısız',
-    },
-    table: {
-      user: 'Kullanıcı',
-      type: 'Tip',
-      amount: 'Tutar',
-      credits: 'Kredi',
-      status: 'Durum',
-      paymentMethod: 'Ödeme Yöntemi',
-      date: 'Tarih',
-      noTransactions: 'İşlem bulunamadı',
-      unnamed: 'İsimsiz',
-    },
-    status: {
-      completed: 'Tamamlandı',
-      pending: 'Bekliyor',
-      failed: 'Başarısız',
-    },
-    type: {
-      subscription: 'Abonelik',
-      creditPackage: 'Kredi Paketi',
-    },
+    stats: { totalTransactions: 'Toplam İşlem', totalRevenue: 'Toplam Gelir', creditsGiven: 'Verilen Kredi', successRate: 'Başarı Oranı' },
+    filter: { label: 'Durum Filtrele:', all: 'Tümü', completed: 'Tamamlanan', pending: 'Bekleyen', failed: 'Başarısız' },
+    table: { user: 'Kullanıcı', type: 'Tip', amount: 'Tutar', credits: 'Kredi', status: 'Durum', paymentMethod: 'Ödeme Yöntemi', date: 'Tarih', noTransactions: 'İşlem bulunamadı', unnamed: 'İsimsiz' },
+    status: { completed: 'Tamamlandı', pending: 'Bekliyor', failed: 'Başarısız' },
+    type: { subscription: 'Abonelik', creditPackage: 'Kredi Paketi' },
   },
   en: {
-    stats: {
-      totalTransactions: 'Total Transactions',
-      totalRevenue: 'Total Revenue',
-      creditsGiven: 'Credits Given',
-      successRate: 'Success Rate',
-    },
-    filter: {
-      label: 'Filter Status:',
-      all: 'All',
-      completed: 'Completed',
-      pending: 'Pending',
-      failed: 'Failed',
-    },
-    table: {
-      user: 'User',
-      type: 'Type',
-      amount: 'Amount',
-      credits: 'Credits',
-      status: 'Status',
-      paymentMethod: 'Payment Method',
-      date: 'Date',
-      noTransactions: 'No transactions found',
-      unnamed: 'Unnamed',
-    },
-    status: {
-      completed: 'Completed',
-      pending: 'Pending',
-      failed: 'Failed',
-    },
-    type: {
-      subscription: 'Subscription',
-      creditPackage: 'Credit Package',
-    },
+    stats: { totalTransactions: 'Total Transactions', totalRevenue: 'Total Revenue', creditsGiven: 'Credits Given', successRate: 'Success Rate' },
+    filter: { label: 'Filter Status:', all: 'All', completed: 'Completed', pending: 'Pending', failed: 'Failed' },
+    table: { user: 'User', type: 'Type', amount: 'Amount', credits: 'Credits', status: 'Status', paymentMethod: 'Payment Method', date: 'Date', noTransactions: 'No transactions found', unnamed: 'Unnamed' },
+    status: { completed: 'Completed', pending: 'Pending', failed: 'Failed' },
+    type: { subscription: 'Subscription', creditPackage: 'Credit Package' },
   },
 };
 
@@ -80,15 +31,12 @@ export const TransactionsPanel: React.FC = () => {
   const [transactions, setTransactions] = useState<AdminTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<'all' | 'completed' | 'pending' | 'failed'>('all');
-  const [language, setLanguage] = useState<Language>('tr');
+  const { language } = useI18n();
+  const t = useTranslation(translations);
 
   useEffect(() => {
     loadTransactions();
-    const savedLang = localStorage.getItem('fasheone_language') as Language;
-    if (savedLang) setLanguage(savedLang);
   }, []);
-
-  const t = translations[language];
 
   const loadTransactions = async () => {
     try {
@@ -184,19 +132,18 @@ export const TransactionsPanel: React.FC = () => {
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
-                filterStatus === status
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filterStatus === status
                   ? 'bg-cyan-600 text-white'
                   : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
-              }`}
+                }`}
             >
               {status === 'all'
                 ? t.filter.all
                 : status === 'completed'
-                ? t.filter.completed
-                : status === 'pending'
-                ? t.filter.pending
-                : t.filter.failed}
+                  ? t.filter.completed
+                  : status === 'pending'
+                    ? t.filter.pending
+                    : t.filter.failed}
             </button>
           ))}
         </div>

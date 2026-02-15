@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useI18n, TranslationRecord } from '../lib/i18n';
 import { Logo } from '../components/Logo';
 import { CREDIT_PACKAGES } from '../lib/supabase';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
@@ -30,417 +31,415 @@ interface LandingPageProps {
   logoMediaUrl?: string;
 }
 
-type Language = 'tr' | 'en';
 type Theme = 'light' | 'dark';
-
-const translations = {
-  tr: {
-    header: {
-      signIn: 'Giriş Yap',
-      start: 'Başla',
-      buyCredits: 'Kredi Al',
-      signOut: 'Çıkış',
-      continueUsing: 'Hemen Kullanmaya Devam Et',
-    },
-    howItWorks: {
-      title: 'Nasıl Çalışır?',
-      subtitle: '3 Adımda AI ile Profesyonel Görsel',
-      step1Title: 'Görseli Yükle',
-      step1Desc: 'Ürün çizimini veya fotoğrafını platforma yükle, AI otomatik analiz eder',
-      step2Title: 'Detayları Seç',
-      step2Desc: 'Hazır şablonlar ve seçeneklerle istediğin stili belirle, prompt kullanmana gerek yok',
-      step3Title: 'Oluştur & İndir',
-      step3Desc: 'Profesyonel sonuçları hemen indir, video oluştur, sosyal medyada paylaş',
-      useCases: {
-        title: 'Güçlü Özellikler',
-        subtitle: 'Her İhtiyaca Özel Çözümler',
-        feature1: {
-          title: 'Çizimden Ürüne',
-          desc: 'Moda çizimlerinizi ultra-gerçekçi hayalet manken ürün fotoğraflarına dönüştürün. Basit karakalem veya dijital teknik çizimlerinizi yükleyin, yapay zeka kumaş, dikiş ve detayları algılayarak profesyonel ürün görselleri oluşturur.',
-          features: [
-            'Otomatik kumaş doku ve renk analizi',
-            'Dikiş ve detay korumalı dönüşüm',
-            'Stüdyo kalitesinde ışıklandırma',
-            'E-ticaret için optimize edilmiş çıktılar'
-          ]
-        },
-        feature2: {
-          title: 'Canlı Model',
-          desc: 'Ürünlerinizi gerçek modeller üzerinde görün. Farklı ten rengi, saç stili ve poz tipleriyle sahip yapay zeka modelleriyle stüdyo çekimi kalitesinde sonuçlar alın. Fiziksel model maliyetlerinden kurtulun.',
-          features: [
-            'Çeşitli etnik köken ve vücut tipi seçenekleri',
-            '12+ farklı profesyonel poz',
-            'Özelleştirilebilir arka plan ve mekan',
-            'Tutarlı model kullanımı ile marka kimliği'
-          ]
-        },
-        feature3: {
-          title: 'Video Oluşturma',
-          desc: 'Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
-          features: [
-            'Sinematik kamera hareketleri',
-            'Yavaş çekim (slow-motion) efektleri',
-            'Sosyal medya formatları (Reels, TikTok, Shorts)',
-            'Yüksek çözünürlük 2K/4K çıktı'
-          ]
-        },
-        feature4: {
-          title: 'Teknik Çizim (Tech Pack)',
-          desc: 'Ürün fotoğraflarınızı üretim için detaylı teknik çizimlere dönüştürün. Yapay zeka, ürün üzerindeki dikiş yollarını ve kalıp parçalarını otomatik olarak algılayarak net çizgilerle sunar.',
-          features: [
-            'Otomatik dikiş ve kalıp analizi',
-            'Üretime hazır teknik çizimler',
-            'Ölçü ve detay korumalı dönüşüm',
-            'Tedarikçi paylaşımı için ideal format'
-          ]
-        },
-        feature5: {
-          title: 'Pixshop - Fotoğraf Düzenleme',
-          desc: 'AI destekli profesyonel rötuş, filtre, ayarlama ve 4K upscaling. Yüz değiştirme ve logo ekleme özellikleriyle fotoğraflarınızı saniyeler içinde mükemmelleştirin. Photoshop bilgisi gerektirmez.',
-          features: [
-            'Akıllı rötuş ve renk düzeltme',
-            'Profesyonel filtre ve atmosfer ayarları',
-            '2K/4K upscaling teknolojisi',
-            'Yüz değiştirme ve logo/aksesuar ekleme'
-          ]
-        },
-        feature6: {
-          title: 'Fotomatik - Toplu İşleme',
-          desc: 'Birden fazla görseli aynı anda işleyin. Arka plan kaldırma, toplu düzenleme ve hızlı katalog hazırlama. Saatler süren manuel işlemleri dakikalara indirin.',
-          features: [
-            'Toplu arka plan kaldırma',
-            'Otomatik görsel iyileştirme',
-            'Hızlı katalog hazırlama',
-            'Prompt mühendisliği ve analiz'
-          ]
-        },
-        collage: {
-          title: 'Kolaj Oluşturma',
-          desc: 'Tek bir üründen birden fazla varyasyon oluşturun. Farklı renkler, pozlar ve arka planlarla zengin kataloglar hazırlayın. 4-16 görseli tek bir kolajda birleştirerek e-ticaret ve sosyal medya için etkileyici içerikler üretin.',
-          features: [
-            'Otomatik grid düzeni ve profesyonel tasarım',
-            'Farklı renk ve stil varyasyonları',
-            'E-ticaret katalogları için ideal format',
-            'Sosyal medya paylaşımları için optimize edilmiş boyutlar'
-          ]
-        },
-        adMedia: {
-          title: 'Reklam Medyası',
-          desc: 'Profesyonel reklam kampanyaları için stüdyo kalitesinde görseller ve videolar üretin. Farklı mekanlar, modeller ve senaryolarla markanızı öne çıkarın. AI ile saniyeler içinde billboard, dergi ve dijital reklam içerikleri oluşturun.',
-          features: [
-            'Stüdyo çekimi kalitesinde model görselleri',
-            'Özelleştirilebilir arka plan ve mekan seçenekleri',
-            '5-10 saniyelik sinematik video içerikler',
-            'Marka kimliğine uygun stil ve atmosfer kontrolü'
-          ]
-        },
-        ecommerce: {
-          title: 'E-ticaret Çözümleri',
-          desc: 'Online mağazanız için eksiksiz görsel içerik paketi hazırlayın. Ürün fotoğrafları, model görselleri, teknik çizimler ve tanıtım videoları tek platformda. Katalog hazırlama sürenizi %90 azaltın, maliyetleri minimize edin.',
-          features: [
-            'Hayalet manken ve model görselleri',
-            'Farklı açılardan ürün fotoğrafları',
-            'Teknik çizim ve ölçü tabloları',
-            'Toplu işleme ile hızlı katalog hazırlama'
-          ]
-        }
-      }
-    },
-    hero: {
-      title: 'Çizimden Gerçeğe,',
-      subtitle: 'Saniyeler İçinde',
-      description: 'Moda tasarımlarınızı AI ile profesyonel ürün fotoğraflarına ve canlı model görsellerine dönüştürün. Video oluşturun, markanızı büyütün.',
-      cta: 'Ücretsiz Deneyin',
-    },
-    showcase: {
-      title: 'Çizimden Gerçeğe Dönüşüm',
-      subtitle: 'AI teknolojisiyle tasarımlarınız profesyonel görsellere dönüşüyor',
-      before: 'ÖNCE',
-      after: 'SONRA',
-      step1: '1. Çizim → Ürün (Hayalet Manken)',
-      step1Desc: 'Basit karakalem veya dijital teknik çizimlerinizi yükleyin. Yapay zeka, kumaş, dikiş ve detayları algılayarak çiziminizi birebir yansıtan gerçekçi bir ürün fotoğrafına dönüştürür.',
-      step1Before: 'ÇİZİM',
-      step1After: 'ÜRÜN',
-      step2: '2. Ürün → Canlı Model',
-      step2Desc: 'Oluşturulan veya yüklenen ürün fotoğrafını dilediğiniz manken üzerinde görün. Farklı ten rengi, saç stili ve poz tipleriyle sahip yapay zeka modelleriyle stüdyo çekimi kalitesinde sonuçlar alın.',
-      step2Before: 'ÜRÜN',
-      step2After: 'MODEL',
-      step3: '3. Görsel → Video',
-      step3Desc: 'Statik görsellerle sınırlı kalmayın. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
-      professionalVideo: 'Profesyonel Video',
-      tryNow: 'Şimdi Deneyin',
-    },
-    features: {
-      title: 'Güçlü Özellikler',
-      feature1Title: 'Çizimden Ürüne',
-      feature1Desc: 'Moda çizimlerinizi ultra-gerçekçi hayalet manken ürün fotoğraflarına dönüştürün.',
-      feature2Title: 'Canlı Model',
-      feature2Desc: 'Ürünlerinizi gerçek modeller üzerinde görün. Etnik köken, poz, stil seçenekleriyle.',
-      feature3Title: 'Video Oluşturma',
-      feature3Desc: 'Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün.',
-      feature4Title: 'Teknik Çizim (Tech Pack)',
-      feature4Desc: 'Ürün fotoğraflarınızı üretim için detaylı teknik çizimlere dönüştürün.',
-      feature5Title: 'Pixshop - Fotoğraf Düzenleme',
-      feature5Desc: 'AI destekli profesyonel rötuş, filtre, ayarlama ve 4K upscaling. Yüz değiştirme ve logo ekleme.',
-      feature6Title: 'Fotomatik - Toplu İşleme',
-      feature6Desc: 'Birden fazla görseli aynı anda işleyin. Arka plan kaldırma, toplu düzenleme ve hızlı katalog hazırlama.',
-      aiPromptTitle: 'AI Prompt ile Sınırsız Özelleştirme',
-      customBg: 'Özel Arka Plan & Mekan',
-      customBgDesc: 'Hazır lokasyonların yanı sıra, kendi arka plan görselinizi yükleyin veya AI\'a prompt verin.',
-      brandPlacement: 'Marka Yerleştirme',
-      brandPlacementDesc: 'Promptta belirterek markanızı arka plana yerleştirin.',
-      sceneSetup: 'Detaylı Sahne Kurgusu',
-      sceneSetupDesc: 'Ayrıntılı senaryolar yazın. AI tüm detayları anlayıp uygular.',
-      styleControl: 'Stil & Atmosfer Kontrolü',
-      styleControlDesc: '100+ hazır seçenek ile birlikte prompt ile daha da özelleştirin.',
-    },
-    adGenius: {
-      title: '🚀 AdGenius AI: Yapay Zeka Destekli Akıllı Reklam ve Prodüksiyon Merkezi',
-      description: 'AdGenius AI, sıradan bir ürün fotoğrafını saniyeler içinde profesyonel bir pazarlama varlığına dönüştüren, uçtan uca bir prodüksiyon çözümüdür. Fiziksel stüdyo maliyetlerini, manken kiralama süreçlerini ve uzun süren grafik tasarım işlerini ortadan kaldırarak ürününüzü doğrudan satışa hazır hale getirir.',
-      featuresTitle: '💎 Temel Özellikler ve Yetenekler',
-      features: [
-        { title: '1. Akıllı Ürün Analizi ve İçerik Yazımı', items: ['SEO Uyumlu Başlıklar: Pazaryeri algoritmalarına uygun, tıklanma oranı yüksek başlıklar üretir.', 'İkna Edici Açıklamalar: Ürünün hikayesini anlatan ve satın alma motivasyonunu tetikleyen profesyonel pazarlama metinleri yazar.', 'Bullet Point Özellik Listesi: Amazon, Trendyol ve Hepsiburada gibi platformlar için hazır teknik özellik maddeleri oluşturur.'] },
-        { title: '2. Profesyonel Mankenli Çekimler (E-Ticaret Paketi)', items: ['12 Farklı Poz: Önden, arkadan, profilden, yürüyüş anından ve sanatsal açılardan oluşan tam bir katalog seti sunar.', 'Model Tutarlılığı: Tüm çekimlerde aynı yüz ve vücut tipine sahip manken kullanarak marka bütünlüğünü korur.'] },
-        { title: '3. Sınırsız Kampanya Konseptleri', items: ['Stil Seçenekleri: Lüks Mağaza, Minimalist Stüdyo, Cyberpunk, Doğal Gün Işığı, Vintage ve daha fazlası.', 'Mekan Özgürlüğü: Ürünü bir şehir sokağında, lüks bir otel lobisinde veya egzotik bir plajda sergileyin.'] },
-        { title: '4. Gelişmiş Doku ve Renk Manipülasyonu', items: ['Renk Değişimi: Ürünün kalıbını bozmadan istediğiniz herhangi bir renge (veya hex koduna) dönüştürür.', 'Doku Eşleştirme (Pattern Mapping): Yüklediğiniz bir desen örneğini, kıyafetin kıvrımlarına ve ışık gölge dengesine uyumlu şekilde üzerine giydirir.'] },
-        { title: '5. Sinematik Reklam Videoları', items: ['Akıcı Hareketler: Ürünün kumaş dokusunu ve modelin duruşunu vurgulayan yavaş çekim (slow-motion) sinematik videolar.', 'Yüksek Çözünürlük: Sosyal medya reklamları (Reels, TikTok, Shorts) için optimize edilmiş yüksek kaliteli çıktılar.'] },
-        { title: '6. Marka ve Metin Entegrasyonu', items: ['Logo/Metin Yerleştirme: Görselin üzerine marka isminizi veya kampanya sloganınızı (Örn: "YENİ SEZON") estetik bir şekilde işler.'] }
-      ],
-      benefitsTitle: '🎯 E-Ticaret İşletmeleri İçin Sağladığı Faydalar',
-      benefits: [
-        { title: '✅ "Hemen Yükle, Hemen Sat" Kolaylığı', desc: 'Geleneksel yöntemde fotoğraf çekimi, rötuş ve içerik yazımı haftalar sürerken; AdGenius ile ürünün fotoğrafını yüklediğiniz anda görsel + video + başlık + açıklama setine sahip olursunuz.' },
-        { title: '✅ %90\'a Varan Maliyet Tasarrufu', desc: 'Işık, Kamera, Manken, Stüdyo, Grafik Tasarımcı masraflarına son.' },
-        { title: '✅ Global Standartlarda Kalite', desc: 'En yeni yapay zeka modellerini kullanarak, dünyanın en ünlü markalarının kullandığı estetik standartlarda görseller üretir.' },
-        { title: '✅ Kişiselleştirilmiş Prodüksiyon', desc: '"Özel İstekler" bölümü sayesinde yapay zekaya dilediğiniz sahneyi kurgulatabilirsiniz.' }
-      ]
-    },
-    collage: {
-      title: '🎨 Kolaj Stüdyosu: Çoklu Görsel Kompozisyon Aracı',
-      description: 'Birden fazla görseli saniyeler içinde profesyonel kolajlara dönüştürün. AI destekli kompozisyon motoru, görsellerinizi otomatik olarak analiz eder ve mükemmel düzenleme önerileri sunar.',
-      featuresTitle: '💎 Kolaj Seçenekleri',
-      features: [
-        { title: '1. Standart Kolaj', items: ['Geleneksel Düzen: 2-6 arası görseli yan yana veya alt alta saniyeler içinde birleştirir.', 'Hızlı Katalog: Ürün varyasyonlarını ve detaylarını topluca sergilemek için idealdir.', 'Önizleme Kolaylığı: Müşterilerinize ürün gruplarını tek bakışta sunmanızı sağlar.'] },
-        { title: '2. Sihirli Kolaj (AI)', items: ['Profesyonel Flat Lay: Tek bir kombin fotoğrafını analiz ederek lüks dergi çekimi estetiğinde bir flat-lay kompozisyon oluşturur.', 'Otomatik Ayrıştırma: Kombindeki parçaları (üret, alt, çanta vb.) yapay zeka ile tanır ve tek tek resmeder.', 'Dergi Modu: İndirilebilir, fiyat etiketli profesyonel bir katalog sayfası üretir.'] },
-        { title: '3. Ürün Kolajı', items: ['Estetik Kompozisyon: Farklı zamanlarda çekilmiş ürünleri tek bir sanatsal düzende birleştirir.', 'Marka Kimliği: Tüm ürünleriniz için tutarlı arka plan ve ışık ayarları sunar.', 'Sınırsız Varyasyon: Farklı renk ve model seçeneklerini şık bir pano üzerinde sergiler.'] },
-        { title: '4. Video Dönüşümü', items: ['Dinamik İçerik: Oluşturduğunuz kolajları tek tıkla 2K sinematik videolara dönüştürün.', 'Sosyal Medya Hazır: Instagram Reels, TikTok ve Shorts için optimize edilmiş boyutlar.', 'Müzikli Geçişler: Ürünlerinizi daha etkileyici kılan profesyonel kamera hareketleri.'] }
-      ],
-      benefitsTitle: '🎯 Kullanım Alanları',
-      benefits: [
-        { title: '✅ E-Ticaret Katalogları', desc: 'Ürün varyasyonlarını tek bir görselde sergileyin. Farklı renk ve model seçeneklerini müşterilerinize etkili şekilde sunun.' },
-        { title: '✅ Sosyal Medya İçeriği', desc: 'Instagram grid postları, Pinterest panoları ve Facebook katalogları için profesyonel kolajlar oluşturun.' },
-        { title: '✅ Lookbook Hazırlama', desc: 'Koleksiyon lansmanları için etkileyici lookbook sayfaları hazırlayın. Tüm parçaları bir arada gösterin.' },
-        { title: '✅ Hızlı Karşılaştırma', desc: 'Önce/Sonra karşılaştırmaları veya farklı stil seçeneklerini yan yana gösterin.' }
-      ],
-      creditInfo: 'Kolaj oluşturma: 2 kredi | Video dönüşümü: +3 kredi'
-    },
-    pricing: {
-      title: 'Fiyatlandırma',
-      subtitle: 'İhtiyacınıza uygun planı seçin. Her ay krediniz otomatik yenilenir.',
-      perMonth: '/ay',
-      popular: 'Popüler',
-      start: 'Başla',
-      extraCreditsTitle: 'Ek Kredi Paketleri',
-      extraCreditsSubtitle: 'Aboneliğiniz devam ederken krediniz biterse, ek kredi satın alabilirsiniz.',
-      creditPackagesTitle: 'Kredi Paketleri',
-      creditPackagesSubtitle: 'İhtiyacınıza uygun kredi paketini seçin. Abonelik yok, sadece kullandığınız kadar ödersiniz.',
-      credits: 'Kredi',
-      credit: 'Kredi',
-      buyNow: 'Satın Al',
-      creditUsage: '💡 Kredi Kullanımı',
-      liveModelVideo: '🎨 Canlı Model & Video',
-      sketchToProduct: 'Çizim → Ürün: 1 kredi',
-      productToModel: 'Ürün → Model: 1 kredi',
-      videoGeneration: 'Video Oluşturma: 3 kredi',
-      otherModules: '⚡ Diğer Modüller',
-      techDrawing: 'Teknik Çizim: 1 kredi',
-      pixshopEdit: 'Pixshop (Düzenleme): 1 kredi',
-      fotomatik: 'Fotomatik: 1 kredi',
-      freeCredits: 'Yeni üyeler 10 ücretsiz kredi ile başlar',
-      creditsNeverExpire: 'Krediler hiç bitmez, istediğiniz zaman kullanın',
-      enterprise: 'Kurumsal',
-      enterpriseTitle: 'Kurumsal Çözümler',
-      enterpriseSubtitle: 'Büyük ekipler ve şirketler için özel çözümler',
-      contactUs: 'İletişime Geç',
-      customCredits: 'Özel Kredi Paketi',
-      unlimitedUsers: 'Sınırsız Kullanıcı',
-      prioritySupport: 'Öncelikli Destek',
-      dedicatedAccount: 'Özel Hesap Yöneticisi',
-      customIntegration: 'Özel Entegrasyon',
-      apiAccess: 'API Erişimi',
-      customTraining: 'Özel Eğitim',
-      sla: 'SLA Garantisi',
-    },
-    testimonials: {
-      title: 'Kullanıcı Yorumları',
-      quote1: '"Bu platform sayesinde koleksiyonumu birkaç saat içinde görselleştirebildim. İnanılmaz hızlı ve kaliteli!"',
-      name1: 'Ayşe Yılmaz',
-      quote2: '"Müşterilerime ürünleri göstermek artık çok kolay. Video özelliği harika, sosyal medyada çok beğeniliyor!"',
-      name2: 'Mehmet Kaya',
-      quote3: '"Fotoğraf çekimi maliyetlerinden kurtuldum. AI görseller gerçekten profesyonel görünüyor!"',
-      name3: 'Zeynep Demir',
-    },
-    comparison: {
-      title: 'NEDEN FASHEONE?',
-      subtitle: 'Fasheone ile farkı hisset',
-      needPrompts: 'Prompt yazmana gerek var',
-      readyOptions: 'Hazır seçimlerle içerik üretilir',
-      multipleTools: 'Bir sürü farklı tool',
-      onePlatform: 'Tek platformda katalogdan reklama her şey',
-      expensive: 'Pahalı stüdyo çekimleri',
-      lowCost: 'Dakikalar içinde düşük maliyet',
-      incorrectPlacement: 'Ürünü hatalı giydirme ve aktarma',
-      allDetails: 'Ürünü tüm detayları ile oluşturmak',
-      faster: 'Geleneksel yöntemlerden 10x daha hızlı',
-    },
-    stats: {
-      videosCreated: 'Oluşturulan Video',
-      imagesCreated: 'Oluşturulan Görsel',
-      satisfiedUsers: 'Memnun Kullanıcı',
-      platformAccess: 'Platform Erişimi',
-    },
-    faq: {
-      title: 'Sık Sorulan Sorular',
-      q1: 'Fasheone ile neler yapabilirim?',
-      a1: 'Moda çizimlerinizi profesyonel ürün fotoğraflarına, canlı model görsellerine ve videolara dönüştürebilirsiniz. Ayrıca AI ile özel arka planlar, renkler ve stiller seçebilirsiniz.',
-      q2: 'Yüklediğim görseller güvende mi?',
-      a2: 'Evet, tüm görselleriniz şifreli olarak saklanır ve sadece siz erişebilirsiniz. Verileriniz 3. şahıslarla paylaşılmaz.',
-      q3: 'Kaç krediye ihtiyacım olur?',
-      a3: 'Çizimden ürün 1 kredi, üründen model 1 kredi, video oluşturma 3 kredi harcar. Ortalama bir koleksiyon için Starter plan yeterlidir.',
-      q4: 'Ürettiğim içeriklerin telif hakkı kime ait?',
-      a4: 'Oluşturduğunuz tüm içerikler size aittir. Ticari amaçlarla kullanabilir, paylaşabilir ve satabilirsiniz.',
-    },
-    cta: {
-      title: 'Hemen Başlayın',
-      subtitle: 'İlk tasarımınızı ücretsiz deneyin. Kredi kartı gerekmez.',
-      button: 'Ücretsiz Başla',
-    },
-    pixshop: {
-      heroTitle: 'Fotoğraf Düzenlemenin Geleceğiyle Tanışın: Pixshop',
-      heroSubtitle: 'Karmaşık araçlara veda edin. Yapay zeka ile sadece ne istediğinizi söyleyin, Pixshop saniyeler içinde gerçeğe dönüştürsün.',
-      featuresTitle: 'Güçlü Özellikler',
-      feature1Title: 'Akıllı Rötuş: Tıkla ve Değiştir',
-      feature1Desc: 'Artık piksellerle uğraşmanıza gerek yok. Fotoğrafınızda düzenlemek istediğiniz noktaya tıklayın ve komutunuzu yazın. "Gömleğimin rengini mavi yap" veya "Arka plandaki nesneyi kaldır" demeniz yeterli.',
-      feature2Title: 'Sınırsız Yaratıcı Filtreler',
-      feature2Desc: 'Sadece hazır filtrelerle yetinmeyin, kendi tarzınızı yaratın. "80\'ler Synthwave estetiği" veya "Eskiz defteri çizimi" gibi hayalinizdeki atmosferi tarif edin.',
-      feature3Title: 'Profesyonel Atmosfer Ayarları',
-      feature3Desc: 'Işık, derinlik ve odak kontrolü parmaklarınızın ucunda. "Arka planı gerçekçi şekilde bulanıklaştır" veya "Stüdyo ışığı ekle" komutlarıyla profesyonel çekimler oluşturun.',
-      feature4Title: 'Kristal Netliğinde Detaylar (Upscale)',
-      feature4Desc: 'Düşük çözünürlüklü fotoğraflarınıza hayat verin. Yapay zeka destekli yükseltme teknolojimizle görsellerinizi 2K veya 4K kalitesine saniyeler içinde taşıyın.',
-      feature5Title: 'Tasarımcı Dostu Çıktılar',
-      feature5Desc: 'Arka plan kaldırma özelliği ile nesnelerinizi anında ayırın. Çalışmalarınızı şeffaf arka planlı yüksek kaliteli SVG formatında dışa aktarın.',
-      feature6Title: 'Yüz Değiştirme (Face Swap)',
-      feature6Desc: 'Profesyonel yüz değiştirme teknolojisi ile fotoğraflardaki yüzleri doğal ve gerçekçi şekilde değiştirin. Model çekimlerinde, kataloglarda veya sosyal medya içeriklerinde kullanın.',
-      feature7Title: 'Logo ve Aksesuar Ekleme',
-      feature7Desc: 'Fotoğraflarınıza logo, marka etiketleri veya aksesuar ekleyin. AI, eklediğiniz öğeleri doğal perspektif ve ışıklandırma ile görüntüye entegre eder.',
-      whyTitle: 'Neden Pixshop?',
-      why1: 'Zaman Kazanın: Saatler süren manuel düzenleme işlemlerini saniyelere indirin.',
-      why2: 'Teknik Bilgi Gerektirmez: Photoshop bilmenize gerek yok, sadece yazmanız yeterli.',
-      why3: 'Tam Kontrol: Geri al/İleri al özellikleri ve "Karşılaştır" moduyla düzenlemenin her aşamasını kontrol edin.',
-      why4: 'Esnek Kırpma: Sosyal medya standartlarına (9:16, 1:1, 4:3) uygun akıllı kırpma ve döndürme araçlarını kullanın.',
-      cta: 'Hemen Denemeye Başlayın!',
-      ctaSubtitle: 'Yaratıcılığınızı serbest bırakın. İlk fotoğrafınızı yükleyin ve yapay zekanın gücünü keşfedin.',
-      tryButton: 'Pixshop\'u Dene',
-    },
-    fotomatik: {
-      heroTitle: 'Fotomatik Neleri Yapabilir? (Teknik Kapasite)',
-      feature1Title: 'Bağlamsal Görsel Dönüşüm (AI Transform)',
-      feature1Desc: 'Yapay zeka teknolojisini kullanarak, bir fotoğraftaki ana objeyi veya kişiyi (yüz hatlarını koruyarak) tamamen farklı bir senaryoya yerleştirebilir. Örneğin; evde çekilmiş bir fotoğrafı "Venedik sahilinde yürüyüş yapan" bir sahneye dönüştürebilir.',
-      feature2Title: 'Derinlemesine Görsel Analiz ve Prompt Mühendisliği',
-      feature2Desc: 'Yüklenen bir resmi sanatsal ve teknik açıdan analiz ederek Midjourney, Stable Diffusion ve Flux gibi platformlar için optimize edilmiş profesyonel istemler (promptlar) üretir.',
-      feature3Title: 'Akıllı İyileştirme (AI Auto-Enhance)',
-      feature3Desc: 'Resmin histogramını ve içeriğini analiz ederek parlaklık, kontrast, doygunluk ve keskinlik gibi değerleri "sinematik", "canlı" veya "dengeli" modlarda otomatik olarak optimize eder.',
-      feature4Title: 'Hassas Manuel Editör',
-      feature4Desc: 'Profesyonel seviyede kırpma (aspect ratio), merkez odaklı ölçekleme, aynalama ve yeniden boyutlandırma araçları sunar.',
-      cta: 'Fotomatik\'i Hemen Deneyin',
-    },
-    techpack: {
-      heroTitle: 'Üretim İçin Teknik Çizim (Tech Pack)',
-      heroSubtitle: 'Üretim sürecinizi hızlandırın. Fotoğraflarınızı saniyeler içinde detaylı teknik çizimlere dönüştürün.',
-      feature1Title: 'Resimden Teknik Çizime',
-      feature1Desc: 'Yüklediğiniz herhangi bir ürün fotoğrafını, dikiş detayları ve hatları korunmuş profesyonel teknik çizimlere dönüştürür.',
-      feature2Title: 'Dikiş ve Kalıp Analizi',
-      feature2Desc: 'Yapay zeka, ürün üzerindeki dikiş yollarını ve kalıp parçalarını otomatik olarak algılayarak net çizgilerle sunar.',
-      feature3Title: 'Üretime Hazır Çıktılar',
-      feature3Desc: 'Tedarikçileriniz ve atölyelerinizle paylaşabileceğiniz, karmaşadan uzak, saf teknik çizimler elde edin.',
-      feature4Title: 'Sınırsız Varyasyon',
-      feature4Desc: 'Aynı modelin farklı varyasyonları için hızlıca teknik taslaklar oluşturun ve arşivleyin.',
-      cta: 'Teknik Çizim Oluştur',
-    },
-    adgenius: {
-      title: '🚀 AdGenius AI: Yapay Zeka Destekli Akıllı Reklam ve Prodüksiyon Merkezi',
-      description: 'AdGenius AI, sıradan bir ürün fotoğrafını saniyeler içinde profesyonel bir pazarlama varlığına dönüştüren, uçtan uca bir prodüksiyon çözümüdür. Fiziksel stüdyo maliyetlerini, manken kiralama süreçlerini ve uzun süren grafik tasarım işlerini ortadan kaldırarak ürününüzü doğrudan satışa hazır hale getirir.',
-      featuresTitle: '💎 Temel Özellikler ve Yetenekler',
-      features: [
-        {
-          title: '1. Akıllı Ürün Analizi ve İçerik Yazımı',
-          items: [
-            'SEO Uyumlu Başlıklar: Pazaryeri algoritmalarına uygun, tıklanma oranı yüksek başlıklar üretir.',
-            'İkna Edici Açıklamalar: Ürünün hikayesini anlatan ve satın alma motivasyonunu tetikleyen profesyonel pazarlama metinleri yazar.',
-            'Bullet Point Özellik Listesi: Amazon, Trendyol ve Hepsiburada gibi platformlar için hazır teknik özellik maddeleri oluşturur.'
-          ]
-        },
-        {
-          title: '2. Profesyonel Mankenli Çekimler',
-          items: [
-            '12 Farklı Poz: Önden, arkadan, profilden, yürüyüş anından ve sanatsal açılardan oluşan tam bir katalog seti sunar.',
-            'Model Tutarlılığı: Tüm çekimlerde aynı yüz ve vücut tipine sahip manken kullanarak marka bütünlüğünü korur.'
-          ]
-        },
-        {
-          title: '3. Sınırsız Kampanya Konseptleri',
-          items: [
-            'Stil Seçenekleri: Lüks Mağaza, Minimalist Stüdyo, Cyberpunk, Doğal Gün Işığı, Vintage ve daha fazlası.',
-            'Mekan Özgürlüğü: Ürünü bir şehir sokağında, lüks bir otel lobisinde veya egzotik bir plajda sergileyin.'
-          ]
-        },
-        {
-          title: '4. Gelişmiş Doku ve Renk Manipülasyonu',
-          items: [
-            'Renk Değişimi: Ürünün kalıbını bozmadan istediğiniz herhangi bir renge dönüştürür.',
-            'Doku Eşleştirme: Yüklediğiniz bir desen örneğini, kıyafetin kıvrımlarına uyumlu şekilde giydirir.'
-          ]
-        },
-        {
-          title: '5. Sinematik Reklam Videoları',
-          items: [
-            'Akıcı Hareketler: Kumaş dokusunu ve modelin duruşunu vurgulayan yavaş çekim videolar.',
-            'Yüksek Çözünürlük: Sosyal medya (Reels, TikTok, Shorts) için optimize edilmiş çıktılar.'
-          ]
-        },
-        {
-          title: '6. Marka ve Metin Entegrasyonu',
-          items: [
-            'Logo/Metin Yerleştirme: Görselin üzerine marka isminizi veya kampanya sloganınızı estetik bir şekilde işler.'
-          ]
-        }
-      ],
-      showcase: {
-        title1: '📍 Profesyonel Model Çekimi',
-        title2: '✨ Akıllı Reklam Varyasyonları',
-        hover1: 'Üst düzey prodüksiyon kalitesi, sıfır maliyet.',
-        hover2: 'Tek bir üründen onlarca kampanya konsepti.'
-      },
-      benefitsTitle: '🎯 E-Ticaret İşletmeleri İçin Sağladığı Faydalar',
-      benefits: [
-        {
-          title: '✅ "Hemen Yükle, Hemen Sat" Kolaylığı',
-          desc: 'Geleneksel yöntemde haftalar süren süreç; AdGenius ile ürünün fotoğrafını yüklediğiniz anda görsel + video + başlık + açıklama setine sahip olursunuz.'
-        },
-        {
-          title: '✅ %90\'a Varan Maliyet Tasarrufu',
-          desc: 'Işık, camera ekipmanı, manken, makyaj artisti, stüdyo kirası ve metin yazarı maliyetlerini ortadan kaldırır.'
-        },
-        {
-          title: '✅ Global Standartlarda Kalite',
-          desc: 'En yeni yapay zeka modellerini kullanarak, dünyanın en ünlü moda markalarının kullandığı estetik standartlarda görseller üretir.'
-        },
-        {
-          title: '✅ Kişiselleştirilmiş Prodüksiyon',
-          desc: 'Özel İstekler bölümü sayesinde yapay zekaya spesifik komutlar vererek tam hayalinizdeki sahneyi kurgulayabilirsiniz.'
-        }
-      ]
-    },
+const trLanding = {
+  header: {
+    signIn: 'Giriş Yap',
+    start: 'Başla',
+    buyCredits: 'Kredi Al',
+    signOut: 'Çıkış',
+    continueUsing: 'Hemen Kullanmaya Devam Et',
   },
+  howItWorks: {
+    title: 'Nasıl Çalışır?',
+    subtitle: '3 Adımda AI ile Profesyonel Görsel',
+    step1Title: 'Görseli Yükle',
+    step1Desc: 'Ürün çizimini veya fotoğrafını platforma yükle, AI otomatik analiz eder',
+    step2Title: 'Detayları Seç',
+    step2Desc: 'Hazır şablonlar ve seçeneklerle istediğin stili belirle, prompt kullanmana gerek yok',
+    step3Title: 'Oluştur & İndir',
+    step3Desc: 'Profesyonel sonuçları hemen indir, video oluştur, sosyal medyada paylaş',
+    useCases: {
+      title: 'Güçlü Özellikler',
+      subtitle: 'Her İhtiyaca Özel Çözümler',
+      feature1: {
+        title: 'Çizimden Ürüne',
+        desc: 'Moda çizimlerinizi ultra-gerçekçi hayalet manken ürün fotoğraflarına dönüştürün. Basit karakalem veya dijital teknik çizimlerinizi yükleyin, yapay zeka kumaş, dikiş ve detayları algılayarak profesyonel ürün görselleri oluşturur.',
+        features: [
+          'Otomatik kumaş doku ve renk analizi',
+          'Dikiş ve detay korumalı dönüşüm',
+          'Stüdyo kalitesinde ışıklandırma',
+          'E-ticaret için optimize edilmiş çıktılar'
+        ]
+      },
+      feature2: {
+        title: 'Canlı Model',
+        desc: 'Ürünlerinizi gerçek modeller üzerinde görün. Farklı ten rengi, saç stili ve poz tipleriyle sahip yapay zeka modelleriyle stüdyo çekimi kalitesinde sonuçlar alın. Fiziksel model maliyetlerinden kurtulun.',
+        features: [
+          'Çeşitli etnik köken ve vücut tipi seçenekleri',
+          '12+ farklı profesyonel poz',
+          'Özelleştirilebilir arka plan ve mekan',
+          'Tutarlı model kullanımı ile marka kimliği'
+        ]
+      },
+      feature3: {
+        title: 'Video Oluşturma',
+        desc: 'Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
+        features: [
+          'Sinematik kamera hareketleri',
+          'Yavaş çekim (slow-motion) efektleri',
+          'Sosyal medya formatları (Reels, TikTok, Shorts)',
+          'Yüksek çözünürlük 2K/4K çıktı'
+        ]
+      },
+      feature4: {
+        title: 'Teknik Çizim (Tech Pack)',
+        desc: 'Ürün fotoğraflarınızı üretim için detaylı teknik çizimlere dönüştürün. Yapay zeka, ürün üzerindeki dikiş yollarını ve kalıp parçalarını otomatik olarak algılayarak net çizgilerle sunar.',
+        features: [
+          'Otomatik dikiş ve kalıp analizi',
+          'Üretime hazır teknik çizimler',
+          'Ölçü ve detay korumalı dönüşüm',
+          'Tedarikçi paylaşımı için ideal format'
+        ]
+      },
+      feature5: {
+        title: 'Pixshop - Fotoğraf Düzenleme',
+        desc: 'AI destekli profesyonel rötuş, filtre, ayarlama ve 4K upscaling. Yüz değiştirme ve logo ekleme özellikleriyle fotoğraflarınızı saniyeler içinde mükemmelleştirin. Photoshop bilgisi gerektirmez.',
+        features: [
+          'Akıllı rötuş ve renk düzeltme',
+          'Profesyonel filtre ve atmosfer ayarları',
+          '2K/4K upscaling teknolojisi',
+          'Yüz değiştirme ve logo/aksesuar ekleme'
+        ]
+      },
+      feature6: {
+        title: 'Fotomatik - Toplu İşleme',
+        desc: 'Birden fazla görseli aynı anda işleyin. Arka plan kaldırma, toplu düzenleme ve hızlı katalog hazırlama. Saatler süren manuel işlemleri dakikalara indirin.',
+        features: [
+          'Toplu arka plan kaldırma',
+          'Otomatik görsel iyileştirme',
+          'Hızlı katalog hazırlama',
+          'Prompt mühendisliği ve analiz'
+        ]
+      },
+      collage: {
+        title: 'Kolaj Oluşturma',
+        desc: 'Tek bir üründen birden fazla varyasyon oluşturun. Farklı renkler, pozlar ve arka planlarla zengin kataloglar hazırlayın. 4-16 görseli tek bir kolajda birleştirerek e-ticaret ve sosyal medya için etkileyici içerikler üretin.',
+        features: [
+          'Otomatik grid düzeni ve profesyonel tasarım',
+          'Farklı renk ve stil varyasyonları',
+          'E-ticaret katalogları için ideal format',
+          'Sosyal medya paylaşımları için optimize edilmiş boyutlar'
+        ]
+      },
+      adMedia: {
+        title: 'Reklam Medyası',
+        desc: 'Profesyonel reklam kampanyaları için stüdyo kalitesinde görseller ve videolar üretin. Farklı mekanlar, modeller ve senaryolarla markanızı öne çıkarın. AI ile saniyeler içinde billboard, dergi ve dijital reklam içerikleri oluşturun.',
+        features: [
+          'Stüdyo çekimi kalitesinde model görselleri',
+          'Özelleştirilebilir arka plan ve mekan seçenekleri',
+          '5-10 saniyelik sinematik video içerikler',
+          'Marka kimliğine uygun stil ve atmosfer kontrolü'
+        ]
+      },
+      ecommerce: {
+        title: 'E-ticaret Çözümleri',
+        desc: 'Online mağazanız için eksiksiz görsel içerik paketi hazırlayın. Ürün fotoğrafları, model görselleri, teknik çizimler ve tanıtım videoları tek platformda. Katalog hazırlama sürenizi %90 azaltın, maliyetleri minimize edin.',
+        features: [
+          'Hayalet manken ve model görselleri',
+          'Farklı açılardan ürün fotoğrafları',
+          'Teknik çizim ve ölçü tabloları',
+          'Toplu işleme ile hızlı katalog hazırlama'
+        ]
+      }
+    }
+  },
+  hero: {
+    title: 'Çizimden Gerçeğe,',
+    subtitle: 'Saniyeler İçinde',
+    description: 'Moda tasarımlarınızı AI ile profesyonel ürün fotoğraflarına ve canlı model görsellerine dönüştürün. Video oluşturun, markanızı büyütün.',
+    cta: 'Ücretsiz Deneyin',
+  },
+  showcase: {
+    title: 'Çizimden Gerçeğe Dönüşüm',
+    subtitle: 'AI teknolojisiyle tasarımlarınız profesyonel görsellere dönüşüyor',
+    before: 'ÖNCE',
+    after: 'SONRA',
+    step1: '1. Çizim → Ürün (Hayalet Manken)',
+    step1Desc: 'Basit karakalem veya dijital teknik çizimlerinizi yükleyin. Yapay zeka, kumaş, dikiş ve detayları algılayarak çiziminizi birebir yansıtan gerçekçi bir ürün fotoğrafına dönüştürür.',
+    step1Before: 'ÇİZİM',
+    step1After: 'ÜRÜN',
+    step2: '2. Ürün → Canlı Model',
+    step2Desc: 'Oluşturulan veya yüklenen ürün fotoğrafını dilediğiniz manken üzerinde görün. Farklı ten rengi, saç stili ve poz tipleriyle sahip yapay zeka modelleriyle stüdyo çekimi kalitesinde sonuçlar alın.',
+    step2Before: 'ÜRÜN',
+    step2After: 'MODEL',
+    step3: '3. Görsel → Video',
+    step3Desc: 'Statik görsellerle sınırlı kalmayın. Modelinizi podyumda yürütmek, dönmek veya poz vermek için sinematik videolar oluşturun. Sosyal medya ve e-ticaret için mükemmel içerik.',
+    professionalVideo: 'Profesyonel Video',
+    tryNow: 'Şimdi Deneyin',
+  },
+  features: {
+    title: 'Güçlü Özellikler',
+    feature1Title: 'Çizimden Ürüne',
+    feature1Desc: 'Moda çizimlerinizi ultra-gerçekçi hayalet manken ürün fotoğraflarına dönüştürün.',
+    feature2Title: 'Canlı Model',
+    feature2Desc: 'Ürünlerinizi gerçek modeller üzerinde görün. Etnik köken, poz, stil seçenekleriyle.',
+    feature3Title: 'Video Oluşturma',
+    feature3Desc: 'Görsellerinizi 5-10 saniyelik profesyonel videolara dönüştürün.',
+    feature4Title: 'Teknik Çizim (Tech Pack)',
+    feature4Desc: 'Ürün fotoğraflarınızı üretim için detaylı teknik çizimlere dönüştürün.',
+    feature5Title: 'Pixshop - Fotoğraf Düzenleme',
+    feature5Desc: 'AI destekli profesyonel rötuş, filtre, ayarlama ve 4K upscaling. Yüz değiştirme ve logo ekleme.',
+    feature6Title: 'Fotomatik - Toplu İşleme',
+    feature6Desc: 'Birden fazla görseli aynı anda işleyin. Arka plan kaldırma, toplu düzenleme ve hızlı katalog hazırlama.',
+    aiPromptTitle: 'AI Prompt ile Sınırsız Özelleştirme',
+    customBg: 'Özel Arka Plan & Mekan',
+    customBgDesc: 'Hazır lokasyonların yanı sıra, kendi arka plan görselinizi yükleyin veya AI\'a prompt verin.',
+    brandPlacement: 'Marka Yerleştirme',
+    brandPlacementDesc: 'Promptta belirterek markanızı arka plana yerleştirin.',
+    sceneSetup: 'Detaylı Sahne Kurgusu',
+    sceneSetupDesc: 'Ayrıntılı senaryolar yazın. AI tüm detayları anlayıp uygular.',
+    styleControl: 'Stil & Atmosfer Kontrolü',
+    styleControlDesc: '100+ hazır seçenek ile birlikte prompt ile daha da özelleştirin.',
+  },
+  collage: {
+    title: '🎨 Kolaj Stüdyosu: Çoklu Görsel Kompozisyon Aracı',
+    description: 'Birden fazla görseli saniyeler içinde profesyonel kolajlara dönüştürün. AI destekli kompozisyon motoru, görsellerinizi otomatik olarak analiz eder ve mükemmel düzenleme önerileri sunar.',
+    featuresTitle: '💎 Kolaj Seçenekleri',
+    features: [
+      { title: '1. Standart Kolaj', items: ['Geleneksel Düzen: 2-6 arası görseli yan yana veya alt alta saniyeler içinde birleştirir.', 'Hızlı Katalog: Ürün varyasyonlarını ve detaylarını topluca sergilemek için idealdir.', 'Önizleme Kolaylığı: Müşterilerinize ürün gruplarını tek bakışta sunmanızı sağlar.'] },
+      { title: '2. Sihirli Kolaj (AI)', items: ['Profesyonel Flat Lay: Tek bir kombin fotoğrafını analiz ederek lüks dergi çekimi estetiğinde bir flat-lay kompozisyon oluşturur.', 'Otomatik Ayrıştırma: Kombindeki parçaları (üret, alt, çanta vb.) yapay zeka ile tanır ve tek tek resmeder.', 'Dergi Modu: İndirilebilir, fiyat etiketli profesyonel bir katalog sayfası üretir.'] },
+      { title: '3. Ürün Kolajı', items: ['Estetik Kompozisyon: Farklı zamanlarda çekilmiş ürünleri tek bir sanatsal düzende birleştirir.', 'Marka Kimliği: Tüm ürünleriniz için tutarlı arka plan ve ışık ayarları sunar.', 'Sınırsız Varyasyon: Farklı renk ve model seçeneklerini şık bir pano üzerinde sergiler.'] },
+      { title: '4. Video Dönüşümü', items: ['Dinamik İçerik: Oluşturduğunuz kolajları tek tıkla 2K sinematik videolara dönüştürün.', 'Sosyal Medya Hazır: Instagram Reels, TikTok ve Shorts için optimize edilmiş boyutlar.', 'Müzikli Geçişler: Ürünlerinizi daha etkileyici kılan profesyonel kamera hareketleri.'] }
+    ],
+    benefitsTitle: '🎯 Kullanım Alanları',
+    benefits: [
+      { title: '✅ E-Ticaret Katalogları', desc: 'Ürün varyasyonlarını tek bir görselde sergileyin. Farklı renk ve model seçeneklerini müşterilerinize etkili şekilde sunun.' },
+      { title: '✅ Sosyal Medya İçeriği', desc: 'Instagram grid postları, Pinterest panoları ve Facebook katalogları için profesyonel kolajlar oluşturun.' },
+      { title: '✅ Lookbook Hazırlama', desc: 'Koleksiyon lansmanları için etkileyici lookbook sayfaları hazırlayın. Tüm parçaları bir arada gösterin.' },
+      { title: '✅ Hızlı Karşılaştırma', desc: 'Önce/Sonra karşılaştırmaları veya farklı stil seçeneklerini yan yana gösterin.' }
+    ],
+    creditInfo: 'Kolaj oluşturma: 2 kredi | Video dönüşümü: +3 kredi'
+  },
+  pricing: {
+    title: 'Fiyatlandırma',
+    subtitle: 'İhtiyacınıza uygun planı seçin. Her ay krediniz otomatik yenilenir.',
+    perMonth: '/ay',
+    popular: 'Popüler',
+    start: 'Başla',
+    extraCreditsTitle: 'Ek Kredi Paketleri',
+    extraCreditsSubtitle: 'Aboneliğiniz devam ederken krediniz biterse, ek kredi satın alabilirsiniz.',
+    creditPackagesTitle: 'Kredi Paketleri',
+    creditPackagesSubtitle: 'İhtiyacınıza uygun kredi paketini seçin. Abonelik yok, sadece kullandığınız kadar ödersiniz.',
+    credits: 'Kredi',
+    credit: 'Kredi',
+    buyNow: 'Satın Al',
+    creditUsage: '💡 Kredi Kullanımı',
+    liveModelVideo: '🎨 Canlı Model & Video',
+    sketchToProduct: 'Çizim → Ürün: 1 kredi',
+    productToModel: 'Ürün → Model: 1 kredi',
+    videoGeneration: 'Video Oluşturma: 3 kredi',
+    otherModules: '⚡ Diğer Modüller',
+    techDrawing: 'Teknik Çizim: 1 kredi',
+    pixshopEdit: 'Pixshop (Düzenleme): 1 kredi',
+    fotomatik: 'Fotomatik: 1 kredi',
+    freeCredits: 'Yeni üyeler 10 ücretsiz kredi ile başlar',
+    creditsNeverExpire: 'Krediler hiç bitmez, istediğiniz zaman kullanın',
+    enterprise: 'Kurumsal',
+    enterpriseTitle: 'Kurumsal Çözümler',
+    enterpriseSubtitle: 'Büyük ekipler ve şirketler için özel çözümler',
+    contactUs: 'İletişime Geç',
+    customCredits: 'Özel Kredi Paketi',
+    unlimitedUsers: 'Sınırsız Kullanıcı',
+    prioritySupport: 'Öncelikli Destek',
+    dedicatedAccount: 'Özel Hesap Yöneticisi',
+    customIntegration: 'Özel Entegrasyon',
+    apiAccess: 'API Erişimi',
+    customTraining: 'Özel Eğitim',
+    sla: 'SLA Garantisi',
+  },
+  testimonials: {
+    title: 'Kullanıcı Yorumları',
+    quote1: '"Bu platform sayesinde koleksiyonumu birkaç saat içinde görselleştirebildim. İnanılmaz hızlı ve kaliteli!"',
+    name1: 'Ayşe Yılmaz',
+    quote2: '"Müşterilerime ürünleri göstermek artık çok kolay. Video özelliği harika, sosyal medyada çok beğeniliyor!"',
+    name2: 'Mehmet Kaya',
+    quote3: '"Fotoğraf çekimi maliyetlerinden kurtuldum. AI görseller gerçekten profesyonel görünüyor!"',
+    name3: 'Zeynep Demir',
+  },
+  comparison: {
+    title: 'NEDEN FASHEONE?',
+    subtitle: 'Fasheone ile farkı hisset',
+    needPrompts: 'Prompt yazmana gerek var',
+    readyOptions: 'Hazır seçimlerle içerik üretilir',
+    multipleTools: 'Bir sürü farklı tool',
+    onePlatform: 'Tek platformda katalogdan reklama her şey',
+    expensive: 'Pahalı stüdyo çekimleri',
+    lowCost: 'Dakikalar içinde düşük maliyet',
+    incorrectPlacement: 'Ürünü hatalı giydirme ve aktarma',
+    allDetails: 'Ürünü tüm detayları ile oluşturmak',
+    faster: 'Geleneksel yöntemlerden 10x daha hızlı',
+  },
+  stats: {
+    videosCreated: 'Oluşturulan Video',
+    imagesCreated: 'Oluşturulan Görsel',
+    satisfiedUsers: 'Memnun Kullanıcı',
+    platformAccess: 'Platform Erişimi',
+  },
+  faq: {
+    title: 'Sık Sorulan Sorular',
+    q1: 'Fasheone ile neler yapabilirim?',
+    a1: 'Moda çizimlerinizi profesyonel ürün fotoğraflarına, canlı model görsellerine ve videolara dönüştürebilirsiniz. Ayrıca AI ile özel arka planlar, renkler ve stiller seçebilirsiniz.',
+    q2: 'Yüklediğim görseller güvende mi?',
+    a2: 'Evet, tüm görselleriniz şifreli olarak saklanır ve sadece siz erişebilirsiniz. Verileriniz 3. şahıslarla paylaşılmaz.',
+    q3: 'Kaç krediye ihtiyacım olur?',
+    a3: 'Çizimden ürün 1 kredi, üründen model 1 kredi, video oluşturma 3 kredi harcar. Ortalama bir koleksiyon için Starter plan yeterlidir.',
+    q4: 'Ürettiğim içeriklerin telif hakkı kime ait?',
+    a4: 'Oluşturduğunuz tüm içerikler size aittir. Ticari amaçlarla kullanabilir, paylaşabilir ve satabilirsiniz.',
+  },
+  cta: {
+    title: 'Hemen Başlayın',
+    subtitle: 'İlk tasarımınızı ücretsiz deneyin. Kredi kartı gerekmez.',
+    button: 'Ücretsiz Başla',
+  },
+  pixshop: {
+    heroTitle: 'Fotoğraf Düzenlemenin Geleceğiyle Tanışın: Pixshop',
+    heroSubtitle: 'Karmaşık araçlara veda edin. Yapay zeka ile sadece ne istediğinizi söyleyin, Pixshop saniyeler içinde gerçeğe dönüştürsün.',
+    featuresTitle: 'Güçlü Özellikler',
+    feature1Title: 'Akıllı Rötuş: Tıkla ve Değiştir',
+    feature1Desc: 'Artık piksellerle uğraşmanıza gerek yok. Fotoğrafınızda düzenlemek istediğiniz noktaya tıklayın ve komutunuzu yazın. "Gömleğimin rengini mavi yap" veya "Arka plandaki nesneyi kaldır" demeniz yeterli.',
+    feature2Title: 'Sınırsız Yaratıcı Filtreler',
+    feature2Desc: 'Sadece hazır filtrelerle yetinmeyin, kendi tarzınızı yaratın. "80\'ler Synthwave estetiği" veya "Eskiz defteri çizimi" gibi hayalinizdeki atmosferi tarif edin.',
+    feature3Title: 'Profesyonel Atmosfer Ayarları',
+    feature3Desc: 'Işık, derinlik ve odak kontrolü parmaklarınızın ucunda. "Arka planı gerçekçi şekilde bulanıklaştır" veya "Stüdyo ışığı ekle" komutlarıyla profesyonel çekimler oluşturun.',
+    feature4Title: 'Kristal Netliğinde Detaylar (Upscale)',
+    feature4Desc: 'Düşük çözünürlüklü fotoğraflarınıza hayat verin. Yapay zeka destekli yükseltme teknolojimizle görsellerinizi 2K veya 4K kalitesine saniyeler içinde taşıyın.',
+    feature5Title: 'Tasarımcı Dostu Çıktılar',
+    feature5Desc: 'Arka plan kaldırma özelliği ile nesnelerinizi anında ayırın. Çalışmalarınızı şeffaf arka planlı yüksek kaliteli SVG formatında dışa aktarın.',
+    feature6Title: 'Yüz Değiştirme (Face Swap)',
+    feature6Desc: 'Profesyonel yüz değiştirme teknolojisi ile fotoğraflardaki yüzleri doğal ve gerçekçi şekilde değiştirin. Model çekimlerinde, kataloglarda veya sosyal medya içeriklerinde kullanın.',
+    feature7Title: 'Logo ve Aksesuar Ekleme',
+    feature7Desc: 'Fotoğraflarınıza logo, marka etiketleri veya aksesuar ekleyin. AI, eklediğiniz öğeleri doğal perspektif ve ışıklandırma ile görüntüye entegre eder.',
+    whyTitle: 'Neden Pixshop?',
+    why1: 'Zaman Kazanın: Saatler süren manuel düzenleme işlemlerini saniyelere indirin.',
+    why2: 'Teknik Bilgi Gerektirmez: Photoshop bilmenize gerek yok, sadece yazmanız yeterli.',
+    why3: 'Tam Kontrol: Geri al/İleri al özellikleri ve "Karşılaştır" moduyla düzenlemenin her aşamasını kontrol edin.',
+    why4: 'Esnek Kırpma: Sosyal medya standartlarına (9:16, 1:1, 4:3) uygun akıllı kırpma ve döndürme araçlarını kullanın.',
+    cta: 'Hemen Denemeye Başlayın!',
+    ctaSubtitle: 'Yaratıcılığınızı serbest bırakın. İlk fotoğrafınızı yükleyin ve yapay zekanın gücünü keşfedin.',
+    tryButton: 'Pixshop\'u Dene',
+  },
+  fotomatik: {
+    heroTitle: 'Fotomatik Neleri Yapabilir? (Teknik Kapasite)',
+    feature1Title: 'Bağlamsal Görsel Dönüşüm (AI Transform)',
+    feature1Desc: 'Yapay zeka teknolojisini kullanarak, bir fotoğraftaki ana objeyi veya kişiyi (yüz hatlarını koruyarak) tamamen farklı bir senaryoya yerleştirebilir. Örneğin; evde çekilmiş bir fotoğrafı "Venedik sahilinde yürüyüş yapan" bir sahneye dönüştürebilir.',
+    feature2Title: 'Derinlemesine Görsel Analiz ve Prompt Mühendisliği',
+    feature2Desc: 'Yüklenen bir resmi sanatsal ve teknik açıdan analiz ederek Midjourney, Stable Diffusion ve Flux gibi platformlar için optimize edilmiş profesyonel istemler (promptlar) üretir.',
+    feature3Title: 'Akıllı İyileştirme (AI Auto-Enhance)',
+    feature3Desc: 'Resmin histogramını ve içeriğini analiz ederek parlaklık, kontrast, doygunluk ve keskinlik gibi değerleri "sinematik", "canlı" veya "dengeli" modlarda otomatik olarak optimize eder.',
+    feature4Title: 'Hassas Manuel Editör',
+    feature4Desc: 'Profesyonel seviyede kırpma (aspect ratio), merkez odaklı ölçekleme, aynalama ve yeniden boyutlandırma araçları sunar.',
+    cta: 'Fotomatik\'i Hemen Deneyin',
+  },
+  techpack: {
+    heroTitle: 'Üretim İçin Teknik Çizim (Tech Pack)',
+    heroSubtitle: 'Üretim sürecinizi hızlandırın. Fotoğraflarınızı saniyeler içinde detaylı teknik çizimlere dönüştürün.',
+    feature1Title: 'Resimden Teknik Çizime',
+    feature1Desc: 'Yüklediğiniz herhangi bir ürün fotoğrafını, dikiş detayları ve hatları korunmuş profesyonel teknik çizimlere dönüştürür.',
+    feature2Title: 'Dikiş ve Kalıp Analizi',
+    feature2Desc: 'Yapay zeka, ürün üzerindeki dikiş yollarını ve kalıp parçalarını otomatik olarak algılayarak net çizgilerle sunar.',
+    feature3Title: 'Üretime Hazır Çıktılar',
+    feature3Desc: 'Tedarikçileriniz ve atölyelerinizle paylaşabileceğiniz, karmaşadan uzak, saf teknik çizimler elde edin.',
+    feature4Title: 'Sınırsız Varyasyon',
+    feature4Desc: 'Aynı modelin farklı varyasyonları için hızlıca teknik taslaklar oluşturun ve arşivleyin.',
+    cta: 'Teknik Çizim Oluştur',
+  },
+  adgenius: {
+    title: '🚀 AdGenius AI: Yapay Zeka Destekli Akıllı Reklam ve Prodüksiyon Merkezi',
+    description: 'AdGenius AI, sıradan bir ürün fotoğrafını saniyeler içinde profesyonel bir pazarlama varlığına dönüştüren, uçtan uca bir prodüksiyon çözümüdür. Fiziksel stüdyo maliyetlerini, manken kiralama süreçlerini ve uzun süren grafik tasarım işlerini ortadan kaldırarak ürününüzü doğrudan satışa hazır hale getirir.',
+    featuresTitle: '💎 Temel Özellikler ve Yetenekler',
+    features: [
+      {
+        title: '1. Akıllı Ürün Analizi ve İçerik Yazımı',
+        items: [
+          'SEO Uyumlu Başlıklar: Pazaryeri algoritmalarına uygun, tıklanma oranı yüksek başlıklar üretir.',
+          'İkna Edici Açıklamalar: Ürünün hikayesini anlatan ve satın alma motivasyonunu tetikleyen profesyonel pazarlama metinleri yazar.',
+          'Bullet Point Özellik Listesi: Amazon, Trendyol ve Hepsiburada gibi platformlar için hazır teknik özellik maddeleri oluşturur.'
+        ]
+      },
+      {
+        title: '2. Profesyonel Mankenli Çekimler',
+        items: [
+          '12 Farklı Poz: Önden, arkadan, profilden, yürüyüş anından ve sanatsal açılardan oluşan tam bir katalog seti sunar.',
+          'Model Tutarlılığı: Tüm çekimlerde aynı yüz ve vücut tipine sahip manken kullanarak marka bütünlüğünü korur.'
+        ]
+      },
+      {
+        title: '3. Sınırsız Kampanya Konseptleri',
+        items: [
+          'Stil Seçenekleri: Lüks Mağaza, Minimalist Stüdyo, Cyberpunk, Doğal Gün Işığı, Vintage ve daha fazlası.',
+          'Mekan Özgürlüğü: Ürünü bir şehir sokağında, lüks bir otel lobisinde veya egzotik bir plajda sergileyin.'
+        ]
+      },
+      {
+        title: '4. Gelişmiş Doku ve Renk Manipülasyonu',
+        items: [
+          'Renk Değişimi: Ürünün kalıbını bozmadan istediğiniz herhangi bir renge dönüştürür.',
+          'Doku Eşleştirme: Yüklediğiniz bir desen örneğini, kıyafetin kıvrımlarına uyumlu şekilde giydirir.'
+        ]
+      },
+      {
+        title: '5. Sinematik Reklam Videoları',
+        items: [
+          'Akıcı Hareketler: Kumaş dokusunu ve modelin duruşunu vurgulayan yavaş çekim videolar.',
+          'Yüksek Çözünürlük: Sosyal medya (Reels, TikTok, Shorts) için optimize edilmiş çıktılar.'
+        ]
+      },
+      {
+        title: '6. Marka ve Metin Entegrasyonu',
+        items: [
+          'Logo/Metin Yerleştirme: Görselin üzerine marka isminizi veya kampanya sloganınızı estetik bir şekilde işler.'
+        ]
+      }
+    ],
+    showcase: {
+      title1: '📍 Profesyonel Model Çekimi',
+      title2: '✨ Akıllı Reklam Varyasyonları',
+      hover1: 'Üst düzey prodüksiyon kalitesi, sıfır maliyet.',
+      hover2: 'Tek bir üründen onlarca kampanya konsepti.'
+    },
+    benefitsTitle: '🎯 E-Ticaret İşletmeleri İçin Sağladığı Faydalar',
+    benefits: [
+      {
+        title: '✅ "Hemen Yükle, Hemen Sat" Kolaylığı',
+        desc: 'Geleneksel yöntemde haftalar süren süreç; AdGenius ile ürünün fotoğrafını yüklediğiniz anda görsel + video + başlık + açıklama setine sahip olursunuz.'
+      },
+      {
+        title: '✅ %90\'a Varan Maliyet Tasarrufu',
+        desc: 'Işık, camera ekipmanı, manken, makyaj artisti, stüdyo kirası ve metin yazarı maliyetlerini ortadan kaldırır.'
+      },
+      {
+        title: '✅ Global Standartlarda Kalite',
+        desc: 'En yeni yapay zeka modellerini kullanarak, dünyanın en ünlü moda markalarının kullandığı estetik standartlarda görseller üretir.'
+      },
+      {
+        title: '✅ Kişiselleştirilmiş Prodüksiyon',
+        desc: 'Özel İstekler bölümü sayesinde yapay zekaya spesifik komutlar vererek tam hayalinizdeki sahneyi kurgulayabilirsiniz.'
+      }
+    ]
+  },
+  footer: {
+    quickLinks: 'Hızlı Linkler',
+    features: 'Özellikler',
+    howItWorks: 'Nasıl Çalışır?',
+    pricing: 'Fiyatlandırma',
+    examples: 'Örnekler',
+    faq: 'Sıkça Sorulan Sorular',
+    legal: 'Hukuki',
+    privacyPolicy: 'Gizlilik Politikası',
+    kvkk: 'KVKK Aydınlatma Metni',
+    termsOfService: 'Fasheone Hizmet Sözleşmesi',
+    cookiePolicy: 'Çerez Politikası',
+    refundPolicy: 'İade ve İptal Koşulları',
+    aiUsage: 'AI Kullanım Bildirimi',
+    contact: 'İletişim',
+    support: '7/24 Destek',
+    allRights: '© 2024 Fasheone. Tüm hakları saklıdır.',
+  },
+};
+
+const landingTranslations: TranslationRecord<typeof trLanding> = {
+  tr: trLanding,
   en: {
     header: {
       signIn: 'Sign In',
@@ -587,6 +586,10 @@ const translations = {
       feature3Desc: 'Convert your visuals into professional 5-10 second videos.',
       feature4Title: 'Technical Drawing (Tech Pack)',
       feature4Desc: 'Transform your product photos into detailed technical drawings for production.',
+      feature5Title: 'Pixshop - Photo Editing',
+      feature5Desc: 'AI-powered professional retouching, filters, adjustments, and 4K upscaling. Face swap and logo addition.',
+      feature6Title: 'Fotomatik - Batch Processing',
+      feature6Desc: 'Process multiple images simultaneously. Background removal, batch editing, and quick catalog preparation.',
       aiPromptTitle: 'Unlimited Customization with AI Prompt',
       customBg: 'Custom Background & Location',
       customBgDesc: 'In addition to ready-made locations, upload your own background image or give AI a prompt.',
@@ -692,6 +695,10 @@ const translations = {
       feature4Desc: 'Bring your low-resolution photos to life. Transform your images to 2K or 4K quality in seconds with our AI-powered upscaling technology.',
       feature5Title: 'Designer-Friendly Outputs',
       feature5Desc: 'Instantly separate your objects with background removal feature. Export your work in high-quality SVG format with transparent backgrounds.',
+      feature6Title: 'Face Swap',
+      feature6Desc: 'Professional face swap technology to change faces in photos naturally and realistically. Use in model shoots, catalogs, or social media content.',
+      feature7Title: 'Logo & Accessory Addition',
+      feature7Desc: 'Add logos, brand labels, or accessories to your photos. AI integrates added elements with natural perspective and lighting into the image.',
       whyTitle: 'Why Pixshop?',
       why1: 'Save Time: Reduce hours of manual editing to seconds.',
       why2: 'No Technical Knowledge Required: You don\'t need to know Photoshop, just write.',
@@ -819,19 +826,27 @@ const translations = {
       ],
       creditInfo: 'Collage creation: 2 credits | Video conversion: +3 credits'
     },
+    footer: {
+      quickLinks: 'Quick Links',
+      features: 'Features',
+      howItWorks: 'How It Works',
+      pricing: 'Pricing',
+      examples: 'Examples',
+      faq: 'FAQ',
+      legal: 'Legal',
+      privacyPolicy: 'Privacy Policy',
+      kvkk: 'KVKK Disclosure',
+      termsOfService: 'Terms of Service',
+      cookiePolicy: 'Cookie Policy',
+      refundPolicy: 'Refund & Cancellation Policy',
+      aiUsage: 'AI Usage Notice',
+      contact: 'Contact',
+      support: '24/7 Support',
+      allRights: '© 2024 Fasheone. All rights reserved.',
+    },
   },
 };
 
-// Detect user's country based on timezone (simple approach)
-const detectDefaultLanguage = (): Language => {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  // Turkey timezones
-  if (timezone.includes('Istanbul') || timezone.includes('Turkey')) {
-    return 'tr';
-  }
-  // Default to English for other countries
-  return 'en';
-};
 
 export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const {
@@ -952,18 +967,11 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const demoHeroVideo2 = heroVideos[2] || heroVideo2Url || '';
   const demoHeroVideo3 = heroVideos[3] || heroVideo3Url || '';
 
-  const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem('language') as Language;
-    return saved || detectDefaultLanguage();
-  });
+  const { language, setLanguage } = useI18n();
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme') as Theme;
     return saved || 'dark';
   });
-
-  useEffect(() => {
-    localStorage.setItem('language', language);
-  }, [language]);
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
@@ -977,7 +985,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const t = translations[language];
+  const t = landingTranslations[language];
 
   const bgClass = theme === 'dark'
     ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900'
@@ -2732,7 +2740,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             {/* Column 2: Quick Links */}
             <div className="space-y-4">
               <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                Hızlı Linkler
+                {t.footer.quickLinks}
               </h3>
               <ul className="space-y-3">
                 <li>
@@ -2743,7 +2751,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Özellikler
+                    {t.footer.features}
                   </button>
                 </li>
                 <li>
@@ -2754,7 +2762,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Nasıl Çalışır?
+                    {t.footer.howItWorks}
                   </button>
                 </li>
                 <li>
@@ -2765,7 +2773,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Fiyatlandırma
+                    {t.footer.pricing}
                   </button>
                 </li>
                 <li>
@@ -2776,7 +2784,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Örnekler
+                    {t.footer.examples}
                   </button>
                 </li>
                 <li>
@@ -2787,7 +2795,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Sıkça Sorulan Sorular
+                    {t.footer.faq}
                   </button>
                 </li>
               </ul>
@@ -2796,7 +2804,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             {/* Column 3: Legal */}
             <div className="space-y-4">
               <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                Hukuki
+                {t.footer.legal}
               </h3>
 
 
@@ -2814,7 +2822,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Gizlilik Politikası
+                    {t.footer.privacyPolicy}
                   </button>
                 </li>
                 <li>
@@ -2827,7 +2835,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    KVKK Aydınlatma Metni
+                    {t.footer.kvkk}
                   </button>
                 </li>
                 <li>
@@ -2840,7 +2848,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Fasheone Hizmet Sözleşmesi
+                    {t.footer.termsOfService}
                   </button>
                 </li>
                 <li>
@@ -2853,7 +2861,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    Çerez Politikası
+                    {t.footer.cookiePolicy}
                   </button>
                 </li>
                 <li>
@@ -2866,7 +2874,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
-                    İade ve İptal Koşulları
+                    {t.footer.refundPolicy}
                   </button>
                 </li>
                 <li>
@@ -2879,7 +2887,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }}
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer flex items-center gap-1`}
                   >
-                    <span>🤖</span> AI Kullanım Bildirimi
+                    <span>🤖</span> {t.footer.aiUsage}
                   </button>
                 </li>
               </ul>
@@ -2888,7 +2896,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             {/* Column 4: Contact */}
             <div className="space-y-4">
               <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                İletişim
+                {t.footer.contact}
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
@@ -2927,7 +2935,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
-                    7/24 Destek
+                    {t.footer.support}
                   </span>
                 </li>
               </ul>
@@ -2938,7 +2946,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           <div className={`pt-8 border-t ${theme === 'dark' ? 'border-slate-700' : 'border-slate-200'}`}>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-center md:text-left`}>
-                &copy; 2024 Fasheone. Tüm hakları saklıdır.
+                {t.footer.allRights}
               </p>
               <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-500'}`}>
                 Made with ❤️ in Turkey
@@ -2952,8 +2960,8 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         className={`fixed bottom-28 right-6 z-[130] w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 group ${showScrollTop
-            ? 'opacity-100 translate-y-0 pointer-events-auto'
-            : 'opacity-0 translate-y-10 pointer-events-none'
+          ? 'opacity-100 translate-y-0 pointer-events-auto'
+          : 'opacity-0 translate-y-10 pointer-events-none'
           } ${theme === 'dark'
             ? 'bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-cyan-500/30 hover:shadow-cyan-400/50'
             : 'bg-gradient-to-br from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 shadow-cyan-600/30 hover:shadow-cyan-500/50'

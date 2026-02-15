@@ -1,5 +1,28 @@
 import React, { useState } from 'react';
 import { XIcon } from './icons/XIcon';
+import { useTranslation } from '../lib/i18n/context';
+import type { TranslationRecord } from '../lib/i18n/types';
+
+const trLogin = {
+    title: 'Giriş Yap',
+    autoFillHint: 'Otomatik doldurmak için tıklayın',
+    adminLogin: 'Admin Girişi',
+    username: 'Kullanıcı Adı',
+    passwordLabel: 'Şifre',
+    submitButton: 'Giriş Yap',
+};
+
+const loginTranslations: TranslationRecord<typeof trLogin> = {
+    tr: trLogin,
+    en: {
+        title: 'Sign In',
+        autoFillHint: 'Click to auto-fill',
+        adminLogin: 'Admin Login',
+        username: 'Username',
+        passwordLabel: 'Password',
+        submitButton: 'Sign In',
+    },
+};
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -9,6 +32,7 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin, onSwitchToRegister }) => {
+    const t = useTranslation(loginTranslations);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -34,31 +58,31 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-white">Giriş Yap</h2>
+                    <h2 className="text-2xl font-bold text-white">{t.title}</h2>
                     <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors">
                         <XIcon />
                     </button>
                 </div>
 
                 {/* Admin Credentials Hint */}
-                <div 
+                <div
                     className="bg-slate-900/50 p-4 rounded-lg border border-slate-700 mb-6 text-sm cursor-pointer hover:border-cyan-500/30 transition-colors group"
                     onClick={fillAdminCreds}
-                    title="Otomatik doldurmak için tıklayın"
+                    title={t.autoFillHint}
                 >
-                    <p className="text-slate-400 mb-2 text-xs uppercase tracking-wider font-semibold">Admin Girişi</p>
+                    <p className="text-slate-400 mb-2 text-xs uppercase tracking-wider font-semibold">{t.adminLogin}</p>
                     <div className="group-hover:text-cyan-400 transition-colors">
-                        <span className="text-xs text-slate-500 block">Kullanıcı Adı:</span>
+                        <span className="text-xs text-slate-500 block">{t.username}:</span>
                         <span className="font-mono">hikmet</span>
-                        <br/>
-                        <span className="text-xs text-slate-500 block mt-1">Şifre:</span>
+                        <br />
+                        <span className="text-xs text-slate-500 block mt-1">{t.passwordLabel}:</span>
                         <span className="font-mono text-slate-500">••••••••••</span>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="email" className="font-medium text-slate-300 block mb-2">Kullanıcı Adı</label>
+                        <label htmlFor="email" className="font-medium text-slate-300 block mb-2">{t.username}</label>
                         <input
                             type="text"
                             id="email"
@@ -69,7 +93,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                         />
                     </div>
                     <div>
-                        <label htmlFor="password" className="font-medium text-slate-300 block mb-2">Şifre</label>
+                        <label htmlFor="password" className="font-medium text-slate-300 block mb-2">{t.passwordLabel}</label>
                         <input
                             type="password"
                             id="password"
@@ -83,7 +107,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin
                         type="submit"
                         className="w-full mt-4 bg-cyan-600 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-cyan-600/30 hover:bg-cyan-500 transition-all duration-300"
                     >
-                        Giriş Yap
+                        {t.submitButton}
                     </button>
                 </form>
             </div>

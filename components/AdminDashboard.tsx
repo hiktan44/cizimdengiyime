@@ -1,75 +1,30 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Header } from './Header';
 import { UploadIconSmall } from './icons/UploadIconSmall';
 import { SettingsPanel } from './admin/SettingsPanel';
 import { UserActivityPanel } from './admin/UserActivityPanel';
 import { TransactionsPanel } from './admin/TransactionsPanel';
+import { useTranslation, TranslationRecord } from '../lib/i18n';
 
-type Language = 'tr' | 'en';
+const trAdmin = {
+    title: 'Admin Paneli',
+    subtitle: 'Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.',
+    tabs: { content: '📸 İçerik Yönetimi', settings: '⚙️ Ayarlar', users: '👥 Kullanıcı Aktivitesi', transactions: '💳 Ödemeler', adgenius: '🚀 AdGenius Yönetimi' },
+    heroVideos: { title: '🎬 Hero Gömülü Videolar (4 Adet)', subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.' },
+    showcase: { title: '📸 Showcase Görselleri', subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.', sketch: '1. Çizim (Sketch)', product: '2. Ürün (Product)', model: '3. Model (Live)', video: '4. Video' },
+    adgenius: { title: '🚀 AdGenius Yönetimi', subtitle: 'AdGenius bölümü için ana görsel ve kolaj görselini buradan yönetebilirsiniz.', mainImage: 'Ana Görsel (Büyük Model Çekimi)', collageImage: 'Kolaj Görsel (9\'lu Grid/Varyasyon)', mainTitle: 'AdGenius Ana Görsel', collageTitle: 'AdGenius Kolaj/Grid' },
+    change: 'Değiştir',
+};
 
-const adminTranslations = {
-    tr: {
-        title: 'Admin Paneli',
-        subtitle: 'Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.',
-        tabs: {
-            content: '📸 İçerik Yönetimi',
-            settings: '⚙️ Ayarlar',
-            users: '👥 Kullanıcı Aktivitesi',
-            transactions: '💳 Ödemeler',
-            adgenius: '🚀 AdGenius Yönetimi',
-        },
-        heroVideos: {
-            title: '🎬 Hero Gömülü Videolar (4 Adet)',
-            subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.',
-        },
-        showcase: {
-            title: '📸 Showcase Görselleri',
-            subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.',
-            sketch: '1. Çizim (Sketch)',
-            product: '2. Ürün (Product)',
-            model: '3. Model (Live)',
-            video: '4. Video',
-        },
-        adgenius: {
-            title: '🚀 AdGenius Yönetimi',
-            subtitle: 'AdGenius bölümü için ana görsel ve kolaj görselini buradan yönetebilirsiniz.',
-            mainImage: 'Ana Görsel (Büyük Model Çekimi)',
-            collageImage: 'Kolaj Görsel (9\'lu Grid/Varyasyon)',
-            mainTitle: 'AdGenius Ana Görsel',
-            collageTitle: 'AdGenius Kolaj/Grid',
-        },
-        change: 'Değiştir',
-    },
+const adminTranslations: TranslationRecord<typeof trAdmin> = {
+    tr: trAdmin,
     en: {
         title: 'Admin Panel',
         subtitle: 'Access all system management functions from here.',
-        tabs: {
-            content: '📸 Content Management',
-            settings: '⚙️ Settings',
-            users: '👥 User Activity',
-            transactions: '💳 Payments',
-            adgenius: '🚀 AdGenius Management',
-        },
-        heroVideos: {
-            title: '🎬 Hero Background Videos (4)',
-            subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.',
-        },
-        showcase: {
-            title: '📸 Showcase Images',
-            subtitle: 'Upload images for sketch-to-reality transformation examples.',
-            sketch: '1. Sketch',
-            product: '2. Product',
-            model: '3. Model (Live)',
-            video: '4. Video',
-        },
-        adgenius: {
-            title: '🚀 AdGenius Management',
-            subtitle: 'Manage the main image and collage image for the AdGenius section candidate from here.',
-            mainImage: 'Main Image (Large Model Shoot)',
-            collageImage: 'Collage Image (9-Grid/Variation)',
-            mainTitle: 'AdGenius Main Image',
-            collageTitle: 'AdGenius Collage/Grid',
-        },
+        tabs: { content: '📸 Content Management', settings: '⚙️ Settings', users: '👥 User Activity', transactions: '💳 Payments', adgenius: '🚀 AdGenius Management' },
+        heroVideos: { title: '🎬 Hero Background Videos (4)', subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.' },
+        showcase: { title: '📸 Showcase Images', subtitle: 'Upload images for sketch-to-reality transformation examples.', sketch: '1. Sketch', product: '2. Product', model: '3. Model (Live)', video: '4. Video' },
+        adgenius: { title: '🚀 AdGenius Management', subtitle: 'Manage the main image and collage image for the AdGenius section candidate from here.', mainImage: 'Main Image (Large Model Shoot)', collageImage: 'Collage Image (9-Grid/Variation)', mainTitle: 'AdGenius Main Image', collageTitle: 'AdGenius Collage/Grid' },
         change: 'Change',
     },
 };
@@ -178,15 +133,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
     } = props;
 
     const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions' | 'adgenius'>('content');
-    const [language, setLanguage] = useState<Language>('tr');
-
-    // Load language from localStorage
-    useEffect(() => {
-        const savedLang = localStorage.getItem('fasheone_language') as Language;
-        if (savedLang) setLanguage(savedLang);
-    }, []);
-
-    const t = adminTranslations[language];
+    const t = useTranslation(adminTranslations);
 
 
 

@@ -40,15 +40,18 @@ export const SUBSCRIPTION_PLANS = {
 // Credit packages
 export const CREDIT_PACKAGES = {
     SMALL: {
-        credits: 50,
-        price: 250,
+        credits: 100,
+        price: 999,
+        priceEUR: 19.90,
     },
     MEDIUM: {
-        credits: 100,
-        price: 500,
+        credits: 250,
+        price: 2399,
+        priceEUR: 48.90,
     },
     LARGE: {
-        credits: 200,
-        price: 1000,
+        credits: 500,
+        price: 4499,
+        priceEUR: 89.90,
     },
 } as const;

@@ -63,7 +63,7 @@ const PromptPreview: React.FC<Props> = ({ results, setResults, onSubmit, onBack,
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">Özel Sahne Promptu</label>
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">{t.preview?.customPromptLabel || 'Custom Scene Prompt'}</label>
                                     <div className="relative">
                                         <textarea
                                             value={result.prompt}

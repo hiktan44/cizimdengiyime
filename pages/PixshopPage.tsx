@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useI18n, useTranslation, TranslationRecord } from '../lib/i18n';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { pixshopGenerateEditedImage, pixshopGenerateFilteredImage, pixshopGenerateAdjustedImage, pixshopRemoveBackground, pixshopUpscaleImage, pixshopAddProductOrLogo } from '../services/pixshopService';
@@ -86,111 +87,151 @@ function centerAspectCrop(
 }
 
 type Tab = 'upload' | 'retouch' | 'adjust' | 'filters' | 'crop' | 'upscale' | 'addproduct';
-type Language = 'tr' | 'en';
 
-const translations = {
-  tr: {
-    tabs: {
-      upload: 'Yükle',
-      retouch: 'Rötuş',
-      crop: 'Kırp',
-      adjust: 'Ayarla',
-      filters: 'Filtreler',
-      upscale: 'Yükselt',
-      addproduct: 'Ürün Yerleştir',
-    },
-    buttons: {
-      removeBackground: 'Arka Planı Kaldır',
-      smartErase: 'Nesneyi Sil',
-      generate: 'Oluştur',
-      download: 'İndir',
-      reset: 'Sıfırla',
-      apply: 'Uygula',
-      cancel: 'İptal',
-      undo: 'Geri Al',
-      redo: 'İleri Al',
-    },
-    placeholders: {
-      retouchPrompt: "ör., 'gömleğimi mavi yap'",
-      selectPoint: 'Önce resimde bir nokta seçin',
-    },
-    messages: {
-      creditCheck: 'Kredi kontrol ediliyor...',
-      processing: 'İşleniyor...',
-      noCredits: 'Yeterli krediniz yok',
-      success: 'İşlem başarılı!',
-      error: 'Bir hata oluştu',
-      uploadFirst: 'Önce bir görsel yükleyin',
-      selectArea: 'Silmek için bir alan seçin',
-    },
-    comparison: {
-      peek: 'Orijinali Göster',
-      sideBySide: 'Yan Yana',
-      split: 'Bölünmüş',
-    },
-    zoom: {
-      zoomIn: 'Yakınlaştır',
-      zoomOut: 'Uzaklaştır',
-      fit: 'Sığdır',
-      magnifier: 'Büyüteç',
-    },
+
+const trPixshop = {
+  tabs: { upload: 'Yükle', retouch: 'Rötuş', crop: 'Kırp', adjust: 'Ayarla', filters: 'Filtreler', upscale: 'Yükselt', addproduct: 'Ürün Yerleştir' },
+  buttons: { removeBackground: 'Arka Planı Kaldır', smartErase: 'Nesneyi Sil', generate: 'Oluştur', download: 'İndir', reset: 'Sıfırla', apply: 'Uygula', cancel: 'İptal', undo: 'Geri Al', redo: 'İleri Al' },
+  placeholders: { retouchPrompt: "ör., 'gömleğimi mavi yap'", selectPoint: 'Önce resimde bir nokta seçin' },
+  messages: { creditCheck: 'Kredi kontrol ediliyor...', processing: 'İşleniyor...', noCredits: 'Yeterli krediniz yok', success: 'İşlem başarılı!', error: 'Bir hata oluştu', uploadFirst: 'Önce bir görsel yükleyin', selectArea: 'Silmek için bir alan seçin' },
+  comparison: { peek: 'Orijinali Göster', sideBySide: 'Yan Yana', split: 'Bölünmüş' },
+  zoom: { zoomIn: 'Yakınlaştır', zoomOut: 'Uzaklaştır', fit: 'Sığdır', magnifier: 'Büyüteç' },
+  errors: {
+    loginRequired: 'İşlem yapmak için giriş yapmalısınız.',
+    insufficientCredits: 'Yetersiz kredi',
+    insufficientCreditsForRes: 'için',
+    creditsRequired: 'kredi gereklidir.',
+    noImageForEdit: 'Düzenlenecek bir resim yüklenmedi.',
+    describeEdit: 'Lütfen yapmak istediğiniz düzenlemeyi açıklayın.',
+    selectEditArea: 'Lütfen düzenlenecek alanı seçmek için resme tıklayın.',
+    unknownError: 'Bilinmeyen bir hata oluştu.',
+    generateFailed: 'Resim oluşturulamadı.',
+    noImageForFilter: 'Filtre uygulanacak bir resim yüklenmedi.',
+    noImageForAdjust: 'Ayar uygulanacak bir resim yüklenmedi.',
+    eraseFailed: 'Nesne silinemedi. Lütfen tekrar deneyin.',
+    uploadMainImage: 'Lütfen önce bir ana görsel yükleyin.',
+    uploadOverlayImage: 'Lütfen eklemek istediğiniz logo veya ürün görselini yükleyin.',
+    describeOverlay: 'Lütfen ne eklemek istediğinizi açıklayın.',
+    selectCropArea: 'Lütfen kırpmak için geçerli bir alan seçin.',
+    cropFailed: 'Kırpma işlemi sırasında hata oluştu.',
+    upscaleFailed: 'Yükseltme işlemi başarısız oldu.',
+    upscaleInsufficient4K: 'Yetersiz kredi. 4K upscale için 2 kredi gereklidir.',
+    svgFailed: 'SVG oluşturulamadı.',
+    errorPrefix: 'Hata:',
   },
+  ui: {
+    errorTitle: 'Bir Hata Oluştu',
+    creditInfo: 'Her işlem',
+    creditUnit: 'kredi',
+    creditConsumes: 'harcar',
+    creditAvailable: 'Mevcut:',
+    resolution: 'Çıktı Çözünürlüğü',
+    currentAlt: 'Mevcut',
+    outputQuality: 'Çıktı Kalitesi',
+    extraCreditFor4K: '4K için +1 kredi eklenir',
+    standard: 'Standart',
+    adding: 'Ekleniyor...',
+    addProductBtn: 'Logo / Ürün Ekle',
+    examplesTitle: '📋 Örnek Kullanımlar:',
+    exLogo: '"Bu logoyu sağ üst köşeye küçük boyutta ekle"',
+    exTie: '"Bu kravatı kişiye doğal bir şekilde giydir"',
+    exScarf: '"Bu şalı omuzlara zarif bir şekilde yerleştir"',
+    exAccessory: '"Bu kolye/küpeyi kişiye tak"',
+    undoBtn: 'Geri Al',
+    redoBtn: 'İleri Al',
+    seeOriginal: 'Orijinali Gör',
+    splitView: 'Bölünmüş Görünüm',
+    resetView: 'Görünümü Sıfırla',
+    resetBtn: 'Sıfırla',
+    uploadNew: 'Yeni Yükle',
+    svgTransparent: 'SVG (Şeffaf)',
+    downloadImage: 'Resmi İndir',
+    filterFailed: 'Filtre uygulanamadı.',
+    adjustFailed: 'Ayar uygulanamadı.',
+    bgRemoveFailed: 'Arka plan kaldırılamadı.',
+    addProductFailed: 'Ürün/Logo eklenemedi.',
+    cropOperationFailed: 'Kırpma işlemi yapılamadı.',
+    aiMagic: 'Yapay zeka sihrini konuşturuyor...',
+  },
+};
+
+const pixshopTranslations: TranslationRecord<typeof trPixshop> = {
+  tr: trPixshop,
   en: {
-    tabs: {
-      upload: 'Upload',
-      retouch: 'Retouch',
-      crop: 'Crop',
-      adjust: 'Adjust',
-      filters: 'Filters',
-      upscale: 'Upscale',
-      addproduct: 'Add Product',
+    tabs: { upload: 'Upload', retouch: 'Retouch', crop: 'Crop', adjust: 'Adjust', filters: 'Filters', upscale: 'Upscale', addproduct: 'Add Product' },
+    buttons: { removeBackground: 'Remove Background', smartErase: 'Smart Erase', generate: 'Generate', download: 'Download', reset: 'Reset', apply: 'Apply', cancel: 'Cancel', undo: 'Undo', redo: 'Redo' },
+    placeholders: { retouchPrompt: "e.g., 'make my shirt blue'", selectPoint: 'Select a point on the image first' },
+    messages: { creditCheck: 'Checking credits...', processing: 'Processing...', noCredits: 'Insufficient credits', success: 'Operation successful!', error: 'An error occurred', uploadFirst: 'Upload an image first', selectArea: 'Select an area to erase' },
+    comparison: { peek: 'Show Original', sideBySide: 'Side by Side', split: 'Split' },
+    zoom: { zoomIn: 'Zoom In', zoomOut: 'Zoom Out', fit: 'Fit', magnifier: 'Magnifier' },
+    errors: {
+      loginRequired: 'Please login to perform this action.',
+      insufficientCredits: 'Insufficient credits',
+      insufficientCreditsForRes: 'for',
+      creditsRequired: 'credits required.',
+      noImageForEdit: 'No image uploaded for editing.',
+      describeEdit: 'Please describe the edit you want to make.',
+      selectEditArea: 'Please click on the image to select the area to edit.',
+      unknownError: 'An unknown error occurred.',
+      generateFailed: 'Image could not be generated.',
+      noImageForFilter: 'No image loaded for filter.',
+      noImageForAdjust: 'No image loaded for adjustment.',
+      eraseFailed: 'Object could not be erased. Please try again.',
+      uploadMainImage: 'Please upload a main image first.',
+      uploadOverlayImage: 'Please upload the logo or product image you want to add.',
+      describeOverlay: 'Please describe what you want to add.',
+      selectCropArea: 'Please select a valid area to crop.',
+      cropFailed: 'An error occurred during cropping.',
+      upscaleFailed: 'Upscale operation failed.',
+      upscaleInsufficient4K: 'Insufficient credits. 2 credits required for 4K upscale.',
+      svgFailed: 'SVG could not be created.',
+      errorPrefix: 'Error:',
     },
-    buttons: {
-      removeBackground: 'Remove Background',
-      smartErase: 'Smart Erase',
-      generate: 'Generate',
-      download: 'Download',
-      reset: 'Reset',
-      apply: 'Apply',
-      cancel: 'Cancel',
-      undo: 'Undo',
-      redo: 'Redo',
-    },
-    placeholders: {
-      retouchPrompt: "e.g., 'make my shirt blue'",
-      selectPoint: 'Select a point on the image first',
-    },
-    messages: {
-      creditCheck: 'Checking credits...',
-      processing: 'Processing...',
-      noCredits: 'Insufficient credits',
-      success: 'Operation successful!',
-      error: 'An error occurred',
-      uploadFirst: 'Upload an image first',
-      selectArea: 'Select an area to erase',
-    },
-    comparison: {
-      peek: 'Show Original',
-      sideBySide: 'Side by Side',
-      split: 'Split',
-    },
-    zoom: {
-      zoomIn: 'Zoom In',
-      zoomOut: 'Zoom Out',
-      fit: 'Fit',
-      magnifier: 'Magnifier',
+    ui: {
+      errorTitle: 'An Error Occurred',
+      creditInfo: 'Each operation costs',
+      creditUnit: 'credits',
+      creditConsumes: '',
+      creditAvailable: 'Available:',
+      resolution: 'Output Resolution',
+      currentAlt: 'Current',
+      outputQuality: 'Output Quality',
+      extraCreditFor4K: '+1 credit added for 4K',
+      standard: 'Standard',
+      adding: 'Adding...',
+      addProductBtn: 'Add Logo / Product',
+      examplesTitle: '📋 Usage Examples:',
+      exLogo: '"Add this logo small in the top-right corner"',
+      exTie: '"Naturally put this tie on the person"',
+      exScarf: '"Elegantly drape this scarf over the shoulders"',
+      exAccessory: '"Put this necklace/earring on the person"',
+      undoBtn: 'Undo',
+      redoBtn: 'Redo',
+      seeOriginal: 'See Original',
+      splitView: 'Split View',
+      resetView: 'Reset View',
+      resetBtn: 'Reset',
+      uploadNew: 'Upload New',
+      svgTransparent: 'SVG (Transparent)',
+      downloadImage: 'Download Image',
+      filterFailed: 'Filter could not be applied.',
+      adjustFailed: 'Adjustment could not be applied.',
+      bgRemoveFailed: 'Background could not be removed.',
+      addProductFailed: 'Product/Logo could not be added.',
+      cropOperationFailed: 'Crop operation failed.',
+      aiMagic: 'AI is working its magic...',
     },
   },
 };
 
-const getTabs = (lang: Language): { id: Tab, name: string }[] => [
-  { id: 'upload', name: translations[lang].tabs.upload },
-  { id: 'retouch', name: translations[lang].tabs.retouch },
-  { id: 'addproduct', name: translations[lang].tabs.addproduct },
-  { id: 'crop', name: translations[lang].tabs.crop },
-  { id: 'adjust', name: translations[lang].tabs.adjust },
-  { id: 'filters', name: translations[lang].tabs.filters },
-  { id: 'upscale', name: translations[lang].tabs.upscale },
+const getTabs = (t: typeof trPixshop): { id: Tab, name: string }[] => [
+  { id: 'upload', name: t.tabs.upload },
+  { id: 'retouch', name: t.tabs.retouch },
+  { id: 'addproduct', name: t.tabs.addproduct },
+  { id: 'crop', name: t.tabs.crop },
+  { id: 'adjust', name: t.tabs.adjust },
+  { id: 'filters', name: t.tabs.filters },
+  { id: 'upscale', name: t.tabs.upscale },
 ];
 
 export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
@@ -199,16 +240,9 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const [prompt, setPrompt] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [language, setLanguage] = useState<Language>('tr');
-
-  // Load language preference
-  useEffect(() => {
-    const savedLang = localStorage.getItem('fasheone_language') as Language;
-    if (savedLang) setLanguage(savedLang);
-  }, []);
-
-  const t = translations[language];
-  const TABS = getTabs(language);
+  const { language } = useI18n();
+  const t = useTranslation(pixshopTranslations);
+  const TABS = getTabs(t);
 
   // Hotspot for API
   const [editHotspot, setEditHotspot] = useState<{ x: number, y: number } | null>(null);
@@ -243,7 +277,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const [overlayPrompt, setOverlayPrompt] = useState<string>('');
   const [overlayImageUrl, setOverlayImageUrl] = useState<string | null>(null);
 
-  // Output resolution selection (2K = 1 kredi, 4K = +1 kredi ekstra)
+  // Output resolution selection
   const [outputResolution, setOutputResolution] = useState<'2K' | '4K'>('2K');
 
   const imgRef = useRef<HTMLImageElement>(null);
@@ -396,16 +430,16 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   // Check credits before operation
   const checkCredits = async (): Promise<boolean> => {
     if (!profile) {
-      setError('İşlem yapmak için giriş yapmalısınız.');
+      setError(t.errors.loginRequired);
       return false;
     }
 
-    // 4K seçiliyse ekstra kredi kontrolü
+    // 4K extra credit check
     const creditCost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
     const result = await checkAndDeductCredits(profile.id, 'pixshop', creditCost);
 
     if (!result.success) {
-      setError(result.message || `Yetersiz kredi. ${outputResolution} için ${creditCost} kredi gereklidir.`);
+      setError(result.message || `${t.errors.insufficientCredits}. ${outputResolution} ${t.errors.insufficientCreditsForRes} ${creditCost} ${t.errors.creditsRequired}`);
       if (onShowBuyCredits) onShowBuyCredits();
       return false;
     }
@@ -449,17 +483,17 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
   const handleGenerate = useCallback(async () => {
     if (!currentImage) {
-      setError('Düzenlenecek bir resim yüklenmedi.');
+      setError(t.errors.noImageForEdit);
       return;
     }
 
     if (!prompt.trim()) {
-      setError('Lütfen yapmak istediğiniz düzenlemeyi açıklayın.');
+      setError(t.errors.describeEdit);
       return;
     }
 
     if (!editHotspot) {
-      setError('Lütfen düzenlenecek alanı seçmek için resme tıklayın.');
+      setError(t.errors.selectEditArea);
       return;
     }
 
@@ -485,8 +519,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       setDisplayHotspot(null);
       setPrompt('');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
-      setError(`Resim oluşturulamadı. ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
+      setError(`${t.errors.generateFailed} ${errorMessage}`);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -495,7 +529,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
   const handleApplyFilter = useCallback(async (filterPrompt: string) => {
     if (!currentImage) {
-      setError('Filtre uygulanacak bir resim yüklenmedi.');
+      setError(t.errors.noImageForFilter);
       return;
     }
 
@@ -514,8 +548,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       addImageToHistory(newImageFile);
       await saveToHistory(filteredImageUrl, inputUrl);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
-      setError(`Filtre uygulanamadı. ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
+      setError(`${t.ui.filterFailed} ${errorMessage}`);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -524,7 +558,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
   const handleApplyAdjustment = useCallback(async (adjustmentPrompt: string) => {
     if (!currentImage) {
-      setError('Ayar uygulanacak bir resim yüklenmedi.');
+      setError(t.errors.noImageForAdjust);
       return;
     }
 
@@ -543,15 +577,15 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       addImageToHistory(newImageFile);
       await saveToHistory(adjustedImageUrl, inputUrl);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
-      setError(`Ayar uygulanamadı. ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
+      setError(`${t.ui.adjustFailed} ${errorMessage}`);
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   }, [currentImage, addImageToHistory, profile]);
 
-  // Smart Erase - Nesneyi Sil fonksiyonu
+  // Smart Erase function
   const handleSmartErase = useCallback(async () => {
     if (!currentImage || !editHotspot) return;
 
@@ -573,27 +607,27 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       setEditHotspot(null);
       setDisplayHotspot(null);
     } catch (err) {
-      setError('Nesne silinemedi. Lütfen tekrar deneyin.');
+      setError(t.errors.eraseFailed);
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   }, [currentImage, editHotspot, addImageToHistory, profile]);
 
-  // Add Product/Logo - Ürün veya Logo Ekleme fonksiyonu
+  // Add Product/Logo function
   const handleAddProduct = useCallback(async () => {
     if (!currentImage) {
-      setError('Lütfen önce bir ana görsel yükleyin.');
+      setError(t.errors.uploadMainImage);
       return;
     }
 
     if (!overlayImage) {
-      setError('Lütfen eklemek istediğiniz logo veya ürün görselini yükleyin.');
+      setError(t.errors.uploadOverlayImage);
       return;
     }
 
     if (!overlayPrompt.trim()) {
-      setError('Lütfen ne eklemek istediğinizi açıklayın.');
+      setError(t.errors.describeOverlay);
       return;
     }
 
@@ -621,15 +655,15 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       setEditHotspot(null);
       setDisplayHotspot(null);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
-      setError(`Ürün/Logo eklenemedi. ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
+      setError(`${t.ui.addProductFailed} ${errorMessage}`);
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   }, [currentImage, overlayImage, overlayPrompt, editHotspot, addImageToHistory, profile]);
 
-  // Arka Planı Kaldır (Galeri'ye ekle versiyonu)
+  // Remove Background function
   const handleRemoveBackground = useCallback(async () => {
     if (!currentImage) return;
 
@@ -648,8 +682,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       addImageToHistory(newImageFile);
       await saveToHistory(transparentImageUrl, inputUrl);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Arka plan kaldırılamadı.';
-      setError(`Hata: ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : t.ui.bgRemoveFailed;
+      setError(`${t.errors.errorPrefix} ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -657,7 +691,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
   const handleApplyCrop = useCallback(async () => {
     if (!completedCrop?.width || !completedCrop?.height || !imgRef.current) {
-      setError('Lütfen kırpmak için geçerli bir alan seçin.');
+      setError(t.errors.selectCropArea);
       return;
     }
 
@@ -681,7 +715,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       const ctx = canvas.getContext('2d');
 
       if (!ctx) {
-        setError('Kırpma işlemi yapılamadı.');
+        setError(t.ui.cropOperationFailed);
         return;
       }
 
@@ -696,7 +730,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       addImageToHistory(newImageFile);
       await saveToHistory(croppedImageUrl, inputUrl);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Kırpma işlemi sırasında hata oluştu.';
+      const errorMessage = err instanceof Error ? err.message : t.errors.cropFailed;
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -706,21 +740,21 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const handleUpscale = useCallback(async (size: '2K' | '4K') => {
     if (!currentImage) return;
 
-    // 4K için özel kredi kontrolü
+    // 4K special credit check
     if (size === '4K') {
       if (!profile) {
-        setError('İşlem yapmak için giriş yapmalısınız.');
+        setError(t.errors.loginRequired);
         return false;
       }
       const result = await checkAndDeductCredits(profile.id, 'pixshop', CREDIT_COSTS.PIXSHOP_4K);
       if (!result.success) {
-        setError(result.message || 'Yetersiz kredi. 4K upscale için 2 kredi gereklidir.');
+        setError(result.message || t.errors.upscaleInsufficient4K);
         if (onShowBuyCredits) onShowBuyCredits();
         return;
       }
       onRefreshProfile();
     } else {
-      // 2K için normal kredi kontrolü
+      // 2K normal credit check
       if (!await checkCredits()) return;
     }
 
@@ -737,8 +771,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       addImageToHistory(newImageFile);
       await saveToHistory(upscaledImageUrl, inputUrl);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Bilinmeyen bir hata oluştu.';
-      setError(`Yükseltme işlemi başarısız oldu. ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
+      setError(`${t.errors.upscaleFailed} ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -836,8 +870,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
 
       await saveToHistory(transparentImageUrl);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'SVG oluşturulamadı.';
-      setError(`Hata: ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : t.errors.svgFailed;
+      setError(`${t.errors.errorPrefix} ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -972,13 +1006,13 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     if (error) {
       return (
         <div className="text-center animate-fade-in bg-red-500/10 border border-red-500/20 p-8 rounded-lg max-w-2xl mx-auto flex flex-col items-center gap-4">
-          <h2 className="text-2xl font-bold text-red-300">Bir Hata Oluştu</h2>
+          <h2 className="text-2xl font-bold text-red-300">{t.ui.errorTitle}</h2>
           <p className="text-md text-red-400">{error}</p>
           <button
             onClick={() => setError(null)}
             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg text-md transition-colors"
           >
-            Tekrar Dene
+            {t.buttons.reset}
           </button>
         </div>
       );
@@ -993,7 +1027,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         ref={imgRef}
         key={cropPreviewUrl || currentImageUrl}
         src={cropPreviewUrl || currentImageUrl}
-        alt="Bu resmi kırp"
+        alt={t.ui.currentAlt}
         className="block max-w-full max-h-[60vh] object-contain mx-auto"
       />
     );
@@ -1005,14 +1039,14 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         {profile && (
           <div className="w-full flex flex-col gap-3">
             <div className="w-full flex items-center justify-between bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2">
-              <span className="text-sm text-slate-400">Her işlem <span className="text-cyan-400 font-bold">{outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP} kredi</span> harcar</span>
-              <span className="text-sm text-slate-300">Mevcut: <span className="text-cyan-400 font-bold">{profile.credits}</span> kredi</span>
+              <span className="text-sm text-slate-400">{t.ui.creditInfo} <span className="text-cyan-400 font-bold">{outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP} {t.ui.creditUnit}</span> {t.ui.creditConsumes}</span>
+              <span className="text-sm text-slate-300">{t.ui.creditAvailable} <span className="text-cyan-400 font-bold">{profile.credits}</span> {t.ui.creditUnit}</span>
             </div>
 
             {/* Resolution Selector */}
             <div className="w-full bg-slate-800/30 border border-slate-700/50 rounded-lg px-4 py-3">
               <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-slate-300 font-medium">Çıktı Çözünürlüğü:</span>
+                <span className="text-sm text-slate-300 font-medium">{t.ui.resolution}:</span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setOutputResolution('2K')}
@@ -1021,7 +1055,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                       : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
                       }`}
                   >
-                    2K <span className="text-xs opacity-75">(1 kredi)</span>
+                    2K <span className="text-xs opacity-75">(1 {t.ui.creditUnit})</span>
                   </button>
                   <button
                     onClick={() => setOutputResolution('4K')}
@@ -1030,7 +1064,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                       : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
                       }`}
                   >
-                    4K <span className="text-xs opacity-75">(2 kredi)</span>
+                    4K <span className="text-xs opacity-75">(2 {t.ui.creditUnit})</span>
                   </button>
                 </div>
               </div>
@@ -1054,7 +1088,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
               {isLoading && (
                 <div className="absolute inset-0 bg-black/70 z-30 flex flex-col items-center justify-center gap-4 animate-fade-in">
                   <Spinner />
-                  <p className="text-gray-300">Yapay zeka sihrini konuşturuyor...</p>
+                  <p className="text-gray-300">{t.ui.aiMagic}</p>
                 </div>
               )}
 
@@ -1105,7 +1139,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                       <img
                         key={originalImageUrl}
                         src={originalImageUrl}
-                        alt="Orijinal"
+                        alt="Original"
                         className="max-w-full max-h-full object-contain pointer-events-none"
                       />
                     )}
@@ -1114,7 +1148,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                       ref={imgRef}
                       key={currentImageUrl}
                       src={currentImageUrl}
-                      alt="Mevcut"
+                      alt={t.ui.currentAlt}
                       className={`absolute inset-0 max-w-full max-h-full object-contain m-auto transition-opacity duration-200 ease-in-out ${isComparing && !isSplitMode ? 'opacity-0' : 'opacity-100'}`}
                       style={isSplitMode ? { clipPath: `inset(0 0 0 ${splitPos}%)` } : undefined}
                       draggable={false}
@@ -1369,8 +1403,8 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
               {/* Resolution Selector */}
               <div className="w-full max-w-2xl flex items-center justify-between bg-gray-900/50 border border-gray-700 rounded-xl p-4">
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-gray-200">Çıktı Kalitesi</span>
-                  <span className="text-xs text-gray-400">4K için +1 kredi eklenir</span>
+                  <span className="text-sm font-bold text-gray-200">{t.ui.outputQuality}</span>
+                  <span className="text-xs text-gray-400">{t.ui.extraCreditFor4K}</span>
                 </div>
                 <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
                   <button
@@ -1379,7 +1413,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                       ? 'bg-gray-600 text-white shadow-sm'
                       : 'text-gray-400 hover:text-white'}`}
                   >
-                    2K (Standart)
+                    2K ({t.ui.standard})
                   </button>
                   <button
                     onClick={() => setOutputResolution('4K')}
@@ -1399,17 +1433,17 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                 disabled={isLoading || !overlayImage || !overlayPrompt.trim() || !currentImage}
                 className="w-full max-w-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-5 px-10 text-lg rounded-2xl shadow-xl hover:shadow-2xl hover:from-purple-500 hover:to-pink-500 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Ekleniyor...' : 'Logo / Ürün Ekle'}
+                {isLoading ? t.ui.adding : t.ui.addProductBtn}
               </button>
 
               {/* Examples */}
               <div className="w-full max-w-2xl bg-gray-900/30 border border-gray-700/50 rounded-xl p-4">
-                <h4 className="text-sm font-bold text-gray-300 mb-3">📋 Örnek Kullanımlar:</h4>
+                <h4 className="text-sm font-bold text-gray-300 mb-3">{t.ui.examplesTitle}</h4>
                 <ul className="space-y-2 text-sm text-gray-400">
-                  <li>• <strong>Logo:</strong> "Bu logoyu sağ üst köşeye küçük boyutta ekle"</li>
-                  <li>• <strong>Kravat:</strong> "Bu kravatı kişiye doğal bir şekilde giydir"</li>
-                  <li>• <strong>Şal:</strong> "Bu şalı omuzlara zarif bir şekilde yerleştir"</li>
-                  <li>• <strong>Aksesuar:</strong> "Bu kolye/küpeyi kişiye tak"</li>
+                  <li>• <strong>Logo:</strong> {t.ui.exLogo}</li>
+                  <li>• <strong>{language === 'tr' ? 'Kravat' : 'Tie'}:</strong> {t.ui.exTie}</li>
+                  <li>• <strong>{language === 'tr' ? 'Şal' : 'Scarf'}:</strong> {t.ui.exScarf}</li>
+                  <li>• <strong>{language === 'tr' ? 'Aksesuar' : 'Accessory'}:</strong> {t.ui.exAccessory}</li>
                 </ul>
               </div>
             </div>
@@ -1420,11 +1454,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
         <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
           <button onClick={handleUndo} disabled={!canUndo || !currentImage} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-white/5">
             <UndoIcon className="w-5 h-5 mr-2" />
-            Geri Al
+            {t.ui.undoBtn}
           </button>
           <button onClick={handleRedo} disabled={!canRedo || !currentImage} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-white/5">
             <RedoIcon className="w-5 h-5 mr-2" />
-            İleri Al
+            {t.ui.redoBtn}
           </button>
 
           {currentImage && (
@@ -1442,12 +1476,12 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
                 className={`flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base ${isComparing ? 'bg-blue-500 text-white' : ''}`}
               >
                 <EyeIcon className="w-5 h-5 mr-2" />
-                Orijinali Gör
+                {t.ui.seeOriginal}
               </button>
               <button
                 onClick={() => setIsSplitMode(!isSplitMode)}
                 className={`p-3 rounded-md transition-all border ${isSplitMode ? 'bg-blue-500 text-white border-blue-500' : 'bg-white/10 border-white/20 text-gray-400 hover:bg-white/20'}`}
-                title="Bölünmüş Görünüm"
+                title={t.ui.splitView}
               >
                 <SplitIcon className="w-5 h-5" />
               </button>
@@ -1463,23 +1497,23 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
             <span className="w-16 text-center text-base font-semibold text-gray-300">{Math.round(scale * 100)}%</span>
             <button onClick={() => handleZoom(0.2)} disabled={scale >= 5 || !currentImage} className="p-3 text-gray-200 hover:bg-white/20 rounded-r-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"><ZoomInIcon className="w-5 h-5" /></button>
           </div>
-          <button onClick={handleResetView} disabled={!currentImage} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed"><ArrowsPointingOutIcon className="w-5 h-5 mr-2" /> Görünümü Sıfırla</button>
+          <button onClick={handleResetView} disabled={!currentImage} className="flex items-center justify-center text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed"><ArrowsPointingOutIcon className="w-5 h-5 mr-2" /> {t.ui.resetView}</button>
 
 
           <button onClick={handleReset} disabled={!canUndo || !currentImage} className="text-center bg-transparent border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/10 hover:border-white/30 active:scale-95 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-transparent">
-            Sıfırla
+            {t.ui.resetBtn}
           </button>
           <button onClick={handleUploadNew} className="text-center bg-white/10 border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-200 ease-in-out hover:bg-white/20 hover:border-white/30 active:scale-95 text-base">
-            Yeni Yükle
+            {t.ui.uploadNew}
           </button>
 
           <div className="flex-grow sm:flex-grow-0 ml-auto flex gap-2">
             <button onClick={handleDownloadTransparentSvg} disabled={isLoading || !currentImage} className="bg-transparent border border-white/20 text-gray-200 font-semibold py-3 px-5 rounded-md transition-all duration-300 ease-in-out hover:bg-white/10 hover:border-white/30 active:scale-95 text-base flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
               <DownloadIcon className="w-5 h-5 mr-2" />
-              SVG (Şeffaf)
+              {t.ui.svgTransparent}
             </button>
             <button onClick={handleDownload} disabled={!currentImage} className="bg-gradient-to-br from-green-600 to-green-500 text-white font-bold py-3 px-5 rounded-md transition-all duration-300 ease-in-out shadow-lg shadow-green-500/20 hover:shadow-xl hover:shadow-green-500/40 hover:-translate-y-px active:scale-95 active:shadow-inner text-base flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
-              Resmi İndir
+              {t.ui.downloadImage}
             </button>
           </div>
         </div>

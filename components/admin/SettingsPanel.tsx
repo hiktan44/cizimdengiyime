@@ -1,70 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { getSiteSettings, updateSiteSetting } from '../../lib/adminService';
+import { useTranslation, TranslationRecord } from '../../lib/i18n';
 
-type Language = 'tr' | 'en';
+interface SettingsTranslations {
+  initialCredits: { title: string; subtitle: string; credits: string };
+  packages: { title: string; small: string; medium: string; large: string; creditAmount: string; price: string };
+  stripe: { title: string; mode: string; publishableKey: string; secretKey: string; test: string; live: string; warning: string };
+  save: { saving: string; button: string; success: string; error: string };
+}
 
-const translations = {
+const translations: TranslationRecord<SettingsTranslations> = {
   tr: {
-    initialCredits: {
-      title: 'İlk Üyelik Kredisi',
-      subtitle: 'Yeni kayıt olan kullanıcılara verilen kredi miktarı',
-      credits: 'Kredi',
-    },
-    packages: {
-      title: 'Kredi Paketleri',
-      small: 'Küçük Paket',
-      medium: 'Orta Paket',
-      large: 'Büyük Paket',
-      creditAmount: 'Kredi Miktarı',
-      price: 'Fiyat (TL)',
-    },
-    stripe: {
-      title: 'Stripe Ödeme Ayarları',
-      mode: 'Çalışma Modu',
-      publishableKey: 'Publishable Key (pk_...)',
-      secretKey: 'Secret Key (sk_...)',
-      test: 'Test Modu',
-      live: 'Canlı (Live) Mod',
-      warning: 'Bu anahtarlar ödeme almak için kritiktir. Dikkatli değiştirin.',
-    },
-    save: {
-      saving: 'Kaydediliyor...',
-      button: 'Ayarları Kaydet',
-      success: 'Ayarlar başarıyla kaydedildi!',
-      error: 'Ayarlar kaydedilirken hata oluştu!',
-    },
-
+    initialCredits: { title: 'İlk Üyelik Kredisi', subtitle: 'Yeni kayıt olan kullanıcılara verilen kredi miktarı', credits: 'Kredi' },
+    packages: { title: 'Kredi Paketleri', small: 'Küçük Paket', medium: 'Orta Paket', large: 'Büyük Paket', creditAmount: 'Kredi Miktarı', price: 'Fiyat (TL)' },
+    stripe: { title: 'Stripe Ödeme Ayarları', mode: 'Çalışma Modu', publishableKey: 'Publishable Key (pk_...)', secretKey: 'Secret Key (sk_...)', test: 'Test Modu', live: 'Canlı (Live) Mod', warning: 'Bu anahtarlar ödeme almak için kritiktir. Dikkatli değiştirin.' },
+    save: { saving: 'Kaydediliyor...', button: 'Ayarları Kaydet', success: 'Ayarlar başarıyla kaydedildi!', error: 'Ayarlar kaydedilirken hata oluştu!' },
   },
   en: {
-    initialCredits: {
-      title: 'Initial Membership Credits',
-      subtitle: 'Credits given to newly registered users',
-      credits: 'Credits',
-    },
-    packages: {
-      title: 'Credit Packages',
-      small: 'Small Package',
-      medium: 'Medium Package',
-      large: 'Large Package',
-      creditAmount: 'Credit Amount',
-      price: 'Price (TL)',
-    },
-    stripe: {
-      title: 'Stripe Payment Settings',
-      mode: 'Operation Mode',
-      publishableKey: 'Publishable Key (pk_...)',
-      secretKey: 'Secret Key (sk_...)',
-      test: 'Test Mode',
-      live: 'Live Mode',
-      warning: 'These keys are critical for payments. Change with caution.',
-    },
-    save: {
-      saving: 'Saving...',
-      button: 'Save Settings',
-      success: 'Settings saved successfully!',
-      error: 'Error saving settings!',
-    },
-
+    initialCredits: { title: 'Initial Membership Credits', subtitle: 'Credits given to newly registered users', credits: 'Credits' },
+    packages: { title: 'Credit Packages', small: 'Small Package', medium: 'Medium Package', large: 'Large Package', creditAmount: 'Credit Amount', price: 'Price (TL)' },
+    stripe: { title: 'Stripe Payment Settings', mode: 'Operation Mode', publishableKey: 'Publishable Key (pk_...)', secretKey: 'Secret Key (sk_...)', test: 'Test Mode', live: 'Live Mode', warning: 'These keys are critical for payments. Change with caution.' },
+    save: { saving: 'Saving...', button: 'Save Settings', success: 'Settings saved successfully!', error: 'Error saving settings!' },
   },
 };
 
@@ -73,15 +29,11 @@ export const SettingsPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [language, setLanguage] = useState<Language>('tr');
+  const t = useTranslation(translations);
 
   useEffect(() => {
     loadSettings();
-    const savedLang = localStorage.getItem('fasheone_language') as Language;
-    if (savedLang) setLanguage(savedLang);
   }, []);
-
-  const t = translations[language];
 
   const loadSettings = async () => {
     try {

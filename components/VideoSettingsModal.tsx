@@ -3,32 +3,33 @@ import React, { useState, useEffect } from 'react';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { XIcon } from './icons/XIcon';
 import { VideoGenerationSettings } from '../services/geminiService';
+import { useI18n, useTranslation, TranslationRecord } from '../lib/i18n';
 
-type Language = 'tr' | 'en';
+const trVideo = {
+    title: 'Video Stüdyosu',
+    subtitle: 'Yapay zeka ile sahnenizi canlandırın',
+    scenario: 'Senaryo',
+    scenarioPlaceholder: 'Örn: Model podyumda yürüyor, dönüyor ve gülümsüyor...',
+    defaultPrompt: 'Model podyumda yürüyor ve gülümsüyor.',
+    quality: 'Kalite & Model',
+    qualityFast: 'Hızlı (Veo Fast - ~30sn)',
+    qualityHigh: 'Yüksek Kalite (Veo 3.1 - ~3dk)',
+    resolution: 'Çözünürlük',
+    duration: 'Süre (Saniye)',
+    format: 'Format',
+    formatVertical: '9:16 (Dikey/Hikaye)',
+    formatHorizontal: '16:9 (Yatay/Sinema)',
+    note: 'Not:',
+    noteText: 'Yüksek kalite modu, daha gerçekçi dokular ve ışıklandırma sağlar ancak oluşturulması 2-5 dakika sürebilir.',
+    creditInfo: 'Video oluşturma:',
+    credits: 'kredi',
+    generating: 'Video Render Ediliyor...',
+    generateFast: 'Hızlı Video Oluştur',
+    generateHQ: 'HQ Video Oluştur',
+};
 
-const translations = {
-    tr: {
-        title: 'Video Stüdyosu',
-        subtitle: 'Yapay zeka ile sahnenizi canlandırın',
-        scenario: 'Senaryo',
-        scenarioPlaceholder: 'Örn: Model podyumda yürüyor, dönüyor ve gülümsüyor...',
-        defaultPrompt: 'Model podyumda yürüyor ve gülümsüyor.',
-        quality: 'Kalite & Model',
-        qualityFast: 'Hızlı (Veo Fast - ~30sn)',
-        qualityHigh: 'Yüksek Kalite (Veo 3.1 - ~3dk)',
-        resolution: 'Çözünürlük',
-        duration: 'Süre (Saniye)',
-        format: 'Format',
-        formatVertical: '9:16 (Dikey/Hikaye)',
-        formatHorizontal: '16:9 (Yatay/Sinema)',
-        note: 'Not:',
-        noteText: 'Yüksek kalite modu, daha gerçekçi dokular ve ışıklandırma sağlar ancak oluşturulması 2-5 dakika sürebilir.',
-        creditInfo: 'Video oluşturma:',
-        credits: 'kredi',
-        generating: 'Video Render Ediliyor...',
-        generateFast: 'Hızlı Video Oluştur',
-        generateHQ: 'HQ Video Oluştur',
-    },
+const translations: TranslationRecord<typeof trVideo> = {
+    tr: trVideo,
     en: {
         title: 'Video Studio',
         subtitle: 'Bring your scene to life with AI',
@@ -61,7 +62,8 @@ interface VideoSettingsModalProps {
 }
 
 export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, isGenerating, onClose, onGenerate }) => {
-    const [language, setLanguage] = useState<Language>('tr');
+    const { language } = useI18n();
+    const t = useTranslation(translations);
     const [prompt, setPrompt] = useState('');
     const [resolution, setResolution] = useState<'720p' | '1080p'>('720p');
     const [durationSecs, setDurationSecs] = useState(5);
@@ -69,13 +71,8 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
     const [quality, setQuality] = useState<'fast' | 'high'>('fast');
 
     useEffect(() => {
-        const savedLang = localStorage.getItem('fasheone_language') as Language;
-        const lang = savedLang || 'tr';
-        setLanguage(lang);
-        setPrompt(translations[lang].defaultPrompt);
-    }, []);
-
-    const t = translations[language];
+        setPrompt(t.defaultPrompt);
+    }, [language]);
 
     if (!isOpen) return null;
 

@@ -1,6 +1,36 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Logo } from './Logo';
+import { useI18n, TranslationRecord } from '../lib/i18n';
+import { LanguageSwitcher } from './LanguageSwitcher';
+
+// Header translations
+const trHeader = {
+    home: 'Ana Sayfa',
+    credits: 'Kredi',
+    buyCredits: 'Kredi Al',
+    history: 'Geçmiş',
+    pastWorks: 'Geçmiş Çalışmalar',
+    signIn: 'Giriş Yap',
+    signOut: 'Çıkış Yap',
+    menu: 'Menü',
+    adminPanel: 'Admin Panel',
+};
+
+const headerTranslations: TranslationRecord<typeof trHeader> = {
+    tr: trHeader,
+    en: {
+        home: 'Home',
+        credits: 'Credits',
+        buyCredits: 'Buy Credits',
+        history: 'History',
+        pastWorks: 'Past Works',
+        signIn: 'Sign In',
+        signOut: 'Sign Out',
+        menu: 'Menu',
+        adminPanel: 'Admin Panel',
+    },
+};
 
 interface HeaderProps {
     onHomeClick?: () => void;
@@ -36,6 +66,8 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const { t } = useI18n();
+    const ht = t(headerTranslations);
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -73,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
                             onClick={onHomeClick}
                             className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors"
                         >
-                            Ana Sayfa
+                            {ht.home}
                         </button>
                     )}
 
@@ -96,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                                 </svg>
                                 <span className="text-sm font-bold text-white">{credits}</span>
-                                <span className="text-xs text-slate-300">Kredi</span>
+                                <span className="text-xs text-slate-300">{ht.credits}</span>
                             </div>
                             {onBuyCreditsClick && (
                                 <button
@@ -106,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({
                                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                     </svg>
-                                    Kredi Al
+                                    {ht.buyCredits}
                                 </button>
                             )}
 
@@ -114,12 +146,12 @@ export const Header: React.FC<HeaderProps> = ({
                                 <button
                                     onClick={onHistoryClick}
                                     className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-semibold transition-all border border-slate-700"
-                                    title="Geçmiş Çalışmalar"
+                                    title={ht.pastWorks}
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    Geçmiş
+                                    {ht.history}
                                 </button>
                             )}
                         </>
@@ -131,11 +163,22 @@ export const Header: React.FC<HeaderProps> = ({
                             onClick={onAdminClick}
                             className="text-sm font-medium px-3 py-1.5 rounded-full border bg-purple-500/10 text-purple-400 border-purple-500/50 hover:bg-purple-500/20 transition-all"
                         >
-                            ⚙️ Admin Panel
+                            ⚙️ {ht.adminPanel}
                         </button>
                     )}
 
+                    {/* Language Switcher - Desktop */}
+                    <LanguageSwitcher compact />
 
+                    {/* Login/Logout */}
+                    {!isLoggedIn && (
+                        <button
+                            onClick={onLoginClick}
+                            className="text-sm font-medium bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-900/20"
+                        >
+                            {ht.signIn}
+                        </button>
+                    )}
 
                 </div>
 
@@ -152,13 +195,16 @@ export const Header: React.FC<HeaderProps> = ({
                         </div>
                     )}
 
+                    {/* Language Switcher - Mobile (compact) */}
+                    <LanguageSwitcher compact />
+
                     {/* Login Button for non-logged in users on mobile */}
                     {!isLoggedIn && (
                         <button
                             onClick={onLoginClick}
                             className="text-xs sm:text-sm font-medium bg-cyan-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-900/20 active:scale-95"
                         >
-                            Giriş Yap
+                            {ht.signIn}
                         </button>
                     )}
 
@@ -167,7 +213,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             className="p-2 rounded-lg bg-slate-800 border border-slate-700 text-white hover:bg-slate-700 transition-all active:scale-95"
-                            aria-label="Menü"
+                            aria-label={ht.menu}
                         >
                             {isMobileMenuOpen ? (
                                 <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
                                         </div>
                                         <div>
                                             <div className="text-sm font-semibold text-white">{userName}</div>
-                                            <div className="text-xs text-slate-400">{credits} Kredi</div>
+                                            <div className="text-xs text-slate-400">{credits} {ht.credits}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -214,7 +260,7 @@ export const Header: React.FC<HeaderProps> = ({
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                             </svg>
                                         </div>
-                                        <span className="text-sm font-medium text-white">Ana Sayfa</span>
+                                        <span className="text-sm font-medium text-white">{ht.home}</span>
                                     </button>
                                 )}
 
@@ -224,7 +270,7 @@ export const Header: React.FC<HeaderProps> = ({
                                         onClick={() => handleMenuItemClick(onBuyCreditsClick)}
                                         className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
                                     >
-                                        <span className="text-sm font-medium text-white">Kredi Al</span>
+                                        <span className="text-sm font-medium text-white">{ht.buyCredits}</span>
                                     </button>
                                 )}
 
@@ -239,7 +285,7 @@ export const Header: React.FC<HeaderProps> = ({
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </div>
-                                        <span className="text-sm font-medium text-white">Geçmiş Çalışmalar</span>
+                                        <span className="text-sm font-medium text-white">{ht.pastWorks}</span>
                                     </button>
                                 )}
 
@@ -255,7 +301,7 @@ export const Header: React.FC<HeaderProps> = ({
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         </div>
-                                        <span className="text-sm font-medium text-white">Admin Panel</span>
+                                        <span className="text-sm font-medium text-white">{ht.adminPanel}</span>
                                     </button>
                                 )}
 
@@ -274,7 +320,7 @@ export const Header: React.FC<HeaderProps> = ({
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
                                     </div>
-                                    <span className="text-sm font-medium text-red-400">Çıkış Yap</span>
+                                    <span className="text-sm font-medium text-red-400">{ht.signOut}</span>
                                 </button>
                             </div>
                         </div>

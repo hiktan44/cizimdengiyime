@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useTranslation, TranslationRecord } from '../lib/i18n';
 import { Profile, CREDIT_COSTS } from '../lib/supabase';
 import { checkAndDeductCredits, saveGeneration } from '../lib/database';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
@@ -27,29 +28,99 @@ interface UploadedImage {
     preview: string;
 }
 
-type Language = 'tr' | 'en';
 
-const translations = {
-    tr: {
-        title: '🎨 Kolaj Stüdyosu',
-        subtitle: 'Birden fazla görseli yan yana birleştirerek yeni kompozisyonlar oluşturun',
-        uploadTitle: 'Görselleri Yükleyin',
-        uploadDesc: '2-6 arası görsel yükleyebilirsiniz',
-        uploadButton: 'Görsel Ekle',
-        promptLabel: 'Kompozisyon Talimatı',
-        promptPlaceholder: 'Örn: Bu görselleri yan yana koy, arka planı beyaz yap, profesyonel bir katalog görünümü ver...',
-        generateButton: 'Kolaj Oluştur',
-        generating: 'Kolaj oluşturuluyor...',
-        downloadButton: 'İndir',
-        clearButton: 'Temizle',
-        removeImage: 'Kaldır',
-        imageCount: 'görsel',
-        minImages: 'En az 2 görsel yüklemelisiniz',
-        maxImages: 'En fazla 6 görsel yükleyebilirsiniz',
-        loginRequired: 'İşlem yapmak için giriş yapmalısınız',
-        insufficientCredits: 'Yetersiz kredi',
-        creditCost: 'kredi',
-    },
+
+const trCollage = {
+    title: '🎨 Kolaj Stüdyosu',
+    subtitle: 'Birden fazla görseli yan yana birleştirerek yeni kompozisyonlar oluşturun',
+    uploadTitle: 'Görselleri Yükleyin',
+    uploadDesc: '2-6 arası görsel yükleyebilirsiniz',
+    uploadButton: 'Görsel Ekle',
+    promptLabel: 'Kompozisyon Talimatı',
+    promptPlaceholder: 'Örn: Bu görselleri yan yana koy, arka planı beyaz yap, profesyonel bir katalog görünümü ver...',
+    generateButton: 'Kolaj Oluştur',
+    generating: 'Kolaj oluşturuluyor...',
+    downloadButton: 'İndir',
+    clearButton: 'Temizle',
+    removeImage: 'Kaldır',
+    imageCount: 'görsel',
+    minImages: 'En az 2 görsel yüklemelisiniz',
+    maxImages: 'En fazla 6 görsel yükleyebilirsiniz',
+    loginRequired: 'İşlem yapmak için giriş yapmalısınız',
+    insufficientCredits: 'Yetersiz kredi',
+    creditCost: 'Kredi',
+    // Tabs
+    tabStandard: 'Standart Kolaj',
+    tabProduct: 'Ürün Kolajı',
+    // Product management
+    productsTitle: 'Ürünler',
+    productsDesc: 'Kolajda görünecek ürünleri ekleyin (Max 6)',
+    addProduct: '+ Ürün Ekle',
+    noProducts: 'Henüz ürün eklenmedi',
+    // Background
+    bgTitle: 'Arka Plan Stili',
+    bgCorkboard: 'Mantar Pano',
+    bgWhite: 'Beyaz Çerçeve',
+    bgBlack: 'Siyah Çerçeve',
+    bgCustom: 'Özel Renk',
+    bgColorPick: 'Renk Seç:',
+    // Prompt
+    styleNotesLabel: 'Stil ve Kompozisyon Notları (Opsiyonel)',
+    styleNotesPlaceholder: 'Örn: Tüm ürünleri Polaroid tarzında kutulara koy, ürün isimlerini altına yaz...',
+    // Buttons
+    generatingText: 'Oluşturuluyor...',
+    productCollageButton: 'Ürün Kolajı Üret',
+    // Prompt requirement
+    promptRequired: 'Lütfen kompozisyon talimatı girin',
+    addProductMin: 'Lütfen en az 1 ürün ekleyin',
+    uploadOutfitRequired: 'Lütfen bir kombin görseli yükleyin',
+    // Error
+    errorOccurred: 'Bir hata oluştu: ',
+    imageUploadError: 'Resim yüklenirken hata: ',
+    magazineDownloadError: 'Dergi sayfası indirilirken bir hata oluştu.',
+    downloadFailed: 'İndirme başarısız oldu. Lütfen tekrar deneyin.',
+    createCollageFirst: 'Önce bir kolaj oluşturmalısınız!',
+    videoError: 'Video oluşturulurken hata: ',
+    analysisError: 'Ürünler ayrıştırılırken bir hata oluştu.',
+    // Result
+    resultTitle: 'Sonuç',
+    resultEmpty: 'Sonuç burada görünecek',
+    resultHint: 'Sol taraftan ayarlarınızı yapıp oluştur butona basın.',
+    viewDetail: '🔍 Detaylı Görüntüle',
+    // Magazine view
+    magazineView: '📖 Dergi Sayfası',
+    collageOnly: '📷 Sadece Kolaj',
+    noImage: 'Resim Yok',
+    unnamedProduct: 'İsimsiz Ürün',
+    // Video
+    createVideo: '🎬 Video Oluştur',
+    generatedVideo: 'Oluşturulan Video',
+    videoProcessing: 'Video Hazırlanıyor...',
+    videoProcessingHint: 'Bu işlem birkaç dakika sürebilir.',
+    // Magic edit panel
+    editBoardProducts: 'PANODAKİ ÜRÜNLERİ DÜZENLE',
+    productCount: 'Ürün',
+    productNamePlaceholder: 'Ürün Adı',
+    pricePlaceholder: 'Fiyat (Opsiyonel)',
+    editHint: 'Değişikliklerin panoya yansıması için "Sihirli Kolaj Üret" butonuna tekrar basmalısınız.',
+    // Magic analysis
+    analyzingProducts: 'Ürünler Analiz Ediliyor...',
+    detectedProducts: 'Tespit Edilen Ürünler',
+    addManualProduct: '+ Manuel Ürün Ekle',
+    newProduct: 'Yeni Ürün',
+    tipLabel: 'İpucu:',
+    tipText: 'Ürün açıklamalarına "Polaroid tarzında olsun", "Üzerinde fiyat yazsın" gibi notlar ekleyebilirsiniz. Fiyat alanını doldurursanız etiketin altında fiyat görünecektir.',
+    uploadSingleOutfit: 'Kombin içeren tek bir fotoğraf yükleyin',
+    magicPreparing: 'Kolaj Hazırlanıyor...',
+    magicGenerate: 'Sihirli Kolajı Oluştur',
+    // Close modal
+    closeModal: 'Kapat',
+    // Credit
+    creditLabel: 'İşlem bedeli:',
+};
+
+const translations: TranslationRecord<typeof trCollage> = {
+    tr: trCollage,
     en: {
         title: '🎨 Collage Studio',
         subtitle: 'Create new compositions by combining multiple images side by side',
@@ -68,18 +139,74 @@ const translations = {
         maxImages: 'You can upload maximum 6 images',
         loginRequired: 'Please login to continue',
         insufficientCredits: 'Insufficient credits',
-        creditCost: 'credits',
+        creditCost: 'Credits',
+        tabStandard: 'Standard Collage',
+        tabProduct: 'Product Collage',
+        productsTitle: 'Products',
+        productsDesc: 'Add products to appear in the collage (Max 6)',
+        addProduct: '+ Add Product',
+        noProducts: 'No products added yet',
+        bgTitle: 'Background Style',
+        bgCorkboard: 'Corkboard',
+        bgWhite: 'White Frame',
+        bgBlack: 'Black Frame',
+        bgCustom: 'Custom Color',
+        bgColorPick: 'Pick Color:',
+        styleNotesLabel: 'Style & Composition Notes (Optional)',
+        styleNotesPlaceholder: 'E.g: Put all products in Polaroid-style boxes, write product names below...',
+        generatingText: 'Generating...',
+        productCollageButton: 'Generate Product Collage',
+        promptRequired: 'Please enter composition instructions',
+        addProductMin: 'Please add at least 1 product',
+        uploadOutfitRequired: 'Please upload an outfit image',
+        errorOccurred: 'An error occurred: ',
+        imageUploadError: 'Error uploading image: ',
+        magazineDownloadError: 'An error occurred while downloading the magazine page.',
+        downloadFailed: 'Download failed. Please try again.',
+        createCollageFirst: 'You must create a collage first!',
+        videoError: 'Error creating video: ',
+        analysisError: 'An error occurred while separating products.',
+        resultTitle: 'Result',
+        resultEmpty: 'Result will appear here',
+        resultHint: 'Set up your preferences on the left and click create.',
+        viewDetail: '🔍 View Detail',
+        magazineView: '📖 Magazine Page',
+        collageOnly: '📷 Collage Only',
+        noImage: 'No Image',
+        unnamedProduct: 'Unnamed Product',
+        createVideo: '🎬 Create Video',
+        generatedVideo: 'Generated Video',
+        videoProcessing: 'Preparing Video...',
+        videoProcessingHint: 'This may take a few minutes.',
+        editBoardProducts: 'EDIT BOARD PRODUCTS',
+        productCount: 'Products',
+        productNamePlaceholder: 'Product Name',
+        pricePlaceholder: 'Price (Optional)',
+        editHint: 'You need to click "Create Magic Collage" again for changes to take effect.',
+        analyzingProducts: 'Analyzing Products...',
+        detectedProducts: 'Detected Products',
+        addManualProduct: '+ Add Manual Product',
+        newProduct: 'New Product',
+        tipLabel: 'Tip:',
+        tipText: 'You can add notes like "Polaroid style", "Write the price on it" to product descriptions. If you fill in the price field, it will appear below the label.',
+        uploadSingleOutfit: 'Upload a single outfit photo',
+        magicPreparing: 'Preparing Collage...',
+        magicGenerate: 'Create Magic Collage',
+        closeModal: 'Close',
+        creditLabel: 'Processing cost:',
     },
 };
 
-const magicTranslations = {
-    tr: {
-        tabTitle: '✨ Sihirli Kolaj',
-        uploadTitle: 'Kombin Görselini Yükle',
-        uploadDesc: 'Yüklediğiniz fotoğraftaki ürünler otomatik olarak ayrıştırılıp bir mantar panoya yerleştirilecektir.',
-        magicButton: 'Ürünleri Ayrıştır ve Kolajla',
-        singleImageRequired: 'Lütfen bir adet kombin fotoğrafı yükleyin',
-    },
+const trMagic = {
+    tabTitle: '✨ Sihirli Kolaj',
+    uploadTitle: 'Kombin Görselini Yükle',
+    uploadDesc: 'Yüklediğiniz fotoğraftaki ürünler otomatik olarak ayrıştırılıp bir mantar panoya yerleştirilecektir.',
+    magicButton: 'Ürünleri Ayrıştır ve Kolajla',
+    singleImageRequired: 'Lütfen bir adet kombin fotoğrafı yükleyin',
+};
+
+const magicTranslations: TranslationRecord<typeof trMagic> = {
+    tr: trMagic,
     en: {
         tabTitle: '✨ Magic Collage',
         uploadTitle: 'Upload Outfit Image',
@@ -91,11 +218,8 @@ const magicTranslations = {
 
 
 export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
-    const [language] = useState<Language>(() => {
-        const saved = localStorage.getItem('fasheone_language') as Language;
-        return saved || 'tr';
-    });
-    const t = translations[language];
+    const t = useTranslation(translations);
+    const mt = useTranslation(magicTranslations);
 
     const [activeTab, setActiveTab] = useState<'standard' | 'product' | 'magic'>('magic');
     const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
@@ -199,7 +323,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                 newImages.push({ id, file: convertedFile, preview });
             } catch (error) {
                 console.error('Error converting image:', error);
-                alert(`Resim yüklenirken hata: ${file.name}`);
+                alert(`${t.imageUploadError}${file.name}`);
             }
         }
 
@@ -239,7 +363,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             link.click();
         } catch (error) {
             console.error('Magazine download error:', error);
-            alert('Dergi sayfası indirilirken bir hata oluştu.');
+            alert(t.magazineDownloadError);
         }
     };
 
@@ -256,17 +380,17 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             }
 
             if (!prompt.trim()) {
-                alert('Lütfen kompozisyon talimatı girin');
+                alert(t.promptRequired);
                 return;
             }
         } else if (activeTab === 'product') {
             if (products.length < 1) {
-                alert('Lütfen en az 1 ürün ekleyin');
+                alert(t.addProductMin);
                 return;
             }
         } else if (activeTab === 'magic') {
             if (uploadedImages.length < 1) {
-                alert('Lütfen bir kombin görseli yükleyin');
+                alert(t.uploadOutfitRequired);
                 return;
             }
         }
@@ -341,7 +465,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             });
         } catch (error) {
             console.error('Generation error:', error);
-            alert('Bir hata oluştu: ' + (error instanceof Error ? error.message : String(error)));
+            alert(t.errorOccurred + (error instanceof Error ? error.message : String(error)));
         } finally {
             setIsGenerating(false);
         }
@@ -358,7 +482,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             setMagicStep('edit');
         } catch (error) {
             console.error('Analysis error:', error);
-            alert('Ürünler ayrıştırılırken bir hata oluştu.');
+            alert(t.analysisError);
         } finally {
             setIsAnalyzing(false);
         }
@@ -401,7 +525,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                 userId: profile?.id
             });
         } else {
-            alert('İndirme başarısız oldu. Lütfen tekrar deneyin.');
+            alert(t.downloadFailed);
         }
     }, [profile]);
 
@@ -412,7 +536,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
         }
 
         if (!generatedImageUrl) {
-            alert('Önce bir kolaj oluşturmalısınız!');
+            alert(t.createCollageFirst);
             return;
         }
 
@@ -453,7 +577,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             });
         } catch (error) {
             console.error('Video generation error:', error);
-            alert('Video oluşturulurken hata: ' + (error instanceof Error ? error.message : String(error)));
+            alert(t.videoError + (error instanceof Error ? error.message : String(error)));
         } finally {
             setIsVideoGenerating(false);
         }
@@ -472,7 +596,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                             : 'text-slate-400 hover:text-white'
                             }`}
                     >
-                        Standart Kolaj
+                        {t.tabStandard}
                     </button>
                     <button
                         onClick={() => setActiveTab('magic')}
@@ -481,7 +605,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                             : 'text-slate-400 hover:text-white'
                             }`}
                     >
-                        {magicTranslations[language].tabTitle}
+                        {mt.tabTitle}
                     </button>
                     <button
                         onClick={() => setActiveTab('product')}
@@ -490,7 +614,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                             : 'text-slate-400 hover:text-white'
                             }`}
                     >
-                        Ürün Kolajı
+                        {t.tabProduct}
                     </button>
                 </div>
             </div>
@@ -550,12 +674,12 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                             {/* Magic Workflow Container */}
                             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
                                 <h3 className="text-xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">
-                                    {magicTranslations[language].tabTitle}
+                                    {mt.tabTitle}
                                 </h3>
 
                                 {magicStep === 'upload' ? (
                                     <>
-                                        <p className="text-slate-400 text-sm mb-6">{magicTranslations[language].uploadDesc}</p>
+                                        <p className="text-slate-400 text-sm mb-6">{mt.uploadDesc}</p>
 
                                         {uploadedImages.length > 0 ? (
                                             <div className="space-y-4">
@@ -605,7 +729,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                         </svg>
                                                     )}
-                                                    {isGenerating ? 'Kolaj Hazırlanıyor...' : 'Sihirli Kolajı Oluştur'}
+                                                    {isGenerating ? t.magicPreparing : t.magicGenerate}
                                                 </button>
                                             </div>
                                         ) : (
@@ -622,8 +746,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                         </svg>
                                                     </div>
-                                                    <p className="text-slate-300 font-bold">{magicTranslations[language].uploadTitle}</p>
-                                                    <p className="text-xs text-slate-500 mt-2">Kombin içeren tek bir fotoğraf yükleyin</p>
+                                                    <p className="text-slate-300 font-bold">{mt.uploadTitle}</p>
+                                                    <p className="text-xs text-slate-500 mt-2">{t.uploadSingleOutfit}</p>
                                                 </div>
                                             </label>
                                         )}
@@ -632,7 +756,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                     <div className="space-y-6">
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm font-bold text-slate-300">
-                                                {isAnalyzing ? 'Ürünler Analiz Ediliyor...' : 'Tespit Edilen Ürünler'}
+                                                {isAnalyzing ? t.analyzingProducts : t.detectedProducts}
                                             </p>
                                             {isAnalyzing && (
                                                 <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -650,16 +774,16 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                 />
                                             ))}
                                             <button
-                                                onClick={() => setProducts(prev => [...prev, { id: Math.random().toString(36).substring(7), file: '', name: 'Yeni Ürün' }])}
+                                                onClick={() => setProducts(prev => [...prev, { id: Math.random().toString(36).substring(7), file: '', name: t.newProduct }])}
                                                 className="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl text-slate-500 hover:text-slate-300 hover:border-slate-600 transition-all text-sm font-medium"
                                             >
-                                                + Manuel Ürün Ekle
+                                                {t.addManualProduct}
                                             </button>
                                         </div>
 
                                         <div className="p-4 bg-purple-900/20 border border-purple-500/30 rounded-xl">
                                             <p className="text-[10px] text-slate-400 leading-relaxed">
-                                                <span className="text-purple-400 font-bold">İpucu:</span> Ürün açıklamalarına "Polaroid tarzında olsun", "Üzerinde fiyat yazsın" gibi notlar ekleyebilirsiniz. Fiyat alanını doldurursanız etiketin altında fiyat görünecektir.
+                                                <span className="text-purple-400 font-bold">{t.tipLabel}</span> {t.tipText}
                                             </p>
                                         </div>
                                     </div>
@@ -672,11 +796,11 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
                                 <div className="flex justify-between items-center mb-4">
                                     <div>
-                                        <h3 className="text-xl font-bold">Ürünler</h3>
-                                        <p className="text-slate-400 text-sm">Kolajda görünecek ürünleri ekleyin (Max 6)</p>
+                                        <h3 className="text-xl font-bold">{t.productsTitle}</h3>
+                                        <p className="text-slate-400 text-sm">{t.productsDesc}</p>
                                     </div>
                                     <label className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors">
-                                        + Ürün Ekle
+                                        {t.addProduct}
                                         <input type="file" multiple accept="image/*" onChange={handleAddProduct} className="hidden" />
                                     </label>
                                 </div>
@@ -684,7 +808,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                 <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                     {products.length === 0 ? (
                                         <div className="text-center py-12 border-2 border-dashed border-slate-700 rounded-xl text-slate-500">
-                                            Henüz ürün eklenmedi
+                                            {t.noProducts}
                                         </div>
                                     ) : (
                                         products.map(product => (
@@ -701,13 +825,13 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
 
                             {/* Background Selection */}
                             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-                                <h3 className="font-bold mb-4">Arka Plan Stili</h3>
+                                <h3 className="font-bold mb-4">{t.bgTitle}</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {[
-                                        { id: 'corkboard', label: 'Mantar Pano', icon: '📌' },
-                                        { id: 'white', label: 'Beyaz Çerçeve', icon: '🖼️' },
-                                        { id: 'black', label: 'Siyah Çerçeve', icon: '🎞️' },
-                                        { id: 'custom', label: 'Özel Renk', icon: '🎨' }
+                                        { id: 'corkboard', label: t.bgCorkboard, icon: '📌' },
+                                        { id: 'white', label: t.bgWhite, icon: '🖼️' },
+                                        { id: 'black', label: t.bgBlack, icon: '🎞️' },
+                                        { id: 'custom', label: t.bgCustom, icon: '🎨' }
                                     ].map(bg => (
                                         <button
                                             key={bg.id}
@@ -725,7 +849,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
 
                                 {collageBackground.startsWith('#') && (
                                     <div className="mt-4 flex items-center gap-3">
-                                        <span className="text-sm text-slate-400">Renk Seç:</span>
+                                        <span className="text-sm text-slate-400">{t.bgColorPick}</span>
                                         <input
                                             type="color"
                                             value={collageBackground}
@@ -742,7 +866,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                     {activeTab !== 'magic' && (
                         <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
                             <label className="block text-sm font-medium mb-2">
-                                {activeTab === 'standard' ? t.promptLabel : 'Stil ve Kompozisyon Notları (Opsiyonel)'}
+                                {activeTab === 'standard' ? t.promptLabel : t.styleNotesLabel}
                             </label>
                             <div className="relative">
                                 <textarea
@@ -750,7 +874,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                     onChange={(e) => {
                                         setPrompt(e.target.value);
                                     }}
-                                    placeholder={activeTab === 'standard' ? t.promptPlaceholder : 'Örn: Tüm ürünleri Polaroid tarzında kutulara koy, ürün isimlerini altına yaz...'}
+                                    placeholder={activeTab === 'standard' ? t.promptPlaceholder : t.styleNotesPlaceholder}
                                     rows={3}
                                     className="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-y min-h-[120px]"
                                 />
@@ -770,20 +894,20 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                             disabled={isGenerating || (activeTab === 'standard' ? uploadedImages.length < 2 : (activeTab === 'product' ? products.length < 1 : uploadedImages.length < 1))}
                             className="flex-1 py-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isGenerating ? 'Oluşturuluyor...' : `✨ ${activeTab === 'standard' ? 'Kolaj Oluştur' : (activeTab === 'product' ? 'Ürün Kolajı Üret' : magicTranslations[language].magicButton)}`}
+                            {isGenerating ? t.generatingText : `✨ ${activeTab === 'standard' ? t.generateButton : (activeTab === 'product' ? t.productCollageButton : mt.magicButton)}`}
                         </button>
                         <button
                             onClick={handleClear}
                             className="px-6 py-4 bg-slate-700 text-white font-bold rounded-xl hover:bg-slate-600 transition-colors"
                         >
-                            Temizle
+                            {t.clearButton}
                         </button>
                     </div>
 
                     {/* Credit Info */}
                     <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 text-center">
                         <span className="text-sm text-slate-300">
-                            İşlem bedeli: <span className="text-purple-400 font-bold text-lg">{CREDIT_COSTS.COLLAGE} Kredi</span>
+                            {t.creditLabel} <span className="text-purple-400 font-bold text-lg">{CREDIT_COSTS.COLLAGE} {t.creditCost}</span>
                         </span>
                     </div>
                 </div>
@@ -793,7 +917,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                     {/* Main Result Box */}
                     <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 flex flex-col">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold">Sonuç</h3>
+                            <h3 className="text-xl font-bold">{t.resultTitle}</h3>
                             {(activeTab === 'product' || activeTab === 'magic') && generatedImageUrl && (
                                 <button
                                     onClick={() => setIsMagazineView(!isMagazineView)}
@@ -802,7 +926,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                         : 'bg-slate-700 text-slate-300 hover:text-white'
                                         }`}
                                 >
-                                    {isMagazineView ? '📷 Sadece Kolaj' : '📖 Dergi Sayfası'}
+                                    {isMagazineView ? t.collageOnly : t.magazineView}
                                 </button>
                             )}
                         </div>
@@ -841,7 +965,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                             {!isMagazineView && (
                                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors pointer-events-none flex items-center justify-center">
                                                     <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-purple-600/90 text-white px-4 py-2 rounded-lg font-medium backdrop-blur-sm">
-                                                        🔍 Detaylı Görüntüle
+                                                        {t.viewDetail}
                                                     </div>
                                                 </div>
                                             )}
@@ -865,13 +989,13 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                                     />
                                                                 ) : (
                                                                     <div className="w-full h-full bg-slate-50 flex items-center justify-center">
-                                                                        <span className="text-[10px] text-slate-300">Resim Yok</span>
+                                                                        <span className="text-[10px] text-slate-300">{t.noImage}</span>
                                                                     </div>
                                                                 )}
                                                             </div>
                                                             <div className="flex-1 flex flex-col justify-start py-1">
                                                                 <div className="flex flex-col mb-2">
-                                                                    <h4 className="font-serif font-black text-lg text-slate-900 uppercase leading-tight tracking-tight break-words mb-1">{p.name || 'İsimsiz Ürün'}</h4>
+                                                                    <h4 className="font-serif font-black text-lg text-slate-900 uppercase leading-tight tracking-tight break-words mb-1">{p.name || t.unnamedProduct}</h4>
                                                                     {p.price && <span className="text-slate-900 font-serif font-bold text-sm border-b border-slate-900 w-fit">{p.price}</span>}
                                                                 </div>
                                                                 {p.description && <p className="text-[11px] text-slate-900 leading-relaxed font-semibold italic">{p.description}</p>}
@@ -907,13 +1031,13 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                 disabled={isVideoGenerating}
                                                 className="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-4 py-3 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                             >
-                                                🎬 Video Oluştur
+                                                {t.createVideo}
                                             </button>
                                             <button
                                                 onClick={() => handleDownload(generatedImageUrl)}
                                                 className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-lg text-sm flex items-center gap-2"
                                             >
-                                                📥 İndir
+                                                📥 {t.downloadButton}
                                             </button>
                                         </div>
 
@@ -921,8 +1045,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                         {activeTab === 'magic' && products.length > 0 && (
                                             <div data-html2canvas-ignore className="mt-6 pt-6 border-t border-slate-700/50">
                                                 <div className="flex items-center justify-between mb-4">
-                                                    <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider">PANODAKİ ÜRÜNLERİ DÜZENLE</h4>
-                                                    <span className="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">{products.length} Ürün</span>
+                                                    <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider">{t.editBoardProducts}</h4>
+                                                    <span className="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">{products.length} {t.productCount}</span>
                                                 </div>
                                                 <div className="space-y-3">
                                                     {products.map((p, idx) => (
@@ -939,7 +1063,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                                     />
                                                                 ) : (
                                                                     <div className="w-full h-full bg-slate-900 rounded-lg border border-slate-700/50 flex items-center justify-center">
-                                                                        <span className="text-[8px] text-slate-600">Resim Yok</span>
+                                                                        <span className="text-[8px] text-slate-600">{t.noImage}</span>
                                                                     </div>
                                                                 )}
                                                                 <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer rounded-lg transition-opacity">
@@ -960,14 +1084,14 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                                 <input
                                                                     type="text"
                                                                     value={p.name}
-                                                                    placeholder="Ürün Adı"
+                                                                    placeholder={t.productNamePlaceholder}
                                                                     onChange={(e) => handleUpdateProduct(p.id, { ...p, name: e.target.value })}
                                                                     className="bg-transparent border-b border-slate-700 text-xs text-white focus:border-purple-500 outline-none py-1"
                                                                 />
                                                                 <input
                                                                     type="text"
                                                                     value={p.price || ''}
-                                                                    placeholder="Fiyat (Opsiyonel)"
+                                                                    placeholder={t.pricePlaceholder}
                                                                     onChange={(e) => handleUpdateProduct(p.id, { ...p, price: e.target.value })}
                                                                     className="bg-transparent border-b border-slate-700 text-xs text-purple-400 focus:border-purple-500 outline-none py-1"
                                                                 />
@@ -976,7 +1100,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                     ))}
                                                 </div>
                                                 <p className="mt-4 text-[10px] text-slate-500 text-center italic">
-                                                    Değişikliklerin panoya yansıması için "Sihirli Kolaj Üret" butonuna tekrar basmalısınız.
+                                                    {t.editHint}
                                                 </p>
                                             </div>
                                         )}
@@ -988,8 +1112,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                         </div>
-                                        <p className="font-medium">Sonuç burada görünecek</p>
-                                        <p className="text-xs text-slate-600 mt-2 max-w-[200px] mx-auto">Sol taraftan ayarlarınızı yapıp oluştur butona basın.</p>
+                                        <p className="font-medium">{t.resultEmpty}</p>
+                                        <p className="text-xs text-slate-600 mt-2 max-w-[200px] mx-auto">{t.resultHint}</p>
                                     </div>
                                 )}
                             </div>
@@ -1001,7 +1125,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                         <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 animate-fade-in">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                    🎬 <span>Oluşturulan Video</span>
+                                    🎬 <span>{t.generatedVideo}</span>
                                 </h3>
                                 {generatedVideoUrl && (
                                     <button
@@ -1025,7 +1149,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                         }}
                                         className="text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1 transition-colors"
                                     >
-                                        📥 İndir
+                                        📥 {t.downloadButton}
                                     </button>
                                 )}
                             </div>
@@ -1034,8 +1158,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                 {isVideoGenerating ? (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80 backdrop-blur-sm z-10">
                                         <div className="w-12 h-12 border-3 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin mb-4"></div>
-                                        <p className="text-cyan-500 font-bold text-sm">Video Hazırlanıyor...</p>
-                                        <p className="text-slate-500 text-xs mt-2">Bu işlem birkaç dakika sürebilir.</p>
+                                        <p className="text-cyan-500 font-bold text-sm">{t.videoProcessing}</p>
+                                        <p className="text-slate-500 text-xs mt-2">{t.videoProcessingHint}</p>
                                     </div>
                                 ) : generatedVideoUrl ? (
                                     <video
@@ -1081,7 +1205,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
-                                İndir
+                                {t.downloadButton}
                             </button>
 
                             <div className="relative w-full h-full flex items-center justify-center">
@@ -1114,7 +1238,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                 onClick={() => setSelectedProductPreview(null)}
                                 className="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors flex items-center gap-2 font-bold"
                             >
-                                <span>Kapat</span>
+                                <span>{t.closeModal}</span>
                                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                             <img

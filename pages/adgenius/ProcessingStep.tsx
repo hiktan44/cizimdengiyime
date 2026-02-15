@@ -15,9 +15,9 @@ const ProcessingStep: React.FC<Props> = ({ step, analysis, results, t }) => {
   const [stageLabel, setStageLabel] = useState("");
 
   const steps = [
-    { id: 'analyzing', label: 'Ürün Analizi', icon: BrainCircuit },
-    { id: 'generating', label: 'Görsel & Video Üretimi', icon: ImageIcon },
-    { id: 'results', label: 'Tamamlandı', icon: CheckCircle },
+    { id: 'analyzing', label: t.processing?.stepAnalyzing || 'Product Analysis', icon: BrainCircuit },
+    { id: 'generating', label: t.processing?.stepGenerating || 'Image & Video Generation', icon: ImageIcon },
+    { id: 'results', label: t.processing?.stepResults || 'Completed', icon: CheckCircle },
   ];
 
   const currentIdx = steps.findIndex(s => s.id === (step === 'generating' ? 'generating' : step === 'analyzing' ? 'analyzing' : 'results'));
@@ -29,22 +29,22 @@ const ProcessingStep: React.FC<Props> = ({ step, analysis, results, t }) => {
 
     if (step === 'upload') {
       targetProgress = 0;
-      label = "Hazır";
+      label = t.processing?.ready || "Ready";
     }
     else if (step === 'analyzing') {
       targetProgress = 15;
-      label = "Yapay zeka ürün özelliklerini analiz ediyor...";
+      label = t.processing?.analyzingAI || "AI is analyzing product features...";
     }
     else if (step === 'results') {
       targetProgress = 100;
-      label = "Tüm işlemler başarıyla tamamlandı!";
+      label = t.processing?.allDone || "All processes completed successfully!";
     }
     else if (step === 'generating') {
       const base = 15;
 
       if (!results || results.length === 0) {
         targetProgress = base;
-        label = "Üretim kuyruğu hazırlanıyor...";
+        label = t.processing?.preparingQueue || "Preparing generation queue...";
       } else {
         let totalItemProgress = 0;
         let activeVideoGen = false;
@@ -60,19 +60,19 @@ const ProcessingStep: React.FC<Props> = ({ step, analysis, results, t }) => {
 
         // Discrete stages based on average item progress
         if (avgProgress < 10) {
-          label = `Sahne kurgusu ve promptlar hazırlanıyor (%${Math.round(avgProgress)})`;
+          label = `${t.processing?.preparingPrompts || 'Setting up scenes and prompts'} (%${Math.round(avgProgress)})`;
         } else if (avgProgress < 48) {
-          label = `Yüksek çözünürlüklü görseller üretiliyor (%${Math.round(avgProgress)})`;
+          label = `${t.processing?.generatingHD || 'Generating high-resolution images'} (%${Math.round(avgProgress)})`;
         } else if (avgProgress < 55) {
-          label = `Görseller işleniyor ve kalite kontrolü yapılıyor (%${Math.round(avgProgress)})`;
+          label = `${t.processing?.qualityCheck || 'Processing images and quality check'} (%${Math.round(avgProgress)})`;
         } else if (avgProgress < 90) {
           if (activeVideoGen) {
-            label = `Veo modeli ile video animasyonları oluşturuluyor (%${Math.round(avgProgress)})`;
+            label = `${t.processing?.videoAnimations || 'Creating video animations with Veo model'} (%${Math.round(avgProgress)})`;
           } else {
-            label = `Detaylar iyileştiriliyor ve netleştiriliyor (%${Math.round(avgProgress)})`;
+            label = `${t.processing?.refiningDetails || 'Refining and enhancing details'} (%${Math.round(avgProgress)})`;
           }
         } else {
-          label = `Sonuçlar derleniyor (%${Math.round(avgProgress)})`;
+          label = `${t.processing?.compilingResults || 'Compiling results'} (%${Math.round(avgProgress)})`;
         }
       }
     }
@@ -88,7 +88,7 @@ ${analysis.eticaret_baslik}
 
 ${analysis.eticaret_aciklama}
 
-Ürün Özellikleri:
+${t.processing?.productFeatures || 'Product Features'}:
 ${analysis.eticaret_ozellikler.map(f => `• ${f}`).join('\n')}
     `.trim();
 
@@ -113,8 +113,8 @@ ${analysis.eticaret_ozellikler.map(f => `• ${f}`).join('\n')}
           return (
             <div key={s.id} className="flex flex-col items-center gap-2 bg-slate-900 px-2 relative z-10">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${isActive
-                  ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/40'
-                  : 'bg-slate-800 border-slate-700 text-slate-500'
+                ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/40'
+                : 'bg-slate-800 border-slate-700 text-slate-500'
                 }`}>
                 {isCurrent && step !== 'results' ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -149,20 +149,20 @@ ${analysis.eticaret_ozellikler.map(f => `• ${f}`).join('\n')}
             <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-5 h-full">
               <div className="flex items-center gap-2 mb-4 text-purple-400">
                 <BrainCircuit className="w-5 h-5" />
-                <h3 className="font-semibold">Teknik Veriler</h3>
+                <h3 className="font-semibold">{t.processing?.technicalData || 'Technical Data'}</h3>
               </div>
 
               <div className="space-y-3">
                 <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800/50">
-                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">Kategori & Stil</span>
+                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">{t.processing?.categoryStyle || 'Category & Style'}</span>
                   <div className="text-slate-200 text-sm">{analysis.urun_kategorisi} • {analysis.stil}</div>
                 </div>
                 <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800/50">
-                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">Materyal</span>
+                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">{t.processing?.material || 'Material'}</span>
                   <div className="text-slate-200 text-sm">{analysis.malzeme}</div>
                 </div>
                 <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800/50">
-                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">Renk Analizi</span>
+                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">{t.processing?.colorAnalysis || 'Color Analysis'}</span>
                   <div className="flex flex-wrap gap-2 mt-1">
                     <span className="px-2 py-0.5 bg-blue-500/10 text-blue-300 rounded text-xs border border-blue-500/20">{analysis.ana_renk}</span>
                     {analysis.ikincil_renkler.map((c, i) => (
@@ -171,7 +171,7 @@ ${analysis.eticaret_ozellikler.map(f => `• ${f}`).join('\n')}
                   </div>
                 </div>
                 <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-800/50">
-                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">Hedef Kitle</span>
+                  <span className="text-slate-500 text-xs uppercase tracking-wider font-bold block mb-1">{t.processing?.targetAudience || 'Target Audience'}</span>
                   <div className="text-slate-200 text-sm">{analysis.hedef_kitle}</div>
                 </div>
               </div>
@@ -185,13 +185,13 @@ ${analysis.eticaret_ozellikler.map(f => `• ${f}`).join('\n')}
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-2 text-green-400">
                   <ShoppingBag className="w-5 h-5" />
-                  <h3 className="font-semibold">Hazır E-Ticaret İçeriği</h3>
+                  <h3 className="font-semibold">{t.processing?.ecommerceContent || 'Ready E-Commerce Content'}</h3>
                 </div>
                 <button
                   onClick={handleCopy}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${copied
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                      : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600'
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    : 'bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600'
                     }`}
                 >
                   {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
@@ -203,21 +203,21 @@ ${analysis.eticaret_ozellikler.map(f => `• ${f}`).join('\n')}
               <div className="space-y-5 text-sm flex-grow">
                 {/* Title */}
                 <div>
-                  <span className="text-slate-500 text-xs uppercase font-bold mb-1 block">Ürün Başlığı</span>
+                  <span className="text-slate-500 text-xs uppercase font-bold mb-1 block">{t.processing?.productTitle || 'Product Title'}</span>
                   <h4 className="text-lg font-bold text-white leading-tight">{analysis.eticaret_baslik || analysis.urun_adi}</h4>
                 </div>
 
                 {/* Description */}
                 <div>
-                  <span className="text-slate-500 text-xs uppercase font-bold mb-1 block flex items-center gap-1"><FileText className="w-3 h-3" /> Açıklama</span>
+                  <span className="text-slate-500 text-xs uppercase font-bold mb-1 block flex items-center gap-1"><FileText className="w-3 h-3" /> {t.processing?.description || 'Description'}</span>
                   <p className="text-slate-300 leading-relaxed">
-                    {analysis.eticaret_aciklama || "Açıklama hazırlanıyor..."}
+                    {analysis.eticaret_aciklama || (t.processing?.descriptionPreparing || "Preparing description...")}
                   </p>
                 </div>
 
                 {/* Bullet Points */}
                 <div>
-                  <span className="text-slate-500 text-xs uppercase font-bold mb-2 block flex items-center gap-1"><Tag className="w-3 h-3" /> Öne Çıkan Özellikler</span>
+                  <span className="text-slate-500 text-xs uppercase font-bold mb-2 block flex items-center gap-1"><Tag className="w-3 h-3" /> {t.processing?.features || 'Key Features'}</span>
                   <ul className="space-y-2">
                     {(analysis.eticaret_ozellikler || analysis.ozellikler).map((feature, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-slate-300">

@@ -24,7 +24,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
     const success = await downloadFile(url, suggestedFilename);
 
     if (!success) {
-      alert('İndirme başarısız oldu. Lütfen tekrar deneyin.');
+      alert(t.gallery?.downloadFailed || 'Download failed. Please try again.');
     }
   };
 
@@ -44,7 +44,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
 
       for (let i = 0; i < completedImages.length; i++) {
         const item = completedImages[i];
-        setDownloadProgress(`Görseller: ${i + 1}/${completedImages.length}`);
+        setDownloadProgress(`${t.gallery?.imagesProgress || 'Images'}: ${i + 1}/${completedImages.length}`);
 
         const ext = getExtension(item.imageUrl!);
         const filename = `adgenius-gorsel-${i + 1}-${item.type?.replace(/[^a-zA-Z0-9]/g, '_') || i}${ext}`;
@@ -73,7 +73,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
 
       for (let i = 0; i < completedVideos.length; i++) {
         const item = completedVideos[i];
-        setDownloadProgress(`Videolar: ${i + 1}/${completedVideos.length}`);
+        setDownloadProgress(`${t.gallery?.videosProgress || 'Videos'}: ${i + 1}/${completedVideos.length}`);
 
         const filename = `adgenius-video-${i + 1}-${item.type?.replace(/[^a-zA-Z0-9]/g, '_') || i}.mp4`;
         await downloadFile(item.videoUrl!, filename);
@@ -104,7 +104,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
       for (let i = 0; i < completedImages.length; i++) {
         current++;
         const item = completedImages[i];
-        setDownloadProgress(`${current}/${totalItems} indiriliyor...`);
+        setDownloadProgress(`${current}/${totalItems} ${t.gallery?.downloadingProgress || 'downloading...'}`);
 
         const ext = getExtension(item.imageUrl!);
         const filename = `adgenius-gorsel-${i + 1}-${item.type?.replace(/[^a-zA-Z0-9]/g, '_') || i}${ext}`;
@@ -116,7 +116,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
       for (let i = 0; i < completedVideos.length; i++) {
         current++;
         const item = completedVideos[i];
-        setDownloadProgress(`${current}/${totalItems} indiriliyor...`);
+        setDownloadProgress(`${current}/${totalItems} ${t.gallery?.downloadingProgress || 'downloading...'}`);
 
         const filename = `adgenius-video-${i + 1}-${item.type?.replace(/[^a-zA-Z0-9]/g, '_') || i}.mp4`;
         await downloadFile(item.videoUrl!, filename);
@@ -227,9 +227,9 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
             <div className="flex items-center gap-3">
               <PackageOpen className="w-7 h-7 text-cyan-400" />
               <div>
-                <h3 className="text-white font-bold text-lg">Toplu İndirme</h3>
+                <h3 className="text-white font-bold text-lg">{t.gallery?.bulkDownload || 'Bulk Download'}</h3>
                 <p className="text-slate-400 text-xs">
-                  {completedImages.length} görsel{completedVideos.length > 0 ? `, ${completedVideos.length} video` : ''} hazır
+                  {completedImages.length} {t.gallery?.imagesReady || 'image(s)'}{completedVideos.length > 0 ? `, ${completedVideos.length} ${t.gallery?.videosReady || 'video(s)'}` : ''} {t.gallery?.ready || 'ready'}
                   {isDownloadingAll && downloadProgress && (
                     <span className="ml-2 text-cyan-400 animate-pulse">• {downloadProgress}</span>
                   )}
@@ -245,7 +245,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                 className="bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 border border-cyan-500/30 hover:border-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Images className="w-4 h-4" />
-                Tüm Görselleri İndir ({completedImages.length})
+                {t.gallery?.downloadAllImages || 'Download All Images'} ({completedImages.length})
               </button>
 
               {/* Download All Videos (if any) */}
@@ -256,7 +256,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                   className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 border border-purple-500/30 hover:border-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Video className="w-4 h-4" />
-                  Tüm Videoları İndir ({completedVideos.length})
+                  {t.gallery?.downloadAllVideos || 'Download All Videos'} ({completedVideos.length})
                 </button>
               )}
 
@@ -268,9 +268,9 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                   className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isDownloadingAll ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> İndiriliyor...</>
+                    <><Loader2 className="w-4 h-4 animate-spin" /> {t.gallery?.downloading || 'Downloading...'}</>
                   ) : (
-                    <><Download className="w-4 h-4" /> Hepsini İndir</>
+                    <><Download className="w-4 h-4" /> {t.gallery?.downloadAll || 'Download All'}</>
                   )}
                 </button>
               )}
@@ -285,9 +285,9 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                       className="bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 border border-blue-500/30 hover:border-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isGeneratingCollage ? (
-                        <><Loader2 className="w-4 h-4 animate-spin" /> Albüm...</>
+                        <><Loader2 className="w-4 h-4 animate-spin" /> {t.gallery?.album || 'Album...'}</>
                       ) : (
-                        <><LayoutGrid className="w-4 h-4" /> Albüm Oluştur</>
+                        <><LayoutGrid className="w-4 h-4" /> {t.gallery?.createAlbum || 'Create Album'}</>
                       )}
                     </button>
                   ) : (
@@ -295,7 +295,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                       onClick={() => collageUrl && handleDownload(collageUrl, 'adgenius-kampanya-albumu.png')}
                       className="bg-green-600/20 hover:bg-green-600/40 text-green-300 px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 border border-green-500/30 hover:border-green-500/50"
                     >
-                      <Download className="w-4 h-4" /> Albümü İndir
+                      <Download className="w-4 h-4" /> {t.gallery?.downloadAlbum || 'Download Album'}
                     </button>
                   )}
                 </>
@@ -307,13 +307,13 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
           {collageUrl && (
             <div className="mt-4 animate-fade-in-up">
               <div className="relative group rounded-xl overflow-hidden shadow-2xl border border-slate-700 max-w-4xl mx-auto">
-                <img src={collageUrl} alt="Kampanya Albümü" className="w-full h-auto" />
+                <img src={collageUrl} alt={t.gallery?.campaignAlbum || 'Campaign Album'} className="w-full h-auto" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                   <button
                     onClick={() => collageUrl && handleDownload(collageUrl, 'adgenius-kampanya-albumu.png')}
                     className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl flex items-center gap-3 transition-all transform hover:scale-105 border border-white/20 font-medium"
                   >
-                    <Download className="w-5 h-5" /> Albümü İndir (PNG)
+                    <Download className="w-5 h-5" /> {t.gallery?.downloadAlbumPNG || 'Download Album (PNG)'}
                   </button>
                 </div>
               </div>
@@ -322,7 +322,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                   onClick={() => setCollageUrl(null)}
                   className="text-slate-500 hover:text-slate-300 text-xs underline"
                 >
-                  Albümü Gizle / Yeniden Oluştur
+                  {t.gallery?.hideAlbum || 'Hide Album / Recreate'}
                 </button>
               </div>
             </div>
@@ -332,7 +332,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
 
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-6 pl-4 border-l-4 border-blue-500">Üretilen İçerikler</h2>
+        <h2 className="text-2xl font-bold text-white mb-6 pl-4 border-l-4 border-blue-500">{t.gallery?.generatedContent || 'Generated Content'}</h2>
       </div>
 
       {/* Grid */}
@@ -358,7 +358,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                 <span className="font-semibold text-blue-300 text-sm">{result.type}</span>
                 {result.progress !== undefined && result.progress > 0 && result.progress < 100 && (
                   <span className="text-[10px] text-slate-400 font-mono">
-                    {result.status === 'generating_image' ? t.buttons.downloadImage || 'Görsel' : 'Video'}: %{result.progress}
+                    {result.status === 'generating_image' ? t.gallery?.imageLabel || 'Image' : t.gallery?.videoLabel || 'Video'}: %{result.progress}
                   </span>
                 )}
               </div>
@@ -368,16 +368,16 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                 {(result.status === 'completed' && result.error) && (
                   <div className="flex items-center gap-1 bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-full text-xs border border-yellow-500/20" title={result.error}>
                     <AlertCircle className="w-3 h-3" />
-                    <span className="hidden sm:inline">Video Hatası</span>
+                    <span className="hidden sm:inline">{t.gallery?.videoError || 'Video Error'}</span>
                   </div>
                 )}
                 <span className={`text-xs px-2 py-1 rounded-full ${result.status === 'completed' ? 'bg-green-500/20 text-green-400' :
                   result.status === 'failed' ? 'bg-red-500/20 text-red-400' :
                     'bg-blue-500/20 text-blue-400 animate-pulse'
                   }`}>
-                  {result.status === 'completed' ? 'Hazır' :
-                    result.status === 'generating_image' ? 'Görsel Üretiliyor...' :
-                      result.status === 'generating_video' ? 'Video Üretiliyor...' : 'Bekliyor'}
+                  {result.status === 'completed' ? (t.gallery?.statusReady || 'Ready') :
+                    result.status === 'generating_image' ? (t.gallery?.statusGeneratingImage || 'Generating Image...') :
+                      result.status === 'generating_video' ? (t.gallery?.statusGeneratingVideo || 'Generating Video...') : (t.gallery?.statusWaiting || 'Waiting')}
                 </span>
               </div>
             </div>
@@ -390,7 +390,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                   <div className={`${(result.videoUrl || result.status === 'generating_video' || result.error) ? 'w-1/2 border-r border-slate-700' : 'w-full'} relative h-full bg-slate-900`}>
                     <img
                       src={result.imageUrl}
-                      alt="Oluşturulan Reklam"
+                      alt={t.gallery?.generatedAd || 'Generated Ad'}
                       className="w-full h-full object-contain"
                     />
                   </div>
@@ -420,12 +420,12 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                               {result.progress}%
                             </div>
                           </div>
-                          <p className="text-xs text-blue-400 font-medium">Veo Video Oluşturuyor...</p>
+                          <p className="text-xs text-blue-400 font-medium">{t.gallery?.veoGenerating || 'Veo Generating Video...'}</p>
                         </div>
                       ) : result.error ? (
                         <div className="text-center p-4 flex flex-col items-center">
                           <AlertCircle className="w-8 h-8 text-yellow-500/50 mb-2" />
-                          <p className="text-xs text-yellow-500/70 text-center font-medium">Video Oluşturulamadı</p>
+                          <p className="text-xs text-yellow-500/70 text-center font-medium">{t.gallery?.videoFailed || 'Video Generation Failed'}</p>
                           <p className="text-[10px] text-slate-500 mt-2 max-w-[150px] leading-tight opacity-70">
                             {result.error.length > 80 ? result.error.substring(0, 80) + '...' : result.error}
                           </p>
@@ -443,7 +443,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                   {result.status === 'failed' ? (
                     <>
                       <AlertCircle className="w-10 h-10 text-red-500 mb-2" />
-                      <p className="text-red-400 text-sm">Hata: {result.error}</p>
+                      <p className="text-red-400 text-sm">{t.gallery?.errorLabel || 'Error'}: {result.error}</p>
                     </>
                   ) : (
                     <>
@@ -454,7 +454,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                           {result.progress || 0}%
                         </div>
                       </div>
-                      <p className="animate-pulse text-blue-400">Görsel Oluşturuluyor...</p>
+                      <p className="animate-pulse text-blue-400">{t.gallery?.imageGenerating || 'Generating Image...'}</p>
                     </>
                   )}
                 </div>
@@ -469,7 +469,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                     onClick={() => result.imageUrl && handleDownload(result.imageUrl, `reklam-gorsel-${result.id}${getExtension(result.imageUrl)}`)}
                     className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors border border-slate-700 hover:border-slate-500"
                   >
-                    <Download className="w-3 h-3" /> Resmi İndir
+                    <Download className="w-3 h-3" /> {t.gallery?.downloadImage || 'Download Image'}
                   </button>
                 )}
 
@@ -478,7 +478,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                     onClick={() => result.videoUrl && handleDownload(result.videoUrl, `reklam-video-${result.id}.mp4`)}
                     className="flex-1 bg-purple-900/20 hover:bg-purple-900/40 text-purple-300 text-xs py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors border border-purple-500/20 hover:border-purple-500/40"
                   >
-                    <Video className="w-3 h-3" /> Videoyu İndir
+                    <Video className="w-3 h-3" /> {t.gallery?.downloadVideo || 'Download Video'}
                   </button>
                 )}
               </div>
@@ -488,7 +488,7 @@ const ResultsGallery: React.FC<Props> = ({ results, onRegenerate, t }) => {
                   onClick={() => onRegenerate(result.id)}
                   className="w-full bg-slate-800 hover:bg-blue-900/40 text-slate-400 hover:text-blue-300 text-[10px] py-1.5 rounded-md flex items-center justify-center gap-2 transition-all border border-slate-700 hover:border-blue-500/30 font-medium"
                 >
-                  <RefreshCw className="w-3 h-3" /> Bu Görseli Yeniden Üret
+                  <RefreshCw className="w-3 h-3" /> {t.gallery?.regenerate || 'Regenerate This Image'}
                 </button>
               )}
             </div>

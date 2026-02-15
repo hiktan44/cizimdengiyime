@@ -62,6 +62,8 @@ import { TermsOfServicePage } from './pages/TermsOfServicePage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { RefundPolicyPage } from './pages/RefundPolicyPage';
 import { AIUsageNoticePage } from './pages/AIUsageNoticePage';
+import { useTranslation } from './lib/i18n';
+import { appTranslations } from './lib/i18n/appTranslations';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -91,6 +93,7 @@ const ToolPage: React.FC<{
     onRefreshProfile,
     initialTab
 }) => {
+        const t = useTranslation(appTranslations);
         const [activeToolTab, setActiveToolTab] = useState<'design' | 'technical' | 'pixshop' | 'fotomatik' | 'adgenius' | 'collage' | 'techpack'>(initialTab || 'design');
 
         // --- STATE MANAGEMENT ---
@@ -122,7 +125,7 @@ const ToolPage: React.FC<{
         const [isBottomProductLoading, setIsBottomProductLoading] = useState(false);
 
         const [isModelLoading, setIsModelLoading] = useState(false);
-        const [loadingText, setLoadingText] = useState('Yapay zeka düşünüyor...');
+        const [loadingText, setLoadingText] = useState(t.loading.aiThinking);
         const [progress, setProgress] = useState(0);
 
         // Step 3: Result (Model & Video) - Persisted
@@ -233,7 +236,7 @@ const ToolPage: React.FC<{
             }
 
             setIsProductLoading(true);
-            setLoadingText('Çizim ürüne dönüştürülüyor...');
+            setLoadingText(t.loading.sketchConverting);
             startProgressSimulation(80, 200);
 
             try {
@@ -272,7 +275,7 @@ const ToolPage: React.FC<{
                     userId: profile.id
                 });
             } catch (error) {
-                alert(`Ürün oluşturma hatası: ${error}`);
+                alert(`${t.alerts.productCreationError} ${error}`);
             } finally {
                 setIsProductLoading(false);
             }
@@ -313,7 +316,7 @@ const ToolPage: React.FC<{
             }
 
             setIsTopProductLoading(true);
-            setLoadingText('Üst giyim ürüne dönüştürülüyor...');
+            setLoadingText(t.loading.topGarmentConverting);
             startProgressSimulation(80, 200);
 
             try {
@@ -336,7 +339,7 @@ const ToolPage: React.FC<{
 
                 onRefreshProfile();
             } catch (error) {
-                alert(`Üst giyim oluşturma hatası: ${error}`);
+                alert(`${t.alerts.topGarmentCreationError} ${error}`);
             } finally {
                 setIsTopProductLoading(false);
             }
@@ -365,7 +368,7 @@ const ToolPage: React.FC<{
             }
 
             setIsBottomProductLoading(true);
-            setLoadingText('Alt giyim ürüne dönüştürülüyor...');
+            setLoadingText(t.loading.bottomGarmentConverting);
             startProgressSimulation(80, 200);
 
             try {
@@ -388,7 +391,7 @@ const ToolPage: React.FC<{
 
                 onRefreshProfile();
             } catch (error) {
-                alert(`Alt giyim oluşturma hatası: ${error}`);
+                alert(`${t.alerts.bottomGarmentCreationError} ${error}`);
             } finally {
                 setIsBottomProductLoading(false);
             }
@@ -416,7 +419,7 @@ const ToolPage: React.FC<{
                     try {
                         sourceFile = await base64ToFile(generatedTopProductUrl, 'top_product.png');
                     } catch (e) {
-                        alert("Üst giyim görseli işlenirken hata oluştu.");
+                        alert(t.alerts.topGarmentProcessingError);
                         return;
                     }
                 }
@@ -428,13 +431,13 @@ const ToolPage: React.FC<{
                     try {
                         secondSourceFile = await base64ToFile(generatedBottomProductUrl, 'bottom_product.png');
                     } catch (e) {
-                        alert("Alt giyim görseli işlenirken hata oluştu.");
+                        alert(t.alerts.bottomGarmentProcessingError);
                         return;
                     }
                 }
 
                 if (!sourceFile || !secondSourceFile) {
-                    alert('Kombin modu için hem üst hem alt giyim görseli gereklidir. Lütfen her iki parçayı da yükleyin veya çizimden oluşturun.');
+                    alert(t.alerts.outfitModeBothRequired);
                     return;
                 }
             } else {
@@ -445,13 +448,13 @@ const ToolPage: React.FC<{
                     try {
                         sourceFile = await base64ToFile(generatedProductUrl, 'generated_product.png');
                     } catch (e) {
-                        alert("Görsel işlenirken hata oluştu.");
+                        alert(t.alerts.imageProcessingError);
                         return;
                     }
                 }
 
                 if (!sourceFile) {
-                    alert('Lütfen önce bir ürün görseli yükleyin veya çizimden oluşturun.');
+                    alert(t.alerts.pleaseUploadProduct);
                     return;
                 }
             }
@@ -466,7 +469,7 @@ const ToolPage: React.FC<{
             setIsModelLoading(true);
             setGeneratedImageUrl(null);
             setGeneratedVideoUrl(null);
-            setLoadingText(isKombinMode ? 'Kombin ile canlı model oluşturuluyor...' : 'Canlı model oluşturuluyor...');
+            setLoadingText(isKombinMode ? t.loading.outfitModelCreating : t.loading.modelCreating);
 
             startProgressSimulation(85, 300);
 
@@ -576,7 +579,7 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Görsel oluşturma hatası:', error);
-                alert(`Görsel oluşturulurken bir hata oluştu: ${error instanceof Error ? error.message : String(error)}`);
+                alert(`${t.alerts.imageGenerationError} ${error instanceof Error ? error.message : String(error)}`);
                 setIsModelLoading(false);
             }
         };
@@ -599,7 +602,7 @@ const ToolPage: React.FC<{
             }
 
             setIsTechLoading(true);
-            setLoadingText('Teknik çizim hazırlanıyor...');
+            setLoadingText(t.loading.techDrawingPreparing);
             startProgressSimulation(90, 200);
 
             try {
@@ -629,7 +632,7 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Teknik çizim hatası:', error);
-                alert(`Hata: ${error instanceof Error ? error.message : String(error)}`);
+                alert(`${t.alerts.genericError} ${error instanceof Error ? error.message : String(error)}`);
             } finally {
                 setIsTechLoading(false);
             }
@@ -652,11 +655,11 @@ const ToolPage: React.FC<{
 
             // Update loading text based on quality
             if (settings.quality === 'high') {
-                setLoadingText('Yüksek kalite video işleniyor (Veo 3.1). Bu işlem 2-5 dakika sürebilir, lütfen bekleyin...');
+                setLoadingText(t.loading.videoCreatingHigh);
                 // Slower progress simulation for high quality
                 startProgressSimulation(95, 3000);
             } else {
-                setLoadingText('Video oluşturuluyor (Hızlı Mod)...');
+                setLoadingText(t.loading.videoCreatingFast);
                 startProgressSimulation(92, 1000);
             }
 
@@ -715,7 +718,7 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Video oluşturma hatası:', error);
-                alert(`Video oluşturulurken hata: ${error instanceof Error ? error.message : String(error)}`);
+                alert(`${t.alerts.videoCreationError} ${error instanceof Error ? error.message : String(error)}`);
                 setIsModelLoading(false);
             }
         };
@@ -734,7 +737,7 @@ const ToolPage: React.FC<{
                     userId: profile.id
                 });
             } else {
-                alert('İndirme başarısız oldu. Lütfen tekrar deneyin.');
+                alert(t.alerts.downloadFailed);
             }
         };
 
@@ -745,8 +748,8 @@ const ToolPage: React.FC<{
                     const blob = await (await fetch(url)).blob();
                     const file = new File([blob], 'generated-content.png', { type: blob.type });
                     await navigator.share({
-                        title: 'Çizimden Gerçeğe AI',
-                        text: 'Yapay zeka ile oluşturduğum tasarıma göz at!',
+                        title: 'Fasheone AI',
+                        text: 'Check out my AI-generated design!',
                         files: [file],
                     });
 
@@ -764,7 +767,7 @@ const ToolPage: React.FC<{
             <div className="min-h-screen flex flex-col bg-slate-900">
                 <FloatingWhatsApp
                     phoneNumber={import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined}
-                    message="Merhaba, Canlı Model ve Teknik Çizim konusunda destek almak istiyorum."
+                    message={t.whatsappMessage}
                 />
                 <Header
                     isLoggedIn={isLoggedIn}
@@ -800,11 +803,11 @@ const ToolPage: React.FC<{
                         >
                             <div className="flex items-center gap-2">
                                 <SparklesIcon />
-                                <span className="hidden sm:inline">Canlı Model & Video</span>
-                                <span className="sm:hidden">Model</span>
+                                <span className="hidden sm:inline">{t.toolTabs.design.label}</span>
+                                <span className="sm:hidden">{t.toolTabs.design.shortLabel}</span>
                             </div>
                             <span className={`text-xs ${activeToolTab === 'design' ? 'text-cyan-200' : 'text-slate-500'}`}>
-                                Model: 1₺ • Video: 3₺
+                                {t.toolTabs.design.credits}
                             </span>
                         </button>
                         <button
@@ -816,11 +819,11 @@ const ToolPage: React.FC<{
                         >
                             <div className="flex items-center gap-2">
                                 <PencilIcon />
-                                <span className="hidden sm:inline">Teknik Çizim (Tech Pack)</span>
-                                <span className="sm:hidden">Tech Pack</span>
+                                <span className="hidden sm:inline">{t.toolTabs.technical.label}</span>
+                                <span className="sm:hidden">{t.toolTabs.technical.shortLabel}</span>
                             </div>
                             <span className={`text-xs ${activeToolTab === 'technical' ? 'text-purple-200' : 'text-slate-500'}`}>
-                                1 kredi/işlem
+                                {t.toolTabs.technical.credits}
                             </span>
                         </button>
                         <button
@@ -837,7 +840,7 @@ const ToolPage: React.FC<{
                                 Pixshop
                             </div>
                             <span className={`text-xs ${activeToolTab === 'pixshop' ? 'text-blue-200' : 'text-slate-500'}`}>
-                                1 kredi/işlem
+                                {t.toolTabs.pixshop.credits}
                             </span>
                         </button>
                         <button
@@ -854,7 +857,7 @@ const ToolPage: React.FC<{
                                 Fotomatik
                             </div>
                             <span className={`text-xs ${activeToolTab === 'fotomatik' ? 'text-teal-200' : 'text-slate-500'}`}>
-                                1 kredi/işlem
+                                {t.toolTabs.fotomatik.credits}
                             </span>
                         </button>
                         <button
@@ -871,7 +874,7 @@ const ToolPage: React.FC<{
                                 AdGenius
                             </div>
                             <span className={`text-xs ${activeToolTab === 'adgenius' ? 'text-orange-200' : 'text-slate-500'}`}>
-                                1-3 kredi/işlem
+                                {t.toolTabs.adgenius.credits}
                             </span>
                         </button>
                         <button
@@ -885,11 +888,11 @@ const ToolPage: React.FC<{
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
                                 </svg>
-                                <span className="hidden sm:inline">Kolaj Stüdyosu</span>
-                                <span className="sm:hidden">Kolaj</span>
+                                <span className="hidden sm:inline">{t.toolTabs.collage.label}</span>
+                                <span className="sm:hidden">{t.toolTabs.collage.shortLabel}</span>
                             </div>
                             <span className={`text-xs ${activeToolTab === 'collage' ? 'text-pink-200' : 'text-slate-500'}`}>
-                                2 kredi/işlem
+                                {t.toolTabs.collage.credits}
                             </span>
                         </button>
                         <button
@@ -903,11 +906,11 @@ const ToolPage: React.FC<{
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                <span className="hidden sm:inline">Tech Pack</span>
-                                <span className="sm:hidden">Tech</span>
+                                <span className="hidden sm:inline">{t.toolTabs.techpack.label}</span>
+                                <span className="sm:hidden">{t.toolTabs.techpack.shortLabel}</span>
                             </div>
                             <span className={`text-xs ${activeToolTab === 'techpack' ? 'text-indigo-200' : 'text-slate-500'}`}>
-                                3 kredi/işlem
+                                {t.toolTabs.techpack.credits}
                             </span>
                         </button>
                     </div>
@@ -929,8 +932,8 @@ const ToolPage: React.FC<{
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h3 className="text-lg font-bold text-white">Kombin Modu Aktif</h3>
-                                                <p className="text-sm text-slate-400">Üst ve alt giyim için ayrı görseller yükleyin</p>
+                                                <h3 className="text-lg font-bold text-white">{t.kombiniMode.title}</h3>
+                                                <p className="text-sm text-slate-400">{t.kombiniMode.description}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -941,14 +944,12 @@ const ToolPage: React.FC<{
                                         <div className="bg-slate-800/50 p-6 rounded-2xl border border-cyan-500/30 shadow-xl flex flex-col">
                                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                                 <span className="bg-cyan-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
-                                                Üst Giyim - Çizim
+                                                {t.kombiniMode.topSketchTitle}
                                             </h2>
                                             <div className="flex-grow min-h-[200px]">
                                                 <ImageUploader onImageUpload={handleTopSketchUpload} imagePreviewUrl={topSketchPreviewUrl} />
                                             </div>
-                                            <div className="mt-2 text-xs text-center text-slate-400">
-                                                Bu işlem <span className="text-cyan-400 font-bold">1 kredi</span> harcar
-                                            </div>
+                                            <div className="mt-2 text-xs text-center text-slate-400" dangerouslySetInnerHTML={{ __html: t.kombiniMode.creditInfo }} />
                                             <button
                                                 onClick={handleGenerateTopProduct}
                                                 disabled={!topSketchFile || isTopProductLoading}
@@ -957,7 +958,7 @@ const ToolPage: React.FC<{
                                                     : 'bg-cyan-600 text-white hover:bg-cyan-500'
                                                     }`}
                                             >
-                                                {isTopProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür →'}
+                                                {isTopProductLoading ? t.kombiniMode.processing : t.kombiniMode.convertToProduct}
                                             </button>
                                         </div>
 
@@ -968,16 +969,16 @@ const ToolPage: React.FC<{
                                             </div>
                                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                                 <span className="bg-cyan-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
-                                                Üst Giyim - Ürün
+                                                {t.kombiniMode.topProductTitle}
                                             </h2>
                                             <div className="flex-grow min-h-[200px] relative">
                                                 <ImageUploader onImageUpload={handleTopProductUpload} imagePreviewUrl={topProductPreviewUrl} />
                                                 {topProductPreviewUrl && (
-                                                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">✓ Hazır</div>
+                                                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">{t.kombiniMode.ready}</div>
                                                 )}
                                             </div>
                                             <p className="text-xs text-slate-500 mt-2 text-center">
-                                                {generatedTopProductUrl ? "Çizimden üretildi" : "Çizimden üret veya doğrudan yükle"}
+                                                {generatedTopProductUrl ? t.kombiniMode.generatedFromSketch : t.kombiniMode.uploadOrGenerate}
                                             </p>
                                         </div>
                                     </div>
@@ -988,14 +989,12 @@ const ToolPage: React.FC<{
                                         <div className="bg-slate-800/50 p-6 rounded-2xl border border-purple-500/30 shadow-xl flex flex-col">
                                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                                 <span className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
-                                                Alt Giyim - Çizim
+                                                {t.kombiniMode.bottomSketchTitle}
                                             </h2>
                                             <div className="flex-grow min-h-[200px]">
                                                 <ImageUploader onImageUpload={handleBottomSketchUpload} imagePreviewUrl={bottomSketchPreviewUrl} />
                                             </div>
-                                            <div className="mt-2 text-xs text-center text-slate-400">
-                                                Bu işlem <span className="text-cyan-400 font-bold">1 kredi</span> harcar
-                                            </div>
+                                            <div className="mt-2 text-xs text-center text-slate-400" dangerouslySetInnerHTML={{ __html: t.kombiniMode.creditInfo }} />
                                             <button
                                                 onClick={handleGenerateBottomProduct}
                                                 disabled={!bottomSketchFile || isBottomProductLoading}
@@ -1004,7 +1003,7 @@ const ToolPage: React.FC<{
                                                     : 'bg-purple-600 text-white hover:bg-purple-500'
                                                     }`}
                                             >
-                                                {isBottomProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür →'}
+                                                {isBottomProductLoading ? t.kombiniMode.processing : t.kombiniMode.convertToProduct}
                                             </button>
                                         </div>
 
@@ -1015,16 +1014,16 @@ const ToolPage: React.FC<{
                                             </div>
                                             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                                 <span className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
-                                                Alt Giyim - Ürün
+                                                {t.kombiniMode.bottomProductTitle}
                                             </h2>
                                             <div className="flex-grow min-h-[200px] relative">
                                                 <ImageUploader onImageUpload={handleBottomProductUpload} imagePreviewUrl={bottomProductPreviewUrl} />
                                                 {bottomProductPreviewUrl && (
-                                                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">✓ Hazır</div>
+                                                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">{t.kombiniMode.ready}</div>
                                                 )}
                                             </div>
                                             <p className="text-xs text-slate-500 mt-2 text-center">
-                                                {generatedBottomProductUrl ? "Çizimden üretildi" : "Çizimden üret veya doğrudan yükle"}
+                                                {generatedBottomProductUrl ? t.kombiniMode.generatedFromSketch : t.kombiniMode.uploadOrGenerate}
                                             </p>
                                         </div>
                                     </div>
@@ -1040,7 +1039,7 @@ const ToolPage: React.FC<{
                                                     <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
-                                                    <span className="text-green-400 font-medium">Her iki parça da hazır! Canlı model oluşturabilirsiniz.</span>
+                                                    <span className="text-green-400 font-medium">{t.kombiniMode.bothReady}</span>
                                                 </>
                                             ) : (
                                                 <>
@@ -1049,10 +1048,10 @@ const ToolPage: React.FC<{
                                                     </svg>
                                                     <span className="text-orange-400 font-medium">
                                                         {!topProductPreviewUrl && !bottomProductPreviewUrl
-                                                            ? 'Üst ve alt giyim görselleri gerekli'
+                                                            ? t.kombiniMode.bothNeeded
                                                             : !topProductPreviewUrl
-                                                                ? 'Üst giyim görseli gerekli'
-                                                                : 'Alt giyim görseli gerekli'}
+                                                                ? t.kombiniMode.topNeeded
+                                                                : t.kombiniMode.bottomNeeded}
                                                     </span>
                                                 </>
                                             )}
@@ -1067,7 +1066,7 @@ const ToolPage: React.FC<{
                                     <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col">
                                         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                             <span className="bg-slate-700 text-cyan-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
-                                            Çizim (Opsiyonel)
+                                            {t.standardMode.sketchTitle}
                                         </h2>
                                         <div className="flex-grow">
                                             <ImageUploader onImageUpload={handleSketchUpload} imagePreviewUrl={sketchPreviewUrl} />
@@ -1077,16 +1076,14 @@ const ToolPage: React.FC<{
                                         {uploadedSketchFile && (
                                             <div className="mt-4">
                                                 <ColorPicker
-                                                    label="Ürün Rengi (Opsiyonel)"
+                                                    label={t.standardMode.productColorLabel}
                                                     selectedColor={productColor}
                                                     onColorChange={setProductColor}
                                                 />
                                             </div>
                                         )}
 
-                                        <div className="mt-2 text-xs text-center text-slate-400">
-                                            Bu işlem <span className="text-cyan-400 font-bold">1 kredi</span> harcar
-                                        </div>
+                                        <div className="mt-2 text-xs text-center text-slate-400" dangerouslySetInnerHTML={{ __html: t.standardMode.creditInfo }} />
                                         <button
                                             onClick={handleGenerateProductClick}
                                             disabled={!uploadedSketchFile || isProductLoading}
@@ -1095,7 +1092,7 @@ const ToolPage: React.FC<{
                                                 : 'bg-blue-600 text-white hover:bg-blue-500'
                                                 }`}
                                         >
-                                            {isProductLoading ? 'İşleniyor...' : 'Ürüne Dönüştür →'}
+                                            {isProductLoading ? t.standardMode.processing : t.standardMode.convertToProduct}
                                         </button>
                                     </div>
 
@@ -1108,7 +1105,7 @@ const ToolPage: React.FC<{
 
                                         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                             <span className="bg-slate-700 text-purple-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
-                                            Ürün Görseli
+                                            {t.standardMode.productImageTitle}
                                         </h2>
                                         <div className="flex-grow relative">
                                             <ImageUploader onImageUpload={handleProductUpload} imagePreviewUrl={productPreviewUrl} />
@@ -1117,7 +1114,7 @@ const ToolPage: React.FC<{
                                                 <button
                                                     onClick={() => handleDownload(generatedProductUrl || productPreviewUrl, 'urun-gorseli.png')}
                                                     className="absolute bottom-4 right-4 bg-cyan-600/90 text-white p-3 rounded-full hover:bg-cyan-500 transition-all shadow-lg backdrop-blur-sm z-10"
-                                                    title="Ürün Görselini İndir"
+                                                    title={t.standardMode.downloadProduct}
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -1126,7 +1123,7 @@ const ToolPage: React.FC<{
                                             )}
                                         </div>
                                         <p className="text-xs text-slate-500 mt-2 text-center">
-                                            {generatedProductUrl ? "Çizimden üretilen görsel kullanılıyor." : "Çizim yoksa, doğrudan ürün fotoğrafı yükleyin."}
+                                            {generatedProductUrl ? t.standardMode.usingGeneratedImage : t.standardMode.uploadDirectPhoto}
                                         </p>
                                     </div>
 
@@ -1141,30 +1138,30 @@ const ToolPage: React.FC<{
                                     <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl space-y-6">
                                         <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                             <AdjustmentsIcon />
-                                            Model Ayarları
+                                            {t.modelSettings.title}
                                         </h2>
 
                                         {/* CLOTHING TYPE SELECTION */}
                                         <div>
-                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Kıyafet Türü</label>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.clothingType.label}</label>
                                             <select
                                                 value={clothingType}
                                                 onChange={(e) => setClothingType(e.target.value)}
                                                 className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition"
                                             >
-                                                <option value="Genel">Genel (Otomatik Algıla)</option>
-                                                <option value="Üst Giyim">Sadece Üst (Gömlek, Tişört, Ceket)</option>
-                                                <option value="Alt Giyim">Sadece Alt (Pantolon, Etek)</option>
-                                                <option value="Elbise">Elbise</option>
-                                                <option value="Takım Elbise">Takım Elbise / Döpiyes</option>
-                                                <option value="Alt & Üst">Alt & Üst (Kombin)</option>
+                                                <option value="Genel">{t.modelSettings.clothingType.auto}</option>
+                                                <option value="Üst Giyim">{t.modelSettings.clothingType.topOnly}</option>
+                                                <option value="Alt Giyim">{t.modelSettings.clothingType.bottomOnly}</option>
+                                                <option value="Elbise">{t.modelSettings.clothingType.dress}</option>
+                                                <option value="Takım Elbise">{t.modelSettings.clothingType.suit}</option>
+                                                <option value="Alt & Üst">{t.modelSettings.clothingType.topAndBottom}</option>
                                             </select>
                                         </div>
 
                                         {/* COLOR PICKERS */}
                                         <div className="space-y-4">
                                             <ColorPicker
-                                                label={clothingType === 'Alt & Üst' ? 'Üst Parça Rengi' : (clothingType === 'Alt Giyim' ? 'Alt Giyim Rengi' : 'Ana Renk')}
+                                                label={clothingType === 'Alt & Üst' ? t.modelSettings.topColor : (clothingType === 'Alt Giyim' ? t.modelSettings.bottomColor : t.modelSettings.topColor)}
                                                 selectedColor={colorSuggestion}
                                                 onColorChange={setColorSuggestion}
                                             />
@@ -1172,14 +1169,14 @@ const ToolPage: React.FC<{
                                             {/* Pattern Upload */}
                                             <div className="bg-slate-800/50 p-3 rounded-xl border border-dashed border-slate-600">
                                                 <label className="block text-xs font-medium text-slate-400 mb-2">
-                                                    Desen / Baskı Ekle (İsteğe Bağlı)
+                                                    {t.modelSettings.pattern.label}
                                                 </label>
 
                                                 {patternPreview ? (
                                                     <div className="relative group">
                                                         <img
                                                             src={patternPreview}
-                                                            alt="Desen"
+                                                            alt={t.modelSettings.pattern.patternLabel}
                                                             className="w-full h-20 object-cover rounded-lg"
                                                         />
                                                         <button
@@ -1212,19 +1209,19 @@ const ToolPage: React.FC<{
                                                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                             </svg>
-                                                            <span>Desen görseli seçin...</span>
+                                                            <span>{t.modelSettings.pattern.selectImage}</span>
                                                         </div>
                                                     </div>
                                                 )}
                                                 <p className="text-[10px] text-slate-500 mt-1 pl-1">
-                                                    Eklenen desen kıyafete uygulanır.
+                                                    {t.modelSettings.pattern.description}
                                                 </p>
                                             </div>
 
                                             {(clothingType === 'Alt & Üst' || clothingType === 'Takım Elbise') && (
                                                 <div className="pt-2 border-t border-slate-700/50">
                                                     <ColorPicker
-                                                        label={clothingType === 'Takım Elbise' ? 'Gömlek/İç Rengi' : 'Alt Parça Rengi'}
+                                                        label={clothingType === 'Takım Elbise' ? t.modelSettings.shirtColor : t.modelSettings.bottomColor}
                                                         selectedColor={secondaryColor}
                                                         onColorChange={setSecondaryColor}
                                                     />
@@ -1235,13 +1232,13 @@ const ToolPage: React.FC<{
                                         {/* CUSTOM PROMPT / CHAT INPUT */}
                                         <div>
                                             <label className="font-medium text-cyan-400 block mb-2 text-sm flex items-center gap-2">
-                                                <SparklesIcon /> Yapay Zeka ile Sohbet / Detaylı İstek
+                                                <SparklesIcon /> {t.modelSettings.chatLabel}
                                             </label>
                                             <div className="relative">
                                                 <textarea
                                                     value={customPrompt}
                                                     onChange={(e) => setCustomPrompt(e.target.value)}
-                                                    placeholder="Örn: Parkta bankta oturan, elinde kahve tutan, güneş gözlüklü bir model olsun. Arka planda sonbahar yaprakları..."
+                                                    placeholder={t.modelSettings.chatPlaceholder}
                                                     rows={3}
                                                     className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-sm placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-y min-h-[100px]"
                                                 />
@@ -1255,74 +1252,74 @@ const ToolPage: React.FC<{
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Etnik Köken</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.ethnicity.label}</label>
                                                 <select value={modelEthnicity} onChange={(e) => setModelEthnicity(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Farklı">Farklı (Karışık)</option>
-                                                    <option value="Türk">Türk</option>
-                                                    <option value="Avrupalı">Avrupalı</option>
-                                                    <option value="Kuzey Avrupalı">İskandinav</option>
-                                                    <option value="Güney Avrupalı">Akdeniz</option>
-                                                    <option value="Asyalı">Doğu Asyalı</option>
-                                                    <option value="Afrikalı">Afrikalı</option>
-                                                    <option value="Latin">Latin</option>
-                                                    <option value="Orta Doğulu">Orta Doğulu</option>
+                                                    <option value="Farklı">{t.modelSettings.ethnicity.diverse}</option>
+                                                    <option value="Türk">{t.modelSettings.ethnicity.turkish}</option>
+                                                    <option value="Avrupalı">{t.modelSettings.ethnicity.european}</option>
+                                                    <option value="Kuzey Avrupalı">{t.modelSettings.ethnicity.scandinavian}</option>
+                                                    <option value="Güney Avrupalı">{t.modelSettings.ethnicity.mediterranean}</option>
+                                                    <option value="Asyalı">{t.modelSettings.ethnicity.eastAsian}</option>
+                                                    <option value="Afrikalı">{t.modelSettings.ethnicity.african}</option>
+                                                    <option value="Latin">{t.modelSettings.ethnicity.latin}</option>
+                                                    <option value="Orta Doğulu">{t.modelSettings.ethnicity.middleEastern}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Sanatsal Stil</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.artisticStyle.label}</label>
                                                 <select value={artisticStyle} onChange={(e) => setArtisticStyle(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Gerçekçi">Fotogerçekçi</option>
-                                                    <option value="Sinematik">Sinematik</option>
-                                                    <option value="Çizgi Film">İllüstrasyon</option>
+                                                    <option value="Gerçekçi">{t.modelSettings.artisticStyle.photorealistic}</option>
+                                                    <option value="Sinematik">{t.modelSettings.artisticStyle.cinematic}</option>
+                                                    <option value="Çizgi Film">{t.modelSettings.artisticStyle.illustration}</option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Işıklandırma</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.lighting.label}</label>
                                                 <select value={lighting} onChange={(e) => setLighting(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Doğal">Doğal Işık</option>
-                                                    <option value="Stüdyo">Stüdyo Softbox</option>
-                                                    <option value="Gün Batımı">Gün Batımı (Golden Hour)</option>
-                                                    <option value="Dramatik">Dramatik / Kontrastlı</option>
-                                                    <option value="Neon">Neon / Gece</option>
+                                                    <option value="Doğal">{t.modelSettings.lighting.natural}</option>
+                                                    <option value="Stüdyo">{t.modelSettings.lighting.studio}</option>
+                                                    <option value="Gün Batımı">{t.modelSettings.lighting.goldenHour}</option>
+                                                    <option value="Dramatik">{t.modelSettings.lighting.dramatic}</option>
+                                                    <option value="Neon">{t.modelSettings.lighting.neon}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Kamera Açısı</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.cameraAngle.label}</label>
                                                 <select value={cameraAngle} onChange={(e) => setCameraAngle(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Normal">Göz Hizası</option>
-                                                    <option value="Alt Açı">Alt Açı (Low Angle)</option>
-                                                    <option value="Üst Açı">Üst Açı (High Angle)</option>
-                                                    <option value="Geniş Açı">Geniş Açı</option>
-                                                    <option value="Portre">Yakın Çekim (Portre)</option>
+                                                    <option value="Normal">{t.modelSettings.cameraAngle.eyeLevel}</option>
+                                                    <option value="Alt Açı">{t.modelSettings.cameraAngle.lowAngle}</option>
+                                                    <option value="Üst Açı">{t.modelSettings.cameraAngle.highAngle}</option>
+                                                    <option value="Geniş Açı">{t.modelSettings.cameraAngle.wideAngle}</option>
+                                                    <option value="Portre">{t.modelSettings.cameraAngle.closeUp}</option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         {/* Camera Zoom (Shot Distance) */}
                                         <div>
-                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Çekim Mesafesi (Zoom)</label>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.cameraZoom.label}</label>
                                             <select value={cameraZoom} onChange={(e) => setCameraZoom(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                <option value="Uzak">Uzak Çekim (Wide Shot) - Tüm vücut + mekan</option>
-                                                <option value="Normal">Normal Çekim (Medium Shot) - Bel üstü</option>
-                                                <option value="Yakın">Yakın Çekim (Close-Up) - Yüz ve detaylar</option>
+                                                <option value="Uzak">{t.modelSettings.cameraZoom.wide}</option>
+                                                <option value="Normal">{t.modelSettings.cameraZoom.medium}</option>
+                                                <option value="Yakın">{t.modelSettings.cameraZoom.closeUp}</option>
                                             </select>
                                         </div>
 
                                         {/* Model Consistency (Lock) */}
                                         <div className="bg-slate-800/50 p-3 rounded-xl border border-dashed border-slate-600 flex items-center justify-between">
                                             <div>
-                                                <label className="block text-sm font-medium text-slate-300">Model Sürekliliği</label>
+                                                <label className="block text-sm font-medium text-slate-300">{t.modelSettings.modelConsistency.label}</label>
                                                 <p className="text-[10px] text-slate-500">
-                                                    Beğendiğiniz modeli sonraki üretimlerde koruyun.
+                                                    {t.modelSettings.modelConsistency.description}
                                                 </p>
                                             </div>
                                             <button
                                                 onClick={() => {
                                                     if (!modelSeed && !isModelLocked) {
-                                                        alert("Henüz bir model oluşturulmadı. Önce bir kez görsel oluşturun, sonra kilitleyebilirsiniz.");
+                                                        alert(t.alerts.noModelCreatedYet);
                                                         return;
                                                     }
 
@@ -1353,12 +1350,12 @@ const ToolPage: React.FC<{
                                                 {isModelLocked ? (
                                                     <>
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                                        Model Kilitli
+                                                        {t.modelSettings.modelConsistency.locked}
                                                     </>
                                                 ) : (
                                                     <>
                                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
-                                                        Modeli Kilitle
+                                                        {t.modelSettings.modelConsistency.lock}
                                                     </>
                                                 )}
                                             </button>
@@ -1367,43 +1364,43 @@ const ToolPage: React.FC<{
                                         {/* Age and Gender Settings */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Yaş Grubu</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.ageGroup.label}</label>
                                                 <select value={ageRange} onChange={(e) => setAgeRange(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Child">Çocuk (Child)</option>
-                                                    <option value="Teen">Genç (Teen)</option>
-                                                    <option value="Adult">Yetişkin (Adult)</option>
-                                                    <option value="Elderly">Yaşlı (Elderly)</option>
+                                                    <option value="Child">{t.modelSettings.ageGroup.child}</option>
+                                                    <option value="Teen">{t.modelSettings.ageGroup.teen}</option>
+                                                    <option value="Adult">{t.modelSettings.ageGroup.adult}</option>
+                                                    <option value="Elderly">{t.modelSettings.ageGroup.elderly}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Cinsiyet</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.gender.label}</label>
                                                 <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Female">Kadın</option>
-                                                    <option value="Male">Erkek</option>
+                                                    <option value="Female">{t.modelSettings.gender.female}</option>
+                                                    <option value="Male">{t.modelSettings.gender.male}</option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Vücut Tipi</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.bodyType.label}</label>
                                                 <select value={bodyType} onChange={(e) => setBodyType(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Standart">Standart</option>
-                                                    <option value="İnce">İnce (Slim)</option>
-                                                    <option value="Kıvrımlı">Kıvrımlı (Curvy)</option>
-                                                    <option value="Atletik">Atletik</option>
-                                                    <option value="Büyük Beden">Büyük Beden</option>
-                                                    <option value="Battal Beden">Battal Beden (130kg+)</option>
+                                                    <option value="Standart">{t.modelSettings.bodyType.standard}</option>
+                                                    <option value="İnce">{t.modelSettings.bodyType.slim}</option>
+                                                    <option value="Kıvrımlı">{t.modelSettings.bodyType.curvy}</option>
+                                                    <option value="Atletik">{t.modelSettings.bodyType.athletic}</option>
+                                                    <option value="Büyük Beden">{t.modelSettings.bodyType.plusSize}</option>
+                                                    <option value="Battal Beden">{t.modelSettings.bodyType.xxl}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Poz</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.pose.label}</label>
                                                 <select value={pose} onChange={(e) => setPose(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Rastgele">Rastgele</option>
-                                                    <option value="Ayakta">Ayakta (Düz)</option>
-                                                    <option value="Yürürken">Yürürken</option>
-                                                    <option value="Eller Belde">Eller Belde</option>
-                                                    <option value="Otururken">Otururken</option>
+                                                    <option value="Rastgele">{t.modelSettings.pose.random}</option>
+                                                    <option value="Ayakta">{t.modelSettings.pose.standing}</option>
+                                                    <option value="Yürürken">{t.modelSettings.pose.walking}</option>
+                                                    <option value="Eller Belde">{t.modelSettings.pose.handsOnHips}</option>
+                                                    <option value="Otururken">{t.modelSettings.pose.sitting}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -1411,28 +1408,28 @@ const ToolPage: React.FC<{
                                         {/* Hair Settings */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Saç Rengi</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.hairColor.label}</label>
                                                 <select value={hairColor} onChange={(e) => setHairColor(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Doğal">Doğal / Otomatik</option>
-                                                    <option value="Sarı">Sarı (Blonde)</option>
-                                                    <option value="Kumral">Kumral (Brown)</option>
-                                                    <option value="Siyah">Siyah</option>
-                                                    <option value="Kızıl">Kızıl (Red)</option>
-                                                    <option value="Gri">Gri / Gümüş</option>
-                                                    <option value="Pastel Pembe">Pastel Pembe</option>
+                                                    <option value="Doğal">{t.modelSettings.hairColor.natural}</option>
+                                                    <option value="Sarı">{t.modelSettings.hairColor.blonde}</option>
+                                                    <option value="Kumral">{t.modelSettings.hairColor.brown}</option>
+                                                    <option value="Siyah">{t.modelSettings.hairColor.black}</option>
+                                                    <option value="Kızıl">{t.modelSettings.hairColor.red}</option>
+                                                    <option value="Gri">{t.modelSettings.hairColor.gray}</option>
+                                                    <option value="Pastel Pembe">{t.modelSettings.hairColor.pastelPink}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Saç Stili</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.hairStyle.label}</label>
                                                 <select value={hairStyle} onChange={(e) => setHairStyle(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="Doğal">Doğal / Otomatik</option>
-                                                    <option value="Uzun Düz">Uzun Düz</option>
-                                                    <option value="Uzun Dalgalı">Uzun Dalgalı</option>
-                                                    <option value="Kısa Küt">Kısa Küt (Bob)</option>
-                                                    <option value="Kısa Pixie">Kısa Pixie</option>
-                                                    <option value="Topuz">Topuz</option>
-                                                    <option value="At Kuyruğu">At Kuyruğu</option>
-                                                    <option value="Kıvırcık">Kıvırcık</option>
+                                                    <option value="Doğal">{t.modelSettings.hairStyle.natural}</option>
+                                                    <option value="Uzun Düz">{t.modelSettings.hairStyle.longStraight}</option>
+                                                    <option value="Uzun Dalgalı">{t.modelSettings.hairStyle.longWavy}</option>
+                                                    <option value="Kısa Küt">{t.modelSettings.hairStyle.shortBob}</option>
+                                                    <option value="Kısa Pixie">{t.modelSettings.hairStyle.shortPixie}</option>
+                                                    <option value="Topuz">{t.modelSettings.hairStyle.bun}</option>
+                                                    <option value="At Kuyruğu">{t.modelSettings.hairStyle.ponytail}</option>
+                                                    <option value="Kıvırcık">{t.modelSettings.hairStyle.curly}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -1440,25 +1437,25 @@ const ToolPage: React.FC<{
                                         {/* Fabric Settings */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Kumaş Cinsi</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.fabricType.label}</label>
                                                 <select value={fabricType} onChange={(e) => setFabricType(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="">Seçiniz</option>
-                                                    <option value="Dokuma">Dokuma</option>
-                                                    <option value="Örme">Örme</option>
-                                                    <option value="Deri">Deri (Leather)</option>
-                                                    <option value="Triko">Triko (Knitwear)</option>
+                                                    <option value="">{t.modelSettings.fabricType.select}</option>
+                                                    <option value="Dokuma">{t.modelSettings.fabricType.woven}</option>
+                                                    <option value="Örme">{t.modelSettings.fabricType.knit}</option>
+                                                    <option value="Deri">{t.modelSettings.fabricType.leather}</option>
+                                                    <option value="Triko">{t.modelSettings.fabricType.knitwear}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Kumaş Yüzey Detayı</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.fabricFinish.label}</label>
                                                 <select value={fabricFinish} onChange={(e) => setFabricFinish(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="">Seçiniz</option>
-                                                    <option value="Soft">Soft (Yumuşak)</option>
-                                                    <option value="Parlak">Parlak (Glossy)</option>
-                                                    <option value="Mat">Mat (Matte)</option>
-                                                    <option value="Pastel">Pastel</option>
-                                                    <option value="Saten">Saten (Satin)</option>
-                                                    <option value="İpek">İpek (Silk)</option>
+                                                    <option value="">{t.modelSettings.fabricFinish.select}</option>
+                                                    <option value="Soft">{t.modelSettings.fabricFinish.soft}</option>
+                                                    <option value="Parlak">{t.modelSettings.fabricFinish.glossy}</option>
+                                                    <option value="Mat">{t.modelSettings.fabricFinish.matte}</option>
+                                                    <option value="Pastel">{t.modelSettings.fabricFinish.pastel}</option>
+                                                    <option value="Saten">{t.modelSettings.fabricFinish.satin}</option>
+                                                    <option value="İpek">{t.modelSettings.fabricFinish.silk}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -1466,72 +1463,72 @@ const ToolPage: React.FC<{
                                         {/* Shoe Settings */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Ayakkabı Tipi</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.shoeType.label}</label>
                                                 <select value={shoeType} onChange={(e) => setShoeType(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="">Otomatik / Yok</option>
-                                                    <option value="Spor Ayakkabı">Spor Ayakkabı (Sneakers)</option>
-                                                    <option value="Topuklu">Topuklu (High Heels)</option>
-                                                    <option value="Bot">Bot (Boots)</option>
-                                                    <option value="Sandalet">Sandalet</option>
-                                                    <option value="Loafer">Loafer / Mokosen</option>
-                                                    <option value="Oxford">Oxford / Klasik</option>
-                                                    <option value="Çizme">Çizme</option>
+                                                    <option value="">{t.modelSettings.shoeType.auto}</option>
+                                                    <option value="Spor Ayakkabı">{t.modelSettings.shoeType.sneakers}</option>
+                                                    <option value="Topuklu">{t.modelSettings.shoeType.highHeels}</option>
+                                                    <option value="Bot">{t.modelSettings.shoeType.boots}</option>
+                                                    <option value="Sandalet">{t.modelSettings.shoeType.sandals}</option>
+                                                    <option value="Loafer">{t.modelSettings.shoeType.loafer}</option>
+                                                    <option value="Oxford">{t.modelSettings.shoeType.oxford}</option>
+                                                    <option value="Çizme">{t.modelSettings.shoeType.tallBoots}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="font-medium text-slate-300 block mb-2 text-sm">Ayakkabı Rengi</label>
+                                                <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.shoeColor.label}</label>
                                                 <select value={shoeColor} onChange={(e) => setShoeColor(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                    <option value="">Otomatik</option>
-                                                    <option value="Siyah">Siyah</option>
-                                                    <option value="Beyaz">Beyaz</option>
-                                                    <option value="Kahverengi">Kahverengi</option>
-                                                    <option value="Lacivert">Lacivert</option>
-                                                    <option value="Kırmızı">Kırmızı</option>
-                                                    <option value="Bej">Bej / Ten Rengi</option>
-                                                    <option value="Gri">Gri</option>
+                                                    <option value="">{t.modelSettings.shoeColor.auto}</option>
+                                                    <option value="Siyah">{t.modelSettings.shoeColor.black}</option>
+                                                    <option value="Beyaz">{t.modelSettings.shoeColor.white}</option>
+                                                    <option value="Kahverengi">{t.modelSettings.shoeColor.brown}</option>
+                                                    <option value="Lacivert">{t.modelSettings.shoeColor.navy}</option>
+                                                    <option value="Kırmızı">{t.modelSettings.shoeColor.red}</option>
+                                                    <option value="Bej">{t.modelSettings.shoeColor.beige}</option>
+                                                    <option value="Gri">{t.modelSettings.shoeColor.gray}</option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         {/* Accessories Settings */}
                                         <div>
-                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Aksesuar</label>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.accessories.label}</label>
                                             <select value={accessories} onChange={(e) => setAccessories(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                <option value="">Yok / Otomatik</option>
-                                                <option value="Güneş Gözlüğü">Güneş Gözlüğü</option>
-                                                <option value="Şapka">Şapka</option>
-                                                <option value="Bere">Bere</option>
-                                                <option value="Şarf / Atkı">Şarf / Atkı</option>
-                                                <option value="Çanta (El)">Çanta (El Çantası)</option>
-                                                <option value="Çanta (Omuz)">Çanta (Omuz / Sirt)</option>
-                                                <option value="Kol Saati">Kol Saati</option>
-                                                <option value="Eldiven">Eldiven</option>
-                                                <option value="Kemer">Kemer (Vurgulu)</option>
-                                                <option value="Kolye / Küpe">Kolye / Küpe</option>
+                                                <option value="">{t.modelSettings.accessories.none}</option>
+                                                <option value="Güneş Gözlüğü">{t.modelSettings.accessories.sunglasses}</option>
+                                                <option value="Şapka">{t.modelSettings.accessories.hat}</option>
+                                                <option value="Bere">{t.modelSettings.accessories.beanie}</option>
+                                                <option value="Şarf / Atkı">{t.modelSettings.accessories.scarf}</option>
+                                                <option value="Çanta (El)">{t.modelSettings.accessories.handBag}</option>
+                                                <option value="Çanta (Omuz)">{t.modelSettings.accessories.shoulderBag}</option>
+                                                <option value="Kol Saati">{t.modelSettings.accessories.watch}</option>
+                                                <option value="Eldiven">{t.modelSettings.accessories.gloves}</option>
+                                                <option value="Kemer">{t.modelSettings.accessories.belt}</option>
+                                                <option value="Kolye / Küpe">{t.modelSettings.accessories.necklaceEarring}</option>
                                             </select>
                                         </div>
 
                                         {/* Aspect Ratio Selection */}
                                         <div>
-                                            <label className="font-medium text-slate-300 block mb-2 text-sm">En/Boy Oranı</label>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.aspectRatio.label}</label>
                                             <select value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value as any)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                <option value="3:4">3:4 (Dikey - Varsayılan)</option>
-                                                <option value="9:16">9:16 (Hikaye / Reels)</option>
-                                                <option value="4:5">4:5 (Instagram Gönderi)</option>
-                                                <option value="1:1">1:1 (Kare)</option>
-                                                <option value="16:9">16:9 (Yatay / YouTube)</option>
+                                                <option value="3:4">{t.modelSettings.aspectRatio.portrait}</option>
+                                                <option value="9:16">{t.modelSettings.aspectRatio.story}</option>
+                                                <option value="4:5">{t.modelSettings.aspectRatio.instagram}</option>
+                                                <option value="1:1">{t.modelSettings.aspectRatio.square}</option>
+                                                <option value="16:9">{t.modelSettings.aspectRatio.landscape}</option>
                                             </select>
                                         </div>
 
                                         <div>
-                                            <label className="font-medium text-slate-300 block mb-2 text-sm">Mekan</label>
+                                            <label className="font-medium text-slate-300 block mb-2 text-sm">{t.modelSettings.location.label}</label>
                                             <select value={location} onChange={(e) => setLocation(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white text-sm focus:ring-cyan-500 focus:border-cyan-500 transition">
-                                                <option value="Podyum">Moda Podyumu</option>
-                                                <option value="Stüdyo">Minimalist Stüdyo</option>
-                                                <option value="Sokak">Şehir Sokağı</option>
-                                                <option value="Doğal Mekan">Doğa / Sahil</option>
-                                                <option value="Lüks Mağaza">Lüks Mağaza İçi</option>
-                                                <option value="Özel Arka Plan">Özel Arka Plan Yükle</option>
+                                                <option value="Podyum">{t.modelSettings.location.runway}</option>
+                                                <option value="Stüdyo">{t.modelSettings.location.studio}</option>
+                                                <option value="Sokak">{t.modelSettings.location.street}</option>
+                                                <option value="Doğal Mekan">{t.modelSettings.location.nature}</option>
+                                                <option value="Lüks Mağaza">{t.modelSettings.location.luxuryStore}</option>
+                                                <option value="Özel Arka Plan">{t.modelSettings.location.customBg}</option>
                                             </select>
                                             {/* Custom Background Upload */}
                                             {location === 'Özel Arka Plan' && (
@@ -1542,7 +1539,7 @@ const ToolPage: React.FC<{
                                                         accept="image/*"
                                                         className="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-cyan-400 hover:file:bg-slate-600"
                                                     />
-                                                    {customBackgroundFile && <p className="text-xs text-green-400 mt-1">✓ Yüklendi: {customBackgroundFile.name}</p>}
+                                                    {customBackgroundFile && <p className="text-xs text-green-400 mt-1">✓ {t.modelSettings.location.uploaded}: {customBackgroundFile.name}</p>}
                                                 </div>
                                             )}
                                             {/* Custom Background Prompt */}
@@ -1550,7 +1547,7 @@ const ToolPage: React.FC<{
                                                 <textarea
                                                     value={customBackgroundPrompt}
                                                     onChange={(e) => setCustomBackgroundPrompt(e.target.value)}
-                                                    placeholder="Örn: Güneş batarken sahilde, kumda yürüyor... (isteğe bağlı)"
+                                                    placeholder={t.modelSettings.location.bgPromptPlaceholder}
                                                     rows={2}
                                                     className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-xs placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-y min-h-[80px]"
                                                 />
@@ -1559,17 +1556,17 @@ const ToolPage: React.FC<{
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
                                                     </svg>
                                                 </div>
-                                                <p className="text-xs text-slate-500 mt-1">İsteğe bağlı: Arka plan hakkında özel detaylar ekleyin</p>
+                                                <p className="text-xs text-slate-500 mt-1">{t.modelSettings.location.bgPromptHint}</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 text-center">
                                         <span className="text-sm text-slate-300">
-                                            Canlı Model: <span className="text-cyan-400 font-bold text-lg">1 kredi</span>
+                                            {t.modelSettings.creditInfo.liveModel} <span className="text-cyan-400 font-bold text-lg">1 kredi</span>
                                         </span>
                                         <span className="text-xs text-slate-400 block mt-1">
-                                            Mevcut krediniz: <span className="text-cyan-400 font-semibold">{profile.credits}</span>
+                                            {t.modelSettings.creditInfo.currentCredits} <span className="text-cyan-400 font-semibold">{profile.credits}</span>
                                         </span>
                                     </div>
 
@@ -1595,7 +1592,7 @@ const ToolPage: React.FC<{
                                         ) : (
                                             <>
                                                 <SparklesIcon />
-                                                Canlı Model Oluştur
+                                                {t.modelSettings.generateButton}
                                             </>
                                         )}
                                     </button>
@@ -1605,7 +1602,7 @@ const ToolPage: React.FC<{
                                 <div className="lg:col-span-8">
                                     <div className="h-full min-h-[600px] bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden relative">
                                         <div className="absolute top-4 right-4 z-10 bg-slate-900/80 backdrop-blur px-3 py-1 rounded-full text-xs text-cyan-400 border border-cyan-500/30">
-                                            3. Sonuç (Model & Video)
+                                            {t.resultLabel}
                                         </div>
                                         <ResultDisplay
                                             isLoading={isModelLoading}
@@ -1633,10 +1630,10 @@ const ToolPage: React.FC<{
                                 <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex flex-col h-full">
                                     <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                                         <span className="bg-slate-700 text-purple-400 w-8 h-8 rounded-full flex items-center justify-center text-sm">A</span>
-                                        Ürün Yükle
+                                        {t.technicalDrawing.uploadTitle}
                                     </h2>
                                     <p className="text-sm text-slate-400 mb-4">
-                                        Teknik çizimini (flat sketch) oluşturmak istediğiniz kıyafetin fotoğrafını yükleyin.
+                                        {t.technicalDrawing.uploadDescription}
                                     </p>
                                     <div className="flex-grow min-h-[400px]">
                                         <ImageUploader onImageUpload={handleTechUpload} imagePreviewUrl={techInputPreview} />
@@ -1646,7 +1643,7 @@ const ToolPage: React.FC<{
                                     {techInputFile && (
                                         <div className="mt-4">
                                             <label className="block text-sm font-semibold text-slate-300 mb-2">
-                                                Çizim Stili
+                                                {t.technicalDrawing.styleLabel}
                                             </label>
                                             <div className="flex gap-3">
                                                 <button
@@ -1656,7 +1653,7 @@ const ToolPage: React.FC<{
                                                         : 'bg-slate-800 text-slate-400 border border-slate-600 hover:border-slate-500'
                                                         }`}
                                                 >
-                                                    🖤 Karakalem
+                                                    {t.technicalDrawing.blackAndWhite}
                                                 </button>
                                                 <button
                                                     onClick={() => setTechSketchStyle('colored')}
@@ -1665,7 +1662,7 @@ const ToolPage: React.FC<{
                                                         : 'bg-slate-800 text-slate-400 border border-slate-600 hover:border-slate-500'
                                                         }`}
                                                 >
-                                                    🎨 Renkli
+                                                    {t.technicalDrawing.colored}
                                                 </button>
                                             </div>
                                         </div>
@@ -1673,10 +1670,10 @@ const ToolPage: React.FC<{
 
                                     <div className="mt-4 bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 text-center">
                                         <span className="text-sm text-slate-300">
-                                            Bu işlem <span className="text-purple-400 font-bold text-lg">1 kredi</span> harcar
+                                            <span dangerouslySetInnerHTML={{ __html: t.technicalDrawing.creditInfo.replace('<span>', '<span class="text-purple-400 font-bold text-lg">').replace('</span>', '</span>') }} />
                                         </span>
                                         <span className="text-xs text-slate-400 block mt-1">
-                                            Mevcut krediniz: <span className="text-purple-400 font-semibold">{profile.credits}</span>
+                                            {t.technicalDrawing.currentCredits} <span className="text-purple-400 font-semibold">{profile.credits}</span>
                                         </span>
                                     </div>
 
@@ -1691,12 +1688,12 @@ const ToolPage: React.FC<{
                                         {isTechLoading ? (
                                             <>
                                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                Çizim Hazırlanıyor...
+                                                {t.technicalDrawing.preparing}
                                             </>
                                         ) : (
                                             <>
                                                 <PencilIcon />
-                                                Teknik Çizim Oluştur
+                                                {t.technicalDrawing.generateButton}
                                             </>
                                         )}
                                     </button>
@@ -1707,14 +1704,14 @@ const ToolPage: React.FC<{
                             <div className="flex flex-col gap-6">
                                 <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden relative h-full min-h-[500px] flex flex-col">
                                     <div className="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur px-3 py-1 rounded-full text-xs text-white border border-white/20">
-                                        Sonuç (Tech Pack)
+                                        {t.technicalDrawing.resultLabel}
                                     </div>
 
                                     <div className="flex-grow flex items-center justify-center bg-white p-4">
                                         {isTechLoading ? (
                                             <div className="text-center">
                                                 <div className="w-16 h-16 border-4 border-slate-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-                                                <p className="text-slate-800 font-medium">Yapay zeka analiz ediyor...</p>
+                                                <p className="text-slate-800 font-medium">{t.technicalDrawing.aiAnalyzing}</p>
                                             </div>
                                         ) : generatedTechSketchUrl ? (
                                             <div className="relative w-full h-full flex flex-col">
@@ -1723,7 +1720,7 @@ const ToolPage: React.FC<{
                                                     <button
                                                         onClick={() => handleDownload(generatedTechSketchUrl, 'teknik-cizim.png')}
                                                         className="bg-slate-900 text-white p-3 rounded-full hover:bg-slate-800 shadow-lg"
-                                                        title="İndir"
+                                                        title={t.technicalDrawing.downloadTitle}
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                                                     </button>
@@ -1732,7 +1729,7 @@ const ToolPage: React.FC<{
                                         ) : (
                                             <div className="text-center text-slate-400">
                                                 <PencilIcon />
-                                                <p className="mt-2 text-sm">Oluşturulan teknik çizim burada görünecek.</p>
+                                                <p className="mt-2 text-sm">{t.technicalDrawing.resultPlaceholder}</p>
                                             </div>
                                         )}
                                     </div>
@@ -1790,6 +1787,7 @@ const ToolPage: React.FC<{
 
 const App: React.FC = () => {
     const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, sendPasswordResetEmail, updatePassword, signOut, refreshProfile, retryAuth } = useAuth();
+    const t = useTranslation(appTranslations);
     const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin' | 'privacy-policy' | 'kvkk' | 'terms-of-service' | 'cookie-policy' | 'refund-policy' | 'ai-usage-notice'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
@@ -1970,7 +1968,7 @@ const App: React.FC = () => {
 
                 if (result.success && result.videoUrl) {
                     console.log(`✅ Hero video ${orderIndex + 1} Supabase'e yüklendi:`, result.videoUrl);
-                    alert(`✅ Hero Video ${orderIndex + 1} başarıyla yüklendi!\n\nAna sayfada görünecektir.`);
+                    alert(`✅ ${t.alerts.heroVideoUploaded.replace('{index}', String(orderIndex + 1))}`);
 
                     // Update state with Supabase URL
                     if (type === 'heroVideo') {
@@ -1988,7 +1986,7 @@ const App: React.FC = () => {
                     }
                 } else {
                     console.error('❌ Hero video Supabase yüklemesi başarısız:', result.error);
-                    alert(`❌ Hero video yükleme başarısız: ${result.error}\n\nLütfen Supabase storage bucket'larının oluşturulduğundan emin olun.`);
+                    alert(`${t.alerts.heroVideoFailed.replace('{error}', result.error || '')}${t.alerts.supabaseBucketHint}`);
                 }
             } else if (type === 'sketch' || type === 'product' || type === 'model') {
                 // Upload showcase image to Supabase
@@ -1997,8 +1995,8 @@ const App: React.FC = () => {
 
                 if (result.success && result.imageUrl) {
                     console.log(`✅ ${imageType} görseli Supabase'e yüklendi:`, result.imageUrl);
-                    const typeNames = { sketch: 'Çizim', product: 'Ürün', model: 'Model' };
-                    alert(`✅ ${typeNames[imageType]} görseli başarıyla yüklendi!\n\nAna sayfada showcase bölümünde görünecektir.`);
+                    const typeNames = { sketch: t.typeNames.sketch, product: t.typeNames.product, model: t.typeNames.model };
+                    alert(`${t.alerts.showcaseImageUploaded.replace('{type}', typeNames[imageType])}`);
 
                     // Update state with Supabase URL
                     if (type === 'sketch') {
@@ -2013,7 +2011,7 @@ const App: React.FC = () => {
                     }
                 } else {
                     console.error(`❌ ${imageType} görseli Supabase yüklemesi başarısız:`, result.error);
-                    alert(`❌ ${imageType} görseli yükleme başarısız: ${result.error}\n\nLütfen Supabase storage bucket'larının oluşturulduğundan emin olun.`);
+                    alert(`${t.alerts.showcaseImageFailed.replace('{type}', imageType).replace('{error}', result.error || '')}${t.alerts.supabaseBucketHint}`);
                 }
             } else if (type === 'video') {
                 // Upload showcase video to Supabase
@@ -2021,12 +2019,12 @@ const App: React.FC = () => {
 
                 if (result.success && result.imageUrl) {
                     console.log('✅ Showcase video Supabase\'e yüklendi:', result.imageUrl);
-                    alert('✅ Showcase video başarıyla yüklendi!\n\nAna sayfada showcase bölümünde görünecektir.');
+                    alert(t.alerts.showcaseVideoUploaded);
                     setVideoUrl(result.imageUrl);
                     localStorage.setItem('videoUrl', result.imageUrl);
                 } else {
                     console.error('❌ Showcase video Supabase yüklemesi başarısız:', result.error);
-                    alert(`❌ Showcase video yükleme başarısız: ${result.error}\n\nLütfen Supabase storage bucket'larının oluşturulduğundan emin olun.`);
+                    alert(`${t.alerts.showcaseVideoFailed.replace('{error}', result.error || '')}${t.alerts.supabaseBucketHint}`);
                 }
             } else if (type === 'adgenius_main' || type === 'adgenius_collage') {
                 // Upload AdGenius image
@@ -2035,7 +2033,7 @@ const App: React.FC = () => {
 
                 if (result.success && result.imageUrl) {
                     console.log(`✅ AdGenius ${type} görseli yüklendi:`, result.imageUrl);
-                    alert('✅ Görsel başarıyla yüklendi!\n\nAna sayfada AdGenius bölümünde görünecektir.');
+                    alert(t.alerts.adgeniusUploaded);
 
                     if (type === 'adgenius_main') {
                         setAdGeniusMainUrl(result.imageUrl);
@@ -2045,7 +2043,7 @@ const App: React.FC = () => {
                         localStorage.setItem('adGeniusCollageUrl', result.imageUrl);
                     }
                 } else {
-                    alert(`❌ Yükleme başarısız: ${result.error}`);
+                    alert(`${t.alerts.uploadFailed.replace('{error}', result.error || '')}`);
                 }
             } else if (type === 'logo_media') {
                 // Attempt to upload to Supabase
@@ -2053,7 +2051,7 @@ const App: React.FC = () => {
 
                 if (result.success && result.imageUrl) {
                     console.log('✅ Logo media Supabase\'e yüklendi:', result.imageUrl);
-                    alert('✅ Logo video/resim başarıyla veritabanına yüklendi!\n\nArtık tüm kullanıcılarda görünecektir.');
+                    alert(t.alerts.logoUploaded);
 
                     setLogoMediaUrl(result.imageUrl);
                     localStorage.setItem('logoMediaUrl', result.imageUrl);
@@ -2063,13 +2061,13 @@ const App: React.FC = () => {
                     // Fallback to localStorage if DB upload fails (e.g. Constraint violation)
                     console.log('⚠️ Supabase yüklemesi başarısız oldu, yerel depolama kullanılıyor.');
 
-                    let errorMessage = `❌ Veritabanına yüklenemedi: ${result.error}`;
+                    let errorMessage = `${t.alerts.logoDbFailed} ${result.error}`;
 
                     if (result.error && result.error.includes('showcase_images_type_check')) {
-                        errorMessage += '\n\n⚠️ HATA NEDENİ: Veritabanı "logo_media" tipini kabul etmiyor.\nLütfen "ADD_LOGO_MEDIA_CONSTRAINT.sql" dosyasındaki SQL komutunu Supabase SQL Editöründe çalıştırın.';
+                        errorMessage += t.alerts.logoConstraintError;
                     }
 
-                    alert(`${errorMessage}\n\n⚠️ Geçici olarak sadece bu tarayıcıda görünecektir.`);
+                    alert(`${errorMessage}${t.alerts.logoFallbackNote}`);
 
                     // Fallback: We already have base64String from reader above, but scope is tricky. 
                     // Actually reader logic runs before this if/else block for upload
@@ -2081,7 +2079,7 @@ const App: React.FC = () => {
             }
         } catch (error) {
             console.error('❌ Dosya yükleme hatası:', error);
-            alert('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+            alert(t.alerts.fileUploadError);
         }
     };
 
@@ -2090,7 +2088,7 @@ const App: React.FC = () => {
             setShowAuthModal(true);
         } else if (!profile) {
             // User exists but profile is still loading or creating
-            alert('Hesap bilgileriniz hazırlanıyor. Lütfen birkaç saniye bekleyin ve tekrar deneyin.');
+            alert(t.alerts.accountPreparing);
             setTimeout(() => {
                 refreshProfile();
             }, 2000);
@@ -2118,7 +2116,7 @@ const App: React.FC = () => {
                 // Ideally this should trigger a backend update or be handled by RLS
             }
         } else {
-            alert('Geçersiz admin giriş bilgileri!');
+            alert(t.alerts.invalidAdmin);
         }
     };
 
@@ -2170,20 +2168,20 @@ const App: React.FC = () => {
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center max-w-sm px-4">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mb-4"></div>
-                    <p className="text-slate-400">Yükleniyor...</p>
+                    <p className="text-slate-400">{t.loading.text}</p>
                     <p className="text-slate-500 text-sm mt-2">
-                        {authError ? authError : 'Kullanıcı bilgileri alınıyor...'}
+                        {authError ? authError : t.loading.gettingUserInfo}
                     </p>
                     {authError && (
                         <button
                             onClick={retryAuth}
                             className="mt-4 px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition text-sm"
                         >
-                            Tekrar Dene
+                            {t.loading.retryButton}
                         </button>
                     )}
                     <p className="text-slate-600 text-xs mt-4">
-                        Bağlantı yavaşsa otomatik olarak yeniden denenecek
+                        {t.loading.autoRetryHint}
                     </p>
                 </div>
             </div>
@@ -2196,23 +2194,23 @@ const App: React.FC = () => {
             <div className="min-h-screen bg-slate-900 flex items-center justify-center">
                 <div className="text-center max-w-md p-8">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-500 mb-4"></div>
-                    <h2 className="text-white text-xl font-bold mb-2">Profil oluşturuluyor...</h2>
+                    <h2 className="text-white text-xl font-bold mb-2">{t.profileCreating.title}</h2>
                     <p className="text-slate-400 mb-4">
-                        {authError ? authError : 'İlk girişiniz için hesap bilgileriniz hazırlanıyor. Bu birkaç saniye sürebilir.'}
+                        {authError ? authError : t.profileCreating.description}
                     </p>
-                    <p className="text-slate-500 text-sm mb-4">Otomatik olarak yeniden deneniyor...</p>
+                    <p className="text-slate-500 text-sm mb-4">{t.profileCreating.autoRetrying}</p>
                     <div className="flex gap-3 justify-center">
                         <button
                             onClick={retryAuth}
                             className="px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition"
                         >
-                            Tekrar Dene
+                            {t.profileCreating.retryButton}
                         </button>
                         <button
                             onClick={() => window.location.reload()}
                             className="px-6 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
                         >
-                            Sayfayı Yenile
+                            {t.profileCreating.refreshPage}
                         </button>
                     </div>
                 </div>
@@ -2224,7 +2222,7 @@ const App: React.FC = () => {
         <>
             <FloatingWhatsApp
                 phoneNumber={import.meta.env.VITE_WHATSAPP_NUMBER as string | undefined}
-                message="Merhaba, Fasheone hakkında bilgi almak istiyorum."
+                message={t.whatsappMessage}
             />
             {currentPage === 'landing' && (
                 <LandingPage
@@ -2375,7 +2373,7 @@ const App: React.FC = () => {
                     onClose={() => setShowBuyCreditsModal(false)}
                     userId={profile.id}
                     userEmail={profile.email}
-                    userName={profile.full_name || 'Kullanıcı'}
+                    userName={profile.full_name || t.userName}
                     onSuccess={() => {
                         refreshProfile();
                         setShowBuyCreditsModal(false);

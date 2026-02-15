@@ -116,49 +116,49 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
   };
 
   const fashionPresets = [
-    { color: '#000000', name: 'Siyah' },
-    { color: '#FFFFFF', name: 'Beyaz' },
-    { color: '#800020', name: 'Bordo' },
-    { color: '#000080', name: 'Lacivert' },
-    { color: '#F5F5DC', name: 'Bej' },
-    { color: '#50C878', name: 'Zümrüt' },
-    { color: '#FFD700', name: 'Altın' },
-    { color: '#C0C0C0', name: 'Gümüş' },
-    { color: '#FF0000', name: 'Kırmızı' },
-    { color: '#FFC0CB', name: 'Pembe' },
+    { color: '#000000', name: t.upload?.colorBlack || 'Black' },
+    { color: '#FFFFFF', name: t.upload?.colorWhite || 'White' },
+    { color: '#800020', name: t.upload?.colorBurgundy || 'Burgundy' },
+    { color: '#000080', name: t.upload?.colorNavy || 'Navy' },
+    { color: '#F5F5DC', name: t.upload?.colorBeige || 'Beige' },
+    { color: '#50C878', name: t.upload?.colorEmerald || 'Emerald' },
+    { color: '#FFD700', name: t.upload?.colorGold || 'Gold' },
+    { color: '#C0C0C0', name: t.upload?.colorSilver || 'Silver' },
+    { color: '#FF0000', name: t.upload?.colorRed || 'Red' },
+    { color: '#FFC0CB', name: t.upload?.colorPink || 'Pink' },
   ];
 
   const adStyles: AdStyle[] = [
-    'Lüks ve Premium',
-    'Minimalist Stüdyo',
-    'Lüks Mağaza Atmosferi',
-    'Doğal Gün Işığı',
-    'Vintage & Retro',
-    'Neon & Cyberpunk',
-    'Sinematik & Dramatik',
-    'Renkli & Pop Art',
-    'Art Deco',
-    'Gotik',
-    'Bilim Kurgu',
-    'Retro Fütürizm',
-    'Soyut',
-    'Steampunk',
-    'Vaporwave',
-    'Bauhaus',
-    'Rustik & Bohem'
+    t.upload?.styleLuxury || 'Luxury & Premium',
+    t.upload?.styleMinimalist || 'Minimalist Studio',
+    t.upload?.styleLuxuryStore || 'Luxury Store Atmosphere',
+    t.upload?.styleNaturalLight || 'Natural Daylight',
+    t.upload?.styleVintage || 'Vintage & Retro',
+    t.upload?.styleNeon || 'Neon & Cyberpunk',
+    t.upload?.styleCinematic || 'Cinematic & Dramatic',
+    t.upload?.stylePopArt || 'Colorful & Pop Art',
+    t.upload?.styleArtDeco || 'Art Deco',
+    t.upload?.styleGothic || 'Gothic',
+    t.upload?.styleSciFi || 'Sci-Fi',
+    t.upload?.styleRetroFuturism || 'Retro Futurism',
+    t.upload?.styleAbstract || 'Abstract',
+    t.upload?.styleSteampunk || 'Steampunk',
+    t.upload?.styleVaporwave || 'Vaporwave',
+    t.upload?.styleBauhaus || 'Bauhaus',
+    t.upload?.styleRustic || 'Rustic & Bohemian'
   ];
 
   const videoOptions: { id: VideoModel; name: string; description: string; icon: React.FC<any> }[] = [
-    { id: 'veo-3.1-generate-preview', name: 'Yüksek Kalite', description: 'Sinematik kalite, en iyi detaylar (Yavaş)', icon: Sparkles },
-    { id: 'veo-3.1-fast-generate-preview', name: 'Hızlı', description: 'Hızlı üretim, standart kalite', icon: Zap },
+    { id: 'veo-3.1-generate-preview', name: t.upload?.videoHighQuality || 'High Quality', description: t.upload?.videoHighDesc || 'Cinematic quality, best details (Slow)', icon: Sparkles },
+    { id: 'veo-3.1-fast-generate-preview', name: t.upload?.videoFast || 'Fast', description: t.upload?.videoFastDesc || 'Fast generation, standard quality', icon: Zap },
   ];
 
   const aspectRatios: { id: AspectRatio, label: string, icon: any }[] = [
-    { id: '1:1', label: 'Kare (1:1)', icon: Square },
-    { id: '9:16', label: 'Hikaye (9:16)', icon: Smartphone },
-    { id: '16:9', label: 'Yatay (16:9)', icon: Monitor },
-    { id: '3:4', label: 'Dikey (3:4)', icon: Smartphone },
-    { id: '4:3', label: 'Yatay (4:3)', icon: Tv },
+    { id: '1:1', label: t.upload?.ratioSquare || 'Square (1:1)', icon: Square },
+    { id: '9:16', label: t.upload?.ratioStory || 'Story (9:16)', icon: Smartphone },
+    { id: '16:9', label: t.upload?.ratioLandscape169 || 'Landscape (16:9)', icon: Monitor },
+    { id: '3:4', label: t.upload?.ratioPortrait || 'Portrait (3:4)', icon: Smartphone },
+    { id: '4:3', label: t.upload?.ratioLandscape43 || 'Landscape (4:3)', icon: Tv },
   ];
 
   return (
@@ -183,8 +183,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
               }`}
           >
             <Layers className="w-4 h-4" />
-            Reklam Kampanyası
-            <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded ml-1">4-10 Stil</span>
+            {t.upload?.modeCampaign || 'Ad Campaign'}
+            <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded ml-1">{t.upload?.modeCampaignBadge || '4-10 Styles'}</span>
           </button>
           <button
             onClick={() => setFormData(prev => ({ ...prev, mode: 'ecommerce' }))}
@@ -194,8 +194,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
               }`}
           >
             <Camera className="w-4 h-4" />
-            E-Ticaret Paketi
-            <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded ml-1">6-12 Poz</span>
+            {t.upload?.modeEcommerce || 'E-Commerce Package'}
+            <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded ml-1">{t.upload?.modeEcommerceBadge || '6-12 Poses'}</span>
           </button>
         </div>
 
@@ -204,8 +204,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
           {formData.mode === 'campaign' ? (
             <div>
               <label className="flex justify-between text-sm font-medium text-slate-300 mb-2">
-                <span className="flex items-center gap-2"><Sliders className="w-4 h-4" /> Kampanya Stil Sayısı</span>
-                <span className="text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded">{formData.campaignStyleCount} Adet</span>
+                <span className="flex items-center gap-2"><Sliders className="w-4 h-4" /> {t.labels.campaignCount}</span>
+                <span className="text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded">{formData.campaignStyleCount} {t.upload?.countUnit || 'Items'}</span>
               </label>
               <input
                 type="range"
@@ -217,8 +217,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
               <div className="flex justify-between text-xs text-slate-500 mt-1">
-                <span>4 (Varsayılan)</span>
-                <span>10 (Max)</span>
+                <span>{t.upload?.defaultLabel || '4 (Default)'}</span>
+                <span>{t.upload?.maxLabel || '10 (Max)'}</span>
               </div>
             </div>
           ) : (
@@ -226,8 +226,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
               {/* Photo Count Slider */}
               <div>
                 <label className="flex justify-between text-sm font-medium text-slate-300 mb-2">
-                  <span className="flex items-center gap-2"><Camera className="w-4 h-4" /> E-Ticaret Poz Sayısı</span>
-                  <span className="text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">{formData.ecommercePhotoCount} Adet</span>
+                  <span className="flex items-center gap-2"><Camera className="w-4 h-4" /> {t.labels.photoCount}</span>
+                  <span className="text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">{formData.ecommercePhotoCount} {t.upload?.countUnit || 'Items'}</span>
                 </label>
                 <input
                   type="range"
@@ -239,8 +239,8 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                   className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
                 />
                 <div className="flex justify-between text-xs text-slate-500 mt-1">
-                  <span>6 (Min)</span>
-                  <span>12 (Max)</span>
+                  <span>{t.upload?.minLabel || '6 (Min)'}</span>
+                  <span>{t.upload?.maxLabel12 || '12 (Max)'}</span>
                 </div>
               </div>
             </div>
@@ -261,7 +261,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                     type="text"
                     value={formData.ecommerceColorVariations}
                     onChange={(e) => setFormData(prev => ({ ...prev, ecommerceColorVariations: e.target.value }))}
-                    placeholder="Örn: Kırmızı, #0000FF, Lacivert"
+                    placeholder={t.upload?.placeholderColor || 'E.g: Red, #0000FF, Navy'}
                     className="w-full bg-slate-900/50 border border-slate-700 rounded-lg pl-3 pr-10 py-2 text-slate-100 focus:ring-2 focus:ring-blue-500 outline-none text-sm h-10"
                   />
                   {formData.ecommerceColorVariations && (
@@ -286,7 +286,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                 >
                   <span className="flex items-center gap-2 text-sm">
                     <Palette className="w-4 h-4" />
-                    Renk
+                    {t.upload?.colorButton || 'Color'}
                   </span>
                   <ChevronDown className={`w-3 h-3 transition-transform ${showColorPicker ? 'rotate-180' : ''}`} />
                 </button>
@@ -305,7 +305,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
 
                   {/* Presets Grid */}
                   <div className="mb-4">
-                    <span className="text-[10px] text-slate-500 mb-2 block">POPÜLER MODA RENKLERİ</span>
+                    <span className="text-[10px] text-slate-500 mb-2 block">{t.upload?.popularFashionColors || 'POPULAR FASHION COLORS'}</span>
                     <div className="grid grid-cols-5 gap-2">
                       {fashionPresets.map((preset) => (
                         <button
@@ -323,7 +323,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
 
                   {/* Custom Picker */}
                   <div>
-                    <span className="text-[10px] text-slate-500 mb-2 block">ÖZEL SEÇİM</span>
+                    <span className="text-[10px] text-slate-500 mb-2 block">{t.upload?.customSelection || 'CUSTOM SELECTION'}</span>
                     <div className="flex gap-2">
                       <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-slate-500 flex-shrink-0">
                         <input
@@ -343,7 +343,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                         <button
                           onClick={() => addColorToInput(pickerColor)}
                           className="bg-blue-600 hover:bg-blue-500 text-white rounded px-3 flex items-center justify-center transition-colors"
-                          title="Listeye Ekle"
+                          title={t.upload?.addToList || 'Add to List'}
                         >
                           <Plus className="w-4 h-4" />
                         </button>
@@ -397,13 +397,13 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                     </button>
                   </div>
                 ) : (
-                  <span className="text-xs text-slate-500">Desen yükle</span>
+                  <span className="text-xs text-slate-500">{t.upload?.uploadPattern || 'Upload pattern'}</span>
                 )}
               </div>
             </div>
           </div>
           <p className="text-[10px] text-slate-500 mt-1 pl-1">
-            Renkler üretilen görsellere sırasıyla uygulanır. Desen yüklerseniz ürün desenli olarak üretilir.
+            {t.upload?.colorPatternHint || 'Colors are applied to generated images in order. If you upload a pattern, the product will be generated with that pattern.'}
           </p>
         </div>
 
@@ -476,13 +476,13 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                   <div className="relative inline-block group/preview">
                     <img
                       src={URL.createObjectURL(formData.productImage)}
-                      alt="Önizleme"
+                      alt={t.upload?.preview || 'Preview'}
                       className="h-40 object-contain rounded-lg shadow-xl mb-3 bg-slate-900/50 mx-auto"
                     />
                     <button
                       onClick={(e) => removeFile(e, 'main')}
                       className="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition-transform hover:scale-110"
-                      title="Resmi Kaldır"
+                      title={t.upload?.removeImage || 'Remove Image'}
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -501,9 +501,9 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                     <Upload className="w-8 h-8 text-blue-400" />
                   </div>
                   <p className="text-slate-200 text-lg font-medium mb-1">
-                    {mainDragActive ? t.messages.uploadProductImage : 'Fotoğrafı buraya sürükle veya seç'}
+                    {mainDragActive ? t.messages.uploadProductImage : (t.upload?.dragOrSelect || 'Drag & drop photo or click to browse')}
                   </p>
-                  <p className="text-slate-500 text-sm">PNG, JPG, WEBP (Max 10MB)</p>
+                  <p className="text-slate-500 text-sm">{t.upload?.formatHint || 'PNG, JPG, WEBP (Max 10MB)'}</p>
                 </>
               )}
             </div>
@@ -520,7 +520,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
               type="text"
               value={formData.productName}
               onChange={(e) => setFormData(prev => ({ ...prev, productName: e.target.value }))}
-              placeholder="Örn: İpek Saten Abiye"
+              placeholder={t.upload?.placeholderProductName || 'E.g: Silk Satin Dress'}
               className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
             />
           </div>
@@ -533,7 +533,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                 type="text"
                 value={formData.brand}
                 onChange={(e) => setFormData(prev => ({ ...prev, brand: e.target.value }))}
-                placeholder="Örn: Vakko, Zara"
+                placeholder={t.upload?.placeholderBrand || 'E.g: Vakko, Zara'}
                 className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               />
               <div className="flex flex-col gap-2">
@@ -550,7 +550,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                     className="w-4 h-4 rounded border-slate-600 bg-slate-900/50 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-900"
                   />
                   <span className={`text - xs ${formData.renderTextOnImage ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-400'} transition - colors`}>
-                    Görsel üzerine yazı/marka ekle
+                    {t.upload?.addBrandOverlay || 'Add text/brand overlay on image'}
                   </span>
                 </label>
 
@@ -560,7 +560,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                     type="text"
                     value={formData.imageOverlayText}
                     onChange={(e) => setFormData(prev => ({ ...prev, imageOverlayText: e.target.value }))}
-                    placeholder="Görselde yazacak metin (Örn: Marka Adı)"
+                    placeholder={t.upload?.placeholderOverlayText || 'Text to display on image (E.g: Brand Name)'}
                     className="w-full bg-slate-900/30 border border-slate-700 rounded-md px-3 py-2 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -605,7 +605,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                   />
                   <div className="flex-1 text-left min-w-0">
                     <p className="text-sm text-slate-200 truncate">{formData.optionalImage.name}</p>
-                    <p className="text-xs text-slate-500">Resim eklendi</p>
+                    <p className="text-xs text-slate-500">{t.upload?.imageAdded || 'Image added'}</p>
                   </div>
                   <button
                     onClick={(e) => removeFile(e, 'optional')}
@@ -617,7 +617,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
               ) : (
                 <div className="flex flex-col items-center text-slate-500">
                   <ImagePlus className="w-6 h-6 mb-1 opacity-50" />
-                  <span className="text-xs">Arkadan görünüm veya aksesuar resmi yükle</span>
+                  <span className="text-xs">{t.upload?.uploadBackView || 'Upload back view or accessory image'}</span>
                 </div>
               )}
             </div>
@@ -634,7 +634,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                 onChange={(e) => {
                   setFormData(prev => ({ ...prev, customPrompt: e.target.value }));
                 }}
-                placeholder={'Örn: "Model hafifçe sağa baksın", "Arka planda hafif şehir ışıkları olsun" veya "Yüklediğim aksesuarı modelin eline doğal bir şekilde yerleştirin".'}
+                placeholder={t.upload?.placeholderCustomPrompt || 'E.g: "Model slightly looking right", "Soft city lights in background" or "Place the accessory naturally in model\'s hand".'}
                 className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-y min-h-[120px] text-sm"
               />
               <div className="absolute bottom-2 right-2 text-slate-600 pointer-events-none">
@@ -661,7 +661,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                 }`}
             >
               <ImageIcon className="w-3 h-3" />
-              Sadece Fotoğraf
+              {t.upload?.photoOnly || 'Photo Only'}
             </button>
             <button
               type="button"
@@ -672,7 +672,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
                 }`}
             >
               <Video className="w-3 h-3" />
-              Fotoğraf + Video
+              {t.upload?.photoAndVideo || 'Photo + Video'}
             </button>
           </div>
         </div>
@@ -680,7 +680,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
         {/* Video Quality */}
         <div className={`transition-all duration-300 ${!formData.includeVideo ? 'opacity-40 pointer-events-none grayscale' : 'opacity-100'}`}>
           <label className="block text-sm font-medium text-slate-300 mb-2">
-            <span className="flex items-center gap-2"><Video className="w-4 h-4" /> Video Kalitesi</span>
+            <span className="flex items-center gap-2"><Video className="w-4 h-4" /> {t.upload?.videoQuality || 'Video Quality'}</span>
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {videoOptions.map((option) => (
@@ -711,7 +711,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">
             <span className="flex items-center gap-2"><Palette className="w-4 h-4" />
-              {formData.mode === 'ecommerce' ? t.labels.style : 'Reklam Stili'}
+              {formData.mode === 'ecommerce' ? t.labels.style : (t.upload?.adStyle || 'Ad Style')}
             </span>
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -748,7 +748,7 @@ const UploadForm: React.FC<Props> = ({ formData, setFormData, onSubmit, isSubmit
               {t.messages.processing}
             </span>
           ) : (
-            formData.mode === 'ecommerce' ? t.buttons.start : 'Kampanyayı Başlat'
+            formData.mode === 'ecommerce' ? t.buttons.start : (t.gallery?.startCampaign || 'Start Campaign')
           )}
         </button>
       </div>

@@ -1,5 +1,54 @@
 import React, { useState } from 'react';
 import { XCircleIcon } from './icons/XCircleIcon';
+import { useTranslation } from '../lib/i18n/context';
+import type { TranslationRecord } from '../lib/i18n/types';
+
+const trAuth = {
+  signIn: 'Giriş Yap',
+  signUp: 'Hesap Oluştur',
+  forgotPassword: 'Şifremi Unuttum',
+  signInSuccess: 'Giriş başarılı! Yönlendiriliyorsunuz...',
+  signUpSuccess: 'Hesap oluşturuldu! Lütfen e-postanızı kontrol edip doğrulama linkine tıklayın.',
+  resetSuccess: 'Sıfırlama bağlantısı e-posta adresinize gönderildi.',
+  googleContinue: 'Google ile Devam Et',
+  or: 'veya',
+  fullName: 'Ad Soyad',
+  email: 'E-posta',
+  password: 'Şifre',
+  forgotPasswordLink: 'Şifremi unuttum?',
+  success: 'Başarılı!',
+  processing: 'İşleniyor...',
+  sendResetLink: 'Sıfırlama Linki Gönder',
+  noAccount: 'Hesabınız yok mu? Kayıt olun',
+  hasAccount: 'Zaten hesabınız var mı? Giriş yapın',
+  backToLogin: 'Giriş ekranına dön',
+  defaultError: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+};
+
+const authTranslations: TranslationRecord<typeof trAuth> = {
+  tr: trAuth,
+  en: {
+    signIn: 'Sign In',
+    signUp: 'Create Account',
+    forgotPassword: 'Forgot Password',
+    signInSuccess: 'Login successful! Redirecting...',
+    signUpSuccess: 'Account created! Please check your email and click the verification link.',
+    resetSuccess: 'Reset link has been sent to your email address.',
+    googleContinue: 'Continue with Google',
+    or: 'or',
+    fullName: 'Full Name',
+    email: 'Email',
+    password: 'Password',
+    forgotPasswordLink: 'Forgot password?',
+    success: 'Success!',
+    processing: 'Processing...',
+    sendResetLink: 'Send Reset Link',
+    noAccount: "Don't have an account? Sign up",
+    hasAccount: 'Already have an account? Sign in',
+    backToLogin: 'Back to login',
+    defaultError: 'An error occurred. Please try again.',
+  },
+};
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -14,11 +63,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   onGoogleSignIn,
-  onAppleSignIn,
   onEmailSignIn,
   onEmailSignUp,
   onForgotPassword,
 }) => {
+  const t = useTranslation(authTranslations);
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot-password'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,13 +93,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         await onForgotPassword(email);
       }
 
-      // Başarılı! Kısa bir başarı mesajı göster
       setSuccess(true);
 
-      // 1 saniye sonra modal'ı kapat
       setTimeout(() => {
         onClose();
-        // Modal kapandığında state'i sıfırla
         setTimeout(() => {
           setSuccess(false);
           setEmail('');
@@ -59,8 +105,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         }, 300);
       }, 5000);
     } catch (err: any) {
-      // Hata mesajını göster (zaten Türkçeleştirilmiş olarak gelecek)
-      setError(err.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+      setError(err.message || t.defaultError);
       setLoading(false);
     }
   };
@@ -76,7 +121,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </button>
 
         <h2 className="text-2xl font-bold text-white mb-6">
-          {mode === 'signin' ? 'Giriş Yap' : mode === 'signup' ? 'Hesap Oluştur' : 'Şifremi Unuttum'}
+          {mode === 'signin' ? t.signIn : mode === 'signup' ? t.signUp : t.forgotPassword}
         </h2>
 
         {error && (
@@ -94,10 +139,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
             {mode === 'signin'
-              ? 'Giriş başarılı! Yönlendiriliyorsunuz...'
+              ? t.signInSuccess
               : mode === 'signup'
-                ? 'Hesap oluşturuldu! Lütfen e-postanızı kontrol edip doğrulama linkine tıklayın.'
-                : 'Sıfırlama bağlantısı e-posta adresinize gönderildi.'}
+                ? t.signUpSuccess
+                : t.resetSuccess}
           </div>
         )}
 
@@ -115,7 +160,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
-                Google ile Devam Et
+                {t.googleContinue}
               </button>
             </div>
 
@@ -124,7 +169,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <div className="w-full border-t border-slate-700"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-slate-900 text-slate-400">veya</span>
+                <span className="px-4 bg-slate-900 text-slate-400">{t.or}</span>
               </div>
             </div>
           </>
@@ -135,7 +180,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {mode === 'signup' && (
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Ad Soyad
+                {t.fullName}
               </label>
               <input
                 type="text"
@@ -149,7 +194,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
-              E-posta
+              {t.email}
             </label>
             <input
               type="email"
@@ -164,7 +209,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="block text-sm font-medium text-slate-300">
-                  Şifre
+                  {t.password}
                 </label>
                 {mode === 'signin' && (
                   <button
@@ -176,7 +221,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     }}
                     className="text-xs text-cyan-400 hover:text-cyan-300 transition"
                   >
-                    Şifremi unuttum?
+                    {t.forgotPasswordLink}
                   </button>
                 )}
               </div>
@@ -204,16 +249,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Başarılı!
+                {t.success}
               </span>
             ) : loading ? (
-              'İşleniyor...'
+              t.processing
             ) : mode === 'signin' ? (
-              'Giriş Yap'
+              t.signIn
             ) : mode === 'signup' ? (
-              'Hesap Oluştur'
+              t.signUp
             ) : (
-              'Sıfırlama Linki Gönder'
+              t.sendResetLink
             )}
           </button>
         </form>
@@ -232,10 +277,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             className="text-sm text-slate-400 hover:text-cyan-400 transition"
           >
             {mode === 'signin'
-              ? 'Hesabınız yok mu? Kayıt olun'
+              ? t.noAccount
               : mode === 'signup'
-                ? 'Zaten hesabınız var mı? Giriş yapın'
-                : 'Giriş ekranına dön'}
+                ? t.hasAccount
+                : t.backToLogin}
           </button>
         </div>
       </div>
