@@ -623,6 +623,7 @@ export const generateAdImage = async (
         safetySettings: PERMISSIVE_SAFETY_SETTINGS,
         seed: effectiveSeed,
         imageConfig: {
+          imageSize: '2K',
           aspectRatio: aspectRatio,
         }
       }

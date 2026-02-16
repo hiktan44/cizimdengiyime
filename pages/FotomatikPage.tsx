@@ -267,7 +267,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
   const [selectedImage, setSelectedImage] = useState<FotomatikImageFile | null>(null);
   const [prompt, setPrompt] = useState<string>('');
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
-  const [imageSize, setImageSize] = useState<string>('1K');
+  const [imageSize, setImageSize] = useState<string>('2K');
 
   const [status, setStatus] = useState<FotomatikAppStatus>(FotomatikAppStatus.IDLE);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
@@ -296,7 +296,7 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
     { label: t.aspectRatios.horizontal, value: '4:3' },
   ];
 
-  const imageSizes = ['1K', '2K', '4K'];
+  const imageSizes = ['2K', '4K'];
 
   // Check credits before operation
   const checkCredits = async (operationType: 'fotomatik_transform' | 'fotomatik_describe'): Promise<boolean> => {
