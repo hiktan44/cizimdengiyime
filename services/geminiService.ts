@@ -396,7 +396,7 @@ export const generateVideoFromImage = async (
                 numberOfVideos: 1,
                 resolution: settings.resolution,
                 aspectRatio: settings.aspectRatio,
-                generateAudio: false,
+
             }
         });
     } catch (e: any) {

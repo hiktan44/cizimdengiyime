@@ -750,7 +750,7 @@ export const generateAdVideo = async (
         numberOfVideos: 1,
         resolution: '720p',
         aspectRatio: aspectRatio as any,
-        generateAudio: false,
+
       }
     });
   } catch (e: any) {
