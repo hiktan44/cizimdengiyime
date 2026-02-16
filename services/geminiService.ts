@@ -191,7 +191,7 @@ BAŞKA RENK KULLANMA.` : '';
     const colorClosing = color && colorHex ?
         `\n\n*** FİNAL RENK KONTROLU ***\nTEKRAR EDİYORUM: Ürün rengi ${color} (${colorHex}) olmalidir. Yeşil, mavi, kırmızı gibi BAŞKA RENKLER KULLANILAMAZ. Sadece ve sadece ${colorHex} kullan.` : '';
 
-    const prompt = `Bu moda çizimini (sketches/flat drawing) analiz et ve onu ultra-gerçekçi, yüksek çözünürlüklü bir hayalet manken (ghost mannequin) ürün fotoğrafına dönüştür.${colorInstruction}
+    const prompt = `Bu moda çizimini (sketches/flat drawing) analiz et ve onu ultra-gerçekçi, 2K çözünürlüklü (2048x2048 piksel) bir hayalet manken (ghost mannequin) ürün fotoğrafına dönüştür.${colorInstruction}
     
     *** 1. RENK KONTROLU - EN YÜKSEK ÖNCELİK (Bu kurala tam uyum ZORUNLUDUR) ***
     ${color && colorHex ? `
@@ -218,7 +218,7 @@ BAŞKA RENK KULLANMA.` : '';
     5. Ghost Mannequin Etkisi: Ürün dolgun ve 3 boyutlu görünmeli, ancak içinde görünmez bir manken varmış gibi durmalı. Boyun içi kısmı gerçekçi bir şekilde (arka etiket vb.) gösterilmeli.
     6. Arka Plan: Saf beyaz (#FFFFFF) veya çok açık nötr gri (#F5F5F5).
     
-    Sonuç, Vogue veya Harper's Bazaar gibi dergilerde veya Lüks E-Ticaret (Farfetch, Net-a-Porter) sitelerinde kullanılacak kalitede, 8K, RAW PHOTO, HİPER-GERÇEKÇİ bir ürün fotoğrafı olmalıdır.` + colorClosing;
+    Sonuç, Vogue veya Harper's Bazaar gibi dergilerde veya Lüks E-Ticaret (Farfetch, Net-a-Porter) sitelerinde kullanılacak kalitede, 2K çözünürlük (en az 2048px), RAW PHOTO, HİPER-GERÇEKÇİ bir ürün fotoğrafı olmalıdır.` + colorClosing;
 
     try {
         return await withRetry(async (model) => {
@@ -232,6 +232,9 @@ BAŞKA RENK KULLANMA.` : '';
                 },
                 config: {
                     responseModalities: [Modality.IMAGE],
+                    imageConfig: {
+                        imageSize: '2K',
+                    },
                 },
             });
 
@@ -266,7 +269,7 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
     2. Detay: Dikiş yerleri (topstitching), fermuarlar, cepler, ribana detayları, düğmeler net bir şekilde çizilmeli.
     3. Perspektif: Ürün tamamen önden, düz (flat) ve simetrik bir şekilde çizilmeli.
     4. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
-    5. Kalite: 4K çözünürlükte, vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
+     5. Kalite: 2K çözünürlükte (en az 2048px), vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
     6. Renklendirme: Kumaş renkleri, detay renkleri (düğme, fermuar vb.) fotoğraftaki ile birebir aynı olmalı. Gölge ve ışık oyunlarıyla derinlik katılmalı.
     7. Doku: Kumaşın dokusu (Texture) çizimde hissedilmeli.`
         : `Bu ürün fotoğrafını analiz et ve moda tasarımı üretimi için profesyonel bir 'Teknik Çizim' (Technical Flat Sketch / CAD) oluştur.
@@ -276,7 +279,7 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
     2. Detay: Dikiş yerleri (topstitching), fermuarlar, cepler, ribana detayları, düğmeler net bir şekilde çizilmeli.
     3. Perspektif: Ürün tamamen önden, düz (flat) ve simetrik bir şekilde çizilmeli.
     4. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
-    5. Kalite: Vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.`;
+     5. Kalite: 2K çözünürlükte (en az 2048px), vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.`;
 
     try {
         const response = await ai.models.generateContent({
@@ -289,6 +292,9 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
             },
             config: {
                 responseModalities: [Modality.IMAGE],
+                imageConfig: {
+                    imageSize: '2K',
+                },
             },
         });
 
@@ -668,7 +674,7 @@ export const generateImage = async (
     Adım 4: Analiz ettiğin kıyafeti bu sabit insana giydir.
     `;
 
-    let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 8k kalitesinde, 'Award Winning' bir moda fotoğrafı oluştur.
+    let prompt = colorOpening + kombinInstruction + `Yüksek çözünürlüklü, 2K kalitesinde (en az 2048px), 'Award Winning' bir moda fotoğrafı oluştur.
     
     ${identityInstruction}
     
@@ -854,6 +860,7 @@ export const generateImage = async (
                 responseModalities: [Modality.IMAGE],
                 ...(effectiveSeed ? { seed: effectiveSeed } : {}), // Use effectiveSeed (from reference image or user input)
                 imageConfig: {
+                    imageSize: '2K',
                     aspectRatio: aspectRatio === '16:9' ? '16:9' :
                         aspectRatio === '9:16' ? '9:16' :
                             aspectRatio === '1:1' ? '1:1' :
@@ -1367,6 +1374,9 @@ Kurallar:
             config: {
                 responseModalities: [Modality.IMAGE],
                 temperature: 0.4,
+                imageConfig: {
+                    imageSize: '2K',
+                },
             }
         });
 
@@ -1401,6 +1411,9 @@ Kurallar:
             config: {
                 responseModalities: [Modality.IMAGE],
                 temperature: 0.4,
+                imageConfig: {
+                    imageSize: '2K',
+                },
             }
         });
 
