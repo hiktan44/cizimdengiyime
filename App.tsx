@@ -64,6 +64,9 @@ import { RefundPolicyPage } from './pages/RefundPolicyPage';
 import { AIUsageNoticePage } from './pages/AIUsageNoticePage';
 import { useTranslation } from './lib/i18n';
 import { appTranslations } from './lib/i18n/appTranslations';
+import AffiliateProgramPage from './pages/AffiliateProgramPage';
+import AffiliatePortal from './components/affiliate/AffiliatePortal';
+import { trackReferralClick } from './lib/affiliateService';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -72,6 +75,7 @@ interface PageHeaderProps {
     onLoginClick: () => void;
     onLogoutClick: () => void;
     onAdminClick?: () => void;
+    onAffiliateClick?: () => void;
     onBuyCreditsClick?: () => void;
 }
 
@@ -88,6 +92,7 @@ const ToolPage: React.FC<{
     onLogoutClick,
     userRole,
     onAdminClick,
+    onAffiliateClick,
     onBuyCreditsClick,
     profile,
     onRefreshProfile,
@@ -779,6 +784,7 @@ const ToolPage: React.FC<{
                     onLogoutClick={onLogoutClick}
                     onHomeClick={onNavigateHome}
                     onAdminClick={onAdminClick}
+                    onAffiliateClick={onAffiliateClick}
                     onBuyCreditsClick={onBuyCreditsClick}
                     onHistoryClick={() => setIsHistoryPanelOpen(true)}
                     credits={profile.credits}
@@ -1790,7 +1796,7 @@ const ToolPage: React.FC<{
 const App: React.FC = () => {
     const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, sendPasswordResetEmail, updatePassword, signOut, refreshProfile, retryAuth } = useAuth();
     const t = useTranslation(appTranslations);
-    const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin' | 'privacy-policy' | 'kvkk' | 'terms-of-service' | 'cookie-policy' | 'refund-policy' | 'ai-usage-notice'>('landing');
+    const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin' | 'privacy-policy' | 'kvkk' | 'terms-of-service' | 'cookie-policy' | 'refund-policy' | 'ai-usage-notice' | 'affiliate-portal' | 'affiliate-info'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -1809,6 +1815,20 @@ const App: React.FC = () => {
             }
         }
     }, [user, profile, currentPage, showAuthModal]);
+
+    // Referral link yakalama: ?ref=XXXX parametresini URL'den al
+    React.useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode) {
+            localStorage.setItem('fasheone_ref_code', refCode);
+            localStorage.setItem('fasheone_ref_time', new Date().toISOString());
+            trackReferralClick(refCode).catch(() => { });
+            // URL'den ref parametresini temizle
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, '', cleanUrl);
+        }
+    }, []);
 
     // Admin check - use is_admin field from profile
     const isAdmin = profile?.is_admin === true;
@@ -2243,6 +2263,7 @@ const App: React.FC = () => {
                         setCurrentPage('landing');
                     }}
                     onAdminClick={isAdmin ? () => setCurrentPage('admin') : undefined}
+                    onAffiliateClick={user ? () => setCurrentPage('affiliate-portal') : undefined}
                     onBuyCreditsClick={user ? () => setShowBuyCreditsModal(true) : undefined}
                     sketchUrl={sketchUrl}
                     productUrl={productUrl}
@@ -2270,6 +2291,7 @@ const App: React.FC = () => {
                         setCurrentPage('landing');
                     }}
                     onAdminClick={isAdmin ? () => setCurrentPage('admin') : undefined}
+                    onAffiliateClick={() => setCurrentPage('affiliate-portal')}
                     onBuyCreditsClick={() => setShowBuyCreditsModal(true)}
                     profile={profile}
                     onRefreshProfile={refreshProfile}
@@ -2348,6 +2370,28 @@ const App: React.FC = () => {
             )}
             {currentPage === 'ai-usage-notice' && (
                 <AIUsageNoticePage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                />
+            )}
+
+            {/* Affiliate Pages */}
+            {currentPage === 'affiliate-info' && (
+                <AffiliateProgramPage
+                    language={(localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'}
+                    onApply={() => {
+                        if (user) {
+                            setCurrentPage('affiliate-portal');
+                        } else {
+                            setShowAuthModal(true);
+                        }
+                    }}
+                    onNavigateHome={() => setCurrentPage('landing')}
+                />
+            )}
+            {currentPage === 'affiliate-portal' && user && profile && (
+                <AffiliatePortal
+                    profile={profile}
+                    language={(localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'}
                     onNavigateHome={() => setCurrentPage('landing')}
                 />
             )}

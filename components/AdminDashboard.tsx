@@ -4,12 +4,13 @@ import { UploadIconSmall } from './icons/UploadIconSmall';
 import { SettingsPanel } from './admin/SettingsPanel';
 import { UserActivityPanel } from './admin/UserActivityPanel';
 import { TransactionsPanel } from './admin/TransactionsPanel';
+import AffiliateManagement from './admin/AffiliateManagement';
 import { useTranslation, TranslationRecord } from '../lib/i18n';
 
 const trAdmin = {
     title: 'Admin Paneli',
     subtitle: 'Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.',
-    tabs: { content: '📸 İçerik Yönetimi', settings: '⚙️ Ayarlar', users: '👥 Kullanıcı Aktivitesi', transactions: '💳 Ödemeler', adgenius: '🚀 AdGenius Yönetimi' },
+    tabs: { content: '📸 İçerik Yönetimi', settings: '⚙️ Ayarlar', users: '👥 Kullanıcı Aktivitesi', transactions: '💳 Ödemeler', adgenius: '🚀 AdGenius Yönetimi', affiliates: '🤝 Ortaklık Yönetimi' },
     heroVideos: { title: '🎬 Hero Gömülü Videolar (4 Adet)', subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.' },
     showcase: { title: '📸 Showcase Görselleri', subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.', sketch: '1. Çizim (Sketch)', product: '2. Ürün (Product)', model: '3. Model (Live)', video: '4. Video' },
     adgenius: { title: '🚀 AdGenius Yönetimi', subtitle: 'AdGenius bölümü için ana görsel ve kolaj görselini buradan yönetebilirsiniz.', mainImage: 'Ana Görsel (Büyük Model Çekimi)', collageImage: 'Kolaj Görsel (9\'lu Grid/Varyasyon)', mainTitle: 'AdGenius Ana Görsel', collageTitle: 'AdGenius Kolaj/Grid' },
@@ -21,7 +22,7 @@ const adminTranslations: TranslationRecord<typeof trAdmin> = {
     en: {
         title: 'Admin Panel',
         subtitle: 'Access all system management functions from here.',
-        tabs: { content: '📸 Content Management', settings: '⚙️ Settings', users: '👥 User Activity', transactions: '💳 Payments', adgenius: '🚀 AdGenius Management' },
+        tabs: { content: '📸 Content Management', settings: '⚙️ Settings', users: '👥 User Activity', transactions: '💳 Payments', adgenius: '🚀 AdGenius Management', affiliates: '🤝 Affiliate Management' },
         heroVideos: { title: '🎬 Hero Background Videos (4)', subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.' },
         showcase: { title: '📸 Showcase Images', subtitle: 'Upload images for sketch-to-reality transformation examples.', sketch: '1. Sketch', product: '2. Product', model: '3. Model (Live)', video: '4. Video' },
         adgenius: { title: '🚀 AdGenius Management', subtitle: 'Manage the main image and collage image for the AdGenius section candidate from here.', mainImage: 'Main Image (Large Model Shoot)', collageImage: 'Collage Image (9-Grid/Variation)', mainTitle: 'AdGenius Main Image', collageTitle: 'AdGenius Collage/Grid' },
@@ -132,7 +133,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
         ...headerProps
     } = props;
 
-    const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions' | 'adgenius'>('content');
+    const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions' | 'adgenius' | 'affiliates'>('content');
     const t = useTranslation(adminTranslations);
 
 
@@ -143,6 +144,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
         { id: 'settings' as const, label: t.tabs.settings, icon: '⚙️' },
         { id: 'users' as const, label: t.tabs.users, icon: '👥' },
         { id: 'transactions' as const, label: t.tabs.transactions, icon: '💳' },
+        { id: 'affiliates' as const, label: t.tabs.affiliates, icon: '🤝' },
     ];
 
     return (
@@ -318,6 +320,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                     {activeTab === 'settings' && <SettingsPanel />}
                     {activeTab === 'users' && <UserActivityPanel currentUserId={props.currentUserId} onRefreshProfile={props.onRefreshProfile} />}
                     {activeTab === 'transactions' && <TransactionsPanel />}
+                    {activeTab === 'affiliates' && <AffiliateManagement language={(localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'} />}
                 </div>
             </main>
         </div>

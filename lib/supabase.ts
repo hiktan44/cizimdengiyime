@@ -32,6 +32,7 @@ export interface Profile {
   subscription_tier: 'free' | 'starter' | 'pro' | 'premium';
   credits: number;
   is_admin: boolean;
+  is_affiliate: boolean;
   subscription_start: string | null;
   subscription_end: string | null;
   created_at: string;

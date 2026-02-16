@@ -15,6 +15,7 @@ const trHeader = {
     signOut: 'Çıkış Yap',
     menu: 'Menü',
     adminPanel: 'Admin Panel',
+    affiliateProgram: 'Affiliate Programı',
 };
 
 const headerTranslations: TranslationRecord<typeof trHeader> = {
@@ -29,6 +30,7 @@ const headerTranslations: TranslationRecord<typeof trHeader> = {
         signOut: 'Sign Out',
         menu: 'Menu',
         adminPanel: 'Admin Panel',
+        affiliateProgram: 'Affiliate Program',
     },
 };
 
@@ -42,6 +44,7 @@ interface HeaderProps {
     onLoginClick: () => void;
     onLogoutClick: () => void;
     onAdminClick?: () => void;
+    onAffiliateClick?: () => void;
     onBuyCreditsClick?: () => void;
     onHistoryClick?: () => void;
     credits?: number;
@@ -57,6 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
     onLoginClick,
     onLogoutClick,
     onAdminClick,
+    onAffiliateClick,
     onBuyCreditsClick,
     onHistoryClick,
     credits,
@@ -155,6 +159,16 @@ export const Header: React.FC<HeaderProps> = ({
                                 </button>
                             )}
                         </>
+                    )}
+
+                    {/* Affiliate Program Button */}
+                    {isLoggedIn && onAffiliateClick && (
+                        <button
+                            onClick={onAffiliateClick}
+                            className="text-sm font-medium px-3 py-1.5 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/50 hover:bg-emerald-500/20 transition-all"
+                        >
+                            🤝 {ht.affiliateProgram}
+                        </button>
                     )}
 
                     {/* Admin Panel Button - Only shown if user is admin */}
@@ -286,6 +300,19 @@ export const Header: React.FC<HeaderProps> = ({
                                             </svg>
                                         </div>
                                         <span className="text-sm font-medium text-white">{ht.pastWorks}</span>
+                                    </button>
+                                )}
+
+                                {/* Affiliate Program */}
+                                {onAffiliateClick && (
+                                    <button
+                                        onClick={() => handleMenuItemClick(onAffiliateClick)}
+                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                    >
+                                        <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                                            <span className="text-base">🤝</span>
+                                        </div>
+                                        <span className="text-sm font-medium text-white">{ht.affiliateProgram}</span>
                                     </button>
                                 )}
 

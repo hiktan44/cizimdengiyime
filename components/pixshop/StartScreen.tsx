@@ -4,28 +4,46 @@
 
 import React, { useState } from 'react';
 import { UploadIcon, MagicWandIcon, PaletteIcon, SunIcon } from './icons';
+import { useI18n, useTranslation, TranslationRecord } from '../../lib/i18n';
 
-interface StartScreenTranslations {
-  heroTitle?: string;
-  heroHighlight?: string;
-  heroDescription?: string;
-  uploadBtn?: string;
-  dragDrop?: string;
-  featureRetouch?: string;
-  featureRetouchDesc?: string;
-  featureFilters?: string;
-  featureFiltersDesc?: string;
-  featureAdjust?: string;
-  featureAdjustDesc?: string;
-}
+const trStartScreen = {
+  heroTitle: 'AI Fotoğraf Düzenleme',
+  heroHighlight: 'Artık Çok Kolay',
+  heroDescription: 'Fotoğraflarınızı metin komutlarıyla rötuşlayın, yaratıcı filtreler ekleyin ve profesyonel ayarlamalar yapın. Karmaşık araçlara elveda deyin.',
+  uploadBtn: 'Fotoğraf Yükle',
+  dragDrop: 'veya sürükleyip bırakın',
+  featureRetouch: 'Hassas Rötuş',
+  featureRetouchDesc: 'Resminizde herhangi bir noktaya tıklayarak lekeleri giderin, renkleri değiştirin veya yeni nesneler ekleyin.',
+  featureFilters: 'Yaratıcı Filtreler',
+  featureFiltersDesc: 'Fotoğraflarınıza sanatsal bir dokunuş katın. Vintage\'den fütüristik tarzlara kadar kendi filtrenizi oluşturun veya hazır şablonları kullanın.',
+  featureAdjust: 'Profesyonel Ayarlar',
+  featureAdjustDesc: 'Aydınlatmayı ayarlayın, arka planı bulanıklaştırın ve fotoğrafınızın atmosferini değiştirin. Stüdyo kalitesinde sonuçlar parmaklarınızın ucunda.',
+};
+
+const startScreenTranslations: TranslationRecord<typeof trStartScreen> = {
+  tr: trStartScreen,
+  en: {
+    heroTitle: 'AI Photo Editing',
+    heroHighlight: 'Made Easy',
+    heroDescription: 'Retouch your photos with text commands, add creative filters and make professional adjustments. Say goodbye to complex tools.',
+    uploadBtn: 'Upload Photo',
+    dragDrop: 'or drag and drop',
+    featureRetouch: 'Precision Retouch',
+    featureRetouchDesc: 'Click on any point in your image to remove blemishes, change colors, or add new objects.',
+    featureFilters: 'Creative Filters',
+    featureFiltersDesc: 'Add an artistic touch to your photos. From vintage to futuristic styles, create your own filter or use presets.',
+    featureAdjust: 'Professional Adjustments',
+    featureAdjustDesc: 'Adjust lighting, blur backgrounds and change the atmosphere of your photo. Studio-quality results at your fingertips.',
+  },
+};
 
 interface StartScreenProps {
   onFileSelect: (files: FileList | null) => void;
-  t?: StartScreenTranslations;
 }
 
-const StartScreen: React.FC<StartScreenProps> = ({ onFileSelect, t = {} }) => {
+const StartScreen: React.FC<StartScreenProps> = ({ onFileSelect }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const t = useTranslation(startScreenTranslations);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFileSelect(e.target.files);
@@ -44,19 +62,19 @@ const StartScreen: React.FC<StartScreenProps> = ({ onFileSelect, t = {} }) => {
     >
       <div className="flex flex-col items-center gap-6 animate-fade-in">
         <h1 className="text-4xl font-extrabold tracking-tight text-gray-100 sm:text-5xl md:text-6xl">
-          {t.heroTitle || 'AI Photo Editing'} <span className="text-blue-400">{t.heroHighlight || 'Made Easy'}</span>.
+          {t.heroTitle} <span className="text-blue-400">{t.heroHighlight}</span>.
         </h1>
         <p className="max-w-2xl text-lg text-gray-400 md:text-xl">
-          {t.heroDescription || 'Retouch your photos with text commands, add creative filters and make professional adjustments. Say goodbye to complex tools.'}
+          {t.heroDescription}
         </p>
 
         <div className="mt-6 flex flex-col items-center gap-4">
           <label htmlFor="pixshop-image-upload-start" className="relative inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-blue-600 rounded-full cursor-pointer group hover:bg-blue-500 transition-colors">
             <UploadIcon className="w-6 h-6 mr-3 transition-transform duration-500 ease-in-out group-hover:rotate-[360deg] group-hover:scale-110" />
-            {t.uploadBtn || 'Upload Photo'}
+            {t.uploadBtn}
           </label>
           <input id="pixshop-image-upload-start" type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
-          <p className="text-sm text-gray-500">{t.dragDrop || 'or drag and drop'}</p>
+          <p className="text-sm text-gray-500">{t.dragDrop}</p>
         </div>
 
         <div className="mt-16 w-full">
@@ -65,22 +83,22 @@ const StartScreen: React.FC<StartScreenProps> = ({ onFileSelect, t = {} }) => {
               <div className="flex items-center justify-center w-12 h-12 bg-gray-700 rounded-full mb-4">
                 <MagicWandIcon className="w-6 h-6 text-blue-400" />
               </div>
-              <h3 className="text-xl font-bold text-gray-100">{t.featureRetouch || 'Precision Retouch'}</h3>
-              <p className="mt-2 text-gray-400">{t.featureRetouchDesc || 'Click on any point in your image to remove blemishes, change colors, or add new objects.'}</p>
+              <h3 className="text-xl font-bold text-gray-100">{t.featureRetouch}</h3>
+              <p className="mt-2 text-gray-400">{t.featureRetouchDesc}</p>
             </div>
             <div className="bg-black/20 p-6 rounded-lg border border-gray-700/50 flex flex-col items-center text-center">
               <div className="flex items-center justify-center w-12 h-12 bg-gray-700 rounded-full mb-4">
                 <PaletteIcon className="w-6 h-6 text-blue-400" />
               </div>
-              <h3 className="text-xl font-bold text-gray-100">{t.featureFilters || 'Creative Filters'}</h3>
-              <p className="mt-2 text-gray-400">{t.featureFiltersDesc || 'Add an artistic touch to your photos. From vintage to futuristic styles, create your own filter or use presets.'}</p>
+              <h3 className="text-xl font-bold text-gray-100">{t.featureFilters}</h3>
+              <p className="mt-2 text-gray-400">{t.featureFiltersDesc}</p>
             </div>
             <div className="bg-black/20 p-6 rounded-lg border border-gray-700/50 flex flex-col items-center text-center">
               <div className="flex items-center justify-center w-12 h-12 bg-gray-700 rounded-full mb-4">
                 <SunIcon className="w-6 h-6 text-blue-400" />
               </div>
-              <h3 className="text-xl font-bold text-gray-100">{t.featureAdjust || 'Professional Adjustments'}</h3>
-              <p className="mt-2 text-gray-400">{t.featureAdjustDesc || 'Adjust lighting, blur backgrounds and change the atmosphere of your photo. Studio-quality results at your fingertips.'}</p>
+              <h3 className="text-xl font-bold text-gray-100">{t.featureAdjust}</h3>
+              <p className="mt-2 text-gray-400">{t.featureAdjustDesc}</p>
             </div>
           </div>
         </div>

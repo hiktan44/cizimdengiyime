@@ -17,6 +17,7 @@ interface LandingPageProps {
   credits?: number;
   onLogout?: () => void;
   onAdminClick?: () => void;
+  onAffiliateClick?: () => void;
   onBuyCreditsClick?: () => void;
   sketchUrl?: string;
   productUrl?: string;
@@ -425,6 +426,7 @@ const trLanding = {
     pricing: 'Fiyatlandırma',
     examples: 'Örnekler',
     faq: 'Sıkça Sorulan Sorular',
+    affiliateProgram: '🤝 Affiliate Programı',
     legal: 'Hukuki',
     privacyPolicy: 'Gizlilik Politikası',
     kvkk: 'KVKK Aydınlatma Metni',
@@ -833,6 +835,7 @@ const landingTranslations: TranslationRecord<typeof trLanding> = {
       pricing: 'Pricing',
       examples: 'Examples',
       faq: 'FAQ',
+      affiliateProgram: '🤝 Affiliate Program',
       legal: 'Legal',
       privacyPolicy: 'Privacy Policy',
       kvkk: 'KVKK Disclosure',
@@ -859,6 +862,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     credits,
     onLogout,
     onAdminClick,
+    onAffiliateClick,
     onBuyCreditsClick,
     sketchUrl,
     productUrl,
@@ -1092,6 +1096,16 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               </>
             )}
 
+            {/* Affiliate Portal Button */}
+            {isLoggedIn && onAffiliateClick && (
+              <button
+                onClick={onAffiliateClick}
+                className="text-xs md:text-sm font-medium px-3 py-1.5 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/50 hover:bg-emerald-500/20 transition-all"
+              >
+                🤝 {language === 'tr' ? 'Ortaklık Programı' : 'Affiliate Program'}
+              </button>
+            )}
+
             {/* Admin Panel Button */}
             {userRole === 'admin' && onAdminClick && (
               <button
@@ -1186,6 +1200,12 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 {theme === 'dark' ? '🌙 Dark' : '☀️ Light'}
               </button>
             </div>
+
+            {isLoggedIn && onAffiliateClick && (
+              <button onClick={onAffiliateClick} className="w-full py-3 bg-emerald-900/30 text-emerald-300 rounded-lg border border-emerald-500/20 text-center text-sm">
+                🤝 {language === 'tr' ? 'Ortaklık Programı' : 'Affiliate Program'}
+              </button>
+            )}
 
             {userRole === 'admin' && onAdminClick && (
               <button onClick={onAdminClick} className="w-full py-3 bg-purple-900/30 text-purple-300 rounded-lg border border-purple-500/20 text-center text-sm">
@@ -2796,6 +2816,19 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.faq}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      if (onNavigate) {
+                        onNavigate('affiliate-info');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                  >
+                    {t.footer.affiliateProgram}
                   </button>
                 </li>
               </ul>
