@@ -1375,7 +1375,7 @@ Kurallar:
                 responseModalities: [Modality.IMAGE],
                 temperature: 0.4,
                 imageConfig: {
-                    imageSize: '2K',
+                    imageSize: '1K',
                 },
             }
         });
@@ -1412,7 +1412,7 @@ Kurallar:
                 responseModalities: [Modality.IMAGE],
                 temperature: 0.4,
                 imageConfig: {
-                    imageSize: '2K',
+                    imageSize: '1K',
                 },
             }
         });
