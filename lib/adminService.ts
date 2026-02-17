@@ -627,3 +627,192 @@ export const getAllGenerationsForAdmin = async () => {
   }
 };
 
+// ==========================================
+// CREDIT REPORTS FUNCTIONS (ADMIN DASHBOARD)
+// ==========================================
+
+export interface CreditReportGeneration {
+  id: string;
+  user_id: string;
+  user_email: string;
+  user_name: string | null;
+  type: string;
+  credits_used: number;
+  created_at: string;
+}
+
+export interface TypeDistribution {
+  type: string;
+  total_credits: number;
+  count: number;
+}
+
+export interface DailyTrend {
+  date: string;
+  total_credits: number;
+  count: number;
+}
+
+export interface TopCreditUser {
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  total_credits_used: number;
+  total_generations: number;
+  most_used_type: string;
+}
+
+// Belirli tarih aralığında admin HARİÇ tüm generation'ları getir
+export const getCreditUsageReport = async (
+  startDate: string,
+  endDate: string
+): Promise<CreditReportGeneration[]> => {
+  try {
+    // Admin user ID'lerini al (is_admin boolean alanı ile)
+    const { data: adminProfiles } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('is_admin', true);
+
+    const adminIds = (adminProfiles || []).map((p: any) => p.id);
+
+    // Tüm generation'ları getir (tarih filtreli)
+    let query = supabase
+      .from('generations')
+      .select(`
+        id, user_id, type, credits_used, created_at,
+        profiles:user_id ( email, full_name )
+      `)
+      .gte('created_at', startDate)
+      .lte('created_at', endDate)
+      .order('created_at', { ascending: false });
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    // Admin kullanıcıları filtrele (client-side)
+    const filtered = (data || [])
+      .filter((g: any) => !adminIds.includes(g.user_id))
+      .map((g: any) => ({
+        id: g.id,
+        user_id: g.user_id,
+        user_email: g.profiles?.email || 'Bilinmiyor',
+        user_name: g.profiles?.full_name || null,
+        type: g.type,
+        credits_used: g.credits_used || 0,
+        created_at: g.created_at,
+      }));
+
+    return filtered;
+  } catch (error) {
+    console.error('Error fetching credit usage report:', error);
+    return [];
+  }
+};
+
+// Operasyon tipine göre kredi dağılımı (admin hariç)
+export const getCreditDistributionByType = async (
+  startDate: string,
+  endDate: string
+): Promise<TypeDistribution[]> => {
+  try {
+    const generations = await getCreditUsageReport(startDate, endDate);
+
+    const typeMap = new Map<string, { total_credits: number; count: number }>();
+    for (const gen of generations) {
+      const existing = typeMap.get(gen.type) || { total_credits: 0, count: 0 };
+      existing.total_credits += gen.credits_used;
+      existing.count += 1;
+      typeMap.set(gen.type, existing);
+    }
+
+    return Array.from(typeMap.entries())
+      .map(([type, data]) => ({ type, ...data }))
+      .sort((a, b) => b.total_credits - a.total_credits);
+  } catch (error) {
+    console.error('Error fetching credit distribution:', error);
+    return [];
+  }
+};
+
+// Günlük kredi kullanım trendi (admin hariç)
+export const getDailyCreditTrend = async (
+  startDate: string,
+  endDate: string
+): Promise<DailyTrend[]> => {
+  try {
+    const generations = await getCreditUsageReport(startDate, endDate);
+
+    const dailyMap = new Map<string, { total_credits: number; count: number }>();
+    for (const gen of generations) {
+      const date = gen.created_at.split('T')[0]; // YYYY-MM-DD
+      const existing = dailyMap.get(date) || { total_credits: 0, count: 0 };
+      existing.total_credits += gen.credits_used;
+      existing.count += 1;
+      dailyMap.set(date, existing);
+    }
+
+    return Array.from(dailyMap.entries())
+      .map(([date, data]) => ({ date, ...data }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  } catch (error) {
+    console.error('Error fetching daily credit trend:', error);
+    return [];
+  }
+};
+
+// En çok kredi kullanan kullanıcılar (admin hariç)
+export const getTopCreditUsers = async (
+  startDate: string,
+  endDate: string,
+  limit: number = 20
+): Promise<TopCreditUser[]> => {
+  try {
+    const generations = await getCreditUsageReport(startDate, endDate);
+
+    const userMap = new Map<string, {
+      email: string;
+      full_name: string | null;
+      total_credits_used: number;
+      total_generations: number;
+      typeCount: Map<string, number>;
+    }>();
+
+    for (const gen of generations) {
+      const existing = userMap.get(gen.user_id) || {
+        email: gen.user_email,
+        full_name: gen.user_name,
+        total_credits_used: 0,
+        total_generations: 0,
+        typeCount: new Map<string, number>(),
+      };
+      existing.total_credits_used += gen.credits_used;
+      existing.total_generations += 1;
+      existing.typeCount.set(gen.type, (existing.typeCount.get(gen.type) || 0) + 1);
+      userMap.set(gen.user_id, existing);
+    }
+
+    return Array.from(userMap.entries())
+      .map(([user_id, data]) => {
+        // En çok kullanılan tip
+        let mostUsedType = '-';
+        let maxCount = 0;
+        data.typeCount.forEach((count, type) => {
+          if (count > maxCount) { maxCount = count; mostUsedType = type; }
+        });
+        return {
+          user_id,
+          email: data.email,
+          full_name: data.full_name,
+          total_credits_used: data.total_credits_used,
+          total_generations: data.total_generations,
+          most_used_type: mostUsedType,
+        };
+      })
+      .sort((a, b) => b.total_credits_used - a.total_credits_used)
+      .slice(0, limit);
+  } catch (error) {
+    console.error('Error fetching top credit users:', error);
+    return [];
+  }
+};
