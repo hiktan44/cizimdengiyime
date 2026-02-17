@@ -67,6 +67,8 @@ import { appTranslations } from './lib/i18n/appTranslations';
 import AffiliateProgramPage from './pages/AffiliateProgramPage';
 import AffiliatePortal from './components/affiliate/AffiliatePortal';
 import { trackReferralClick } from './lib/affiliateService';
+import { FeaturesPage } from './pages/FeaturesPage';
+import { BlogPage } from './pages/BlogPage';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -1796,7 +1798,7 @@ const ToolPage: React.FC<{
 const App: React.FC = () => {
     const { user, profile, loading, authError, signInWithGoogle, signInWithEmail, signUpWithEmail, sendPasswordResetEmail, updatePassword, signOut, refreshProfile, retryAuth } = useAuth();
     const t = useTranslation(appTranslations);
-    const [currentPage, setCurrentPage] = useState<'landing' | 'tool' | 'dashboard' | 'admin' | 'privacy-policy' | 'kvkk' | 'terms-of-service' | 'cookie-policy' | 'refund-policy' | 'ai-usage-notice' | 'affiliate-portal' | 'affiliate-info'>('landing');
+    const [currentPage, setCurrentPage] = useState<'landing' | 'features' | 'blog' | 'tool' | 'dashboard' | 'admin' | 'privacy-policy' | 'kvkk' | 'terms-of-service' | 'cookie-policy' | 'refund-policy' | 'ai-usage-notice' | 'affiliate-portal' | 'affiliate-info'>('landing');
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showAdminLogin, setShowAdminLogin] = useState(false);
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -1877,6 +1879,14 @@ const App: React.FC = () => {
     const [adGeniusMainUrl, setAdGeniusMainUrl] = useState(() => { const saved = localStorage.getItem('adGeniusMainUrl'); return saved && saved.startsWith('data:') ? saved : ''; });
     const [adGeniusCollageUrl, setAdGeniusCollageUrl] = useState(() => { const saved = localStorage.getItem('adGeniusCollageUrl'); return saved && saved.startsWith('data:') ? saved : ''; });
 
+    // Pixshop & AdGenius Showcase Box States
+    const [pixshopRetushUrl, setPixshopRetushUrl] = useState(() => { const s = localStorage.getItem('pixshopRetushUrl'); return s && s.startsWith('data:') ? s : ''; });
+    const [pixshopProductPlacementUrl, setPixshopProductPlacementUrl] = useState(() => { const s = localStorage.getItem('pixshopProductPlacementUrl'); return s && s.startsWith('data:') ? s : ''; });
+    const [adGeniusModelUrl, setAdGeniusModelUrl] = useState(() => { const s = localStorage.getItem('adGeniusModelUrl'); return s && s.startsWith('data:') ? s : ''; });
+    const [adGeniusCampaignUrl, setAdGeniusCampaignUrl] = useState(() => { const s = localStorage.getItem('adGeniusCampaignUrl'); return s && s.startsWith('data:') ? s : ''; });
+    const [adGeniusVideoUrl, setAdGeniusVideoUrl] = useState(() => { const s = localStorage.getItem('adGeniusVideoUrl'); return s && s.startsWith('data:') ? s : ''; });
+    const [adGeniusProductPlacementUrl, setAdGeniusProductPlacementUrl] = useState(() => { const s = localStorage.getItem('adGeniusProductPlacementUrl'); return s && s.startsWith('data:') ? s : ''; });
+
     // Load content from Supabase on mount
     React.useEffect(() => {
         const loadContentFromSupabase = async () => {
@@ -1926,6 +1936,24 @@ const App: React.FC = () => {
                     } else if (image.type === 'logo_media') {
                         setLogoMediaUrl(image.image_url);
                         localStorage.setItem('logoMediaUrl', image.image_url);
+                    } else if (image.type === 'pixshop_retush') {
+                        setPixshopRetushUrl(image.image_url);
+                        localStorage.setItem('pixshopRetushUrl', image.image_url);
+                    } else if (image.type === 'pixshop_product_placement') {
+                        setPixshopProductPlacementUrl(image.image_url);
+                        localStorage.setItem('pixshopProductPlacementUrl', image.image_url);
+                    } else if (image.type === 'adgenius_model') {
+                        setAdGeniusModelUrl(image.image_url);
+                        localStorage.setItem('adGeniusModelUrl', image.image_url);
+                    } else if (image.type === 'adgenius_campaign') {
+                        setAdGeniusCampaignUrl(image.image_url);
+                        localStorage.setItem('adGeniusCampaignUrl', image.image_url);
+                    } else if (image.type === 'adgenius_video') {
+                        setAdGeniusVideoUrl(image.image_url);
+                        localStorage.setItem('adGeniusVideoUrl', image.image_url);
+                    } else if (image.type === 'adgenius_product_placement') {
+                        setAdGeniusProductPlacementUrl(image.image_url);
+                        localStorage.setItem('adGeniusProductPlacementUrl', image.image_url);
                     }
                 });
                 console.log('✅ Showcase görseller Supabase\'den yüklendi:', showcaseImages.length);
@@ -1937,7 +1965,7 @@ const App: React.FC = () => {
         loadContentFromSupabase();
     }, []);
 
-    const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3' | 'adgenius_main' | 'adgenius_collage' | 'logo_media') => {
+    const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3' | 'adgenius_main' | 'adgenius_collage' | 'logo_media' | 'pixshop_retush' | 'pixshop_product_placement' | 'adgenius_model' | 'adgenius_campaign' | 'adgenius_video' | 'adgenius_product_placement') => {
         try {
             // Convert file to base64 for immediate display
             const reader = new FileReader();
@@ -1978,6 +2006,24 @@ const App: React.FC = () => {
                 } else if (type === 'logo_media') {
                     setLogoMediaUrl(base64String);
                     localStorage.setItem('logoMediaUrl', base64String);
+                } else if (type === 'pixshop_retush') {
+                    setPixshopRetushUrl(base64String);
+                    localStorage.setItem('pixshopRetushUrl', base64String);
+                } else if (type === 'pixshop_product_placement') {
+                    setPixshopProductPlacementUrl(base64String);
+                    localStorage.setItem('pixshopProductPlacementUrl', base64String);
+                } else if (type === 'adgenius_model') {
+                    setAdGeniusModelUrl(base64String);
+                    localStorage.setItem('adGeniusModelUrl', base64String);
+                } else if (type === 'adgenius_campaign') {
+                    setAdGeniusCampaignUrl(base64String);
+                    localStorage.setItem('adGeniusCampaignUrl', base64String);
+                } else if (type === 'adgenius_video') {
+                    setAdGeniusVideoUrl(base64String);
+                    localStorage.setItem('adGeniusVideoUrl', base64String);
+                } else if (type === 'adgenius_product_placement') {
+                    setAdGeniusProductPlacementUrl(base64String);
+                    localStorage.setItem('adGeniusProductPlacementUrl', base64String);
                 }
             };
             reader.readAsDataURL(file);
@@ -2097,6 +2143,36 @@ const App: React.FC = () => {
                     // So key state is already updated visually. We just need to persist to localStorage as fallback.
                     // Note: setLogoMediaUrl(base64String) was already called in reader.onloadend
                     // We just accept the current state as fallback.
+                }
+            } else if (['pixshop_retush', 'pixshop_product_placement', 'adgenius_model', 'adgenius_campaign', 'adgenius_video', 'adgenius_product_placement'].includes(type)) {
+                // Upload Pixshop/AdGenius showcase box images
+                const result = await uploadShowcaseImage(file, type as any, 0);
+
+                if (result.success && result.imageUrl) {
+                    console.log(`✅ ${type} görseli Supabase'e yüklendi:`, result.imageUrl);
+                    alert(`✅ Görsel başarıyla yüklendi!`);
+
+                    const stateSetters: Record<string, (url: string) => void> = {
+                        pixshop_retush: setPixshopRetushUrl,
+                        pixshop_product_placement: setPixshopProductPlacementUrl,
+                        adgenius_model: setAdGeniusModelUrl,
+                        adgenius_campaign: setAdGeniusCampaignUrl,
+                        adgenius_video: setAdGeniusVideoUrl,
+                        adgenius_product_placement: setAdGeniusProductPlacementUrl,
+                    };
+                    const storageKeys: Record<string, string> = {
+                        pixshop_retush: 'pixshopRetushUrl',
+                        pixshop_product_placement: 'pixshopProductPlacementUrl',
+                        adgenius_model: 'adGeniusModelUrl',
+                        adgenius_campaign: 'adGeniusCampaignUrl',
+                        adgenius_video: 'adGeniusVideoUrl',
+                        adgenius_product_placement: 'adGeniusProductPlacementUrl',
+                    };
+
+                    stateSetters[type]?.(result.imageUrl);
+                    localStorage.setItem(storageKeys[type], result.imageUrl);
+                } else {
+                    alert(`❌ Yükleme başarısız: ${result.error || 'Bilinmeyen hata'}`);
                 }
             }
         } catch (error) {
@@ -2278,6 +2354,21 @@ const App: React.FC = () => {
                     logoMediaUrl={logoMediaUrl}
                 />
             )}
+            {currentPage === 'features' && (
+                <FeaturesPage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    onGetStarted={handleGetStarted}
+                    isLoggedIn={!!user}
+                />
+            )}
+            {currentPage === 'blog' && (
+                <BlogPage
+                    onNavigateHome={() => setCurrentPage('landing')}
+                    onNavigateFeatures={() => setCurrentPage('features')}
+                    onGetStarted={handleGetStarted}
+                    isLoggedIn={!!user}
+                />
+            )}
             {currentPage === 'tool' && user && profile && (
                 <ToolPage
                     initialTab={initialToolTab}
@@ -2339,6 +2430,18 @@ const App: React.FC = () => {
                     onRefreshProfile={refreshProfile}
                     logoMediaUrl={logoMediaUrl}
                     onLogoMediaUpload={(f) => handleFileUpload(f, 'logo_media')}
+                    pixshopRetushUrl={pixshopRetushUrl}
+                    onPixshopRetushUpload={(f) => handleFileUpload(f, 'pixshop_retush')}
+                    pixshopProductPlacementUrl={pixshopProductPlacementUrl}
+                    onPixshopProductPlacementUpload={(f) => handleFileUpload(f, 'pixshop_product_placement')}
+                    adGeniusModelUrl={adGeniusModelUrl}
+                    onAdGeniusModelUpload={(f) => handleFileUpload(f, 'adgenius_model')}
+                    adGeniusCampaignUrl={adGeniusCampaignUrl}
+                    onAdGeniusCampaignUpload={(f) => handleFileUpload(f, 'adgenius_campaign')}
+                    adGeniusVideoUrl={adGeniusVideoUrl}
+                    onAdGeniusVideoUpload={(f) => handleFileUpload(f, 'adgenius_video')}
+                    adGeniusProductPlacementUrl={adGeniusProductPlacementUrl}
+                    onAdGeniusProductPlacementUpload={(f) => handleFileUpload(f, 'adgenius_product_placement')}
                 />
             )}
 

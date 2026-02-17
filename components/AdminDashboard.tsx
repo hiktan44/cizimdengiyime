@@ -14,7 +14,8 @@ const trAdmin = {
     tabs: { content: '📸 İçerik Yönetimi', settings: '⚙️ Ayarlar', users: '👥 Kullanıcı Aktivitesi', transactions: '💳 Ödemeler', adgenius: '🚀 AdGenius Yönetimi', affiliates: '🤝 Ortaklık Yönetimi', creditReports: '📊 Kredi Raporları' },
     heroVideos: { title: '🎬 Hero Gömülü Videolar (4 Adet)', subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.' },
     showcase: { title: '📸 Showcase Görselleri', subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.', sketch: '1. Çizim (Sketch)', product: '2. Ürün (Product)', model: '3. Model (Live)', video: '4. Video' },
-    adgenius: { title: '🚀 AdGenius Yönetimi', subtitle: 'AdGenius bölümü için ana görsel ve kolaj görselini buradan yönetebilirsiniz.', mainImage: 'Ana Görsel (Büyük Model Çekimi)', collageImage: 'Kolaj Görsel (9\'lu Grid/Varyasyon)', mainTitle: 'AdGenius Ana Görsel', collageTitle: 'AdGenius Kolaj/Grid' },
+    pixshopBoxes: { title: '🖌️ Pixshop Kutuları', subtitle: 'Landing sayfasındaki Pixshop bölümünün görsellerini yükleyin.', retush: 'Akıllı Rötuş', productPlacement: 'Ürün Ekleme (Product Placement)' },
+    adgenius: { title: '🚀 AdGenius Yönetimi', subtitle: 'AdGenius bölümü için tüm kutu görsellerini buradan yönetebilirsiniz.', mainImage: 'Ana Görsel (Büyük Model Çekimi)', collageImage: 'Kolaj Görsel (9\'lu Grid/Varyasyon)', mainTitle: 'AdGenius Ana Görsel', collageTitle: 'AdGenius Kolaj/Grid', modelShoot: 'Mankenli Çekimler', campaign: 'Kampanya Konseptleri', adVideo: 'Reklam Videoları', productPlacement: 'Ürün Yerleştirme' },
     change: 'Değiştir',
 };
 
@@ -26,7 +27,8 @@ const adminTranslations: TranslationRecord<typeof trAdmin> = {
         tabs: { content: '📸 Content Management', settings: '⚙️ Settings', users: '👥 User Activity', transactions: '💳 Payments', adgenius: '🚀 AdGenius Management', affiliates: '🤝 Affiliate Management', creditReports: '📊 Credit Reports' },
         heroVideos: { title: '🎬 Hero Background Videos (4)', subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.' },
         showcase: { title: '📸 Showcase Images', subtitle: 'Upload images for sketch-to-reality transformation examples.', sketch: '1. Sketch', product: '2. Product', model: '3. Model (Live)', video: '4. Video' },
-        adgenius: { title: '🚀 AdGenius Management', subtitle: 'Manage the main image and collage image for the AdGenius section candidate from here.', mainImage: 'Main Image (Large Model Shoot)', collageImage: 'Collage Image (9-Grid/Variation)', mainTitle: 'AdGenius Main Image', collageTitle: 'AdGenius Collage/Grid' },
+        pixshopBoxes: { title: '🖌️ Pixshop Boxes', subtitle: 'Upload images for the Pixshop section on the landing page.', retush: 'Smart Retouch', productPlacement: 'Product Placement' },
+        adgenius: { title: '🚀 AdGenius Management', subtitle: 'Manage all box images for the AdGenius section from here.', mainImage: 'Main Image (Large Model Shoot)', collageImage: 'Collage Image (9-Grid/Variation)', mainTitle: 'AdGenius Main Image', collageTitle: 'AdGenius Collage/Grid', modelShoot: 'Model Shoots', campaign: 'Campaign Concepts', adVideo: 'Ad Videos', productPlacement: 'Product Placement' },
         change: 'Change',
     },
 };
@@ -63,6 +65,20 @@ interface AdminDashboardProps {
     onRefreshProfile?: () => void;
     logoMediaUrl?: string;
     onLogoMediaUpload?: (file: File) => void;
+    // Pixshop showcase boxes
+    pixshopRetushUrl?: string;
+    onPixshopRetushUpload?: (file: File) => void;
+    pixshopProductPlacementUrl?: string;
+    onPixshopProductPlacementUpload?: (file: File) => void;
+    // AdGenius showcase boxes
+    adGeniusModelUrl?: string;
+    onAdGeniusModelUpload?: (file: File) => void;
+    adGeniusCampaignUrl?: string;
+    onAdGeniusCampaignUpload?: (file: File) => void;
+    adGeniusVideoUrl?: string;
+    onAdGeniusVideoUpload?: (file: File) => void;
+    adGeniusProductPlacementUrl?: string;
+    onAdGeniusProductPlacementUpload?: (file: File) => void;
 }
 
 const ContentCard: React.FC<{
@@ -284,6 +300,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                     />
                                 </div>
                             </div>
+
+                            {/* Pixshop Kutuları Section */}
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-4">{t.pixshopBoxes.title}</h2>
+                                <p className="text-slate-400 mb-6">
+                                    {t.pixshopBoxes.subtitle}
+                                </p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <ContentCard
+                                        title={`🖌️ ${t.pixshopBoxes.retush}`}
+                                        mediaUrl={props.pixshopRetushUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={props.onPixshopRetushUpload || (() => { })}
+                                        accept="image/*,video/*"
+                                        changeLabel={t.change}
+                                    />
+                                    <ContentCard
+                                        title={`📦 ${t.pixshopBoxes.productPlacement}`}
+                                        mediaUrl={props.pixshopProductPlacementUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={props.onPixshopProductPlacementUpload || (() => { })}
+                                        accept="image/*,video/*"
+                                        changeLabel={t.change}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -295,7 +337,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                 <p className="text-slate-400 mb-6">
                                     {t.adgenius.subtitle}
                                 </p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                                     <ContentCard
                                         title={t.adgenius.mainTitle}
                                         mediaUrl={adGeniusMainUrl || ''}
@@ -310,6 +352,41 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                                         mediaType="image"
                                         onFileSelect={onAdGeniusCollageUpload || (() => { })}
                                         accept="image/*"
+                                        changeLabel={t.change}
+                                    />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-4">🎨 Landing Page Kutuları</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <ContentCard
+                                        title={`👗 ${t.adgenius.modelShoot}`}
+                                        mediaUrl={props.adGeniusModelUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={props.onAdGeniusModelUpload || (() => { })}
+                                        accept="image/*,video/*"
+                                        changeLabel={t.change}
+                                    />
+                                    <ContentCard
+                                        title={`🎬 ${t.adgenius.campaign}`}
+                                        mediaUrl={props.adGeniusCampaignUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={props.onAdGeniusCampaignUpload || (() => { })}
+                                        accept="image/*,video/*"
+                                        changeLabel={t.change}
+                                    />
+                                    <ContentCard
+                                        title={`🎥 ${t.adgenius.adVideo}`}
+                                        mediaUrl={props.adGeniusVideoUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={props.onAdGeniusVideoUpload || (() => { })}
+                                        accept="image/*,video/*"
+                                        changeLabel={t.change}
+                                    />
+                                    <ContentCard
+                                        title={`📦 ${t.adgenius.productPlacement}`}
+                                        mediaUrl={props.adGeniusProductPlacementUrl || ''}
+                                        mediaType="image"
+                                        onFileSelect={props.onAdGeniusProductPlacementUpload || (() => { })}
+                                        accept="image/*,video/*"
                                         changeLabel={t.change}
                                     />
                                 </div>

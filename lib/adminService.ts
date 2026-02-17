@@ -117,7 +117,7 @@ export const uploadHeroVideo = async (
 // Upload showcase image to storage and save to DB
 export const uploadShowcaseImage = async (
   file: File,
-  type: 'sketch' | 'product' | 'model' | 'video' | 'adgenius_main' | 'adgenius_collage' | 'logo_media',
+  type: 'sketch' | 'product' | 'model' | 'video' | 'adgenius_main' | 'adgenius_collage' | 'logo_media' | 'pixshop_retush' | 'pixshop_product_placement' | 'adgenius_model' | 'adgenius_campaign' | 'adgenius_video' | 'adgenius_product_placement',
   orderIndex: number = 0
 ): Promise<{ success: boolean; imageUrl?: string; error?: string }> => {
   try {
