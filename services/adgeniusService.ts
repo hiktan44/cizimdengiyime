@@ -726,112 +726,177 @@ export const generateAdVideo = async (
   checkApiKey();
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 
-  const mimeType = 'image/png';
+  // Detect and normalize mime type from base64 data
+  let mimeType = 'image/png';
+  const mimeMatch = imageB64Data.match(/^data:image\/(png|jpeg|webp);base64,/);
+  if (mimeMatch) {
+    mimeType = `image/${mimeMatch[1]}`;
+  }
   const cleanB64 = imageB64Data.replace(/^data:image\/(png|jpeg|webp);base64,/, "");
 
-  // Safe and generic video prompt that works for both humans and mannequins
-  const videoPrompt = `
-  Cinematic commercial video.
-  Subject: The fashion product/model shown in image.
-  Action: Very subtle, elegant, slow-motion movement. 
-  Atmosphere: ${promptType}.
-  Quality: High resolution, photorealistic.`;
+  // Focused commercial video prompt
+  const videoPrompt = `Cinematic fashion commercial video. Subject: The fashion product/model shown in image. Action: Very subtle, elegant, slow-motion movement. Atmosphere: ${promptType}. Quality: High resolution, photorealistic, professional fashion photography lighting, magazine quality.`;
 
-  let operation;
+  // Negative prompt to avoid unwanted content
+  const negativePrompt = 'blurry, low quality, distorted, deformed, ugly, amateur, watermark, text overlay, logo, rapid movement, shaky camera, horror, violent';
 
-  try {
-    operation = await ai.models.generateVideos({
-      model: model,
-      image: {
-        imageBytes: cleanB64,
-        mimeType: mimeType
-      },
-      prompt: videoPrompt + ' No audio, no music, no sound effects. Silent video only.',
-      config: {
-        numberOfVideos: 1,
-        resolution: '720p',
-        aspectRatio: aspectRatio as any,
+  const MAX_RETRIES = 2;
+  let lastError: Error | null = null;
 
-      }
-    });
-  } catch (e: any) {
-    console.error("Video initiation error:", e);
-    throw new Error(`Video başlatılamadı: ${e.message}`);
-  }
-
-  // Poll for completion
-  let pollCount = 0;
-  const maxPolls = 60; // 10 minutes max (approx)
-
-  while (!operation.done) {
-    pollCount++;
-    // Report simulated progress based on time passed
-    if (onProgress) {
-      // Assume roughly 2-3 minutes max, map poll count to 50% -> 95% range
-      // Starts at 50 (passed from caller), goes up to 95
-      const currentBase = 50;
-      const remainingSpace = 45;
-      const estimatedCompletion = 15; // Assume 15 polls (~2.5 mins) is typical
-
-      let increment = (pollCount / estimatedCompletion) * remainingSpace;
-      if (increment > remainingSpace) increment = remainingSpace;
-
-      onProgress(Math.floor(currentBase + increment));
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 10000));
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const updatedOp = await ai.operations.getVideosOperation({ operation: operation });
-      operation = updatedOp;
+      if (attempt > 1) {
+        console.log(`Video üretim denemesi ${attempt}/${MAX_RETRIES}...`);
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
 
+      let operation = await ai.models.generateVideos({
+        model: model,
+        image: {
+          imageBytes: cleanB64,
+          mimeType: mimeType
+        },
+        prompt: videoPrompt,
+        config: {
+          numberOfVideos: 1,
+          aspectRatio: aspectRatio as any,
+          personGeneration: 'allow_all' as any,
+          negativePrompt: negativePrompt,
+          durationSeconds: 4,
+        }
+      });
+
+      // Poll for completion
+      let pollCount = 0;
+      const maxPolls = 60; // ~10 minutes max
+
+      while (!operation.done) {
+        pollCount++;
+
+        if (pollCount > maxPolls) {
+          throw new Error('Video üretim zaman aşımına uğradı (10 dakika).');
+        }
+
+        // Report progress: map polls to 50% -> 95% range
+        if (onProgress) {
+          const currentBase = 50;
+          const remainingSpace = 45;
+          const estimatedCompletion = 15;
+          let increment = (pollCount / estimatedCompletion) * remainingSpace;
+          if (increment > remainingSpace) increment = remainingSpace;
+          onProgress(Math.floor(currentBase + increment));
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 10000));
+
+        try {
+          const updatedOp = await ai.operations.getVideosOperation({ operation: operation });
+          operation = updatedOp;
+
+          if (operation.error) {
+            const errMsg = String(operation.error.message || 'Bilinmeyen API hatası');
+            console.error("Video operation error:", errMsg);
+            throw new Error(errMsg);
+          }
+        } catch (pollErr: any) {
+          // If it's already our thrown error, rethrow
+          if (pollErr.message && !pollErr.message.includes('fetch')) {
+            throw pollErr;
+          }
+          // Network/fetch errors during polling - retry poll
+          console.warn(`Video polling geçici hata (deneme ${pollCount}):`, pollErr.message);
+          // Continue polling - don't abort on transient network issues
+          continue;
+        }
+      }
+
+      if (onProgress) onProgress(98);
+
+      // Double check error after loop
       if (operation.error) {
-        throw new Error(operation.error.message || 'Bilinmeyen API hatası');
+        throw new Error(String(operation.error.message || 'Video API hatası'));
       }
-    } catch (e: any) {
-      console.error("Video polling error:", e);
-      throw new Error(`Video durumu izlenirken hata: ${e.message}`);
+
+      // Extract video URI with multiple fallback paths
+      const responseData = operation.response || (operation as any).result;
+
+      // Try multiple paths for video data
+      const videoFile = responseData?.generatedVideos?.[0]?.video;
+      const videoUri = videoFile?.uri;
+
+      if (!videoUri) {
+        // Check for RAI (Responsible AI) filters
+        const raiReasons = responseData?.raiMediaFilteredReasons ||
+          responseData?.generatedVideos?.[0]?.raiMediaFilteredReason;
+
+        if (raiReasons) {
+          const reasons = Array.isArray(raiReasons) ? raiReasons : [raiReasons];
+          if (reasons.length > 0 && reasons[0]) {
+            const reason = String(reasons[0]);
+            if (reason.toLowerCase().includes("celebrity")) {
+              throw new Error("Güvenlik Filtresi: Görselde ünlü kişi benzerliği algılandı. Farklı bir görsel deneyin.");
+            }
+            if (reason.toLowerCase().includes("child") || reason.toLowerCase().includes("minor")) {
+              throw new Error("Güvenlik Filtresi: Çocuk içeriği tespit edildi. Sadece yetişkin modeller kullanılabilir.");
+            }
+            throw new Error(`Video güvenlik filtresine takıldı: ${reason}`);
+          }
+        }
+
+        // Log debug info
+        console.error("Video tamamlandı ama URI bulunamadı. Yanıt:", JSON.stringify(operation, null, 2));
+        throw new Error("Video üretimi tamamlandı ancak video bağlantısı alınamadı. Lütfen tekrar deneyin.");
+      }
+
+      // Download video - correctly handle URI with/without query params
+      try {
+        const separator = videoUri.includes('?') ? '&' : '?';
+        const videoUrl = `${videoUri}${separator}key=${API_KEY}`;
+
+        const videoRes = await fetch(videoUrl);
+        if (!videoRes.ok) {
+          // If 403/404, try without key (some URIs are pre-signed)
+          if (videoRes.status === 403 || videoRes.status === 404) {
+            const retryRes = await fetch(videoUri);
+            if (!retryRes.ok) {
+              throw new Error(`Video indirilemedi (Status: ${retryRes.status})`);
+            }
+            const blob = await retryRes.blob();
+            return URL.createObjectURL(blob);
+          }
+          throw new Error(`Video indirilemedi (Status: ${videoRes.status})`);
+        }
+
+        const blob = await videoRes.blob();
+        if (blob.size < 1000) {
+          throw new Error('İndirilen video dosyası çok küçük, bozuk olabilir.');
+        }
+
+        return URL.createObjectURL(blob);
+      } catch (downloadErr: any) {
+        throw new Error(`Video indirme hatası: ${downloadErr.message}`);
+      }
+
+    } catch (err: any) {
+      lastError = err;
+      console.error(`Video üretim hatası (deneme ${attempt}/${MAX_RETRIES}):`, err.message);
+
+      // Don't retry on these specific errors - they won't resolve with retry
+      const noRetryPatterns = ['güvenlik filtre', 'ünlü', 'çocuk', 'api key', 'api anahtarı', 'raimedialfiltered'];
+      const lowerMsg = err.message?.toLowerCase() || '';
+      if (noRetryPatterns.some(p => lowerMsg.includes(p))) {
+        throw err; // Non-retryable error
+      }
+
+      if (attempt === MAX_RETRIES) {
+        throw new Error(`Video oluşturulamadı (${MAX_RETRIES} deneme sonrası): ${err.message}`);
+      }
     }
   }
 
-  if (onProgress) onProgress(98);
-
-  // Double check error after loop
-  if (operation.error) {
-    throw new Error(`Video API Hatası: ${operation.error.message}`);
-  }
-
-  // Attempt to extract URI with fallback for result property
-  // Some SDK versions or API responses might put data in 'result' instead of 'response'
-  const responseData = operation.response || (operation as any).result;
-  const videoUri = responseData?.generatedVideos?.[0]?.video?.uri;
-
-  if (!videoUri) {
-    // Check for RAI filters
-    if (responseData?.raiMediaFilteredReasons && responseData.raiMediaFilteredReasons.length > 0) {
-      const reason = responseData.raiMediaFilteredReasons[0];
-      // Translate common messages for better UX or pass through
-      // The common one is "Sorry, we can't create videos from input images containing celebrity..."
-      if (reason.includes("celebrity")) {
-        throw new Error("Güvenlik Filtresi: Videoda ünlü benzerliği algılandı (RAI).");
-      }
-      throw new Error(`Video güvenlik filtresine takıldı: ${reason}`);
-    }
-
-    // Log full operation object for debugging in browser console
-    console.error("Video Operation finished but no URI. Full Operation Dump:", JSON.stringify(operation, null, 2));
-    throw new Error("Video başarıyla tamamlandı raporlandı fakat video bağlantısı bulunamadı.");
-  }
-
-  // Fetch with API Key
-  try {
-    const videoRes = await fetch(`${videoUri}&key=${API_KEY}`);
-    if (!videoRes.ok) throw new Error(`Video indirilemedi (Status: ${videoRes.status})`);
-
-    const blob = await videoRes.blob();
-    return URL.createObjectURL(blob);
-  } catch (e: any) {
-    throw new Error(`Video indirme hatası: ${e.message}`);
-  }
+  // Fallback (should not reach here)
+  throw lastError || new Error('Video oluşturulamadı.');
 };
 
 // Key Selection Helper

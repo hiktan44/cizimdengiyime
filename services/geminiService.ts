@@ -62,7 +62,14 @@ const withRetry = async <T>(
         }
     }
 
-    throw lastError || new Error('Tüm modeller denendi ancak başarısız oldu.');
+    // Son hatayı analiz et ve anlaşılır mesaj fırlat
+    const lastMsg = lastError?.message || '';
+    if (lastMsg.includes('503') || lastMsg.includes('overloaded') || lastMsg.includes('UNAVAILABLE') || lastMsg.includes('high demand')) {
+        throw new Error('SERVER_OVERLOADED');
+    } else if (lastMsg.includes('429') || lastMsg.includes('rate limit') || lastMsg.includes('RESOURCE_EXHAUSTED')) {
+        throw new Error('RATE_LIMITED');
+    }
+    throw lastError || new Error('ALL_MODELS_FAILED');
 };
 
 // Simple hash function (djb2 algorithm)
@@ -129,7 +136,7 @@ const getColorHex = (colorName: string): string => {
 // Interface for Video Settings
 export interface VideoGenerationSettings {
     prompt: string;
-    resolution: '720p' | '1080p';
+    resolution: '720p' | '1080p' | '4k';
     durationSecs: number;
     aspectRatio: '16:9' | '9:16';
     quality: 'fast' | 'high';
@@ -368,143 +375,220 @@ export const generateVideoFromImage = async (
                 throw new Error(`Görsel URL'si base64'e çevrilemedi: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
             }
         }
-        // Invalid format - Detaylı debugging ile
+        // Invalid format
         else {
             console.error('Invalid image format provided!');
-            console.error('Full input:', imageInput);
-            console.error('Full input length:', imageInput.length);
-            console.error('First 200 chars:', imageInput.substring(0, 200));
-            console.error('Does it start with data:? :', imageInput.startsWith('data:'));
-            console.error('Contains base64?', imageInput.includes('base64'));
-            console.error('Contains semicolon?', imageInput.includes(';'));
-            console.error('Base64 position:', imageInput.indexOf('base64'));
-            throw new Error(`Geçersiz görsel formatı. Lütfen geçerli bir base64 (data:image/xxx;base64,xxx) formatında veya geçerli bir URL (http:// veya https://) kullanın. Görsel boyutu: ${imageInput.length} karakter. İlk 50 karakter: ${imageInput.substring(0, 50)}...`);
+            throw new Error(`Geçersiz görsel formatı. Lütfen geçerli bir base64 veya URL kullanın.`);
         }
     } else {
         throw new Error("Geçersiz görsel girişi. Lütfen File, Base64 string veya URL kullanın.");
     }
 
+    // MIME type normalization
+    if (mimeType && !mimeType.startsWith('image/')) {
+        mimeType = `image/${mimeType}`;
+    }
+    if (!mimeType) mimeType = 'image/png';
+
     const modelName = settings.quality === 'high' ? 'veo-3.1-generate-preview' : 'veo-3.1-fast-generate-preview';
 
-    console.log('Starting video generation with model:', modelName);
-
-    let operation;
-
-    try {
-        operation = await ai.models.generateVideos({
-            model: modelName,
-            prompt: settings.prompt + ' No audio, no music, no sound effects. Silent video only.',
-            image: {
-                imageBytes: imageBytes,
-                mimeType: mimeType,
-            },
-            config: {
-                numberOfVideos: 1,
-                resolution: settings.resolution,
-                aspectRatio: settings.aspectRatio,
-
-            }
-        });
-    } catch (e: any) {
-        console.error("Video initiation error:", e);
-        throw new Error(`Video başlatılamadı: ${e.message}`);
+    // Validate resolution - 4k only available with veo-3.1-generate-preview
+    let effectiveResolution = settings.resolution || '720p';
+    if (effectiveResolution === '4k' && settings.quality !== 'high') {
+        console.warn('4k resolution requires high quality mode. Downgrading to 1080p.');
+        effectiveResolution = '1080p';
     }
 
-    console.log('Initial operation response:', operation);
+    // Validate durationSeconds - API supports 4, 5, 6, 8
+    let durationSeconds = settings.durationSecs || 5;
+    const validDurations = [4, 5, 6, 8];
+    if (!validDurations.includes(durationSeconds)) {
+        durationSeconds = validDurations.reduce((prev, curr) =>
+            Math.abs(curr - durationSeconds) < Math.abs(prev - durationSeconds) ? curr : prev
+        );
+    }
 
-    // Poll for completion with timeout
-    let pollCount = 0;
-    const maxPolls = 60; // 10 minutes max (60 * 10 seconds)
+    // Enhanced fashion video prompt
+    const enhancedPrompt = settings.prompt + ' Professional fashion photography lighting, magazine quality. Professional fashion video. No audio, no music, no sound effects. Silent video only.';
 
-    while (!operation.done && pollCount < maxPolls) {
-        await new Promise(resolve => setTimeout(resolve, 10000));
-        pollCount++;
-        console.log(`Polling attempt ${pollCount}/${maxPolls}...`);
+    // Negative prompt for quality filtering
+    const negativePrompt = 'blurry, low quality, distorted, deformed, ugly, amateur, watermark, text overlay, logo, rapid movement, shaky camera, horror, violent, cartoon, drawing';
 
+    console.log(`Starting video generation - Model: ${modelName}, Resolution: ${effectiveResolution}, Duration: ${durationSeconds}s, AspectRatio: ${settings.aspectRatio}`);
+
+    const MAX_RETRIES = 2;
+    let lastError: Error | null = null;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
-            const updatedOp = await ai.operations.getVideosOperation({ operation: operation });
-            operation = updatedOp;
-            console.log('Operation status:', { done: operation.done, pollCount });
+            if (attempt > 1) {
+                console.log(`Video üretim denemesi ${attempt}/${MAX_RETRIES}...`);
+                await new Promise(resolve => setTimeout(resolve, 5000));
+            }
 
-            // Check for immediate errors during polling
+            let operation = await ai.models.generateVideos({
+                model: modelName,
+                prompt: enhancedPrompt,
+                image: {
+                    imageBytes: imageBytes,
+                    mimeType: mimeType,
+                },
+                config: {
+                    numberOfVideos: 1,
+                    resolution: effectiveResolution,
+                    aspectRatio: settings.aspectRatio,
+                    durationSeconds: durationSeconds,
+                    personGeneration: 'allow_all',
+                    negativePrompt: negativePrompt,
+                }
+            });
+
+            console.log('Initial operation response received');
+
+            // Poll for completion with timeout
+            let pollCount = 0;
+            const maxPolls = 60; // 10 minutes max
+            let consecutiveErrors = 0;
+            const maxConsecutiveErrors = 3;
+
+            while (!operation.done && pollCount < maxPolls) {
+                await new Promise(resolve => setTimeout(resolve, 10000));
+                pollCount++;
+                console.log(`Polling attempt ${pollCount}/${maxPolls}...`);
+
+                try {
+                    const updatedOp = await ai.operations.getVideosOperation({ operation: operation });
+                    operation = updatedOp;
+                    consecutiveErrors = 0; // Reset on success
+                    console.log('Operation status:', { done: operation.done, pollCount });
+
+                    // Check for immediate errors during polling
+                    if ((operation as any).error) {
+                        const errMsg = String((operation as any).error.message || 'Video işleme sırasında API hatası oluştu.');
+                        console.error("Operation error detected during polling:", errMsg);
+                        throw new Error(errMsg);
+                    }
+
+                } catch (e: any) {
+                    // Distinguish between network/polling errors and API errors
+                    if (e.message && (e.message.includes('fetch') || e.message.includes('network') || e.message.includes('timeout'))) {
+                        consecutiveErrors++;
+                        console.warn(`Polling network error (${consecutiveErrors}/${maxConsecutiveErrors}):`, e.message);
+                        if (consecutiveErrors >= maxConsecutiveErrors) {
+                            throw new Error('Video durumu kontrol edilirken bağlantı koptu. Lütfen tekrar deneyin.');
+                        }
+                        continue; // Skip to next poll iteration
+                    }
+
+                    // Handle "Requested entity was not found" error (common Veo issue)
+                    if (e.message && e.message.includes('404')) {
+                        console.warn("Polling 404 received.");
+                        throw new Error("Video işlenirken bağlantı koptu (404). Lütfen tekrar deneyin.");
+                    }
+                    console.error('Polling error:', e);
+                    throw e;
+                }
+            }
+
+            if (pollCount >= maxPolls) {
+                throw new Error('Video oluşturma zaman aşımına uğradı. Lütfen daha kısa bir video deneyin veya tekrar deneyin.');
+            }
+
+            console.log('Final operation response received');
+
+            // Double check error after loop
             if ((operation as any).error) {
-                console.error("Operation error detected during polling:", (operation as any).error);
-                throw new Error((operation as any).error.message || 'Video işleme sırasında API hatası oluştu.');
+                throw new Error(`Video API Hatası: ${String((operation as any).error.message)}`);
             }
 
-        } catch (e: any) {
-            // Handle "Requested entity was not found" error during polling (common Veo issue)
-            if (e.message && e.message.includes('404')) {
-                console.warn("Polling 404 received.");
-                throw new Error("Video işlenirken bağlantı koptu (404). Lütfen tekrar deneyin.");
-            }
-            console.error('Polling error:', e);
-            throw e;
-        }
-    }
+            // Get response data
+            const responseData = operation.response || (operation as any).result;
 
-    if (pollCount >= maxPolls) {
-        throw new Error('Video oluşturma zaman aşımına uğradı. Lütfen daha kısa bir video deneyin veya tekrar deneyin.');
-    }
+            // Check RAI filters FIRST (before trying to extract URI)
+            const raiReasons = responseData?.raiMediaFilteredReasons || responseData?.generatedVideos?.[0]?.raiMediaFilteredReason;
+            if (raiReasons) {
+                const reasons = Array.isArray(raiReasons) ? raiReasons : [raiReasons];
+                if (reasons.length > 0 && reasons[0]) {
+                    const reason = String(reasons[0]);
+                    console.warn("Video blocked by RAI filter:", reason);
 
-    console.log('Final operation response:', JSON.stringify(operation, null, 2));
-
-    // Double check error after loop
-    if ((operation as any).error) {
-        throw new Error(`Video API Hatası: ${(operation as any).error.message}`);
-    }
-
-    // Attempt to extract URI with fallback for result property
-    // Some SDK versions or API responses might put data in 'result' instead of 'response'
-    const responseData = operation.response || (operation as any).result;
-    const videoUri = responseData?.generatedVideos?.[0]?.video?.uri;
-
-    if (videoUri) {
-        const downloadLink = videoUri;
-        console.log('Video URI found:', downloadLink);
-
-        // Append API key strictly from the variable
-        try {
-            const videoRes = await fetch(`${downloadLink}&key=${API_KEY}`);
-
-            if (!videoRes.ok) {
-                const err = await videoRes.text();
-                console.warn("Video download failed:", err);
-                throw new Error(`Video indirilemedi: ${err}`);
+                    if (reason.toLowerCase().includes("celebrity") || reason.toLowerCase().includes("identity")) {
+                        throw new Error("Güvenlik Filtresi: Görselde ünlü kişi benzerliği algılandı. Farklı bir görsel deneyin.");
+                    }
+                    if (reason.toLowerCase().includes("child") || reason.toLowerCase().includes("minor")) {
+                        throw new Error("Güvenlik Filtresi: Çocuk içeriği tespit edildi. Sadece yetişkin modeller kullanılabilir.");
+                    }
+                    if (reason.toLowerCase().includes("sexual") || reason.toLowerCase().includes("nsfw")) {
+                        throw new Error("Güvenlik Filtresi: Görsel veya prompt güvenli içerik politikasına takıldı.");
+                    }
+                    throw new Error(`Video güvenlik filtresine takıldı: ${reason}`);
+                }
             }
 
-            const blob = await videoRes.blob();
-            return URL.createObjectURL(blob);
-        } catch (e: any) {
-            throw new Error(`Video indirme hatası: ${e.message}`);
+            // Extract video URI
+            const videoUri = responseData?.generatedVideos?.[0]?.video?.uri;
+
+            if (!videoUri) {
+                const errorDetails = {
+                    done: operation.done,
+                    hasResponse: !!responseData,
+                    hasVideos: !!responseData?.generatedVideos,
+                    videoCount: responseData?.generatedVideos?.length || 0,
+                };
+                console.error('Video generation failed. Operation details:', errorDetails);
+                throw new Error(`Video oluşturulamadı. API'den video URI alınamadı. Lütfen görseli veya promptu değiştirip tekrar deneyin.`);
+            }
+
+            console.log('Video URI found:', videoUri);
+
+            // Download video - correctly handle URI with/without query params
+            try {
+                const separator = videoUri.includes('?') ? '&' : '?';
+                const videoUrl = `${videoUri}${separator}key=${API_KEY}`;
+                const videoRes = await fetch(videoUrl);
+
+                if (!videoRes.ok) {
+                    // Try without API key (pre-signed URL case)
+                    console.warn(`Video download with API key failed (${videoRes.status}), trying pre-signed URI...`);
+                    const videoResNoKey = await fetch(videoUri);
+                    if (!videoResNoKey.ok) {
+                        throw new Error(`Video indirilemedi: HTTP ${videoRes.status}`);
+                    }
+                    const blob = await videoResNoKey.blob();
+                    if (blob.size < 1000) {
+                        throw new Error('İndirilen video dosyası çok küçük, bozuk olabilir.');
+                    }
+                    return URL.createObjectURL(blob);
+                }
+
+                const blob = await videoRes.blob();
+                if (blob.size < 1000) {
+                    throw new Error('İndirilen video dosyası çok küçük, bozuk olabilir.');
+                }
+                return URL.createObjectURL(blob);
+            } catch (downloadErr: any) {
+                throw new Error(`Video indirme hatası: ${downloadErr.message}`);
+            }
+
+        } catch (err: any) {
+            lastError = err;
+            console.error(`Video üretim hatası (deneme ${attempt}/${MAX_RETRIES}):`, err.message);
+
+            // Don't retry on these specific errors - they won't resolve with retry
+            const noRetryPatterns = ['güvenlik filtre', 'ünlü', 'çocuk', 'api key', 'api anahtarı', 'raimedialfiltered', 'nsfw', 'sexual'];
+            const lowerMsg = err.message?.toLowerCase() || '';
+            if (noRetryPatterns.some((p: string) => lowerMsg.includes(p))) {
+                throw err;
+            }
+
+            if (attempt === MAX_RETRIES) {
+                throw new Error(`Video oluşturulamadı (${MAX_RETRIES} deneme sonrası): ${err.message}`);
+            }
         }
     }
 
-    // Check for RAI filters (Safety/Policy blocks)
-    if (responseData?.raiMediaFilteredReasons && responseData.raiMediaFilteredReasons.length > 0) {
-        const reason = responseData.raiMediaFilteredReasons[0];
-        console.warn("Video blocked by RAI filter:", reason);
-
-        if (reason.includes("celebrity") || reason.includes("identity")) {
-            throw new Error("Güvenlik Filtresi: Videoda ünlü benzerliği veya kimlik koruması algılandı.");
-        }
-        if (reason.includes("sexual") || reason.includes("nsfw")) {
-            throw new Error("Güvenlik Filtresi: Görsel veya prompt güvenli içerik politikasına takıldı.");
-        }
-        throw new Error(`Video güvenlik filtresine takıldı: ${reason}`);
-    }
-
-    // More detailed error message if we still don't have a URI
-    const errorDetails = {
-        done: operation.done,
-        hasResponse: !!responseData,
-        hasVideos: !!responseData?.generatedVideos,
-        videoCount: responseData?.generatedVideos?.length || 0,
-        fullOp: operation
-    };
-
-    console.error('Video generation failed. Operation details:', errorDetails);
-    throw new Error(`Video oluşturulamadı. API'den video URI alınamadı. Lütfen görseli veya promptu değiştirip tekrar deneyin.`);
+    // Fallback
+    throw lastError || new Error('Video oluşturulamadı.');
 };
 
 export const generateImage = async (

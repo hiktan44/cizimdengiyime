@@ -69,6 +69,10 @@ import AffiliatePortal from './components/affiliate/AffiliatePortal';
 import { trackReferralClick } from './lib/affiliateService';
 import { FeaturesPage } from './pages/FeaturesPage';
 import { BlogPage } from './pages/BlogPage';
+import { getFriendlyErrorMessage } from './utils/errorMessages';
+
+// Dil bilgisini al
+const getLang = (): 'tr' | 'en' => (localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr';
 
 interface PageHeaderProps {
     isLoggedIn: boolean;
@@ -282,7 +286,7 @@ const ToolPage: React.FC<{
                     userId: profile.id
                 });
             } catch (error) {
-                alert(`${t.alerts.productCreationError} ${error}`);
+                alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsProductLoading(false);
             }
@@ -346,7 +350,7 @@ const ToolPage: React.FC<{
 
                 onRefreshProfile();
             } catch (error) {
-                alert(`${t.alerts.topGarmentCreationError} ${error}`);
+                alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsTopProductLoading(false);
             }
@@ -398,7 +402,7 @@ const ToolPage: React.FC<{
 
                 onRefreshProfile();
             } catch (error) {
-                alert(`${t.alerts.bottomGarmentCreationError} ${error}`);
+                alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsBottomProductLoading(false);
             }
@@ -586,7 +590,7 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Görsel oluşturma hatası:', error);
-                alert(`${t.alerts.imageGenerationError} ${error instanceof Error ? error.message : String(error)}`);
+                alert(getFriendlyErrorMessage(error, getLang()));
                 setIsModelLoading(false);
             }
         };
@@ -639,7 +643,7 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Teknik çizim hatası:', error);
-                alert(`${t.alerts.genericError} ${error instanceof Error ? error.message : String(error)}`);
+                alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsTechLoading(false);
             }
@@ -727,7 +731,7 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Video oluşturma hatası:', error);
-                alert(`${t.alerts.videoCreationError} ${error instanceof Error ? error.message : String(error)}`);
+                alert(getFriendlyErrorMessage(error, getLang()));
                 setIsModelLoading(false);
             }
         };

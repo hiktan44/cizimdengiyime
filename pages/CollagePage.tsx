@@ -14,6 +14,7 @@ import { VideoGenerationSettings, generateVideoFromImage, generateProductCollage
 import { ProductItem } from '../services/geminiService';
 import { ProductItemEditor } from '../components/ProductItemEditor';
 import { fileToGenerativePart, blobToBase64, base64ToFile, cropImageFromFile, fileToBase64 } from '../utils/fileUtils';
+import { getFriendlyErrorMessage } from '../utils/errorMessages';
 import html2canvas from 'html2canvas';
 
 interface CollagePageProps {
@@ -465,7 +466,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             });
         } catch (error) {
             console.error('Generation error:', error);
-            alert(t.errorOccurred + (error instanceof Error ? error.message : String(error)));
+            alert(getFriendlyErrorMessage(error, (localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'));
         } finally {
             setIsGenerating(false);
         }
@@ -579,7 +580,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             });
         } catch (error) {
             console.error('Video generation error:', error);
-            alert(t.videoError + (error instanceof Error ? error.message : String(error)));
+            alert(getFriendlyErrorMessage(error, (localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'));
         } finally {
             setIsVideoGenerating(false);
         }

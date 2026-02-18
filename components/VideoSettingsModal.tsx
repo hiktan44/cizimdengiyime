@@ -65,7 +65,7 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
     const { language } = useI18n();
     const t = useTranslation(translations);
     const [prompt, setPrompt] = useState('');
-    const [resolution, setResolution] = useState<'720p' | '1080p'>('720p');
+    const [resolution, setResolution] = useState<'720p' | '1080p' | '4k'>('1080p');
     const [durationSecs, setDurationSecs] = useState(5);
     const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16'>('9:16');
     const [quality, setQuality] = useState<'fast' | 'high'>('fast');
@@ -145,11 +145,12 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
                             <label className="text-xs font-semibold text-slate-400 uppercase">{t.resolution}</label>
                             <select
                                 value={resolution}
-                                onChange={(e) => setResolution(e.target.value as '720p' | '1080p')}
+                                onChange={(e) => setResolution(e.target.value as '720p' | '1080p' | '4k')}
                                 className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm focus:ring-2 focus:ring-cyan-500 transition appearance-none"
                             >
                                 <option value="720p">720p HD</option>
                                 <option value="1080p">1080p FHD</option>
+                                {quality === 'high' && <option value="4k">4K Ultra HD</option>}
                             </select>
                         </div>
                         <div className="space-y-2">
@@ -182,6 +183,14 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
                         </div>
                     )}
 
+                    {resolution === '4k' && (
+                        <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-xs text-amber-200">
+                            <strong>⚡ 4K:</strong> {language === 'tr'
+                                ? '4K Ultra HD çözünürlük daha uzun süre alır ve daha fazla kredi harcar. Yüksek kalite modu gerektirir.'
+                                : '4K Ultra HD resolution takes longer and costs more credits. Requires high quality mode.'}
+                        </div>
+                    )}
+
                     {/* Kredi Bilgisi */}
                     <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -190,7 +199,7 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                             </svg>
                             <span className="text-sm font-semibold text-slate-300">
-                                {t.creditInfo} <span className="text-orange-400 font-bold text-lg">3 {t.credits}</span>
+                                {t.creditInfo} <span className="text-orange-400 font-bold text-lg">{resolution === '4k' ? 5 : quality === 'high' ? 4 : 3} {t.credits}</span>
                             </span>
                         </div>
                     </div>

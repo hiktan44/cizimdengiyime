@@ -14,6 +14,7 @@ import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage, addCredit
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
 
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
+import { getFriendlyErrorMessage } from '../utils/errorMessages';
 import { Sparkles, Upload, BrainCircuit, Image as ImageIcon, Video, Loader2 } from 'lucide-react';
 
 interface AdgeniusPageProps {
@@ -677,11 +678,13 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
             onRefreshProfile();
           }
 
+          const friendlyMsg = getFriendlyErrorMessage(videoError, (localStorage.getItem('fasheone-language') as 'tr' | 'en') || 'tr');
+
           // Mark as completed but attach error message to show partial success
           updateResult(item.id, {
             status: 'completed',
             imageUrl: base64Image,
-            error: videoError.message,
+            error: friendlyMsg,
             progress: 100
           });
 
@@ -712,9 +715,11 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
         onRefreshProfile();
       }
 
+      const friendlyMsg = getFriendlyErrorMessage(err, (localStorage.getItem('fasheone-language') as 'tr' | 'en') || 'tr');
+
       updateResult(item.id, {
         status: 'failed',
-        error: err.message || "Bilinmeyen bir hata oluştu.",
+        error: friendlyMsg,
         progress: 0
       });
     }
