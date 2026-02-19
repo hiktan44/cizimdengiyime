@@ -434,13 +434,15 @@ export const generateVideoFromImage = async (
         effectiveResolution = '1080p';
     }
 
-    // Validate durationSeconds - API supports 4, 5, 6, 8
-    let durationSeconds = settings.durationSecs || 5;
-    const validDurations = [4, 5, 6, 8];
+    // Validate durationSeconds - Veo API supports 4, 6, 8 (5 artık desteklenmiyor)
+    let durationSeconds = settings.durationSecs || 4;
+    const validDurations = [4, 6, 8];
     if (!validDurations.includes(durationSeconds)) {
+        // 5 → 4, 7 → 8 gibi en yakın geçerli değere yuvarlama
         durationSeconds = validDurations.reduce((prev, curr) =>
             Math.abs(curr - durationSeconds) < Math.abs(prev - durationSeconds) ? curr : prev
         );
+        console.warn(`⚠️ durationSeconds ${settings.durationSecs} geçersiz, ${durationSeconds}'e yuvarlandı`);
     }
 
     // Enhanced fashion video prompt
@@ -610,7 +612,7 @@ export const generateVideoFromImage = async (
             console.error(`Video üretim hatası (deneme ${attempt}/${MAX_RETRIES}):`, err.message);
 
             // Don't retry on these specific errors - they won't resolve with retry
-            const noRetryPatterns = ['güvenlik filtre', 'ünlü', 'çocuk', 'api key', 'api anahtarı', 'raimedialfiltered', 'nsfw', 'sexual'];
+            const noRetryPatterns = ['güvenlik filtre', 'ünlü', 'çocuk', 'api key', 'api anahtarı', 'raimedialfiltered', 'nsfw', 'sexual', 'invalid_argument', 'out of bound', 'durationseconds'];
             const lowerMsg = err.message?.toLowerCase() || '';
             if (noRetryPatterns.some((p: string) => lowerMsg.includes(p))) {
                 throw err;

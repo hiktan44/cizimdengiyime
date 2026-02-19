@@ -66,7 +66,7 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
     const t = useTranslation(translations);
     const [prompt, setPrompt] = useState('');
     const [resolution, setResolution] = useState<'720p' | '1080p' | '4k'>('1080p');
-    const [durationSecs, setDurationSecs] = useState(5);
+    const [durationSecs, setDurationSecs] = useState(4);
     const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16'>('9:16');
     const [quality, setQuality] = useState<'fast' | 'high'>('fast');
 
@@ -155,14 +155,15 @@ export const VideoSettingsModal: React.FC<VideoSettingsModalProps> = ({ isOpen, 
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-semibold text-slate-400 uppercase">{t.duration}</label>
-                            <input
-                                type="number"
+                            <select
                                 value={durationSecs}
-                                onChange={(e) => setDurationSecs(Math.max(2, Math.min(10, parseInt(e.target.value, 10) || 5)))}
-                                min="2"
-                                max="10"
-                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm focus:ring-2 focus:ring-cyan-500 transition"
-                            />
+                                onChange={(e) => setDurationSecs(parseInt(e.target.value, 10))}
+                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm focus:ring-2 focus:ring-cyan-500 transition appearance-none"
+                            >
+                                <option value="4">4 {language === 'tr' ? 'saniye' : 'seconds'}</option>
+                                <option value="6">6 {language === 'tr' ? 'saniye' : 'seconds'}</option>
+                                <option value="8">8 {language === 'tr' ? 'saniye' : 'seconds'}</option>
+                            </select>
                         </div>
                         <div className="space-y-2">
                             <label className="text-xs font-semibold text-slate-400 uppercase">{t.format}</label>
