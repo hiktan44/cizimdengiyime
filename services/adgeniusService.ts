@@ -84,18 +84,25 @@ export const analyzeProductImage = async (file: File): Promise<ProductAnalysis> 
     required: ["urun_adi", "urun_kategorisi", "ana_renk", "malzeme", "stil", "eticaret_baslik", "eticaret_aciklama", "eticaret_ozellikler", "urun_uzerindeki_yazilar", "urun_uzerindeki_logolar", "ozel_detaylar"]
   };
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-preview',
-    contents: {
-      parts: [
-        {
-          inlineData: {
-            mimeType: file.type,
-            data: base64Data
-          }
-        },
-        {
-          text: `Bu görseldeki ürünü **Profesyonel E-Ticaret İçerik Yazarı**, **Kıdemli Moda Tasarımcısı** ve **Detay Uzmanı** kimliğiyle analiz et.
+  // Retry wrapper for 503/UNAVAILABLE errors
+  const MAX_RETRIES = 3;
+  let lastError: any = null;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`🔄 Ürün analizi deneme: ${attempt}/${MAX_RETRIES}`);
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-pro-preview',
+        contents: {
+          parts: [
+            {
+              inlineData: {
+                mimeType: file.type,
+                data: base64Data
+              }
+            },
+            {
+              text: `Bu görseldeki ürünü **Profesyonel E-Ticaret İçerik Yazarı**, **Kıdemli Moda Tasarımcısı** ve **Detay Uzmanı** kimliğiyle analiz et.
            
            Görevin ÜÇ aşamalıdır:
            1. Görsel Üretimi İçin Teknik Analiz: Renk, doku ve kalıp detaylarını çıkar.
@@ -119,20 +126,37 @@ export const analyzeProductImage = async (file: File): Promise<ProductAnalysis> 
            - **ozel_detaylar:** Fermuar (renk, tip), düğme (sayı, malzeme, renk), dikiş desenleri, metal aksesuarlar (toka, kopça), cep tipleri, yaka detayları, manşet detayları gibi TÜM yapısal öğeleri listeleyin.
 
            Çıktı tamamen JSON formatında olmalıdır.`
+            }
+          ]
+        },
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: analysisSchema,
+          temperature: 0.4,
+          safetySettings: PERMISSIVE_SAFETY_SETTINGS
         }
-      ]
-    },
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: analysisSchema,
-      temperature: 0.4,
-      safetySettings: PERMISSIVE_SAFETY_SETTINGS
-    }
-  });
+      });
 
-  const text = response.text;
-  if (!text) throw new Error("Analiz oluşturulamadı.");
-  return JSON.parse(text) as ProductAnalysis;
+      const text = response.text;
+      if (!text) throw new Error("Analiz oluşturulamadı.");
+      return JSON.parse(text) as ProductAnalysis;
+    } catch (error: any) {
+      lastError = error;
+      const errorMsg = error?.message?.toLowerCase() || String(error).toLowerCase();
+      const isRetryable = errorMsg.includes('503') || errorMsg.includes('unavailable') ||
+        errorMsg.includes('high demand') || errorMsg.includes('overloaded') ||
+        errorMsg.includes('429') || errorMsg.includes('resource_exhausted');
+
+      if (isRetryable && attempt < MAX_RETRIES) {
+        const waitTime = 3000 * attempt;
+        console.warn(`🔄 Sunucu yoğun, ${waitTime}ms sonra tekrar deneniyor... (${attempt}/${MAX_RETRIES})`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw lastError || new Error("Analiz oluşturulamadı.");
 };
 
 // 2. Generate Prompts (Human Models Allowed by Default)
@@ -652,11 +676,32 @@ export const generateAdImage = async (
   };
 
   // Retry helper with exponential backoff
-  const retryWithDelay = async (fn: () => Promise<string>, retries: number = 2, delayMs: number = 3000): Promise<string> => {
+  const retryWithDelay = async (fn: () => Promise<string>, retries: number = 3, delayMs: number = 3000): Promise<string> => {
     try {
       return await fn();
     } catch (error: any) {
       if (retries <= 0) throw error;
+
+      const errorMsg = error?.message?.toLowerCase() || String(error).toLowerCase();
+      const statusCode = error?.status || error?.code;
+
+      // 503/UNAVAILABLE/high demand — sunucu yoğunluğunda retry yap
+      const isServerOverloaded =
+        statusCode === 503 || statusCode === 429 ||
+        errorMsg.includes('503') ||
+        errorMsg.includes('429') ||
+        errorMsg.includes('unavailable') ||
+        errorMsg.includes('high demand') ||
+        errorMsg.includes('overloaded') ||
+        errorMsg.includes('resource_exhausted') ||
+        errorMsg.includes('rate limit') ||
+        errorMsg.includes('too many requests');
+
+      if (isServerOverloaded) {
+        console.warn(`🔄 Sunucu yoğun (503/429), ${delayMs}ms sonra tekrar deneniyor... (${retries} deneme kaldı)`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        return retryWithDelay(fn, retries - 1, delayMs * 1.5);
+      }
 
       // For INVALID_ARGUMENT, wait longer and retry
       if (error.message?.includes('INVALID_ARGUMENT') || error.status === 'INVALID_ARGUMENT') {
