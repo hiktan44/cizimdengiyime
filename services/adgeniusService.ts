@@ -834,7 +834,7 @@ export const generateAdVideo = async (
         config: {
           numberOfVideos: 1,
           aspectRatio: aspectRatio as any,
-          personGeneration: 'allow_all' as any,
+          // personGeneration kaldırıldı — Veo API artık 'allow_all' desteklemiyor
           negativePrompt: negativePrompt,
           durationSeconds: 4,
         }
@@ -955,8 +955,7 @@ export const generateAdVideo = async (
       lastError = err;
       console.error(`Video üretim hatası (deneme ${attempt}/${MAX_RETRIES}):`, err.message);
 
-      // Don't retry on these specific errors - they won't resolve with retry
-      const noRetryPatterns = ['güvenlik filtre', 'ünlü', 'çocuk', 'api key', 'api anahtarı', 'raimedialfiltered'];
+      const noRetryPatterns = ['güvenlik filtre', 'ünlü', 'çocuk', 'api key', 'api anahtarı', 'raimedialfiltered', 'invalid_argument', 'not supported', 'out of bound'];
       const lowerMsg = err.message?.toLowerCase() || '';
       if (noRetryPatterns.some(p => lowerMsg.includes(p))) {
         throw err; // Non-retryable error

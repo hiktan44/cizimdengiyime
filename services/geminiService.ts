@@ -475,7 +475,7 @@ export const generateVideoFromImage = async (
                     resolution: effectiveResolution,
                     aspectRatio: settings.aspectRatio,
                     durationSeconds: durationSeconds,
-                    personGeneration: 'allow_all',
+                    // personGeneration kaldırıldı — Veo API artık 'allow_all' desteklemiyor
                     negativePrompt: negativePrompt,
                 }
             });
