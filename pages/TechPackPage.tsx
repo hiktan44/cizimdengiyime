@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { generateTechPack } from '../services/geminiService';
-import { uploadBase64ToStorage, saveGeneration, checkAndDeductCredits } from '../lib/database';
+import { uploadBase64ToStorage, saveGeneration, checkAndDeductCredits, refundCredits } from '../lib/database';
 import { CREDIT_COSTS } from '../lib/supabase';
 import jsPDF from 'jspdf';
 import { GoogleGenAI } from '@google/genai';
@@ -345,6 +345,10 @@ Profesyonel tech pack formatında sun. SADECE METIN döndür, görsel oluşturma
             }
 
         } catch (error: any) {
+            if (profile) {
+                await refundCredits(profile.id, 'tech_pack');
+                onRefreshProfile();
+            }
             setErrorMessage(error.message || tp.errors.genericError);
         } finally {
             setIsProcessing(false);

@@ -15,7 +15,7 @@ import CropPanel from '../components/pixshop/CropPanel';
 import UpscalePanel from '../components/pixshop/UpscalePanel';
 import StartScreen from '../components/pixshop/StartScreen';
 import { UndoIcon, RedoIcon, EyeIcon, ZoomInIcon, ZoomOutIcon, ArrowsPointingOutIcon, DownloadIcon, MagicWandIcon, EraserIcon, SplitIcon } from '../components/pixshop/icons';
-import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
+import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage, refundCredits } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 
@@ -448,7 +448,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   };
 
   // Save generation to history
-  const saveToHistory = async (outputUrl: string) => {
+  const saveToHistory = async (outputUrl: string, inputUrl?: string | null) => {
     if (!profile) return;
 
     const uploadedUrl = await uploadBase64ToStorage(outputUrl, profile.id, 'output');
@@ -456,7 +456,7 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       profile.id,
       'pixshop',
       CREDIT_COSTS.PIXSHOP,
-      null,
+      inputUrl || null,
       uploadedUrl,
       null,
       { tool: 'pixshop', activeTab }
@@ -522,6 +522,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
       setError(`${t.errors.generateFailed} ${errorMessage}`);
       console.error(err);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -551,6 +556,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
       setError(`${t.ui.filterFailed} ${errorMessage}`);
       console.error(err);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -580,6 +590,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
       setError(`${t.ui.adjustFailed} ${errorMessage}`);
       console.error(err);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -609,6 +624,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     } catch (err) {
       setError(t.errors.eraseFailed);
       console.error(err);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -658,6 +678,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
       setError(`${t.ui.addProductFailed} ${errorMessage}`);
       console.error(err);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -684,6 +709,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t.ui.bgRemoveFailed;
       setError(`${t.errors.errorPrefix} ${errorMessage}`);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -732,6 +762,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t.errors.cropFailed;
       setError(errorMessage);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -773,6 +808,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
       setError(`${t.errors.upscaleFailed} ${errorMessage}`);
+      if (profile) {
+        const cost = size === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -872,6 +912,11 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : t.errors.svgFailed;
       setError(`${t.errors.errorPrefix} ${errorMessage}`);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
     } finally {
       setIsLoading(false);
     }

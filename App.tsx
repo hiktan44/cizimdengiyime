@@ -42,9 +42,9 @@ import { BeforeAfterSlider } from './components/BeforeAfterSlider';
 import { useAuth } from './hooks/useAuth';
 import { AuthModal } from './components/AuthModal';
 
-import { LandingPage } from './pages/LandingPage';
+import LandingPage from './pages/LandingPage';
 import { Dashboard } from './components/Dashboard';
-import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from './lib/database';
+import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage, refundCredits } from './lib/database';
 import { CREDIT_COSTS } from './lib/supabase';
 import { BuyCreditsModal } from './components/BuyCreditsModal';
 import { HistoryPanel } from './components/HistoryPanel';
@@ -286,6 +286,8 @@ const ToolPage: React.FC<{
                     userId: profile.id
                 });
             } catch (error) {
+                await refundCredits(profile.id, 'sketch_to_product');
+                onRefreshProfile();
                 alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsProductLoading(false);
@@ -350,6 +352,8 @@ const ToolPage: React.FC<{
 
                 onRefreshProfile();
             } catch (error) {
+                await refundCredits(profile.id, 'sketch_to_product');
+                onRefreshProfile();
                 alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsTopProductLoading(false);
@@ -402,6 +406,8 @@ const ToolPage: React.FC<{
 
                 onRefreshProfile();
             } catch (error) {
+                await refundCredits(profile.id, 'sketch_to_product');
+                onRefreshProfile();
                 alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsBottomProductLoading(false);
@@ -590,6 +596,8 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Görsel oluşturma hatası:', error);
+                await refundCredits(profile.id, 'product_to_model');
+                onRefreshProfile();
                 alert(getFriendlyErrorMessage(error, getLang()));
                 setIsModelLoading(false);
             }
@@ -643,6 +651,8 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Teknik çizim hatası:', error);
+                await refundCredits(profile.id, 'tech_sketch');
+                onRefreshProfile();
                 alert(getFriendlyErrorMessage(error, getLang()));
             } finally {
                 setIsTechLoading(false);
@@ -731,6 +741,8 @@ const ToolPage: React.FC<{
                 });
             } catch (error) {
                 console.error('Video oluşturma hatası:', error);
+                await refundCredits(profile.id, videoOpType as 'video_high' | 'video_fast');
+                onRefreshProfile();
                 alert(getFriendlyErrorMessage(error, getLang()));
                 setIsModelLoading(false);
             }
@@ -2343,19 +2355,7 @@ const App: React.FC = () => {
                         setCurrentPage('landing');
                     }}
                     onAdminClick={isAdmin ? () => setCurrentPage('admin') : undefined}
-                    onAffiliateClick={user ? () => setCurrentPage('affiliate-portal') : undefined}
                     onBuyCreditsClick={user ? () => setShowBuyCreditsModal(true) : undefined}
-                    sketchUrl={sketchUrl}
-                    productUrl={productUrl}
-                    modelUrl={modelUrl}
-                    videoUrl={videoUrl}
-                    heroVideoUrl={heroVideoUrl}
-                    heroVideo1Url={heroVideo1Url}
-                    heroVideo2Url={heroVideo2Url}
-                    heroVideo3Url={heroVideo3Url}
-                    adGeniusMainUrl={adGeniusMainUrl}
-                    adGeniusCollageUrl={adGeniusCollageUrl}
-                    logoMediaUrl={logoMediaUrl}
                 />
             )}
             {currentPage === 'features' && (

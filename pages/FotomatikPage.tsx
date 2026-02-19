@@ -13,7 +13,7 @@ import { ImageEditor } from '../components/fotomatik/ImageEditor';
 import { BatchProcessor } from '../components/fotomatik/BatchProcessor';
 import { FotomatikAppStatus, FotomatikImageFile } from '../types/fotomatik';
 import { processFile } from '../components/fotomatik/fileUtils';
-import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage } from '../lib/database';
+import { checkAndDeductCredits, saveGeneration, uploadBase64ToStorage, refundCredits } from '../lib/database';
 import { CREDIT_COSTS, Profile } from '../lib/supabase';
 
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
@@ -364,6 +364,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       await saveToHistory(result, 'fotomatik_transform', { prompt, aspectRatio, imageSize });
     } catch (error: any) {
       console.error('Transform Error:', error);
+      if (profile) {
+        await refundCredits(profile.id, 'fotomatik_transform');
+        onRefreshProfile();
+      }
       setErrorMessage(error.message || t.messages.transformError);
       setStatus(FotomatikAppStatus.ERROR);
     }
@@ -414,6 +418,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       }
     } catch (error: any) {
       console.error('Describe Error:', error);
+      if (profile) {
+        await refundCredits(profile.id, 'fotomatik_describe');
+        onRefreshProfile();
+      }
       setErrorMessage(error.message || t.messages.describeError);
       setStatus(FotomatikAppStatus.ERROR);
     }
@@ -479,6 +487,10 @@ export const FotomatikPage: React.FC<FotomatikPageProps> = ({ profile, onRefresh
       });
     } catch (error: any) {
       console.error('Enhance Error:', error);
+      if (profile) {
+        await refundCredits(profile.id, 'fotomatik_transform');
+        onRefreshProfile();
+      }
       setErrorMessage(error.message || t.messages.enhanceError);
       setStatus(FotomatikAppStatus.ERROR);
     }

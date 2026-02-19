@@ -974,7 +974,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const { language, setLanguage } = useI18n();
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme') as Theme;
-    return saved || 'dark';
+    return saved || 'light';
   });
 
   useEffect(() => {

@@ -6,7 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { useTranslation, TranslationRecord } from '../lib/i18n';
 import { Profile, CREDIT_COSTS } from '../lib/supabase';
-import { checkAndDeductCredits, saveGeneration } from '../lib/database';
+import { checkAndDeductCredits, saveGeneration, refundCredits } from '../lib/database';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 import { Layout } from '../components/Layout';
 import { VideoSettingsModal } from '../components/VideoSettingsModal';
@@ -466,6 +466,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             });
         } catch (error) {
             console.error('Generation error:', error);
+            await refundCredits(profile.id, 'collage');
+            onRefreshProfile();
             alert(getFriendlyErrorMessage(error, (localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'));
         } finally {
             setIsGenerating(false);
@@ -580,6 +582,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             });
         } catch (error) {
             console.error('Video generation error:', error);
+            await refundCredits(profile.id, videoOpType as 'video_high' | 'video_fast');
+            onRefreshProfile();
             alert(getFriendlyErrorMessage(error, (localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'));
         } finally {
             setIsVideoGenerating(false);

@@ -2,7 +2,8 @@ import { supabase, CREDIT_COSTS, Generation } from '../lib/supabase';
 
 export const checkAndDeductCredits = async (
   userId: string,
-  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'video_fast' | 'video_high' | 'tech_sketch' | 'tech_pack' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage'
+  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'video_fast' | 'video_high' | 'tech_sketch' | 'tech_pack' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage',
+  customAmount?: number
 ): Promise<{ success: boolean; message?: string; remainingCredits?: number }> => {
   try {
     // Get user profile
@@ -35,7 +36,7 @@ export const checkAndDeductCredits = async (
       'collage': 'COLLAGE',
     };
 
-    const creditsNeeded = CREDIT_COSTS[creditCostMap[operationType]];
+    const creditsNeeded = customAmount ?? CREDIT_COSTS[creditCostMap[operationType]];
 
     if (profile.credits < creditsNeeded) {
       return {
@@ -63,6 +64,42 @@ export const checkAndDeductCredits = async (
       success: false,
       message: 'Kredi kontrolü sırasında bir hata oluştu.',
     };
+  }
+};
+
+/**
+ * Hata durumunda düşülen krediyi iade eder.
+ * İşlem başarısız olduğunda catch bloğunda çağrılır.
+ */
+export const refundCredits = async (
+  userId: string,
+  operationType: 'sketch_to_product' | 'product_to_model' | 'video' | 'video_fast' | 'video_high' | 'tech_sketch' | 'tech_pack' | 'pixshop' | 'fotomatik_transform' | 'fotomatik_describe' | 'adgenius_campaign_image' | 'adgenius_campaign_video' | 'adgenius_ecommerce_image' | 'adgenius_ecommerce_video' | 'collage',
+  customAmount?: number
+): Promise<void> => {
+  try {
+    const creditCostMap: Record<string, keyof typeof CREDIT_COSTS> = {
+      'sketch_to_product': 'SKETCH_TO_PRODUCT',
+      'product_to_model': 'PRODUCT_TO_MODEL',
+      'video': 'VIDEO',
+      'video_fast': 'VIDEO_FAST',
+      'video_high': 'VIDEO_HIGH',
+      'tech_sketch': 'TECH_SKETCH',
+      'tech_pack': 'TECH_PACK',
+      'pixshop': 'PIXSHOP',
+      'fotomatik_transform': 'FOTOMATIK_TRANSFORM',
+      'fotomatik_describe': 'FOTOMATIK_DESCRIBE',
+      'adgenius_campaign_image': 'ADGENIUS_IMAGE',
+      'adgenius_campaign_video': 'ADGENIUS_VIDEO',
+      'adgenius_ecommerce_image': 'ADGENIUS_IMAGE',
+      'adgenius_ecommerce_video': 'ADGENIUS_VIDEO',
+      'collage': 'COLLAGE',
+    };
+
+    const refundAmount = customAmount ?? CREDIT_COSTS[creditCostMap[operationType]];
+    await addCreditsToUser(userId, refundAmount);
+    console.log(`💰 Kredi iadesi: ${refundAmount} kredi (${operationType}) → user: ${userId}`);
+  } catch (refundError) {
+    console.error('❌ Kredi iadesi başarısız:', refundError);
   }
 };
 
