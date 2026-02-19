@@ -756,6 +756,34 @@ IMPORTANT: Preserve the exact product design, color, and details from the refere
       return await attemptGeneration(simplifiedPrompt);
     }
 
+    // 🔄 FAL.AI GÖRSEL FALLBACK — Tüm Gemini denemeleri başarısız olunca
+    const errMsg = error?.message?.toLowerCase() || '';
+    const isServerIssue = errMsg.includes('server_overloaded') || errMsg.includes('503') ||
+      errMsg.includes('unavailable') || errMsg.includes('high demand') ||
+      errMsg.includes('429') || errMsg.includes('overloaded');
+
+    if (isServerIssue) {
+      try {
+        const { falGenerateImage, hasFalApiKey } = await import('./falaiService');
+        if (hasFalApiKey()) {
+          console.log('🔀 Tüm Gemini denemeleri başarısız, Fal.ai AdGenius fallback devreye giriyor...');
+          window.dispatchEvent(new CustomEvent('fal-fallback-active', {
+            detail: { message: '🔄 Ana sunucu yoğun, alternatif AI sunucusuna geçiliyor... Bu işlem biraz daha uzun sürebilir, özür dileriz.' }
+          }));
+          const result = await falGenerateImage(prompt, { imageSize: '1024x1024' });
+          window.dispatchEvent(new CustomEvent('fal-fallback-success', {
+            detail: { message: '✅ Reklam görseli alternatif sunucu ile başarıyla oluşturuldu.' }
+          }));
+          return result;
+        }
+      } catch (falErr: any) {
+        console.error('❌ Fal.ai AdGenius fallback da başarısız:', falErr.message);
+        window.dispatchEvent(new CustomEvent('fal-fallback-failed', {
+          detail: { message: '❌ Alternatif sunucu da yanıt veremedi. Lütfen birkaç dakika sonra tekrar deneyin.' }
+        }));
+      }
+    }
+
     throw error;
   }
 };
@@ -935,6 +963,40 @@ export const generateAdVideo = async (
       }
 
       if (attempt === MAX_RETRIES) {
+        // 🔄 FAL.AI VIDEO FALLBACK
+        const errorMsg = err.message?.toLowerCase() || '';
+        const isServerIssue = errorMsg.includes('503') || errorMsg.includes('unavailable') ||
+          errorMsg.includes('overloaded') || errorMsg.includes('high demand') ||
+          errorMsg.includes('429') || errorMsg.includes('zaman aşımı');
+
+        if (isServerIssue) {
+          try {
+            const { falGenerateVideo, hasFalApiKey } = await import('./falaiService');
+            if (hasFalApiKey()) {
+              console.log('🔀 Veo başarısız, Fal.ai AdGenius video fallback devreye giriyor...');
+              window.dispatchEvent(new CustomEvent('fal-fallback-active', {
+                detail: { message: '🔄 Video sunucusu yoğun, alternatif AI sunucusuna geçiliyor... Bu işlem biraz daha uzun sürebilir, özür dileriz.' }
+              }));
+
+              const result = await falGenerateVideo(promptType, {
+                imageUrl: `data:image/png;base64,${imageB64Data}`,
+                duration: 5,
+                aspectRatio,
+              });
+
+              window.dispatchEvent(new CustomEvent('fal-fallback-success', {
+                detail: { message: '✅ Video alternatif sunucu ile başarıyla oluşturuldu.' }
+              }));
+              return result;
+            }
+          } catch (falErr: any) {
+            console.error('❌ Fal.ai video fallback da başarısız:', falErr.message);
+            window.dispatchEvent(new CustomEvent('fal-fallback-failed', {
+              detail: { message: '❌ Alternatif video sunucusu da yanıt veremedi.' }
+            }));
+          }
+        }
+
         throw new Error(`Video oluşturulamadı (${MAX_RETRIES} deneme sonrası): ${err.message}`);
       }
     }
