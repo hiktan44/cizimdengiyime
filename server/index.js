@@ -120,9 +120,18 @@ const getStripe = async () => {
 
 // --- ROUTES ---
 
-// Health Check
+// Health Check (Frontend/API)
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Backend is running' });
+});
+
+// Coolify System Health Check (ZORUNLU)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: Date.now(),
+    uptime: process.uptime()
+  });
 });
 
 // 1. Get Currency Rate (TCMB)
