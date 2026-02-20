@@ -23,6 +23,10 @@ const trAuth = {
   hasAccount: 'Zaten hesabınız var mı? Giriş yapın',
   backToLogin: 'Giriş ekranına dön',
   defaultError: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+  corporateWarningTitle: 'Kurumsal Ağ / Güvenlik Uyarısı',
+  corporateWarningDesc: 'Şirket ağı veya VPN üzerinden bağlanıyorsanız, güvenlik duvarınız bu işlemi (özellikle Google ile bağlantılarda) yanlışlıkla "Phishing (Oltalama)" olarak algılayıp engelleyebilir.',
+  corporateWarningSolutionLabel: 'Çözüm:',
+  corporateWarningSolution: 'Tarayıcı uyarısında "Güvenli olarak devam et" seçeneğini kullanın veya işlemi kişisel ağınızdan (Mobil Veri vs.) yapmayı deneyin.',
 };
 
 const authTranslations: TranslationRecord<typeof trAuth> = {
@@ -47,6 +51,10 @@ const authTranslations: TranslationRecord<typeof trAuth> = {
     hasAccount: 'Already have an account? Sign in',
     backToLogin: 'Back to login',
     defaultError: 'An error occurred. Please try again.',
+    corporateWarningTitle: 'Corporate Network / Security Warning',
+    corporateWarningDesc: 'If you are connecting from a corporate network or VPN, your firewall might mistakenly detect this action (especially Google connections) as "Phishing" and block it.',
+    corporateWarningSolutionLabel: 'Solution:',
+    corporateWarningSolution: 'Use the "Continue to site" option on the browser warning, or try connecting from your personal network (Mobile Data).',
   },
 };
 
@@ -149,6 +157,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Social Login - Hide in forgot password mode */}
         {mode !== 'forgot-password' && (
           <>
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 sm:p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div className="text-xs sm:text-sm text-amber-200/90 leading-relaxed">
+                  <p className="font-semibold text-amber-500 mb-1">{t.corporateWarningTitle}</p>
+                  <p className="mb-2">{t.corporateWarningDesc}</p>
+                  <p className="text-amber-400">
+                    <span className="font-semibold text-white">{t.corporateWarningSolutionLabel}</span> {t.corporateWarningSolution}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-3 mb-6">
               <button
                 onClick={onGoogleSignIn}
