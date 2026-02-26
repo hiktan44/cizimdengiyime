@@ -799,7 +799,9 @@ export const generateImage = async (
     // Enhanced detailed descriptions to force consistency across multiple calls
     const gen = gender || 'Female';
     const age = ageRange || 'Adult';
-    const eth = ethnicity && ethnicity !== 'Genel Dünya Karması' ? ethnicity : 'diverse international model';
+    const ethRaw = ethnicity && ethnicity !== 'Genel Dünya Karması' ? ethnicity : 'diverse international model';
+    // Slav değerini Gemini için açıklayıcı prompt'a çevir
+    const eth = ethRaw === 'Slav' ? 'Slavic/Eastern European (Russian, Ukrainian type features - fair skin, light eyes, angular cheekbones)' : ethRaw;
 
     const isMale = gen === 'Male';
 

@@ -1296,6 +1296,7 @@ const ToolPage: React.FC<{
                                                     <option value="Afrikalı">{t.modelSettings.ethnicity.african}</option>
                                                     <option value="Latin">{t.modelSettings.ethnicity.latin}</option>
                                                     <option value="Orta Doğulu">{t.modelSettings.ethnicity.middleEastern}</option>
+                                                    <option value="Slav">{t.modelSettings.ethnicity.slavic}</option>
                                                 </select>
                                             </div>
                                             <div>

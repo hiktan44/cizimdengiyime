@@ -106,6 +106,7 @@ export interface AppTranslationType {
             african: string;
             latin: string;
             middleEastern: string;
+            slavic: string;
         };
         artisticStyle: {
             label: string;
@@ -427,6 +428,7 @@ export const appTranslations: TranslationRecord<AppTranslationType> = {
                 african: 'Afrikalı',
                 latin: 'Latin',
                 middleEastern: 'Orta Doğulu',
+                slavic: 'Slav / Doğu Avrupalı',
             },
             artisticStyle: {
                 label: 'Sanatsal Stil',
@@ -746,6 +748,7 @@ export const appTranslations: TranslationRecord<AppTranslationType> = {
                 african: 'African',
                 latin: 'Latin',
                 middleEastern: 'Middle Eastern',
+                slavic: 'Slavic / Eastern European',
             },
             artisticStyle: {
                 label: 'Artistic Style',
