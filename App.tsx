@@ -1627,24 +1627,19 @@ const ToolPage: React.FC<{
                                                         className="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-cyan-400 hover:file:bg-slate-600"
                                                     />
                                                     {customBackgroundFile && <p className="text-xs text-green-400 mt-1">✓ {t.modelSettings.location.uploaded}: {customBackgroundFile.name}</p>}
+                                                    {/* Custom Background Prompt - sadece Özel Arka Plan seçildiğinde */}
+                                                    <div className="relative">
+                                                        <textarea
+                                                            value={customBackgroundPrompt}
+                                                            onChange={(e) => setCustomBackgroundPrompt(e.target.value)}
+                                                            placeholder={t.modelSettings.location.bgPromptPlaceholder}
+                                                            rows={2}
+                                                            className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-xs placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-y min-h-[80px]"
+                                                        />
+                                                        <p className="text-xs text-slate-500 mt-1">{t.modelSettings.location.bgPromptHint}</p>
+                                                    </div>
                                                 </div>
                                             )}
-                                            {/* Custom Background Prompt */}
-                                            <div className="mt-2 relative">
-                                                <textarea
-                                                    value={customBackgroundPrompt}
-                                                    onChange={(e) => setCustomBackgroundPrompt(e.target.value)}
-                                                    placeholder={t.modelSettings.location.bgPromptPlaceholder}
-                                                    rows={2}
-                                                    className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white text-xs placeholder-slate-500 focus:ring-cyan-500 focus:border-cyan-500 transition resize-y min-h-[80px]"
-                                                />
-                                                <div className="absolute bottom-2 right-2 text-slate-600 pointer-events-none opacity-50">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 13v6m0 0h-6m6 0L13 13" />
-                                                    </svg>
-                                                </div>
-                                                <p className="text-xs text-slate-500 mt-1">{t.modelSettings.location.bgPromptHint}</p>
-                                            </div>
                                         </div>
                                     </div>
 
