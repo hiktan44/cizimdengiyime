@@ -188,14 +188,14 @@ const getLocationPromptFragment = (location: string): string => {
         case 'Sokak':
             return 'Model, hareketli, flu arka planlı şık bir şehir sokağında durmalıdır (Urban Chic).';
         case 'Stüdyo':
-            return 'Model, sonsuz fonlu (cyclorama) minimalist ve profesyonel bir stüdyo ortamında durmalıdır.';
+            return 'Model, sonsuz fonlu (cyclorama) minimalist ve profesyonel bir stüdyo ortamında durmalıdır. Arka plan tamamen temiz, tek renk ve pürüzsüz olmalıdır. Stüdyo ekipmanları (softbox, tripod, ışık standı, reflektör, kablo, C-stand) KESİNLİKLE görünmeyecek. Sadece temiz, sonsuz fon ve yumuşak gölgeler.';
         case 'Doğal Mekan':
             return 'Model, gün ışığı alan doğal bir mekanda (orman, sahil, bahçe) durmalıdır.';
         case 'Lüks Mağaza':
             return 'Model, lüks bir moda mağazasının şık ve modern iç mekanında durmalıdır.';
         case 'Podyum':
         default:
-            return 'Model, profesyonel bir stüdyo ortamında doğal bir şekilde hafifçe dönerek ve poz vererek kıyafetini sergilemelidir. Hareketler abartısız, akıcı ve gerçekçi olmalıdır. Arka plan gerçek bir profesyonel video çekimi atmosferinde olmalıdır.';
+            return 'Model, profesyonel bir stüdyo ortamında doğal bir şekilde hafifçe dönerek ve poz vererek kıyafetini sergilemelidir. Hareketler abartısız, akıcı ve gerçekçi olmalıdır. Arka plan temiz ve sonsuz fonlu olmalıdır. Stüdyo ekipmanları (softbox, tripod, ışık standı, reflektör) KESİNLİKLE görünmeyecek.';
     }
 };
 

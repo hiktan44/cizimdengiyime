@@ -296,7 +296,12 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
    TECHNICAL QUALITY: ${selectedStyle}. 8k resolution, hyper-realistic, sharp focus, professional three-point lighting, clean textures.
    
    ${textRenderingInstruction}
-   
+    
+    *** ÜRÜN VE MODEL DEĞİŞMEZLİK KURALLARI (TÜM KARELER İÇİN) ***
+    - Model yüzü: AYNI kişi, AYNI yüz hatları, AYNI ifade. Hiçbir karede farklı yüz ÜRETME.
+    - Kıyafet: Referans görseldeki AYNI kıyafet, AYNI renk, AYNI desen, AYNI kesim. Hiçbir detay değişmez.
+    - Aksesuarlar: Referans görseldeki tüm aksesuarlar her karede AYNI.
+    
    ${userCustomInstruction}
    `;
 
@@ -323,7 +328,25 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
     - COLOR TEMPERATURE: 5500K daylight balanced, consistent across all frames.
     - ATMOSPHERE: Clean, professional, distraction-free. NO gradient shifts, NO color variations between shots.
     
-    CRITICAL: The background, lighting, and overall studio environment must be PIXEL-PERFECT IDENTICAL in every image. Only the model's POSE changes.`;
+    *** STÜDYO TEMİZLİĞİ KURALLARI (MUTLAK) ***
+    - Işık kaynakları (softbox, ring light, strobe), tripodlar, standlar, kablolar, yansıtıcılar ASLA görünmeyecek.
+    - Arka planda SADECE temiz, pürüzsüz, tek renk cyclorama duvarı olacak.
+    - Kamera ekipmanları, reflektörler, c-stand'ler, ışık diffizerlerı KESİNLİKLE kadraja girmeyecek.
+    
+    CRITICAL: The background, lighting, and overall studio environment must be PIXEL-PERFECT IDENTICAL in every image. Only the model's POSE changes.
+    
+    *** MODEL VE KİYASET SABİTLİĞİ KURALLARI (DEĞİŞMEZ) ***
+    1. MODEL YÜZÜ: Tüm karelerde AYNI YÜZ. Yüz hatları, burun şekli, göz rengi, kaş yapısı, dudak şekli %100 aynı. Yüz hiçbir karede DEĞİŞMEZ.
+    2. VÜCUT ÖLÇÜLERİ: Boy, kilo, omuz genişliği, bel ölçüsü tüm karelerde AYNI.
+    3. KİYASET: Modelin üzerindeki kıyafet (${analysis.urun_adi}) HER karede BİREBİR AYNI. Renk, desen, kesim, dikiş, düğme, fermuarlar DEĞİŞMEZ.
+    4. AKSESUARLAR: Eğer modelite aksesuar varsa (saat, kolye, yüzük, kemer) tüm karelerde AYNI aksesuar AYNI konumda.
+    5. SAÇ: Saç stili, saç rengi, saç uzunluğu tüm karelerde DEĞİŞMEZ.
+    6. MAKYAJ: Makyaj stili ve tonu tüm karelerde AYNI.
+    
+    *** YAKIN PLAN ÇEKİM HASSASİYETİ ***
+    - Yakın plan çekimlerde ürün rengi, dokusu, deseni EKSTRA hassasiyetle korunmalı.
+    - Kumaş dokusu, iplik detayları, baskı kalitesi piksel düzeyinde doğru olmalı.
+    - Renk sıcaklığı diğer karelerle BİREBİR AYNI olmalı.`;
 
 
     // 12 Distinct Poses for E-commerce - REORDERED for Better Default Selection (First 8)
@@ -496,6 +519,13 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
         text: `${baseInstruction}
         
         ${transformationInstruction}
+
+        *** KAMPANYA SERİSİ TUTARLILIK KURALI ***
+        Mekan ve sahne değişse bile:
+        - AYNI model, AYNI yüz, AYNI vücut ölçüleri.
+        - AYNI kıyafet (${analysis.urun_adi}), AYNI renk, AYNI desen, AYNI kesim.
+        - AYNI aksesuarlar, AYNI saç stili, AYNI makyaj.
+        Sadece MEKAN ve POZ değişir, MODEL ve KIYAFETİ DEĞİŞMEZ.
 
         ${env.text}`
       }
