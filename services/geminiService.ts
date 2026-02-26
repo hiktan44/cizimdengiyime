@@ -13,11 +13,15 @@ const checkApiKey = () => {
 
 // Model fallback listesi - 503 hatası durumunda sırayla denenecek
 const IMAGE_MODELS = [
+    'gemini-3.1-flash-image-preview',
     'gemini-3-pro-image-preview',
     'gemini-3-pro-preview',
     'gemini-2.0-flash-preview-image-generation',
     'imagen-3.0-generate-002'
 ] as const;
+
+// Canlı model için Flash model (2K, 2 sonuç)
+const LIVE_MODEL_PRIMARY = 'gemini-3.1-flash-image-preview';
 
 // Retry helper fonksiyonu - 503 hatalarında otomatik yeniden deneme + fal.ai fallback
 const withRetry = async <T>(
@@ -687,13 +691,13 @@ export const generateImage = async (
     shoeType?: string,
     shoeColor?: string,
     accessories?: string,
-    ageRange?: string, // New: Yaş Aralığı (Child, Teen, Adult, Elderly)
-    gender?: string,   // New: Cinsiyet
-    secondProductFile?: File, // New: İkinci ürün görseli (Alt & Üst kombin için)
-    patternImageFile?: File, // New: Desen/Baskı görseli
-    seed?: number, // New: Seed for consistency
-    modelIdentityFile?: File // New: Previous generation result for identity locking
-): Promise<string> => {
+    ageRange?: string, // Yaş Aralığı (Child, Teen, Adult, Elderly)
+    gender?: string,   // Cinsiyet
+    secondProductFile?: File, // İkinci ürün görseli (Alt & Üst kombin için)
+    patternImageFile?: File, // Desen/Baskı görseli
+    seed?: number, // Seed for consistency
+    modelIdentityFile?: File // Previous generation result for identity locking
+): Promise<string[]> => {
     checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(imageFile);
@@ -1006,52 +1010,93 @@ export const generateImage = async (
     // Add text prompt to parts
     promptParts.push({ text: prompt });
 
+    // 🔥 gemini-3.1-flash-image-preview ile 2 varyant üret
+    const selectedModel = LIVE_MODEL_PRIMARY;
+    const targetAspectRatio = aspectRatio === '16:9' ? '16:9' :
+        aspectRatio === '9:16' ? '9:16' :
+            aspectRatio === '1:1' ? '1:1' :
+                '3:4';
+
+    console.log(`🚀 Canlı Model Üretimi - Model: ${selectedModel}, 2 varyant, 2K çözünürlük`);
+
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
+            model: selectedModel,
             contents: {
                 parts: promptParts,
             },
             config: {
                 responseModalities: [Modality.IMAGE],
-                ...(effectiveSeed ? { seed: effectiveSeed } : {}), // Use effectiveSeed (from reference image or user input)
+                ...(effectiveSeed ? { seed: effectiveSeed } : {}),
+                candidateCount: 1, // Maliyet optimizasyonu: tek sonuç üret
                 imageConfig: {
                     imageSize: '2K',
-                    aspectRatio: aspectRatio === '16:9' ? '16:9' :
-                        aspectRatio === '9:16' ? '9:16' :
-                            aspectRatio === '1:1' ? '1:1' :
-                                '3:4' // Default/Fallback for others
+                    aspectRatio: targetAspectRatio,
                 }
             },
         });
 
-        const candidate = response.candidates?.[0];
+        // Tüm candidate'lerden görselleri topla
+        const results: string[] = [];
 
-        if (!candidate) {
-            throw new Error("API'den boş yanıt alındı.");
-        }
-
-        if (candidate.finishReason && candidate.finishReason !== 'STOP') {
-            if (!candidate.content?.parts) {
-                throw new Error(`Görsel oluşturulamadı.Sebep: ${candidate.finishReason} `);
+        if (response.candidates) {
+            for (const candidate of response.candidates) {
+                if (candidate.finishReason && candidate.finishReason !== 'STOP' && !candidate.content?.parts) {
+                    console.warn(`⚠️ Candidate atlandı, sebep: ${candidate.finishReason}`);
+                    continue;
+                }
+                const parts = candidate.content?.parts;
+                if (parts) {
+                    for (const part of parts) {
+                        if (part.inlineData) {
+                            results.push(`data:${part.inlineData.mimeType};base64,${part.inlineData.data}`);
+                        }
+                    }
+                }
             }
         }
 
-        const parts = candidate.content?.parts;
-        if (!parts) {
-            throw new Error("Görsel içeriği bulunamadı.");
+        if (results.length === 0) {
+            throw new Error("API'den görsel alınamadı.");
         }
 
-        for (const part of parts) {
-            if (part.inlineData) {
-                const base64ImageBytes: string = part.inlineData.data;
-                return `data:${part.inlineData.mimeType}; base64, ${base64ImageBytes} `;
+        console.log(`✅ ${results.length} varyant başarıyla üretildi (${selectedModel})`);
+        return results;
+    } catch (e: any) {
+        console.error(`❌ ${selectedModel} başarısız:`, e.message);
+
+        // Fallback: gemini-3-pro-image-preview ile tek sonuç dene
+        console.log('🔀 Fallback: gemini-3-pro-image-preview ile tekli üretim deneniyor...');
+        try {
+            const fallbackResponse = await ai.models.generateContent({
+                model: 'gemini-3-pro-image-preview',
+                contents: {
+                    parts: promptParts,
+                },
+                config: {
+                    responseModalities: [Modality.IMAGE],
+                    ...(effectiveSeed ? { seed: effectiveSeed } : {}),
+                    imageConfig: {
+                        imageSize: '2K',
+                        aspectRatio: targetAspectRatio,
+                    }
+                },
+            });
+
+            const candidate = fallbackResponse.candidates?.[0];
+            if (candidate?.content?.parts) {
+                for (const part of candidate.content.parts) {
+                    if (part.inlineData) {
+                        console.log('✅ Fallback ile 1 sonuç üretildi');
+                        return [`data:${part.inlineData.mimeType};base64,${part.inlineData.data}`];
+                    }
+                }
             }
+            throw new Error("Fallback model de görsel üretemedi.");
+        } catch (fallbackError) {
+            console.error("❌ Fallback de başarısız:", fallbackError);
+            throw e; // Orijinal hatayı fırlat
         }
-        throw new Error("Görsel yanıtı işlenemedi.");
-    } catch (e) {
-        console.error("Model Oluşturma Hatası:", e);
-        throw e;
     }
 };
 

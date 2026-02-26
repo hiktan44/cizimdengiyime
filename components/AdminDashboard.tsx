@@ -6,12 +6,13 @@ import { UserActivityPanel } from './admin/UserActivityPanel';
 import { TransactionsPanel } from './admin/TransactionsPanel';
 import AffiliateManagement from './admin/AffiliateManagement';
 import { CreditReportsPanel } from './admin/CreditReportsPanel';
+import { MobileLandingPanel } from './admin/MobileLandingPanel';
 import { useTranslation, TranslationRecord } from '../lib/i18n';
 
 const trAdmin = {
     title: 'Admin Paneli',
     subtitle: 'Sistemin tüm yönetim fonksiyonlarına buradan erişebilirsiniz.',
-    tabs: { content: '📸 İçerik Yönetimi', settings: '⚙️ Ayarlar', users: '👥 Kullanıcı Aktivitesi', transactions: '💳 Ödemeler', adgenius: '🚀 AdGenius Yönetimi', affiliates: '🤝 Ortaklık Yönetimi', creditReports: '📊 Kredi Raporları' },
+    tabs: { content: '📸 İçerik Yönetimi', settings: '⚙️ Ayarlar', users: '👥 Kullanıcı Aktivitesi', transactions: '💳 Ödemeler', adgenius: '🚀 AdGenius Yönetimi', affiliates: '🤝 Ortaklık Yönetimi', creditReports: '📊 Kredi Raporları', mobileLanding: '📱 Mobil Landing' },
     heroVideos: { title: '🎬 Hero Gömülü Videolar (4 Adet)', subtitle: 'Hero bölümünde arka planda sırayla dönecek 4 videoyu yükleyin. Videolar otomatik olarak geçiş yapacak.' },
     showcase: { title: '📸 Showcase Görselleri', subtitle: 'Çizimden gerçeğe dönüşüm örnekleri için görselleri yükleyin.', sketch: '1. Çizim (Sketch)', product: '2. Ürün (Product)', model: '3. Model (Live)', video: '4. Video' },
     pixshopBoxes: { title: '🖌️ Pixshop Kutuları', subtitle: 'Landing sayfasındaki Pixshop bölümünün görsellerini yükleyin.', retush: 'Akıllı Rötuş', productPlacement: 'Ürün Ekleme (Product Placement)' },
@@ -24,7 +25,7 @@ const adminTranslations: TranslationRecord<typeof trAdmin> = {
     en: {
         title: 'Admin Panel',
         subtitle: 'Access all system management functions from here.',
-        tabs: { content: '📸 Content Management', settings: '⚙️ Settings', users: '👥 User Activity', transactions: '💳 Payments', adgenius: '🚀 AdGenius Management', affiliates: '🤝 Affiliate Management', creditReports: '📊 Credit Reports' },
+        tabs: { content: '📸 Content Management', settings: '⚙️ Settings', users: '👥 User Activity', transactions: '💳 Payments', adgenius: '🚀 AdGenius Management', affiliates: '🤝 Affiliate Management', creditReports: '📊 Credit Reports', mobileLanding: '📱 Mobile Landing' },
         heroVideos: { title: '🎬 Hero Background Videos (4)', subtitle: 'Upload 4 videos to rotate in the hero section background. Videos will transition automatically.' },
         showcase: { title: '📸 Showcase Images', subtitle: 'Upload images for sketch-to-reality transformation examples.', sketch: '1. Sketch', product: '2. Product', model: '3. Model (Live)', video: '4. Video' },
         pixshopBoxes: { title: '🖌️ Pixshop Boxes', subtitle: 'Upload images for the Pixshop section on the landing page.', retush: 'Smart Retouch', productPlacement: 'Product Placement' },
@@ -150,7 +151,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
         ...headerProps
     } = props;
 
-    const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions' | 'adgenius' | 'affiliates' | 'creditReports'>('content');
+    const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'users' | 'transactions' | 'adgenius' | 'affiliates' | 'creditReports' | 'mobileLanding'>('content');
     const t = useTranslation(adminTranslations);
 
 
@@ -158,6 +159,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
     const tabs = [
         { id: 'content' as const, label: t.tabs.content, icon: '📸' },
         { id: 'adgenius' as const, label: t.tabs.adgenius, icon: '🚀' },
+        { id: 'mobileLanding' as const, label: t.tabs.mobileLanding, icon: '📱' },
         { id: 'settings' as const, label: t.tabs.settings, icon: '⚙️' },
         { id: 'users' as const, label: t.tabs.users, icon: '👥' },
         { id: 'transactions' as const, label: t.tabs.transactions, icon: '💳' },
@@ -178,7 +180,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
 
                 {/* Tab Navigation */}
                 <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-2 mb-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
@@ -401,6 +403,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
                     {activeTab === 'transactions' && <TransactionsPanel />}
                     {activeTab === 'affiliates' && <AffiliateManagement language={(localStorage.getItem('fasheone_language') as 'tr' | 'en') || 'tr'} />}
                     {activeTab === 'creditReports' && <CreditReportsPanel />}
+                    {activeTab === 'mobileLanding' && <MobileLandingPanel />}
                 </div>
             </main>
         </div>

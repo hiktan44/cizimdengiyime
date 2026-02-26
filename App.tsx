@@ -526,7 +526,7 @@ const ToolPage: React.FC<{
             }
 
             try {
-                const imageUrl = await generateImage(
+                const imageResults = await generateImage(
                     sourceFile,
                     clothingType,
                     colorSuggestion,
@@ -559,8 +559,13 @@ const ToolPage: React.FC<{
                 );
                 finishProgress();
 
+                // imageResults: string[] (genelde 1 sonuç)
+                const primaryImage = imageResults[0];
+
+                console.log(`🎨 Sonuç alındı (gemini-3.1-flash-image-preview)`);
+
                 setTimeout(() => {
-                    setGeneratedImageUrl(imageUrl);
+                    setGeneratedImageUrl(primaryImage);
                     setIsModelLoading(false);
                 }, 600);
 
@@ -570,7 +575,7 @@ const ToolPage: React.FC<{
                     'product_to_model',
                     CREDIT_COSTS.PRODUCT_TO_MODEL,
                     null,
-                    imageUrl,
+                    primaryImage,
                     null,
                     {
                         clothingType, colorSuggestion, secondaryColor, modelEthnicity,
@@ -578,7 +583,8 @@ const ToolPage: React.FC<{
                         customPrompt, lighting, cameraAngle, cameraZoom, aspectRatio,
                         fabricType, fabricFinish, shoeType, shoeColor, accessories,
                         ageRange, gender,
-                        isKombinMode, hasPattern: !!patternFile
+                        isKombinMode, hasPattern: !!patternFile,
+                        model: 'gemini-3.1-flash-image-preview'
                     }
                 );
 
@@ -592,6 +598,7 @@ const ToolPage: React.FC<{
                     artisticStyle,
                     location,
                     isKombinMode,
+                    model: 'gemini-3.1-flash-image-preview',
                     userId: profile.id
                 });
             } catch (error) {
@@ -1642,6 +1649,20 @@ const ToolPage: React.FC<{
                                             onConvertToVideo={() => setIsVideoModalOpen(true)}
                                             onShare={() => handleShare(generatedVideoUrl || generatedImageUrl)}
                                             isShareSupported={isShareSupported}
+                                            onGenerateVariant={() => {
+                                                // Mevcut sonucu Varyant A olarak sakla, yeni seed ile tekrar üret
+                                                const currentImage = generatedImageUrl;
+                                                if (currentImage) {
+                                                    // Mevcut görseli variant olarak event gönder
+                                                    window.dispatchEvent(new CustomEvent('model-variants-ready', {
+                                                        detail: { variant1: currentImage, variant2: null, count: 1 }
+                                                    }));
+                                                }
+                                                // Yeni seed ile tekrar üret (lock'u geçici kapat)
+                                                setModelSeed(null);
+                                                setIsModelLocked(false);
+                                                handleGenerateModelClick();
+                                            }}
                                         />
                                     </div>
                                 </div>

@@ -438,6 +438,14 @@ export const UserActivityPanel: React.FC<UserActivityPanelProps> = ({ currentUse
                     <td className="px-4 py-3">
                       <div className="text-sm font-medium text-white">{user.full_name || t.table.unnamed}</div>
                       <div className="text-xs text-slate-400">{user.email}</div>
+                      {user.signup_platform && (
+                        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold mt-1 w-fit ${user.signup_platform === 'mobile'
+                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40'
+                            : 'bg-slate-600/40 text-slate-300 border border-slate-500/40'
+                          }`}>
+                          {user.signup_platform === 'mobile' ? '📱 Mobil Kayıt' : '🌐 Web Kayıt'}
+                        </span>
+                      )}
                     </td>
                   )}
                   {visibleColumns.phone && (

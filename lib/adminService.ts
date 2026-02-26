@@ -375,6 +375,7 @@ export interface UserActivity {
   total_credits_used: number;
   created_at: string;
   last_activity: string | null;
+  signup_platform?: 'mobile' | 'web' | null;
 }
 
 export const getAllUsersActivity = async (): Promise<UserActivity[]> => {
@@ -437,6 +438,7 @@ export const getAllUsersActivity = async (): Promise<UserActivity[]> => {
           total_credits_used: totalCreditsUsed,
           created_at: profile.created_at,
           last_activity: lastActivity,
+          signup_platform: profile.signup_platform || null,
         });
       }
 
@@ -462,6 +464,7 @@ export interface AdminTransaction {
   credits: number;
   status: 'pending' | 'completed' | 'failed';
   payment_method: string | null;
+  platform?: 'mobile' | 'web' | 'admin';
   stripe_payment_id: string | null;
   created_at: string;
 }
@@ -492,6 +495,7 @@ export const getAllTransactions = async (): Promise<AdminTransaction[]> => {
       credits: tx.credits,
       status: tx.status,
       payment_method: tx.payment_method,
+      platform: tx.platform || (tx.payment_method === 'revenuecat' ? 'mobile' : tx.payment_method === 'admin_grant' ? 'admin' : 'web'),
       stripe_payment_id: tx.stripe_payment_id,
       created_at: tx.created_at,
     }));
@@ -589,6 +593,7 @@ export const addCreditsToUser = async (
         credits: amount,
         status: 'completed',
         payment_method: 'admin_grant',
+        platform: 'admin',
         metadata: { reason, granted_by: 'admin' }
       });
 

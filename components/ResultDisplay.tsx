@@ -18,6 +18,7 @@ interface ResultDisplayProps {
     onConvertToVideo: () => void;
     onShare: () => void;
     isShareSupported: boolean;
+    onGenerateVariant?: () => void; // Yeni Varyant butonu callback
 }
 
 const LoadingState: React.FC<{ text: string, progress: number }> = ({ text, progress }) => (
@@ -59,7 +60,8 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
     onDownload,
     onConvertToVideo,
     onShare,
-    isShareSupported
+    isShareSupported,
+    onGenerateVariant
 }) => {
     const [activeTab, setActiveTab] = useState<'image' | 'comparison' | 'gallery' | 'video'>('image');
     const [isUpscaling, setIsUpscaling] = useState(false);
@@ -89,7 +91,6 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
         if (!currentImageUrl) return;
         setIsUpscaling(true);
         try {
-            // Convert current base64/url to File object
             const res = await fetch(currentImageUrl);
             const blob = await res.blob();
             const file = new File([blob], "image.png", { type: blob.type });
@@ -201,10 +202,10 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                             onClick={() => !tab.disabled && setActiveTab(tab.id as any)}
                             disabled={Boolean(tab.disabled)}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-900/40'
-                                    : tab.disabled
-                                        ? 'bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700'
-                                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border border-slate-600'
+                                ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-900/40'
+                                : tab.disabled
+                                    ? 'bg-slate-800 text-slate-600 cursor-not-allowed border border-slate-700'
+                                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border border-slate-600'
                                 }`}
                         >
                             {tab.label}
@@ -228,8 +229,13 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                                 <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
                                     <div className={`w-2 h-2 rounded-full ${isUpscaled ? 'bg-cyan-400 shadow-[0_0_8px_cyan]' : 'bg-green-400'}`}></div>
                                     <span className="text-xs font-bold text-white tracking-wide">
-                                        {isUpscaled ? '4K ULTRA DETAY' : 'HD READY'}
+                                        {isUpscaled ? '4K ULTRA DETAY' : '2K HD'}
                                     </span>
+                                </div>
+
+                                {/* Model Badge */}
+                                <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                                    <span className="text-[10px] font-medium text-slate-400">⚡ gemini-3.1-flash</span>
                                 </div>
                             </div>
                         )}
@@ -298,6 +304,22 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                                     <UpscaleIcon />
                                     <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                         4K Yap
+                                    </span>
+                                </button>
+                            )}
+
+                            {/* Yeni Varyant Butonu */}
+                            {activeTab === 'image' && onGenerateVariant && (
+                                <button
+                                    onClick={onGenerateVariant}
+                                    className="bg-amber-600/90 text-white p-3 rounded-full hover:bg-amber-500 transition-all shadow-lg backdrop-blur-sm group relative"
+                                    title="Yeni Varyant Oluştur (1 Kredi)"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Yeni Varyant (1₺)
                                     </span>
                                 </button>
                             )}

@@ -133,8 +133,8 @@ export const TransactionsPanel: React.FC = () => {
               key={status}
               onClick={() => setFilterStatus(status)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filterStatus === status
-                  ? 'bg-cyan-600 text-white'
-                  : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+                ? 'bg-cyan-600 text-white'
+                : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
                 }`}
             >
               {status === 'all'
@@ -193,7 +193,24 @@ export const TransactionsPanel: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-xs text-slate-400">{tx.payment_method || 'N/A'}</span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-slate-400">{tx.payment_method || 'N/A'}</span>
+                        {tx.platform === 'mobile' && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/40 w-fit">
+                            📱 Mobil
+                          </span>
+                        )}
+                        {tx.platform === 'web' && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-600/40 text-slate-300 border border-slate-500/40 w-fit">
+                            🌐 Web
+                          </span>
+                        )}
+                        {tx.platform === 'admin' && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-500/20 text-orange-400 border border-orange-500/40 w-fit">
+                            ⚙️ Admin
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-xs text-slate-400">{new Date(tx.created_at).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US')}</span>
