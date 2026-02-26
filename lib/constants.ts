@@ -17,6 +17,7 @@ export const CREDIT_COSTS = {
     ADGENIUS_VIDEO_HIGH: 4, // AdGenius video yüksek kalite (veo-3.1-generate)
     ADGENIUS_VIDEO: 3, // Geriye uyumluluk (fast varsayılan)
     COLLAGE: 2, // Kolaj oluşturma maliyeti (2-6 görsel birleştirme) - 2 kredi
+    MULTI_ITEM_MODEL: 2, // Çoklu ürün giydirme (2-6 ürün) - 2 kredi
 } as const;
 
 // Subscription plans

@@ -696,7 +696,8 @@ export const generateImage = async (
     secondProductFile?: File, // İkinci ürün görseli (Alt & Üst kombin için)
     patternImageFile?: File, // Desen/Baskı görseli
     seed?: number, // Seed for consistency
-    modelIdentityFile?: File // Previous generation result for identity locking
+    modelIdentityFile?: File, // Previous generation result for identity locking
+    multiItemFiles?: File[] // Çoklu ürün görselleri (2-6 ürün)
 ): Promise<string[]> => {
     checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -710,9 +711,16 @@ export const generateImage = async (
         if (secondProductFile instanceof Blob) {
             const secondPart = await fileToGenerativePart(secondProductFile);
             promptParts.push(secondPart);
-            console.log('📦 İkinci ürün görseli (Alt Giyim) eklendi');
-        } else {
-            console.warn('⚠️ İkinci ürün görseli (Alt Giyim) geçersiz format (Blob değil), atlanıyor:', typeof secondProductFile);
+        }
+    }
+
+    // Çoklu ürün görselleri ekle (Multi-Item mode)
+    if (multiItemFiles && multiItemFiles.length > 0) {
+        for (let i = 0; i < multiItemFiles.length; i++) {
+            if (multiItemFiles[i] instanceof Blob) {
+                const itemPart = await fileToGenerativePart(multiItemFiles[i]);
+                promptParts.push(itemPart);
+            }
         }
     }
 
@@ -923,6 +931,38 @@ export const generateImage = async (
     ` : ''}
     
     ${getStylePromptFragment(style)} `;
+
+    // Çoklu ürün modu - Giyim katmanlama kuralları
+    if (multiItemFiles && multiItemFiles.length > 0) {
+        const totalImages = 1 + multiItemFiles.length; // Ana ürün + ek ürünler
+        prompt += `
+
+*** ÇOKLU ÜRÜN GİYDİRME MODU ***
+Bu istekte toplamda ${totalImages} farklı kıyafet/aksesuar görseli verilmiştir.
+HER BİR ÜRÜNÜ modelin üzerinde DOĞRU KATMANLAMA SIRASI ile giydirmelisin.
+
+GİYİM KATMANLAMA KURALLARI (İÇTEN DIŞA DOĞRU):
+1. İÇ KATMAN: İç çamaşırı, atlet, fanila (görünmez)
+2. TEMEL KATMAN: Tişört, gömlek, bluz, body
+3. ARA KATMAN: Yelek, süveter, hırka, kazak
+4. DIŞ KATMAN: Ceket, mont, kaban, palto, trençkot
+5. ALT GİYİM: Pantolon, etek, şort, tayt
+6. AYAKKABI: Spor ayakkabı, bot, topuklu, sandalet
+7. AKSESUAR: Şapka, şal, çanta, güneş gözlüğü, kolye, saat, kemer
+
+KRİTİK KURALLAR:
+- Yelek HER ZAMAN gömleğin/tişörtün ÜSTÜNE giyilir
+- Mont/ceket HER ZAMAN yeleğin ÜSTÜNE giyilir
+- Pantolon/etek HER ZAMAN ayakkabının ÜSTÜNDE görünür
+- Atkı/şal ceketin/montun ÜSTÜNE veya altına giyilebilir
+- Kemer pantolonun/eteğin beline takılır
+- Her ürünün rengi, deseni ve kumaş dokusu AYNEN korunmalıdır
+- Ürünlerin birbirleriyle uyumlu bir stil oluşturması önemlidir
+- TÜM ürünler tek bir model üzerinde GİYDİRİLMİŞ olarak gösterilmelidir
+
+Verilen ${totalImages} görselin her birini analiz et ve doğru katmanlama sırasına göre modele giydir.
+`;
+    }
 
     // Kullanıcı Özel İsteği (En yüksek öncelik)
     if (customPrompt && customPrompt.trim().length > 0) {

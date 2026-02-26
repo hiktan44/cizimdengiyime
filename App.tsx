@@ -26,6 +26,7 @@ function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<Rea
 import { Header } from './components/Header';
 import { ImageUploader } from './components/ImageUploader';
 import { ResultDisplay } from './components/ResultDisplay';
+import { MultiItemUploader, MultiItem } from './components/MultiItemUploader';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import { ColorPicker } from './components/ColorPicker';
 import { generateImage, generateVideoFromImage, generateProductFromSketch, generateSketchFromProduct, VideoGenerationSettings } from './services/geminiService';
@@ -194,6 +195,10 @@ const ToolPage: React.FC<{
 
         // Custom Background
         const [customBackgroundFile, setCustomBackgroundFile] = useState<File | undefined>(undefined);
+
+        // Çoklu Ürün Modu
+        const [isMultiItemMode, setIsMultiItemMode] = useState(false);
+        const [multiItems, setMultiItems] = useState<MultiItem[]>([]);
 
         const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
         const [isHistoryPanelOpen, setIsHistoryPanelOpen] = useState(false);
@@ -526,6 +531,11 @@ const ToolPage: React.FC<{
             }
 
             try {
+                // Çoklu ürün dosyalarını hazırla
+                const multiItemFiles = isMultiItemMode && multiItems.length > 0
+                    ? multiItems.map(item => item.file)
+                    : undefined;
+
                 const imageResults = await generateImage(
                     sourceFile,
                     clothingType,
@@ -555,25 +565,29 @@ const ToolPage: React.FC<{
                     secondSourceFile || undefined, // Pass second image for Kombin mode
                     patternFile || undefined, // Pass pattern file
                     activeSeed, // Pass seed
-                    modelIdentityFile // Pass identity file
+                    modelIdentityFile, // Pass identity file
+                    multiItemFiles // Çoklu ürün görselleri
                 );
                 finishProgress();
 
                 // imageResults: string[] (genelde 1 sonuç)
                 const primaryImage = imageResults[0];
 
-
-
                 setTimeout(() => {
                     setGeneratedImageUrl(primaryImage);
                     setIsModelLoading(false);
                 }, 600);
 
+                // Kredi: Çoklu ürün modunda 2, normal modda 1
+                const creditCost = (isMultiItemMode && multiItems.length > 0)
+                    ? CREDIT_COSTS.MULTI_ITEM_MODEL
+                    : CREDIT_COSTS.PRODUCT_TO_MODEL;
+
                 // Save to database
                 await saveGeneration(
                     profile.id,
                     'product_to_model',
-                    CREDIT_COSTS.PRODUCT_TO_MODEL,
+                    creditCost,
                     null,
                     primaryImage,
                     null,
@@ -584,7 +598,8 @@ const ToolPage: React.FC<{
                         fabricType, fabricFinish, shoeType, shoeColor, accessories,
                         ageRange, gender,
                         isKombinMode, hasPattern: !!patternFile,
-
+                        isMultiItem: isMultiItemMode && multiItems.length > 0,
+                        multiItemCount: multiItems.length
                     }
                 );
 
@@ -598,7 +613,8 @@ const ToolPage: React.FC<{
                     artisticStyle,
                     location,
                     isKombinMode,
-
+                    isMultiItem: isMultiItemMode,
+                    multiItemCount: multiItems.length,
                     userId: profile.id
                 });
             } catch (error) {
@@ -1191,6 +1207,43 @@ const ToolPage: React.FC<{
                                             </select>
                                         </div>
 
+                                        {/* 🔥 ÇOKLU ÜRÜN MODU */}
+                                        <div className="relative">
+                                            {/* YENİ Badge */}
+                                            <div className="flex items-center justify-between mb-2">
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isMultiItemMode}
+                                                        onChange={(e) => {
+                                                            setIsMultiItemMode(e.target.checked);
+                                                            if (!e.target.checked) setMultiItems([]);
+                                                        }}
+                                                        className="w-4 h-4 rounded bg-slate-700 border-slate-600 text-cyan-500 focus:ring-cyan-500"
+                                                    />
+                                                    <span className="text-sm font-medium text-slate-300">Çoklu Ürün Giydirme</span>
+                                                </label>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="px-2 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold rounded-full uppercase tracking-wider animate-pulse">Yeni</span>
+                                                    <span className="text-[10px] text-amber-400 font-medium">2 Kredi</span>
+                                                </div>
+                                            </div>
+
+                                            {isMultiItemMode && (
+                                                <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 p-3 rounded-xl border border-amber-500/20 space-y-2">
+                                                    <p className="text-[11px] text-slate-400">
+                                                        6 farklı kıyafet ve aksesuar yükleyin — AI doğru katmanlama sırasıyla giydirir.
+                                                    </p>
+                                                    <MultiItemUploader
+                                                        items={multiItems}
+                                                        onItemsChange={setMultiItems}
+                                                        maxItems={6}
+                                                        disabled={isModelLoading}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
                                         {/* COLOR PICKERS */}
                                         <div className="space-y-4">
                                             <ColorPicker
@@ -1597,7 +1650,7 @@ const ToolPage: React.FC<{
 
                                     <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 text-center">
                                         <span className="text-sm text-slate-300">
-                                            {t.modelSettings.creditInfo.liveModel} <span className="text-cyan-400 font-bold text-lg">1 kredi</span>
+                                            {t.modelSettings.creditInfo.liveModel} <span className={`font-bold text-lg ${isMultiItemMode && multiItems.length > 0 ? 'text-amber-400' : 'text-cyan-400'}`}>{isMultiItemMode && multiItems.length > 0 ? '2 kredi' : '1 kredi'}</span>
                                         </span>
                                         <span className="text-xs text-slate-400 block mt-1">
                                             {t.modelSettings.creditInfo.currentCredits} <span className="text-cyan-400 font-semibold">{profile.credits}</span>
