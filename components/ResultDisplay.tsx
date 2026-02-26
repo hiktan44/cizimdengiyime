@@ -233,10 +233,6 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                                     </span>
                                 </div>
 
-                                {/* Model Badge */}
-                                <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
-                                    <span className="text-[10px] font-medium text-slate-400">⚡ gemini-3.1-flash</span>
-                                </div>
                             </div>
                         )}
 

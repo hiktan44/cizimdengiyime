@@ -37,7 +37,7 @@ const withRetry = async <T>(
 
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                console.log(`🔄 Model: ${model}, Deneme: ${attempt}/${maxRetries}`);
+                console.log(`🔄 Deneme: ${attempt}/${maxRetries}`);
                 return await fn(model);
             } catch (error: any) {
                 lastError = error;
@@ -46,7 +46,7 @@ const withRetry = async <T>(
                     errorMessage.includes('429') ? 429 :
                         errorMessage.includes('overloaded') ? 503 : null);
 
-                console.warn(`⚠️ Hata (${model}, deneme ${attempt}): ${errorMessage}`);
+                console.warn(`⚠️ Hata (deneme ${attempt}): ${errorMessage}`);
 
                 // 503 veya 429 hatalarında retry yap
                 if (statusCode === 503 || statusCode === 429 || errorMessage.includes('overloaded') || errorMessage.includes('UNAVAILABLE')) {
@@ -57,7 +57,7 @@ const withRetry = async <T>(
                         continue;
                     }
                     // Son deneme de başarısız, sonraki modele geç
-                    console.log(`🔀 Model değiştiriliyor: ${model} -> ${IMAGE_MODELS[modelIndex + 1] || 'FAL.AI FALLBACK'}`);
+                    console.log('🔀 Sonraki model deneniyor...');
                     break;
                 }
 
@@ -72,7 +72,7 @@ const withRetry = async <T>(
         try {
             const { hasFalApiKey } = await import('./falaiService');
             if (hasFalApiKey()) {
-                console.log('🔀 Tüm Gemini modelleri başarısız, Fal.ai fallback devreye giriyor...');
+                console.log('🔀 Fallback devreye giriyor...');
                 // Kullanıcıya bildirim gönder (UI'da yakalanacak)
                 window.dispatchEvent(new CustomEvent('fal-fallback-active', {
                     detail: { message: '🔄 Ana sunucu yoğun, alternatif AI sunucusuna geçiliyor... Bu işlem biraz daha uzun sürebilir, özür dileriz.' }
@@ -84,7 +84,7 @@ const withRetry = async <T>(
                 return result;
             }
         } catch (falError: any) {
-            console.error('❌ Fal.ai fallback da başarısız:', falError.message);
+            console.error('❌ Fallback da başarısız');
             window.dispatchEvent(new CustomEvent('fal-fallback-failed', {
                 detail: { message: '❌ Alternatif sunucu da yanıt veremedi. Lütfen birkaç dakika sonra tekrar deneyin.' }
             }));
@@ -455,7 +455,7 @@ export const generateVideoFromImage = async (
     // Negative prompt for quality filtering
     const negativePrompt = 'blurry, low quality, distorted, deformed, ugly, amateur, watermark, text overlay, logo, rapid movement, shaky camera, horror, violent, cartoon, drawing';
 
-    console.log(`Starting video generation - Model: ${modelName}, Resolution: ${effectiveResolution}, Duration: ${durationSeconds}s, AspectRatio: ${settings.aspectRatio}`);
+    console.log(`Video üretimi başlatıldı - Çözünürlük: ${effectiveResolution}, Süre: ${durationSeconds}s`);
 
     const MAX_RETRIES = 2;
     let lastError: Error | null = null;
@@ -633,7 +633,7 @@ export const generateVideoFromImage = async (
                     try {
                         const { falGenerateVideo, hasFalApiKey } = await import('./falaiService');
                         if (hasFalApiKey()) {
-                            console.log('🔀 Veo başarısız, Fal.ai video fallback devreye giriyor...');
+                            console.log('🔀 Video fallback devreye giriyor...');
                             window.dispatchEvent(new CustomEvent('fal-fallback-active', {
                                 detail: { message: '🔄 Video sunucusu yoğun, alternatif AI sunucusuna geçiliyor... Bu işlem biraz daha uzun sürebilir, özür dileriz.' }
                             }));
@@ -651,7 +651,7 @@ export const generateVideoFromImage = async (
                             return result;
                         }
                     } catch (falErr: any) {
-                        console.error('❌ Fal.ai video fallback da başarısız:', falErr.message);
+                        console.error('❌ Video fallback da başarısız');
                         window.dispatchEvent(new CustomEvent('fal-fallback-failed', {
                             detail: { message: '❌ Alternatif video sunucusu da yanıt veremedi.' }
                         }));
@@ -1017,7 +1017,7 @@ export const generateImage = async (
             aspectRatio === '1:1' ? '1:1' :
                 '3:4';
 
-    console.log(`🚀 Canlı Model Üretimi - Model: ${selectedModel}, 2 varyant, 2K çözünürlük`);
+    console.log('🚀 Canlı Model Üretimi başlatıldı - 2K çözünürlük');
 
     try {
         const response = await ai.models.generateContent({
@@ -1060,13 +1060,13 @@ export const generateImage = async (
             throw new Error("API'den görsel alınamadı.");
         }
 
-        console.log(`✅ ${results.length} varyant başarıyla üretildi (${selectedModel})`);
+        console.log(`✅ ${results.length} sonuç başarıyla üretildi`);
         return results;
     } catch (e: any) {
-        console.error(`❌ ${selectedModel} başarısız:`, e.message);
+        console.error('❌ Üretim başarısız:', e.message);
 
         // Fallback: gemini-3-pro-image-preview ile tek sonuç dene
-        console.log('🔀 Fallback: gemini-3-pro-image-preview ile tekli üretim deneniyor...');
+        console.log('🔀 Fallback ile tekli üretim deneniyor...');
         try {
             const fallbackResponse = await ai.models.generateContent({
                 model: 'gemini-3-pro-image-preview',
@@ -1094,7 +1094,7 @@ export const generateImage = async (
             }
             throw new Error("Fallback model de görsel üretemedi.");
         } catch (fallbackError) {
-            console.error("❌ Fallback de başarısız:", fallbackError);
+            console.error('❌ Fallback de başarısız');
             throw e; // Orijinal hatayı fırlat
         }
     }

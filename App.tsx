@@ -562,7 +562,7 @@ const ToolPage: React.FC<{
                 // imageResults: string[] (genelde 1 sonuç)
                 const primaryImage = imageResults[0];
 
-                console.log(`🎨 Sonuç alındı (gemini-3.1-flash-image-preview)`);
+
 
                 setTimeout(() => {
                     setGeneratedImageUrl(primaryImage);
@@ -584,7 +584,7 @@ const ToolPage: React.FC<{
                         fabricType, fabricFinish, shoeType, shoeColor, accessories,
                         ageRange, gender,
                         isKombinMode, hasPattern: !!patternFile,
-                        model: 'gemini-3.1-flash-image-preview'
+
                     }
                 );
 
@@ -598,7 +598,7 @@ const ToolPage: React.FC<{
                     artisticStyle,
                     location,
                     isKombinMode,
-                    model: 'gemini-3.1-flash-image-preview',
+
                     userId: profile.id
                 });
             } catch (error) {
