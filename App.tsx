@@ -1698,16 +1698,15 @@ const ToolPage: React.FC<{
                                             onConvertToVideo={() => setIsVideoModalOpen(true)}
                                             onShare={() => handleShare(generatedVideoUrl || generatedImageUrl)}
                                             isShareSupported={isShareSupported}
+                                            multiItemPreviews={isMultiItemMode && multiItems.length > 0 ? multiItems.map(item => item.preview) : undefined}
+                                            combinationImages={clothingType === 'Alt & Üst' ? { top: topProductPreviewUrl, bottom: bottomProductPreviewUrl } : undefined}
                                             onGenerateVariant={() => {
-                                                // Mevcut sonucu Varyant A olarak sakla, yeni seed ile tekrar üret
                                                 const currentImage = generatedImageUrl;
                                                 if (currentImage) {
-                                                    // Mevcut görseli variant olarak event gönder
                                                     window.dispatchEvent(new CustomEvent('model-variants-ready', {
                                                         detail: { variant1: currentImage, variant2: null, count: 1 }
                                                     }));
                                                 }
-                                                // Yeni seed ile tekrar üret (lock'u geçici kapat)
                                                 setModelSeed(null);
                                                 setIsModelLocked(false);
                                                 handleGenerateModelClick();

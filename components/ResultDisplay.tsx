@@ -19,6 +19,8 @@ interface ResultDisplayProps {
     onShare: () => void;
     isShareSupported: boolean;
     onGenerateVariant?: () => void; // Yeni Varyant butonu callback
+    multiItemPreviews?: string[]; // Çoklu ürün preview URL'leri
+    combinationImages?: { top?: string; bottom?: string }; // Kombin üst/alt görselleri
 }
 
 const LoadingState: React.FC<{ text: string, progress: number }> = ({ text, progress }) => (
@@ -61,7 +63,9 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
     onConvertToVideo,
     onShare,
     isShareSupported,
-    onGenerateVariant
+    onGenerateVariant,
+    multiItemPreviews,
+    combinationImages
 }) => {
     const [activeTab, setActiveTab] = useState<'image' | 'comparison' | 'gallery' | 'video'>('image');
     const [isUpscaling, setIsUpscaling] = useState(false);
@@ -249,22 +253,64 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
 
                         {activeTab === 'gallery' && (
                             <div className="w-full h-full p-4 flex flex-col gap-4">
+                                {/* Çoklu Ürün / Kombin Albümü */}
+                                {(multiItemPreviews && multiItemPreviews.length > 0) || (combinationImages && (combinationImages.top || combinationImages.bottom)) ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Kullanılan Ürünler</span>
+                                            <span className="text-[10px] px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">
+                                                {multiItemPreviews ? multiItemPreviews.length : ((combinationImages?.top ? 1 : 0) + (combinationImages?.bottom ? 1 : 0))} ürün
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-600">
+                                            {/* Kombin görselleri */}
+                                            {combinationImages?.top && (
+                                                <div className="flex-shrink-0 flex flex-col gap-1">
+                                                    <span className="text-[9px] text-purple-400 font-bold uppercase text-center">Üst</span>
+                                                    <img src={combinationImages.top} alt="Üst" className="w-20 h-20 object-cover rounded-lg border border-purple-500/40" />
+                                                </div>
+                                            )}
+                                            {combinationImages?.bottom && (
+                                                <div className="flex-shrink-0 flex flex-col gap-1">
+                                                    <span className="text-[9px] text-orange-400 font-bold uppercase text-center">Alt</span>
+                                                    <img src={combinationImages.bottom} alt="Alt" className="w-20 h-20 object-cover rounded-lg border border-orange-500/40" />
+                                                </div>
+                                            )}
+                                            {/* Çoklu ürün görselleri */}
+                                            {multiItemPreviews?.map((preview, i) => (
+                                                <div key={i} className="flex-shrink-0 flex flex-col gap-1">
+                                                    <span className="text-[9px] text-cyan-400 font-bold uppercase text-center">Ürün {i + 1}</span>
+                                                    <img src={preview} alt={`Ürün ${i + 1}`} className="w-20 h-20 object-cover rounded-lg border border-cyan-500/40" />
+                                                </div>
+                                            ))}
+                                            {/* Sonuç küçük resim */}
+                                            <div className="flex-shrink-0 flex flex-col gap-1 ml-2 pl-2 border-l border-slate-600">
+                                                <span className="text-[9px] text-green-400 font-bold uppercase text-center">Sonuç</span>
+                                                <img src={currentImageUrl!} alt="Sonuç" className="w-20 h-20 object-cover rounded-lg border-2 border-green-500/50 shadow-lg shadow-green-900/20" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : null}
+
                                 {/* Gallery Grid */}
-                                <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4 overflow-y-auto">
+                                <div className={`flex-grow grid gap-4 overflow-y-auto ${(multiItemPreviews && multiItemPreviews.length > 0) || (combinationImages && (combinationImages.top || combinationImages.bottom))
+                                        ? 'grid-cols-1 md:grid-cols-2'
+                                        : 'grid-cols-1 md:grid-cols-3'
+                                    }`}>
                                     {sketchImageUrl && (
                                         <div className="flex flex-col gap-2">
-                                            <span className="text-xs text-slate-400 font-semibold uppercase">1. Çizim</span>
+                                            <span className="text-xs text-slate-400 font-semibold uppercase">Çizim</span>
                                             <img src={sketchImageUrl} alt="Sketch" className="w-full aspect-[3/4] object-cover rounded-lg border border-slate-600" />
                                         </div>
                                     )}
                                     {beforeImageUrl && (
                                         <div className="flex flex-col gap-2">
-                                            <span className="text-xs text-purple-400 font-semibold uppercase">2. Ürün</span>
+                                            <span className="text-xs text-purple-400 font-semibold uppercase">Ana Ürün</span>
                                             <img src={beforeImageUrl} alt="Product" className="w-full aspect-[3/4] object-cover rounded-lg border border-slate-600" />
                                         </div>
                                     )}
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-xs text-cyan-400 font-semibold uppercase">3. Model (Sonuç)</span>
+                                        <span className="text-xs text-cyan-400 font-semibold uppercase">Model (Sonuç)</span>
                                         <img src={currentImageUrl!} alt="Model" className="w-full aspect-[3/4] object-cover rounded-lg border-2 border-cyan-500/50 shadow-lg shadow-cyan-900/20" />
                                     </div>
                                 </div>
