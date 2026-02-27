@@ -415,20 +415,20 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                 resultUrl = await generateCollage(
                     uploadedImages.map(img => img.file),
                     prompt,
-                    '16:9'
+                    '3:4'
                 );
             } else if (activeTab === 'product') {
                 resultUrl = await generateProductCollage(
                     products,
                     collageBackground,
-                    '16:9',
+                    '3:4',
                     prompt
                 );
             } else if (activeTab === 'magic') {
                 const { analyzeOutfitItems, generateAutoProductCollage: genAuto } = await import('../services/geminiService');
 
                 // 1. Önce yüksek kaliteli profesyonel kolajı oluştur (Görseller burada AI tarafından re-paint ediliyor)
-                const collageUrl = await genAuto(uploadedImages[0].file, '16:9');
+                const collageUrl = await genAuto(uploadedImages[0].file, '3:4');
                 resultUrl = collageUrl;
 
                 // 2. Ardından bu TEMİZ kolaj üzerinden ürün analizini yap (Kesitler yerine temiz ürünleri alalım)
@@ -946,7 +946,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                         <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Styling Editorial...</p>
                                     </div>
                                 ) : generatedImageUrl ? (
-                                    <div ref={magazineRef} className={`w-full flex flex-col ${isMagazineView ? 'bg-[#FAF9F6] p-12 border border-slate-200 shadow-2xl rounded-sm' : ''}`}>
+                                    <div ref={magazineRef} className={`w-full flex flex-col ${isMagazineView ? 'bg-[#FAF9F6] p-12 border border-slate-200 shadow-2xl rounded-sm max-w-[680px] mx-auto' : ''}`}>
                                         {/* Magazine Header */}
                                         {isMagazineView && (
                                             <div className="flex justify-between items-end mb-10 border-b-2 border-slate-900 pb-6 animate-fade-in">
@@ -1003,7 +1003,7 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                             <div className="flex-1 flex flex-col justify-start py-1">
                                                                 <div className="flex flex-col mb-2">
                                                                     <h4 className="font-serif font-black text-lg text-slate-900 uppercase leading-tight tracking-tight break-words mb-1">{p.name || t.unnamedProduct}</h4>
-                                                                    {p.price && <span className="text-slate-900 font-serif font-bold text-sm border-b border-slate-900 w-fit">{p.price}</span>}
+                                                                    {p.price && <span className="text-slate-900 font-serif font-bold text-base tracking-wide">{p.price}</span>}
                                                                 </div>
                                                                 {p.description && <p className="text-[11px] text-slate-900 leading-relaxed font-semibold italic">{p.description}</p>}
                                                                 <span className="mt-3 text-[8px] font-black text-slate-400 tracking-[0.2em] uppercase">Ref. #FA-{idx + 100}</span>
@@ -1106,9 +1106,26 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
                                                         </div>
                                                     ))}
                                                 </div>
-                                                <p className="mt-4 text-[10px] text-slate-500 text-center italic">
-                                                    {t.editHint}
-                                                </p>
+
+                                                {/* Güncelle Butonu + Kredi Uyarısı */}
+                                                <div className="mt-4 space-y-3">
+                                                    <button
+                                                        onClick={() => handleGenerate()}
+                                                        disabled={isGenerating}
+                                                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
+                                                    >
+                                                        {isGenerating ? (
+                                                            <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                                        ) : (
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                                        )}
+                                                        🔄 Güncelle (1 Kredi)
+                                                    </button>
+                                                    <div className="flex items-center justify-center gap-2 text-[10px] text-amber-400/80">
+                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                        <span>Her düzenleme hesabınızdan 1 kredi düşer</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
