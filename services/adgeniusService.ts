@@ -540,7 +540,7 @@ export const generateAdImage = async (
   referenceImageMimeType: string,
   optionalImageB64: string | null,
   optionalImageMimeType: string | null,
-  model: ImageModel = 'gemini-3-pro-image-preview',
+  model: ImageModel = 'gemini-3.1-flash-image-preview',
   aspectRatio: string = '16:9',
   patternImageB64?: string | null,
   patternImageMimeType?: string | null,

@@ -1163,7 +1163,7 @@ export const upscaleImage = async (imageFile: File): Promise<string> => {
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
+            model: LIVE_MODEL_PRIMARY,
             contents: {
                 parts: [
                     imagePart,
@@ -1250,7 +1250,7 @@ OUTPUT REQUIREMENTS:
         const parts = [...imageParts, { text: fullPrompt }];
 
         const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
+            model: LIVE_MODEL_PRIMARY,
             contents: {
                 parts: parts,
             },
@@ -1432,7 +1432,7 @@ export const generateAutoProductCollage = async (
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
+            model: LIVE_MODEL_PRIMARY,
             contents: {
                 parts: [imagePart, { text: fullPrompt }],
             },
@@ -1539,7 +1539,7 @@ export const generateProductCollage = async (
             : [...productParts, { text: fullPrompt }];
 
         const response = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
+            model: LIVE_MODEL_PRIMARY,
             contents: {
                 parts: parts,
             },
@@ -1610,7 +1610,7 @@ Kurallar:
 7. Etiketler: Önemli detayları etiketle (örn: "Düğme", "Cep", "Fermuar", "Dikiş").`;
 
         const frontResponse = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
+            model: LIVE_MODEL_PRIMARY,
             contents: {
                 parts: [imagePart, { text: frontPrompt }]
             },
@@ -1647,7 +1647,7 @@ Kurallar:
 7. Etiketler: Önemli detayları etiketle (örn: "Arka Dikiş", "Yaka Arkası", "Kol Arkası").`;
 
         const backResponse = await ai.models.generateContent({
-            model: 'gemini-3-pro-image-preview',
+            model: LIVE_MODEL_PRIMARY,
             contents: {
                 parts: [imagePart, { text: backPrompt }]
             },

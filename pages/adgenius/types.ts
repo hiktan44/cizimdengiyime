@@ -42,7 +42,7 @@ export type AdStyle =
   | 'Bauhaus'
   | 'Rustik & Bohem';
 
-export type ImageModel = 'gemini-3-pro-image-preview' | 'gemini-2.5-flash-image';
+export type ImageModel = 'gemini-3.1-flash-image-preview' | 'gemini-3-pro-image-preview' | 'gemini-2.5-flash-image';
 export type VideoModel = 'veo-3.1-fast-generate-preview' | 'veo-3.1-generate-preview';
 export type GenerationMode = 'campaign' | 'ecommerce';
 export type AspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4';

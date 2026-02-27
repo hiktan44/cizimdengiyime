@@ -14,6 +14,10 @@ const checkApiKey = () => {
     }
 };
 
+// Birincil model (maliyet düşük, hızlı)
+const IMAGE_MODEL_PRIMARY = 'gemini-3.1-flash-image-preview';
+const IMAGE_MODEL_FALLBACK = 'gemini-3-pro-image-preview';
+
 // Helper function to convert a File object to a Gemini API Part
 const fileToPart = async (file: File): Promise<{ inlineData: { mimeType: string; data: string; } }> => {
     const dataUrl = await new Promise<string>((resolve, reject) => {
@@ -108,7 +112,7 @@ Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: $
 
     console.log('Sending image and prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-3-pro-image-preview',
+        model: IMAGE_MODEL_PRIMARY,
         contents: { parts: [originalImagePart, textPart] },
         config: {
             safetySettings,
@@ -148,7 +152,7 @@ Do not change the content or composition, only apply the visual style.`;
 
     console.log('Sending image and filter prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-3-pro-image-preview',
+        model: IMAGE_MODEL_PRIMARY,
         contents: { parts: [originalImagePart, textPart] },
         config: {
             safetySettings,
@@ -192,7 +196,7 @@ Request: "${adjustmentPrompt}"
 
     console.log('Sending image and adjustment prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-3-pro-image-preview',
+        model: IMAGE_MODEL_PRIMARY,
         contents: { parts: [originalImagePart, textPart] },
         config: {
             safetySettings,
@@ -231,7 +235,7 @@ The output MUST be a transparent PNG.`;
 
     console.log('Sending image and background removal prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-3-pro-image-preview',
+        model: IMAGE_MODEL_PRIMARY,
         contents: { parts: [originalImagePart, textPart] },
         config: {
             safetySettings,
@@ -274,7 +278,7 @@ export const pixshopUpscaleImage = async (
 
     console.log('Sending image and upscale prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-3-pro-image-preview',
+        model: IMAGE_MODEL_PRIMARY,
         contents: { parts: [originalImagePart, textPart] },
         config: {
             safetySettings,
@@ -330,7 +334,7 @@ ${hotspotText}
 
     console.log('Sending images and composite prompt to the model...');
     const response: GenerateContentResponse = await ai.models.generateContent({
-        model: 'gemini-3-pro-image-preview',
+        model: IMAGE_MODEL_PRIMARY,
         contents: { parts: [originalImagePart, overlayImagePart, textPart] },
         config: {
             safetySettings,

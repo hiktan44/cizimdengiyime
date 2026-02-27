@@ -14,6 +14,10 @@ const checkApiKey = () => {
   }
 };
 
+// Birincil image model (hızlı + maliyet düşük)
+const IMAGE_MODEL_PRIMARY = 'gemini-3.1-flash-image-preview';
+const IMAGE_MODEL_FALLBACK = 'gemini-3-pro-image-preview';
+
 /**
  * Görüntüyü dönüştürür (Transform modu)
  * @param imageBase64 Base64 formatında görüntü verisi
@@ -36,7 +40,7 @@ export const fotomatikGenerateEditedImage = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-image-preview',
+      model: IMAGE_MODEL_PRIMARY,
       contents: {
         parts: [
           {
@@ -264,7 +268,7 @@ export const fotomatikRemoveBackground = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-image-preview',
+      model: IMAGE_MODEL_PRIMARY,
       contents: {
         parts: [
           {
@@ -321,7 +325,7 @@ export const fotomatikRetouch = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-image-preview',
+      model: IMAGE_MODEL_PRIMARY,
       contents: {
         parts: [
           {
@@ -378,7 +382,7 @@ export const fotomatikCatalogPrep = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-image-preview',
+      model: IMAGE_MODEL_PRIMARY,
       contents: {
         parts: [
           {

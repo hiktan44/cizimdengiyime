@@ -439,7 +439,7 @@ export const AdgeniusPage: React.FC<AdgeniusPageProps> = ({ profile, onRefreshPr
     brand: '',
     customPrompt: '',
     adStyle: 'Lüks ve Premium',
-    imageModel: 'gemini-3-pro-image-preview',
+    imageModel: 'gemini-3.1-flash-image-preview',
     videoModel: 'veo-3.1-fast-generate-preview',
     mode: 'campaign',
     includeVideo: false,
