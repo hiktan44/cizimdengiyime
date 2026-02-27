@@ -103,10 +103,12 @@ User Request: "${userPrompt}"
 Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: ${hotspot.y}).
 
 *** EXECUTION RULES FOR HYPER-REALISM ***:
-1. NO AI LOOK: The edited area MUST blend 100% physically correct with the grain, noise, and lighting of the original RAW photo. Do not introduce smooth, plastic, or cartoonish textures.
-2. TEXTURE MATCHING: If the original image has film grain or sensor noise, the edited part perfectly copy that noise pattern.
-3. LIGHTING CONSISTENCY: Subsurface scattering and shadow softness must match the original scene exactly.
-4. INVISIBLE EDIT: The result should look like it was captured in-camera, not photoshopped.`;
+1. PRESERVE DIMENSIONS: The output image MUST have the EXACT SAME dimensions and aspect ratio as the input image. Do NOT crop, resize, or change the aspect ratio.
+2. NO AI LOOK: The edited area MUST blend 100% physically correct with the grain, noise, and lighting of the original RAW photo. Do not introduce smooth, plastic, or cartoonish textures.
+3. TEXTURE MATCHING: If the original image has film grain or sensor noise, the edited part perfectly copy that noise pattern.
+4. LIGHTING CONSISTENCY: Subsurface scattering and shadow softness must match the original scene exactly.
+5. INVISIBLE EDIT: The result should look like it was captured in-camera, not photoshopped.
+6. MINIMAL CHANGE: Only modify the requested area. Leave ALL other pixels unchanged.`;
 
     const textPart = { text: prompt };
 
@@ -118,8 +120,7 @@ Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: $
             safetySettings,
             responseModalities: [Modality.IMAGE],
             imageConfig: {
-                imageSize: resolution, // 2K veya 4K
-                aspectRatio: "3:4"
+                imageSize: resolution,
             }
         },
     });
@@ -146,7 +147,7 @@ export const pixshopGenerateFilteredImage = async (
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Apply a stylistic filter to this image.
 Filter Request: "${filterPrompt}"
-Do not change the content or composition, only apply the visual style.`;
+Do not change the content, composition, or dimensions. Only apply the visual style. Preserve the exact same aspect ratio and resolution.`;
 
     const textPart = { text: prompt };
 
@@ -159,7 +160,6 @@ Do not change the content or composition, only apply the visual style.`;
             responseModalities: [Modality.IMAGE],
             imageConfig: {
                 imageSize: resolution,
-                aspectRatio: "3:4"
             }
         },
     });
@@ -188,9 +188,10 @@ export const pixshopGenerateAdjustedImage = async (
 Request: "${adjustmentPrompt}"
 
 *** PROFESSIONAL COLOR GRADING RULES ***:
-1. PRESERVE DYNAMIC RANGE: Do not blow out highlights or crush shadows excessively unless requested.
-2. NATURAL SKIN TONES: If people are present, skin tones must remain within natural vectors (Vectorscope line). Avoid orange/teal abuse on skin.
-3. ORGANIC FEEL: The adjustment should feel like optical filters or professional chemical film processing, not digital overlays.`;
+1. PRESERVE DIMENSIONS: The output image MUST have the EXACT SAME dimensions and aspect ratio as the input.
+2. PRESERVE DYNAMIC RANGE: Do not blow out highlights or crush shadows excessively unless requested.
+3. NATURAL SKIN TONES: If people are present, skin tones must remain within natural vectors (Vectorscope line). Avoid orange/teal abuse on skin.
+4. ORGANIC FEEL: The adjustment should feel like optical filters or professional chemical film processing, not digital overlays.`;
 
     const textPart = { text: prompt };
 
@@ -203,7 +204,6 @@ Request: "${adjustmentPrompt}"
             responseModalities: [Modality.IMAGE],
             imageConfig: {
                 imageSize: resolution,
-                aspectRatio: "3:4"
             }
         },
     });
@@ -226,10 +226,17 @@ export const pixshopRemoveBackground = async (
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const originalImagePart = await fileToPart(originalImage);
-    const prompt = `Remove the background from this image. 
-Return ONLY the main subject with a fully transparent background (alpha channel). 
-Ensure there are no background artifacts or white outlines. 
-The output MUST be a transparent PNG.`;
+    const prompt = `SYSTEM_COMMAND: EXECUTE_BACKGROUND_REMOVAL_PROTOCOL
+
+OBJECTIVE: Remove the background from this image completely.
+
+STRICT RULES:
+1. SUBJECT ISOLATION: Detect and isolate the main subject (person, product, or object) with pixel-perfect precision.
+2. TRANSPARENT BACKGROUND: Replace the ENTIRE background with full transparency (alpha = 0). The output MUST be a transparent PNG.
+3. EDGE QUALITY: Ensure clean, anti-aliased edges around the subject. NO white outlines, halos, or fringing artifacts.
+4. PRESERVE SUBJECT: Do NOT modify, crop, resize, or alter the main subject in any way. Keep exact same dimensions.
+5. HAIR & FINE DETAILS: Carefully preserve hair strands, fur, and other fine details at the edges.
+6. MAINTAIN DIMENSIONS: The output MUST have the EXACT SAME width and height as the input image.`;
 
     const textPart = { text: prompt };
 
@@ -242,7 +249,6 @@ The output MUST be a transparent PNG.`;
             responseModalities: [Modality.IMAGE],
             imageConfig: {
                 imageSize: resolution,
-                aspectRatio: "3:4"
             }
         },
     });
@@ -328,7 +334,8 @@ ${hotspotText}
 3. REALISTIC PHYSICS: If adding clothing/accessories (tie, scarf, etc.), they must drape naturally with realistic fabric physics and shadows.
 4. PROPER SCALING: Scale the added element appropriately for the scene - logos should be visible but not overwhelming, accessories should fit the person naturally.
 5. SEAMLESS BLENDING: Edges must blend perfectly - no harsh cutouts or obvious compositing artifacts.
-6. MAINTAIN QUALITY: The final image should look professional and production-ready, suitable for e-commerce or marketing use.`;
+6. MAINTAIN QUALITY: The final image should look professional and production-ready, suitable for e-commerce or marketing use.
+7. PRESERVE DIMENSIONS: The output MUST have the EXACT SAME dimensions and aspect ratio as the first image.`;
 
     const textPart = { text: prompt };
 
@@ -341,7 +348,6 @@ ${hotspotText}
             responseModalities: [Modality.IMAGE],
             imageConfig: {
                 imageSize: resolution,
-                aspectRatio: "3:4"
             }
         },
     });

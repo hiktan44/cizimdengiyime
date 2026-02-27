@@ -610,7 +610,17 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
     setError(null);
 
     try {
-      const erasePrompt = "Remove the object at this location and fill the background naturally with the surrounding texture (inpainting).";
+      const erasePrompt = `SYSTEM_COMMAND: EXECUTE_SMART_ERASE_PROTOCOL
+
+OBJECTIVE: Completely ERASE and REMOVE the object located at the specified coordinates.
+
+STRICT RULES:
+1. ERASE COMPLETELY: The object at the target point MUST be removed entirely — leave no trace of it.
+2. NATURAL FILL: Fill the erased area with surrounding background texture using context-aware inpainting. Match colors, patterns, shadows, and lighting of the surrounding area.
+3. PRESERVE EVERYTHING ELSE: Do NOT modify, move, or alter ANY other part of the image.
+4. MAINTAIN DIMENSIONS: Output MUST have the EXACT SAME dimensions and aspect ratio as the input.
+5. INVISIBLE EDIT: The result must look like the object was never there — no smudges, no blur patches, no color mismatches.
+6. TEXTURE CONTINUITY: If the background has a pattern (floor tiles, fabric weave, grass), continue that pattern seamlessly through the erased area.`;
       const erasedImageUrl = await pixshopGenerateEditedImage(currentImage, erasePrompt, editHotspot, outputResolution);
       const newImageFile = dataURLtoFile(erasedImageUrl, `erased-${Date.now()}.png`);
 
