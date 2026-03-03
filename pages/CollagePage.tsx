@@ -8,7 +8,6 @@ import { useTranslation, TranslationRecord } from '../lib/i18n';
 import { Profile, CREDIT_COSTS } from '../lib/supabase';
 import { checkAndDeductCredits, saveGeneration, refundCredits } from '../lib/database';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
-import { Layout } from '../components/Layout';
 import { VideoSettingsModal } from '../components/VideoSettingsModal';
 import { VideoGenerationSettings, generateVideoFromImage, generateProductCollage } from '../services/geminiService';
 import { ProductItem } from '../services/geminiService';
@@ -317,14 +316,14 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
 
             try {
                 // Convert to PNG if needed
-                const convertedFile = await convertImageToPNG(file);
+                const convertedFile = await convertImageToPNG(file as File);
 
                 const id = Math.random().toString(36).substring(7);
                 const preview = URL.createObjectURL(convertedFile);
                 newImages.push({ id, file: convertedFile, preview });
             } catch (error) {
                 console.error('Error converting image:', error);
-                alert(`${t.imageUploadError}${file.name}`);
+                alert(`${t.imageUploadError}${(file as File).name}`);
             }
         }
 
@@ -498,8 +497,8 @@ export const CollagePage: React.FC<CollagePageProps> = ({ profile, onRefreshProf
             const newProducts = await Promise.all(files.map(async (file) => ({
                 id: Math.random().toString(36).substring(7),
                 file,
-                name: file.name.split('.')[0], // Default name from file name
-                preview: await fileToBase64(file)
+                name: (file as File).name.split('.')[0], // Default name from file name
+                preview: await fileToBase64(file as File)
             })));
             setProducts(prev => [...prev, ...newProducts].slice(0, 6)); // Limit to 6 products
         }

@@ -1742,3 +1742,280 @@ Profesyonel tech pack formatında sun.`;
         throw new Error(error.message || 'Tech pack oluşturulurken bir hata oluştu');
     }
 };
+
+/**
+ * Advanced Tech Pack Generation Pro - Strict JSON output with detailed PRD format
+ */
+export const generateTechPackPro = async (
+    frontImageBase64: string,
+    backImageBase64: string | null
+): Promise<{
+    frontSketchBase64: string;
+    backSketchBase64: string | null;
+    techPackData: any;
+}> => {
+    checkApiKey();
+
+    try {
+        const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+        const frontData = frontImageBase64.split(',')[1];
+        const frontMime = frontImageBase64.split(';')[0].split(':')[1];
+        const parts: any[] = [{ inlineData: { data: frontData, mimeType: frontMime } }];
+
+        let backPart = null;
+        if (backImageBase64) {
+            const backData = backImageBase64.split(',')[1];
+            const backMime = backImageBase64.split(';')[0].split(':')[1];
+            backPart = { inlineData: { data: backData, mimeType: backMime } };
+            parts.push(backPart);
+        }
+
+        // Generate JSON DATA using Pro Model - 6 Sayfalık Fabrika-Ready Format
+        const jsonPrompt = `Bu kıyafet görsellerini (Ön ve opsiyonel Arka) analiz et ve aşağıdaki JSON formatına TAM OLARAK uyarak endüstri standartlarında bir Tech Pack (Teknik Dosya) hazırla.
+VERİLECEK YANIT SADECE GEÇERLİ BİR JSON OLMALIDIR. BAŞKACA HİÇBİR BİLGİ/METİN EKLEME.
+TÜM DEĞERLERİ TÜRKÇE YAZ. İngilizce kesinlikle kullanma (ISO kodları ve Pantone hariç).
+ASLA INCH KULLANMA. Tüm ölçüler kesinlikle CM (santimetre) cinsinden olacak. Dikiş genişlikleri de CM olacak (örn: 0.1 cm, 0.3 cm, 0.5 cm, 1.0 cm).
+Kumaş ağırlığı gr/m² (gram/metrekare) cinsinden olacak.
+Beden standardı AVRUPA (EU) standardıdır: XS=32-34, S=36-38, M=38-40, L=42-44, XL=46-48, XXL=50-52. Baz beden M'dir.
+ÖLÇÜ DOĞRULUĞU KRİTİK: Verdiğin tüm ölçümler (POM, dikiş genişliği, tolerans) gerçek endüstri standartlarına %100 uyumlu olmalıdır. Tahmini veya eksik ölçü VERME. Görseli dikkatle analiz et, kıyafetin türüne göre gerçekçi ölçüler belirle. Tolerans değerlerini her ölçü noktası için mutlaka ver (örn: +/- 0.5 cm, +/- 1.0 cm). Gövde uzunluğu, göğüs genişliği, kol uzunluğu gibi temel ölçüler gerçek üretim verilerine dayanmalıdır.
+Renk kodları PANTONE formatında olmalıdır. Dikiş tipleri ISO numarasıyla belirtilmelidir.
+
+{
+  "coverPage": {
+    "styleCode": "XX-2026-001 formatında üret",
+    "styleName": "Ürünün profesyonel adı (Türkçe)",
+    "season": "SS26/AW26 gibi üret",
+    "category": "Erkek/Kadın - Üst/Alt Giyim",
+    "targetSize": "M",
+    "sizeRange": "XS-S-M-L-XL-XXL",
+    "date": "${new Date().toLocaleDateString('tr-TR')}",
+    "description": "Ürünün kısa tasarım vizyonu (1-2 cümle)",
+    "fit": "Regular/Slim/Oversize/Relaxed Fit"
+  },
+  "designFeatures": {
+    "collarType": "Yaka tipi (Bisiklet/Polo/V-Yaka/Dik Yaka/Kapüşon vb.) ve bitiriş detayı (ribana, biye vb.)",
+    "closure": "Kapama detayı (Düğmeli/Fermuarlı/Yarım pat/Tam boy vb.) ve kapama ile ilgili özel notlar",
+    "sleeveType": "Kol yapısı (Uzun/Kısa/Raglankol/Set-inkol/Drop shoulder) ve manşet detayı",
+    "knitDetails": "Örgü detayları (varsa): Jersey, Ribana, Jakar, İnterlok vb. ve fashioning marks",
+    "hemFinish": "Etek bitimi: Ribana bant genişliği, reçme, kıvrım vb.",
+    "specialDetails": "Ekstra tasarım detayları: Cep tipi, yırtmaç, fermuar detayı, biye, şerit vb."
+  },
+  "construction": {
+    "front": [
+      {
+        "area": "Yaka/Cep/Fermuar/Kol/Düğme Patı vb.",
+        "detail": "Kısa teknik talimat",
+        "stitchType": "ISO 301/401/504/Remayöz(Linking) vb.",
+        "stitchWidth": "0.3 cm / 0.5 cm / 1.0 cm gibi CM cinsinden",
+        "seamAllowance": "Dikiş payı CM cinsinden (örn: 1.0 cm, 0.7 cm)"
+      }
+    ],
+    "back": [
+      {
+        "area": "Omuz/Sırt Paneli/Arka Cep vb.",
+        "detail": "Kısa teknik talimat",
+        "stitchType": "ISO numarası veya Remayöz",
+        "stitchWidth": "CM cinsinden ölçü",
+        "seamAllowance": "Dikiş payı CM"
+      }
+    ],
+    "interfacing": "Tela kullanım detayı: Kullanıldığı yerler (yaka, pat, cep ağzı vb.) ve tela tipi (ince şerit tela, dokuma tela, yapışkan tela vb.). Tela yoksa 'Yok' yaz."
+  },
+  "bom": {
+    "fabrics": [
+      {
+        "description": "Ana Kumaş (Shell) / Astar / Ribana vb.",
+        "composition": "%100 Pamuk French Terry / %50 Akrilik %28 Polyester %22 Naylon gibi tam içerik",
+        "usage": "Tüm gövde ve kollar / Yaka-etek-kol ribanaları gibi",
+        "colorCode": "Pantone XX-XXXX TCX",
+        "weight": "gr/m² cinsinden ağırlık",
+        "gauge": "Örgü ise gauge (GG) ve örgü tipi (12GG Düz örgü gibi). Dokuma ise 'Dokuma' yaz.",
+        "finish": "Yüzey dokusu: Brushed/Şardonlu/Peach/Normal vb."
+      }
+    ],
+    "trims": [
+      {
+        "description": "Düğme/Fermuar/Kuşgözü/İplik/Tela/Etiket vb.",
+        "specification": "Detaylı teknik bilgi: tip (kalp şekli/yuvarlak/kare), malzeme (metal/plastik/polyester), boyut (18L=11.5mm/YKK#5), renk (gümüş/altın/DTM)",
+        "usage": "Kullanım yeri ve detay",
+        "quantity": "Adet veya -"
+      }
+    ]
+  },
+  "pom": [
+    {
+      "code": "A harfinden başlayarak sıralı (EN AZ 12 ÖLÇÜ NOKTASI ZORUNLU)",
+      "measurement": "Ölçü noktası adı: Tam Boy(HPS'den), Göğüs Genişliği(1/2), Omuz Genişliği, Kol Boyu, Pazı Genişliği(1/2), Etek Genişliği(1/2), Yaka Açıklığı, Yaka Düşüklüğü, Kol Ağzı(1/2), Koltuk Derinliği, Ribana Yüksekliği(Yaka), Ribana Yüksekliği(Etek), Ribana Yüksekliği(Kol) gibi tüm kritik noktalar",
+      "howToMeasure": "Nasıl ölçüleceğinin kısa açıklaması (örn: HPS noktasından etek ucuna kadar düz ölçüm)",
+      "tolerance": "+/- 0.5 cm veya +/- 1.0 cm gibi (HER ÖLÇÜ İÇİN ZORUNLU)",
+      "sizes": {
+        "XS": "gerçekçi CM ölçü",
+        "S": "gerçekçi CM ölçü",
+        "M": "gerçekçi CM ölçü (BAZ)",
+        "L": "gerçekçi CM ölçü",
+        "XL": "gerçekçi CM ölçü",
+        "XXL": "gerçekçi CM ölçü"
+      }
+    }
+  ],
+  "colorways": [
+    {
+      "name": "Renk yolu adı (Örn: Bordo/Midnight Black)",
+      "pantoneCode": "Pantone 19-4006 TCX",
+      "components": {
+        "shell": "Ana kumaş renk kodu",
+        "lining": "Astar renk kodu (varsa, yoksa '-')",
+        "trim": "Aksesuar renk kodu (gümüş/altın/DTM)",
+        "thread": "DTM veya kontrast"
+      }
+    }
+  ],
+  "artwork": [
+    {
+      "type": "Baskı/Nakış/Etiket",
+      "technique": "Serigrafi/Transfer/Dijital/Dokuma vb.",
+      "placement": "Göğüs ortası, yaka dikişinden X cm aşağı gibi",
+      "dimensions": "Genişlik x Yükseklik cm",
+      "colors": "Kullanılan renk kodları"
+    }
+  ],
+  "labelsAndPackaging": {
+    "mainLabel": {
+      "placement": "Yerleşim yeri ve ölçüsü (ense ortası vb.)",
+      "type": "Dokuma/Baskılı"
+    },
+    "careLabel": {
+      "placement": "Sol iç yan dikiş, etek ucundan X cm yukarı",
+      "content": "Yıkama sembolleri açıklaması"
+    },
+    "sizeLabel": {
+      "placement": "Yerleşim",
+      "type": "Tip"
+    },
+    "hangtag": "Askı etiketi açıklaması",
+    "folding": "Katlama talimatı",
+    "polybag": "Polybag ölçüsü ve barkod konumu",
+    "cartonPacking": "Koli bilgileri"
+  }
+}`;
+
+
+        console.log("JSON analiz başlatılıyor...");
+
+        // Fallback modelleri: Pro meşgulse Flash'a düş
+        const JSON_MODELS = ['gemini-3-pro-preview', 'gemini-3-flash-preview', 'gemini-2.0-flash'];
+        let jsonResponse = null;
+        let usedModel = '';
+
+        for (const model of JSON_MODELS) {
+            try {
+                console.log(`📡 JSON analiz deneniyor: ${model}`);
+                jsonResponse = await ai.models.generateContent({
+                    model,
+                    contents: { parts: [...parts, { text: jsonPrompt }] },
+                    config: {
+                        temperature: 0.1,
+                    }
+                });
+                usedModel = model;
+                console.log(`✅ JSON analiz başarılı: ${model}`);
+                break;
+            } catch (modelError: any) {
+                console.warn(`⚠️ ${model} başarısız (${modelError?.message || 'bilinmeyen hata'}), sonraki model deneniyor...`);
+                if (model === JSON_MODELS[JSON_MODELS.length - 1]) {
+                    throw new Error('Tüm AI modelleri şu anda meşgul. Lütfen birkaç dakika sonra tekrar deneyin.');
+                }
+            }
+        }
+
+        let responseText = jsonResponse?.text || "{}";
+        responseText = responseText.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        let parsedData;
+        try {
+            parsedData = JSON.parse(responseText);
+        } catch (e) {
+            console.error("JSON Parse Error:", responseText);
+            throw new Error("AI geçerli bir JSON formatı üretemedi.");
+        }
+
+        // Generate FRONT SKETCH — TÜRKÇE ETİKETLİ
+        const frontPrompt = `Bu ürün fotoğrafını analiz et ve ÖN GÖRÜNÜM için profesyonel bir 'Teknik Düz Çizim' (Technical Flat Sketch) oluştur.
+
+KRİTİK KURALLAR:
+- Tüm yazılar, etiketler ve notlar TÜRKÇE olacak.
+- Dikiş noktalarını Türkçe etiketle: "Düz Dikiş", "Çift İğne", "Overlok" vb.
+- Ölçü referans çizgileri ekle: "Göğüs Genişliği", "Kol Boyu", "Ürün Boyu" gibi Türkçe başlıklar.
+- Detayları Türkçe etiketle: "Yaka", "Cep", "Fermuar", "Manşet", "Düğme", "Etek Ucu" vb.
+- Gölgelendirme ve renk YOK, sadece siyah-beyaz teknik çizgiler.
+- Kalıp (düz çizgi) ve dikiş (kesik çizgi) hatlarını net göster.`;
+
+        console.log("Ön Çizim başlatılıyor...");
+        const frontResponse = await ai.models.generateContent({
+            model: LIVE_MODEL_PRIMARY,
+            contents: { parts: [{ inlineData: { data: frontData, mimeType: frontMime } }, { text: frontPrompt }] },
+            config: {
+                responseModalities: [Modality.IMAGE],
+                temperature: 0.4,
+                imageConfig: { imageSize: '1K' },
+            }
+        });
+
+        const frontParts = frontResponse.candidates?.[0]?.content?.parts;
+        let frontSketchBase64 = '';
+        if (frontParts) {
+            for (const part of frontParts) {
+                if (part.inlineData) {
+                    frontSketchBase64 = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    break;
+                }
+            }
+        }
+
+        // Generate BACK SKETCH
+        let backSketchBase64 = null;
+        if (backPart) {
+            const backPrompt = `Bu ürün arka fotoğrafını analiz et ve ARKA GÖRÜNÜM için profesyonel bir 'Teknik Düz Çizim' (Technical Flat Sketch) oluştur.
+
+KRİTİK KURALLAR:
+- Tüm yazılar, etiketler ve notlar TÜRKÇE olacak.
+- Arka dikiş noktalarını Türkçe etiketle: "Omuz Dikişi", "Sırt Ortası", "Arka Cep" vb.
+- Ölçü referans çizgileri ekle: Türkçe başlıklarla.
+- Gölgelendirme ve renk YOK, sadece siyah-beyaz teknik çizgiler.`;
+            console.log("Arka Çizim başlatılıyor...");
+            const backResponse = await ai.models.generateContent({
+                model: LIVE_MODEL_PRIMARY,
+                contents: { parts: [backPart, { text: backPrompt }] },
+                config: {
+                    responseModalities: [Modality.IMAGE],
+                    temperature: 0.4,
+                    imageConfig: { imageSize: '1K' },
+                }
+            });
+
+            const backPartsRes = backResponse.candidates?.[0]?.content?.parts;
+            if (backPartsRes) {
+                for (const part of backPartsRes) {
+                    if (part.inlineData) {
+                        backSketchBase64 = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!frontSketchBase64) {
+            throw new Error('Ön teknik çizim oluşturulamadı');
+        }
+
+        return {
+            frontSketchBase64,
+            backSketchBase64,
+            techPackData: parsedData,
+        };
+
+    } catch (error: any) {
+        console.error('Tech Pack Pro Generation Error:', error);
+        throw new Error(error.message || 'Gelişmiş Tech Pack oluşturulurken bir hata oluştu');
+    }
+};

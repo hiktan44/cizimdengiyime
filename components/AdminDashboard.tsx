@@ -41,6 +41,8 @@ interface AdminDashboardProps {
     userName?: string | null;
     onLoginClick: () => void;
     onLogoutClick: () => void;
+    onBlogClick?: () => void;
+    onFeaturesClick?: () => void;
     sketchUrl: string;
     productUrl: string;
     modelUrl: string;
@@ -130,6 +132,8 @@ const ContentCard: React.FC<{
 export const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
     const {
         onNavigateHome,
+        onBlogClick,
+        onFeaturesClick,
         sketchUrl,
         productUrl,
         modelUrl,
