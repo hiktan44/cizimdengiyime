@@ -54,7 +54,7 @@ import { PixshopPage } from './pages/PixshopPage';
 import { FotomatikPage } from './pages/FotomatikPage';
 import { AdgeniusPage } from './pages/AdgeniusPage';
 import { CollagePage } from './pages/CollagePage';
-import TechPackPage from './pages/TechPackPage';
+import TechPackProPage from './pages/TechPackProPage';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { trackEvent, ANALYTICS_EVENTS } from './utils/analytics';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
@@ -1855,7 +1855,7 @@ const ToolPage: React.FC<{
                         />
                     ) : activeToolTab === 'techpack' ? (
                         /* --- TECH PACK MODE (Technical Drawings) --- */
-                        <TechPackPage
+                        <TechPackProPage
                             profile={profile}
                             onRefreshProfile={onRefreshProfile}
                             onShowBuyCredits={onBuyCreditsClick}

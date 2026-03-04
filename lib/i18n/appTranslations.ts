@@ -360,7 +360,7 @@ export const appTranslations: TranslationRecord<AppTranslationType> = {
             fotomatik: { label: 'Fotomatik', credits: '1 kredi/işlem' },
             adgenius: { label: 'AdGenius', credits: '1-3 kredi/işlem' },
             collage: { label: 'Kolaj Stüdyosu', shortLabel: 'Kolaj', credits: '2 kredi/işlem' },
-            techpack: { label: 'Tech Pack', shortLabel: 'Tech', credits: '3 kredi/işlem' },
+            techpack: { label: 'Tech Pack PRO', shortLabel: 'Tech PRO', credits: '3 kredi/işlem' },
         },
         kombiniMode: {
             title: 'Kombin Modu Aktif',
@@ -680,7 +680,7 @@ export const appTranslations: TranslationRecord<AppTranslationType> = {
             fotomatik: { label: 'Fotomatik', credits: '1 credit/operation' },
             adgenius: { label: 'AdGenius', credits: '1-3 credits/operation' },
             collage: { label: 'Collage Studio', shortLabel: 'Collage', credits: '2 credits/operation' },
-            techpack: { label: 'Tech Pack', shortLabel: 'Tech', credits: '3 credits/operation' },
+            techpack: { label: 'Tech Pack PRO', shortLabel: 'Tech PRO', credits: '3 credits/operation' },
         },
         kombiniMode: {
             title: 'Outfit Mode Active',
