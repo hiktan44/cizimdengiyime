@@ -25,7 +25,7 @@ export const colors = [
   { name: 'Mor', value: '#8b5cf6' },
   { name: 'Lila', value: '#e9d5ff' },
   { name: 'Turuncu', value: '#f97316' },
-  { name: 'Pastel', value: 'linear-gradient(to right, #fbcfe8, #fef08a, #bbf7d0)'},
+  { name: 'Pastel', value: 'linear-gradient(to right, #fbcfe8, #fef08a, #bbf7d0)' },
 ];
 
 interface ColorPickerProps {
@@ -38,13 +38,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
   const [customColorHex, setCustomColorHex] = useState('#3b82f6');
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showLargeModal, setShowLargeModal] = useState(false);
-  
+
   const handleColorClick = (colorName: string) => {
-    if (selectedColor === colorName) {
-      onColorChange(''); // Deselect if clicked again
-    } else {
-      onColorChange(colorName);
-    }
+    onColorChange(colorName);
   };
 
   const handleCustomColorSelect = () => {
@@ -78,7 +74,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
           </button>
         </div>
       </label>
-      
+
       {/* Compact color selector */}
       <div className="flex items-center gap-2 flex-wrap bg-slate-900/50 p-3 rounded-lg border border-slate-700">
         {colors.map((color) => (
@@ -88,30 +84,30 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
             title={color.name}
             onClick={() => handleColorClick(color.name)}
             className={`w-6 h-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-cyan-500 relative ${selectedColor === color.name ? 'scale-125 ring-2 ring-white' : 'hover:scale-110'}`}
-            style={{ 
-                background: color.value,
-                border: color.border ? '1px solid #cbd5e1' : 'none'
+            style={{
+              background: color.value,
+              border: color.border ? '1px solid #cbd5e1' : 'none'
             }}
             aria-label={`Renk seç: ${color.name}`}
           />
         ))}
-        
+
         {/* Custom Color Picker Button */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setShowColorPicker(!showColorPicker)}
             className="w-6 h-6 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-cyan-500 flex items-center justify-center"
-            style={{ 
-                background: `conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red)`,
-                border: '2px solid #fff'
+            style={{
+              background: `conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red)`,
+              border: '2px solid #fff'
             }}
             title="Özel Renk Seç"
             aria-label="Özel renk paleti aç"
           >
             <span className="text-white text-xs font-bold drop-shadow">+</span>
           </button>
-          
+
           {showColorPicker && (
             <div className="absolute top-8 left-0 z-50 bg-slate-800 p-3 rounded-lg border border-slate-600 shadow-2xl flex flex-col gap-2">
               <label className="text-xs text-slate-400 font-medium">Özel Renk Ton Seç</label>
@@ -138,9 +134,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
           )}
         </div>
 
-         {selectedColor && (
-          <button 
-            onClick={() => onColorChange('')} 
+        {selectedColor && (
+          <button
+            onClick={() => onColorChange('')}
             className="text-slate-500 hover:text-red-400 transition-colors ml-auto"
             title="Rengi Temizle"
             aria-label="Renk seçimini temizle"
@@ -165,7 +161,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
                 </svg>
               </button>
             </div>
-            
+
             <div className="p-6">
               {/* Color Grid */}
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
@@ -174,11 +170,10 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({ label = "Renk Önerisi
                     key={color.name}
                     type="button"
                     onClick={() => handleLargeModalColorSelect(color.name)}
-                    className={`group relative flex flex-col items-center gap-3 p-4 rounded-xl transition-all duration-200 hover:scale-105 ${
-                      selectedColor === color.name
+                    className={`group relative flex flex-col items-center gap-3 p-4 rounded-xl transition-all duration-200 hover:scale-105 ${selectedColor === color.name
                         ? 'bg-cyan-600/20 ring-2 ring-cyan-500 shadow-lg shadow-cyan-500/30'
                         : 'bg-slate-700/50 hover:bg-slate-700 border border-slate-600'
-                    }`}
+                      }`}
                   >
                     <div
                       className="w-16 h-16 rounded-lg shadow-lg transition-transform group-hover:scale-110"
