@@ -20,6 +20,22 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     headers: {
       'X-Client-Info': 'cizimdengiyime-app',
     },
+    fetch: (url, options) => {
+      // Create a native Headers object safely
+      const headers = new Headers(options?.headers);
+
+      // Suppress headers not allowed by strict self-hosted API gateway
+      headers.delete('content-profile');
+      headers.delete('Content-Profile');
+
+      // Convert mapping back since supabase expects a dictionary sometimes
+      const strippedHeaders: Record<string, string> = {};
+      headers.forEach((value, key) => {
+        strippedHeaders[key] = value;
+      });
+
+      return fetch(url, { ...options, headers: strippedHeaders });
+    }
   },
 });
 
