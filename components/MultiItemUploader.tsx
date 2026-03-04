@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import { convertHeicToJpeg } from '../utils/heicConverter';
+import { Loader2 } from 'lucide-react';
 
 interface MultiItem {
     file: File;
@@ -22,20 +24,29 @@ export const MultiItemUploader: React.FC<MultiItemUploaderProps> = ({
     disabled = false
 }) => {
     const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const [processingIndex, setProcessingIndex] = useState<number | null>(null);
 
-    const handleFileSelect = async (index: number, file: File) => {
-        const preview = URL.createObjectURL(file);
-        const label = file.name.replace(/\.[^/.]+$/, '').substring(0, 20);
+    const handleFileSelect = async (index: number, originalFile: File) => {
+        setProcessingIndex(index);
+        try {
+            const file = await convertHeicToJpeg(originalFile);
+            const preview = URL.createObjectURL(file);
+            const label = file.name.replace(/\.[^/.]+$/, '').substring(0, 20);
 
-        const newItems = [...items];
-        if (index < newItems.length) {
-            // Eski preview'i temizle
-            URL.revokeObjectURL(newItems[index].preview);
-            newItems[index] = { file, preview, label };
-        } else {
-            newItems.push({ file, preview, label });
+            const newItems = [...items];
+            if (index < newItems.length) {
+                // Eski preview'i temizle
+                URL.revokeObjectURL(newItems[index].preview);
+                newItems[index] = { file, preview, label };
+            } else {
+                newItems.push({ file, preview, label });
+            }
+            onItemsChange(newItems);
+        } catch (error) {
+            console.error('Error processing format:', error);
+        } finally {
+            setProcessingIndex(null);
         }
-        onItemsChange(newItems);
     };
 
     const handleRemove = (index: number) => {
@@ -46,7 +57,7 @@ export const MultiItemUploader: React.FC<MultiItemUploaderProps> = ({
     };
 
     const handleSlotClick = (index: number) => {
-        if (disabled) return;
+        if (disabled || processingIndex !== null) return;
         fileInputRefs.current[index]?.click();
     };
 
@@ -56,13 +67,14 @@ export const MultiItemUploader: React.FC<MultiItemUploaderProps> = ({
                 {Array.from({ length: maxItems }).map((_, index) => {
                     const item = items[index];
                     const hasItem = !!item;
+                    const isProcessing = processingIndex === index;
 
                     return (
                         <div key={index} className="relative group">
                             <input
                                 ref={el => { fileInputRefs.current[index] = el; }}
                                 type="file"
-                                accept="image/*"
+                                accept="image/*,.heic,.heif"
                                 className="hidden"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
@@ -74,19 +86,25 @@ export const MultiItemUploader: React.FC<MultiItemUploaderProps> = ({
                             <button
                                 type="button"
                                 onClick={() => handleSlotClick(index)}
-                                disabled={disabled || (index > items.length)}
+                                disabled={disabled || (index > items.length) || isProcessing}
                                 className={`
                                     w-full aspect-square rounded-lg border-2 border-dashed transition-all overflow-hidden
                                     flex items-center justify-center relative
-                                    ${hasItem
-                                        ? 'border-cyan-500/50 bg-slate-800'
-                                        : index <= items.length
-                                            ? 'border-slate-600 bg-slate-800/50 hover:border-cyan-500/50 hover:bg-slate-700/50 cursor-pointer'
-                                            : 'border-slate-700/30 bg-slate-900/30 opacity-40 cursor-not-allowed'
+                                    ${isProcessing ? 'border-cyan-500 bg-slate-800/70 cursor-wait' :
+                                        hasItem
+                                            ? 'border-cyan-500/50 bg-slate-800'
+                                            : index <= items.length
+                                                ? 'border-slate-600 bg-slate-800/50 hover:border-cyan-500/50 hover:bg-slate-700/50 cursor-pointer'
+                                                : 'border-slate-700/30 bg-slate-900/30 opacity-40 cursor-not-allowed'
                                     }
                                 `}
                             >
-                                {hasItem ? (
+                                {isProcessing ? (
+                                    <div className="flex flex-col items-center justify-center text-cyan-400">
+                                        <Loader2 className="w-6 h-6 animate-spin mb-1" />
+                                        <span className="text-[9px] font-medium text-slate-300">Format...</span>
+                                    </div>
+                                ) : hasItem ? (
                                     <>
                                         <img
                                             src={item.preview}
@@ -148,3 +166,4 @@ export const MultiItemUploader: React.FC<MultiItemUploaderProps> = ({
 };
 
 export type { MultiItem };
+

@@ -159,6 +159,17 @@ export const getFriendlyErrorMessage = (error: unknown, lang: 'tr' | 'en' = 'tr'
         return msgs.modelNotAvailable;
     }
 
+    // Dosya formatı
+    if (
+        lowerError.includes('geçersiz dosya formatı') ||
+        lowerError.includes('unsupported format') ||
+        lowerError.includes('invalid format') ||
+        lowerError.includes('invalid file') ||
+        lowerError.includes('mimetype')
+    ) {
+        return msgs.unsupportedFormat;
+    }
+
     // Dosya boyutu
     if (
         lowerError.includes('too large') ||
