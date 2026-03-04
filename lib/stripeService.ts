@@ -7,7 +7,7 @@ const getBackendUrl = () => {
         return 'http://localhost:3001';
     }
     // Production URL (Coolify or Vercel)
-    return import.meta.env.VITE_BACKEND_URL || window.location.origin;
+    return import.meta.env.VITE_BACKEND_URL || 'https://fasheone-backend.apps.seymata.com';
 };
 
 // Stripe instance loader
