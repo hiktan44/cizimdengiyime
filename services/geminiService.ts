@@ -449,13 +449,19 @@ export const generateVideoFromImage = async (
         console.warn(`⚠️ durationSeconds ${settings.durationSecs} geçersiz, ${durationSeconds}'e yuvarlandı`);
     }
 
+    // Google Veo API Constraint: When using reference images, durationSeconds must be 8.
+    const apiDuration = 8;
+    if (durationSeconds !== 8) {
+        console.warn(`⚠️ API Kısıtlaması: Görselden video üretimi (Image-to-Video) için Veo API sadece 8 saniyeyi destekler. Süre 8s olarak zorlanıyor.`);
+    }
+
     // Enhanced fashion video prompt
     const enhancedPrompt = settings.prompt + ' Professional fashion photography lighting, magazine quality. Professional fashion video. No audio, no music, no sound effects. Silent video only.';
 
     // Negative prompt for quality filtering
     const negativePrompt = 'blurry, low quality, distorted, deformed, ugly, amateur, watermark, text overlay, logo, rapid movement, shaky camera, horror, violent, cartoon, drawing';
 
-    console.log(`Video üretimi başlatıldı - Çözünürlük: ${effectiveResolution}, Süre: ${durationSeconds}s`);
+    console.log(`Video üretimi başlatıldı - Çözünürlük: ${effectiveResolution}, İstenen Süre: ${durationSeconds}s (API: ${apiDuration}s)`);
 
     const MAX_RETRIES = 2;
     let lastError: Error | null = null;
@@ -478,7 +484,7 @@ export const generateVideoFromImage = async (
                     numberOfVideos: 1,
                     resolution: effectiveResolution,
                     aspectRatio: settings.aspectRatio,
-                    durationSeconds: durationSeconds,
+                    durationSeconds: apiDuration, // ZORUNLU KURAL
                     // personGeneration kaldırıldı — Veo API artık 'allow_all' desteklemiyor
                     negativePrompt: negativePrompt,
                 }
