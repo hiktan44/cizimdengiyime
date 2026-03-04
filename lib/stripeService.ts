@@ -3,11 +3,7 @@ import { supabase } from './supabase';
 
 // Helper to get backend URL
 const getBackendUrl = () => {
-    if (import.meta.env.DEV) {
-        return 'http://localhost:3001';
-    }
-    // Production URL (Coolify or Vercel)
-    return 'https://fasheone-backend.apps.seymata.com';
+    return import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? 'http://localhost:3001' : 'https://fasheone-backend.apps.seymata.com');
 };
 
 // Stripe instance loader
