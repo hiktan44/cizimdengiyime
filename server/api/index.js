@@ -176,14 +176,15 @@ const deductCredits = async (userId, amount, type) => {
         .update({ credits: profile.credits - amount })
         .eq('id', userId);
 
-    // Log the generation
-    await supabaseAdmin
-        .from('generations')
-        .insert({
-            user_id: userId,
-            type: type,
-            credits_used: amount,
-        });
+    // ⚠️ DEVRE DIŞI BIRAKILDI - generations tablosuna kayıt yapılmıyor
+    // await supabaseAdmin
+    //     .from('generations')
+    //     .insert({
+    //         user_id: userId,
+    //         type: type,
+    //         credits_used: amount,
+    //     });
+    console.log(`[DISABLED] Backend generation insert skipped for user: ${userId}, type: ${type}`);
 
     return profile.credits - amount;
 };
@@ -515,14 +516,15 @@ app.post('/api/v1/generation/sketch-to-product', verifyAuth, upload.single('imag
             throw new Error('No image generated');
         }
 
-        // Save generation record
-        await supabaseAdmin
-            .from('generations')
-            .update({ output_image_url: outputImage })
-            .eq('user_id', req.user.id)
-            .eq('type', 'sketch_to_product')
-            .order('created_at', { ascending: false })
-            .limit(1);
+        // ⚠️ DEVRE DIŞI BIRAKILDI - generations tablosuna güncelleme yapılmıyor
+        // await supabaseAdmin
+        //     .from('generations')
+        //     .update({ output_image_url: outputImage })
+        //     .eq('user_id', req.user.id)
+        //     .eq('type', 'sketch_to_product')
+        //     .order('created_at', { ascending: false })
+        //     .limit(1);
+        console.log(`[DISABLED] Backend generation update skipped for sketch_to_product`);
 
         res.json({
             success: true,

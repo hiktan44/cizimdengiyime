@@ -112,22 +112,9 @@ export const saveGeneration = async (
   outputVideoUrl: string | null,
   settings: Record<string, any>
 ): Promise<void> => {
-  try {
-    const { error } = await supabase.from('generations').insert({
-      user_id: userId,
-      type,
-      credits_used: creditsUsed,
-      input_image_url: inputImageUrl,
-      output_image_url: outputImageUrl,
-      output_video_url: outputVideoUrl,
-      settings,
-      created_at: new Date().toISOString(),
-    });
-
-    if (error) throw error;
-  } catch (error) {
-    console.error('Error saving generation:', error);
-  }
+  // ⚠️ DEVRE DIŞI BIRAKILDI - generations tablosuna kayıt yapılmıyor
+  console.log(`[DISABLED] saveGeneration skipped for user: ${userId}, type: ${type}`);
+  return;
 };
 
 export const uploadImageToStorage = async (
@@ -135,23 +122,9 @@ export const uploadImageToStorage = async (
   userId: string,
   type: 'input' | 'output'
 ): Promise<string | null> => {
-  try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${userId}/${type}-${Date.now()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('generations')
-      .upload(fileName, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data } = supabase.storage.from('generations').getPublicUrl(fileName);
-
-    return data.publicUrl;
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    return null;
-  }
+  // ⚠️ DEVRE DIŞI BIRAKILDI - generations storage'a dosya yüklenmiyor
+  console.log(`[DISABLED] uploadImageToStorage skipped for user: ${userId}, type: ${type}`);
+  return null;
 };
 
 export const uploadBase64ToStorage = async (
@@ -159,35 +132,9 @@ export const uploadBase64ToStorage = async (
   userId: string,
   type: 'input' | 'output' | 'video'
 ): Promise<string | null> => {
-  try {
-    // Extract mime type and base64 data
-    const matches = base64Data.match(/^data:(.+);base64,(.+)$/);
-    if (!matches) return null;
-
-    const mimeType = matches[1];
-    const base64 = matches[2];
-
-    // Convert base64 to blob
-    const blob = await fetch(base64Data).then((res) => res.blob());
-
-    const fileExt = mimeType.split('/')[1];
-    const fileName = `${userId}/${type}-${Date.now()}.${fileExt}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('generations')
-      .upload(fileName, blob, {
-        contentType: mimeType,
-      });
-
-    if (uploadError) throw uploadError;
-
-    const { data } = supabase.storage.from('generations').getPublicUrl(fileName);
-
-    return data.publicUrl;
-  } catch (error) {
-    console.error('Error uploading base64:', error);
-    return null;
-  }
+  // ⚠️ DEVRE DIŞI BIRAKILDI - generations storage'a base64 yüklenmiyor
+  console.log(`[DISABLED] uploadBase64ToStorage skipped for user: ${userId}, type: ${type}`);
+  return null;
 };
 
 // ==========================================
