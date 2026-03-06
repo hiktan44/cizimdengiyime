@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Logo } from './Logo';
 import { useI18n, TranslationRecord } from '../lib/i18n';
-import { LanguageSwitcher } from './LanguageSwitcher';
 
 // Header translations
 const trHeader = {
@@ -18,6 +17,8 @@ const trHeader = {
     menu: 'Menü',
     adminPanel: 'Admin Panel',
     affiliateProgram: 'Affiliate Programı',
+    account: 'Hesap',
+    tools: 'Araçlar',
 };
 
 const headerTranslations: TranslationRecord<typeof trHeader> = {
@@ -35,6 +36,8 @@ const headerTranslations: TranslationRecord<typeof trHeader> = {
         menu: 'Menu',
         adminPanel: 'Admin Panel',
         affiliateProgram: 'Affiliate Program',
+        account: 'Account',
+        tools: 'Tools',
     },
 };
 
@@ -77,15 +80,20 @@ export const Header: React.FC<HeaderProps> = ({
     activeToolTab
 }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
-    const { t } = useI18n();
+    const accountDropdownRef = useRef<HTMLDivElement>(null);
+    const { t, language, setLanguage } = useI18n();
     const ht = t(headerTranslations);
 
-    // Close menu when clicking outside
+    // Close menus when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setIsMobileMenuOpen(false);
+            }
+            if (accountDropdownRef.current && !accountDropdownRef.current.contains(event.target as Node)) {
+                setIsAccountDropdownOpen(false);
             }
         };
 
@@ -95,120 +103,95 @@ export const Header: React.FC<HeaderProps> = ({
 
     const handleMenuItemClick = (action: () => void) => {
         setIsMobileMenuOpen(false);
+        setIsAccountDropdownOpen(false);
         action();
     };
 
     return (
         <header className="sticky top-0 bg-slate-900/95 backdrop-blur-md z-[100] border-b border-slate-800 shadow-xl w-full safe-area-inset-top">
-            <nav className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
+            <nav className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3">
+                {/* Logo - tıklayınca ana sayfaya */}
                 <div className="flex items-center gap-3 sm:gap-4">
                     <div
                         className="cursor-pointer hover:opacity-90 transition-all duration-300 hover:scale-105 active:scale-95"
                         onClick={onHomeClick}
+                        title={ht.home}
                     >
-                        <Logo className="h-10 sm:h-12 md:h-16 lg:h-[120px]" theme={theme} />
+                        <Logo className="h-10 sm:h-12 md:h-14" theme={theme} />
                     </div>
                 </div>
 
                 {/* Desktop Menu */}
-                <div className="hidden md:flex items-center gap-2 sm:gap-3 md:gap-4">
-                    {onHomeClick && (
-                        <button
-                            onClick={onHomeClick}
-                            className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors"
-                        >
-                            {ht.home}
-                        </button>
-                    )}
-                    {onFeaturesClick && (
-                        <button
-                            onClick={onFeaturesClick}
-                            className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors"
-                        >
-                            {ht.features}
-                        </button>
-                    )}
-                    {onBlogClick && (
-                        <button
-                            onClick={onBlogClick}
-                            className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors"
-                        >
-                            {ht.blog}
-                        </button>
-                    )}
-
-                    {/* User Name Badge */}
-                    {isLoggedIn && userName && (
-                        <div className="flex items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-full px-4 py-1.5">
-                            <svg className="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-sm font-medium text-white">{userName}</span>
-                        </div>
-                    )}
-
-                    {/* Credits Badge & Buy Button */}
-                    {isLoggedIn && credits !== undefined && (
+                <div className="hidden md:flex items-center gap-2 lg:gap-3">
+                    {/* Landing page menüleri (giriş yapılmamışsa) */}
+                    {!isLoggedIn && (
                         <>
-                            <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/50 rounded-full px-4 py-1.5 flex items-center gap-2">
-                                <svg className="w-4 h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                                </svg>
-                                <span className="text-sm font-bold text-white">{credits}</span>
-                                <span className="text-xs text-slate-300">{ht.credits}</span>
-                            </div>
-                            {onBuyCreditsClick && (
+                            {onFeaturesClick && (
                                 <button
-                                    onClick={onBuyCreditsClick}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-4 py-1.5 rounded-full text-xs font-semibold transition-all shadow-lg"
+                                    onClick={onFeaturesClick}
+                                    className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors px-2 py-1"
                                 >
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    {ht.buyCredits}
+                                    {ht.features}
                                 </button>
                             )}
-
-                            {onHistoryClick && (
+                            {onBlogClick && (
                                 <button
-                                    onClick={onHistoryClick}
-                                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-full text-xs font-semibold transition-all border border-slate-700"
-                                    title={ht.pastWorks}
+                                    onClick={onBlogClick}
+                                    className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors px-2 py-1"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    {ht.history}
+                                    {ht.blog}
                                 </button>
                             )}
                         </>
                     )}
 
-                    {/* Affiliate Program Button */}
-                    {isLoggedIn && onAffiliateClick && (
-                        <button
-                            onClick={onAffiliateClick}
-                            className="text-sm font-medium px-3 py-1.5 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/50 hover:bg-emerald-500/20 transition-all"
-                        >
-                            🤝 {ht.affiliateProgram}
-                        </button>
+                    {/* Credits Badge & Buy Button - Giriş yapmışsa */}
+                    {isLoggedIn && credits !== undefined && (
+                        <>
+                            <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/40 rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                                <svg className="w-3.5 h-3.5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
+                                </svg>
+                                <span className="text-sm font-bold text-white">{credits}</span>
+                            </div>
+                            {onBuyCreditsClick && (
+                                <button
+                                    onClick={onBuyCreditsClick}
+                                    className="flex items-center gap-1.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold transition-all shadow-lg"
+                                >
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    {ht.buyCredits}
+                                </button>
+                            )}
+                        </>
                     )}
 
-                    {/* Admin Panel Button - Only shown if user is admin */}
-                    {userRole === 'admin' && onAdminClick && (
+                    {/* Language Toggle - TR / EN */}
+                    <div className="flex items-center bg-slate-800/60 border border-slate-700 rounded-full p-0.5">
                         <button
-                            onClick={onAdminClick}
-                            className="text-sm font-medium px-3 py-1.5 rounded-full border bg-purple-500/10 text-purple-400 border-purple-500/50 hover:bg-purple-500/20 transition-all"
+                            onClick={() => setLanguage('tr')}
+                            className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all ${language === 'tr'
+                                ? 'bg-cyan-600 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                                }`}
                         >
-                            ⚙️ {ht.adminPanel}
+                            TR
                         </button>
-                    )}
+                        <button
+                            onClick={() => setLanguage('en')}
+                            className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all ${language === 'en'
+                                ? 'bg-cyan-600 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                                }`}
+                        >
+                            EN
+                        </button>
+                    </div>
 
-                    {/* Language Switcher - Desktop */}
-                    <LanguageSwitcher compact />
-
-                    {/* Login/Logout */}
+                    {/* Login Button (giriş yapılmamışsa) */}
                     {!isLoggedIn && (
                         <button
                             onClick={onLoginClick}
@@ -218,29 +201,141 @@ export const Header: React.FC<HeaderProps> = ({
                         </button>
                     )}
 
+                    {/* Account Dropdown (giriş yapılmışsa) */}
+                    {isLoggedIn && (
+                        <div className="relative" ref={accountDropdownRef}>
+                            <button
+                                onClick={() => setIsAccountDropdownOpen(!isAccountDropdownOpen)}
+                                className="flex items-center gap-2 bg-slate-800/60 border border-slate-700 hover:border-slate-600 rounded-full px-3 py-1.5 transition-all"
+                            >
+                                <div className="w-7 h-7 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
+                                    <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                {userName && (
+                                    <span className="text-sm font-medium text-white max-w-[100px] truncate hidden lg:inline">{userName}</span>
+                                )}
+                                <svg
+                                    className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isAccountDropdownOpen ? 'rotate-180' : ''}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {/* Account Dropdown */}
+                            {isAccountDropdownOpen && (
+                                <div className="absolute right-0 top-full mt-2 w-56 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50">
+                                    {/* User Info */}
+                                    {userName && (
+                                        <div className="px-4 py-3 bg-slate-800/50 border-b border-slate-700">
+                                            <div className="text-sm font-semibold text-white truncate">{userName}</div>
+                                            <div className="text-xs text-slate-400">{credits} {ht.credits}</div>
+                                        </div>
+                                    )}
+
+                                    <div className="py-1">
+                                        {/* History */}
+                                        {onHistoryClick && (
+                                            <button
+                                                onClick={() => handleMenuItemClick(onHistoryClick)}
+                                                className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors text-sm text-slate-300 hover:text-white"
+                                            >
+                                                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {ht.pastWorks}
+                                            </button>
+                                        )}
+
+                                        {/* Affiliate Program */}
+                                        {onAffiliateClick && (
+                                            <button
+                                                onClick={() => handleMenuItemClick(onAffiliateClick)}
+                                                className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors text-sm text-slate-300 hover:text-white"
+                                            >
+                                                <span className="text-sm w-4 text-center">🤝</span>
+                                                {ht.affiliateProgram}
+                                            </button>
+                                        )}
+
+                                        {/* Admin Panel */}
+                                        {userRole === 'admin' && onAdminClick && (
+                                            <button
+                                                onClick={() => handleMenuItemClick(onAdminClick)}
+                                                className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors text-sm text-purple-400 hover:text-purple-300"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                {ht.adminPanel}
+                                            </button>
+                                        )}
+
+                                        {/* Divider */}
+                                        <div className="my-1 border-t border-slate-700"></div>
+
+                                        {/* Logout */}
+                                        <button
+                                            onClick={() => handleMenuItemClick(onLogoutClick)}
+                                            className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-red-500/10 transition-colors text-sm text-red-400 hover:text-red-300"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                            </svg>
+                                            {ht.signOut}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Mobile Menu */}
-                <div className="flex md:hidden items-center gap-2 sm:gap-3" ref={menuRef}>
-                    {/* Credits Badge - Always visible on mobile */}
+                <div className="flex md:hidden items-center gap-2" ref={menuRef}>
+                    {/* Credits Badge - Mobilde her zaman görünür */}
                     {isLoggedIn && credits !== undefined && (
-                        <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/50 rounded-full px-2 sm:px-3 py-1.5 flex items-center gap-1.5 sm:gap-2">
-                            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-500/40 rounded-full px-2 py-1 flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                             </svg>
-                            <span className="text-xs sm:text-sm font-bold text-white">{credits}</span>
+                            <span className="text-xs font-bold text-white">{credits}</span>
                         </div>
                     )}
 
-                    {/* Language Switcher - Mobile (compact) */}
-                    <LanguageSwitcher compact />
+                    {/* Language Toggle - Mobile */}
+                    <div className="flex items-center bg-slate-800/60 border border-slate-700 rounded-full p-0.5">
+                        <button
+                            onClick={() => setLanguage('tr')}
+                            className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${language === 'tr'
+                                ? 'bg-cyan-600 text-white'
+                                : 'text-slate-400'
+                                }`}
+                        >
+                            TR
+                        </button>
+                        <button
+                            onClick={() => setLanguage('en')}
+                            className={`px-2 py-1 rounded-full text-xs font-bold transition-all ${language === 'en'
+                                ? 'bg-cyan-600 text-white'
+                                : 'text-slate-400'
+                                }`}
+                        >
+                            EN
+                        </button>
+                    </div>
 
-                    {/* Login Button for non-logged in users on mobile */}
+                    {/* Login Button (giriş yapılmamışsa) */}
                     {!isLoggedIn && (
                         <button
                             onClick={onLoginClick}
-                            className="text-xs sm:text-sm font-medium bg-cyan-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-900/20 active:scale-95"
+                            className="text-xs font-medium bg-cyan-600 text-white px-3 py-2 rounded-lg hover:bg-cyan-500 transition-all shadow-lg shadow-cyan-900/20 active:scale-95"
                         >
                             {ht.signIn}
                         </button>
@@ -254,11 +349,11 @@ export const Header: React.FC<HeaderProps> = ({
                             aria-label={ht.menu}
                         >
                             {isMobileMenuOpen ? (
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             ) : (
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>
                             )}
@@ -267,13 +362,13 @@ export const Header: React.FC<HeaderProps> = ({
 
                     {/* Mobile Dropdown Menu */}
                     {isMobileMenuOpen && isLoggedIn && (
-                        <div className="absolute top-full right-2 sm:right-4 mt-2 w-72 sm:w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 animate-slide-in-right">
+                        <div className="absolute top-full right-2 mt-2 w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50">
                             {/* User Info */}
                             {userName && (
                                 <div className="px-4 py-3 bg-slate-800/50 border-b border-slate-700">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
-                                            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <div className="w-9 h-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
+                                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                             </svg>
                                         </div>
@@ -285,60 +380,17 @@ export const Header: React.FC<HeaderProps> = ({
                                 </div>
                             )}
 
-                            {/* Menu Items */}
-                            <div className="py-2">
-                                {/* Home */}
-                                {onHomeClick && (
-                                    <button
-                                        onClick={() => handleMenuItemClick(onHomeClick)}
-                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
-                                    >
-                                        <div className="w-8 h-8 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                                            <svg className="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                            </svg>
-                                        </div>
-                                        <span className="text-sm font-medium text-white">{ht.home}</span>
-                                    </button>
-                                )}
-
-                                {/* Features */}
-                                {onFeaturesClick && (
-                                    <button
-                                        onClick={() => handleMenuItemClick(onFeaturesClick)}
-                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
-                                    >
-                                        <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                                            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                                            </svg>
-                                        </div>
-                                        <span className="text-sm font-medium text-white">{ht.features}</span>
-                                    </button>
-                                )}
-
-                                {/* Blog */}
-                                {onBlogClick && (
-                                    <button
-                                        onClick={() => handleMenuItemClick(onBlogClick)}
-                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
-                                    >
-                                        <div className="w-8 h-8 bg-pink-500/20 rounded-lg flex items-center justify-center">
-                                            <svg className="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v10m2 4v-4m0 4a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4v4m0 0H9" />
-                                            </svg>
-                                        </div>
-                                        <span className="text-sm font-medium text-white">{ht.blog}</span>
-                                    </button>
-                                )}
-
+                            <div className="py-1.5">
                                 {/* Buy Credits */}
                                 {onBuyCreditsClick && (
                                     <button
                                         onClick={() => handleMenuItemClick(onBuyCreditsClick)}
-                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
                                     >
-                                        <span className="text-sm font-medium text-white">{ht.buyCredits}</span>
+                                        <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        <span className="text-sm font-medium text-green-400">{ht.buyCredits}</span>
                                     </button>
                                 )}
 
@@ -346,13 +398,11 @@ export const Header: React.FC<HeaderProps> = ({
                                 {onHistoryClick && (
                                     <button
                                         onClick={() => handleMenuItemClick(onHistoryClick)}
-                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
                                     >
-                                        <div className="w-8 h-8 bg-slate-700/50 rounded-lg flex items-center justify-center">
-                                            <svg className="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </div>
+                                        <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
                                         <span className="text-sm font-medium text-white">{ht.pastWorks}</span>
                                     </button>
                                 )}
@@ -361,11 +411,9 @@ export const Header: React.FC<HeaderProps> = ({
                                 {onAffiliateClick && (
                                     <button
                                         onClick={() => handleMenuItemClick(onAffiliateClick)}
-                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
                                     >
-                                        <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                                            <span className="text-base">🤝</span>
-                                        </div>
+                                        <span className="text-sm w-4 text-center">🤝</span>
                                         <span className="text-sm font-medium text-white">{ht.affiliateProgram}</span>
                                     </button>
                                 )}
@@ -374,33 +422,27 @@ export const Header: React.FC<HeaderProps> = ({
                                 {userRole === 'admin' && onAdminClick && (
                                     <button
                                         onClick={() => handleMenuItemClick(onAdminClick)}
-                                        className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
                                     >
-                                        <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                                            <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                        </div>
-                                        <span className="text-sm font-medium text-white">{ht.adminPanel}</span>
+                                        <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span className="text-sm font-medium text-purple-400">{ht.adminPanel}</span>
                                     </button>
                                 )}
 
-
-
                                 {/* Divider */}
-                                <div className="my-2 border-t border-slate-700"></div>
+                                <div className="my-1.5 border-t border-slate-700"></div>
 
                                 {/* Logout */}
                                 <button
                                     onClick={() => handleMenuItemClick(onLogoutClick)}
-                                    className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-red-500/10 transition-colors active:scale-95"
+                                    className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-red-500/10 transition-colors active:scale-95"
                                 >
-                                    <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-                                        <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                        </svg>
-                                    </div>
+                                    <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
                                     <span className="text-sm font-medium text-red-400">{ht.signOut}</span>
                                 </button>
                             </div>
@@ -408,6 +450,6 @@ export const Header: React.FC<HeaderProps> = ({
                     )}
                 </div>
             </nav>
-        </header >
+        </header>
     );
 };

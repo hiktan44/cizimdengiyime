@@ -1898,13 +1898,19 @@ const App: React.FC = () => {
         }
     }, [user, profile, showAuthModal]);
 
-    // Redirect logged-in users from landing to tool page
+    // Note: Redirect kaldırıldı - kullanıcı landing page'e dönebilecek
+    // İlk giriş sonrası tool'a yönlendirme için ayrı kontrol
     React.useEffect(() => {
         if (user && profile && currentPage === 'landing') {
-            console.log('✅ Kullanıcı giriş yapmış, tool sayfasına yönlendiriliyor');
-            setCurrentPage('tool');
+            // Sadece ilk login'de yönlendir, sonra kullanıcı seçebilsin
+            const hasRedirected = sessionStorage.getItem('fasheone_initial_redirect');
+            if (!hasRedirected) {
+                console.log('✅ İlk giriş, tool sayfasına yönlendiriliyor');
+                sessionStorage.setItem('fasheone_initial_redirect', 'true');
+                setCurrentPage('tool');
+            }
         }
-    }, [user, profile, currentPage]);
+    }, [user, profile]);
 
     // Referral link yakalama: ?ref=XXXX parametresini URL'den al
     React.useEffect(() => {
