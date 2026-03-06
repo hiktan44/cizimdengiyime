@@ -1892,16 +1892,19 @@ const App: React.FC = () => {
 
     // Close auth modal when user is logged in
     React.useEffect(() => {
-
         if (user && profile && showAuthModal) {
             console.log('✅ User logged in, closing auth modal');
             setShowAuthModal(false);
-            // If on landing page, redirect to tool
-            if (currentPage === 'landing') {
-                setCurrentPage('tool');
-            }
         }
-    }, [user, profile, currentPage, showAuthModal]);
+    }, [user, profile, showAuthModal]);
+
+    // Redirect logged-in users from landing to tool page
+    React.useEffect(() => {
+        if (user && profile && currentPage === 'landing') {
+            console.log('✅ Kullanıcı giriş yapmış, tool sayfasına yönlendiriliyor');
+            setCurrentPage('tool');
+        }
+    }, [user, profile, currentPage]);
 
     // Referral link yakalama: ?ref=XXXX parametresini URL'den al
     React.useEffect(() => {
