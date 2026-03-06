@@ -27,6 +27,9 @@ dotenv.config({ path: join(__dirname, '.env') });
 
 const app = express();
 
+// Trust first proxy hop (Coolify/Traefik reverse proxy)
+app.set('trust proxy', 1);
+
 // Security Middleware (Helmet + Rate Limiting)
 app.use(helmet());
 
