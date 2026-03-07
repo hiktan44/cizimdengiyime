@@ -271,7 +271,128 @@ export const FeaturesPage: React.FC<FeaturesPageProps> = ({
                 </div>
             </section>
 
-            {/* CTA Section */}
+            {/* ===== DETAYLI BÖLÜMLER ===== */}
+
+            {/* Pixshop Detailed Section */}
+            <section className="px-6 pb-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 p-8 md:p-12">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-3xl font-bold text-white">Pixshop</h3>
+                                <p className="text-orange-300 text-sm">{language === 'tr' ? 'AI Destekli Fotoğraf Düzenleme' : 'AI-Powered Photo Editing'}</p>
+                            </div>
+                        </div>
+                        <p className="text-slate-300 leading-relaxed mb-8 text-lg max-w-3xl">
+                            {language === 'tr'
+                                ? 'Karmaşık araçlara veda edin. Yapay zeka ile sadece ne istediğinizi söyleyin, Pixshop saniyeler içinde gerçeğe dönüştürsün. Photoshop bilgisi gerektirmez.'
+                                : 'Say goodbye to complex tools. Just tell the AI what you want, and Pixshop transforms it into reality in seconds. No Photoshop knowledge needed.'}
+                        </p>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {(language === 'tr'
+                                ? ['🎨 Akıllı Rötuş: Tıkla ve Değiştir', '🖼️ Sınırsız Yaratıcı Filtreler', '🌟 Profesyonel Atmosfer Ayarları', '🔍 Kristal Netliğinde Detaylar (2K/4K Upscale)', '👤 Yüz Değiştirme (Face Swap)', '✂️ Arka Plan Kaldırma ve SVG Çıktı']
+                                : ['🎨 Smart Retouching: Click & Replace', '🖼️ Unlimited Creative Filters', '🌟 Professional Atmosphere Adjustments', '🔍 Crystal Clear Enhancement (2K/4K Upscale)', '👤 Face Swap', '✂️ Background Removal & SVG Export']
+                            ).map((feature, idx) => (
+                                <div key={idx} className="bg-slate-800/60 rounded-xl p-4 border border-white/5 hover:border-orange-500/30 transition">
+                                    <span className="text-sm text-slate-200">{feature}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* AdGenius Detailed Section */}
+            <section className="px-6 pb-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 p-8 md:p-12">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-rose-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-3xl font-bold text-white">AdGenius AI</h3>
+                                <p className="text-pink-300 text-sm">{language === 'tr' ? 'Reklam & Pazarlama Prodüksiyon Çözümü' : 'Ad & Marketing Production Solution'}</p>
+                            </div>
+                        </div>
+                        <p className="text-slate-300 leading-relaxed mb-8 text-lg max-w-3xl">
+                            {language === 'tr'
+                                ? 'Sıradan bir ürün fotoğrafını saniyeler içinde profesyonel bir pazarlama varlığına dönüştüren, uçtan uca bir prodüksiyon çözümü. %90\'a varan maliyet tasarrufu sağlayın.'
+                                : 'An end-to-end production solution that transforms an ordinary product photo into a professional marketing asset in seconds. Save up to 90% on costs.'}
+                        </p>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {(language === 'tr'
+                                ? ['📝 Akıllı Ürün Analizi ve SEO İçerik', '👗 12 Farklı Poz ile Mankenli Çekim', '🏖️ Sınırsız Kampanya Konseptleri', '🎨 Gelişmiş Doku ve Renk Manipülasyonu', '🎬 Sinematik Reklam Videoları', '🏷️ Logo ve Metin Entegrasyonu']
+                                : ['📝 Smart Product Analysis & SEO Copy', '👗 12-Pose Professional Model Shoots', '🏖️ Unlimited Campaign Concepts', '🎨 Advanced Texture & Color Manipulation', '🎬 Cinematic Ad Videos', '🏷️ Logo & Text Integration']
+                            ).map((feature, idx) => (
+                                <div key={idx} className="bg-slate-800/60 rounded-xl p-4 border border-white/5 hover:border-pink-500/30 transition">
+                                    <span className="text-sm text-slate-200">{feature}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-8 grid md:grid-cols-2 gap-6">
+                            <div className="bg-slate-800/40 rounded-xl p-6 border border-pink-500/10">
+                                <h4 className="text-pink-400 font-bold mb-3">{language === 'tr' ? '💰 Maliyet Avantajı' : '💰 Cost Advantage'}</h4>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    {language === 'tr'
+                                        ? 'Işık, kamera, manken, makyaj artisti, stüdyo kirası ve metin yazarı maliyetlerini ortadan kaldırır.'
+                                        : 'Eliminates costs for lighting, cameras, models, makeup artists, studio rental, and copywriters.'}
+                                </p>
+                            </div>
+                            <div className="bg-slate-800/40 rounded-xl p-6 border border-pink-500/10">
+                                <h4 className="text-pink-400 font-bold mb-3">{language === 'tr' ? '⚡ Hız Avantajı' : '⚡ Speed Advantage'}</h4>
+                                <p className="text-slate-400 text-sm leading-relaxed">
+                                    {language === 'tr'
+                                        ? 'Haftalar süren süreç yerine, ürün fotoğrafını yüklediğiniz anda görsel + video + başlık + açıklama setine sahip olursunuz.'
+                                        : 'Instead of weeks-long processes, get a complete visual + video + title + description set the moment you upload your product photo.'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Techpack Detailed Section */}
+            <section className="px-6 pb-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 p-8 md:p-12">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="text-3xl font-bold text-white">{language === 'tr' ? 'Teknik Çizim (Tech Pack)' : 'Technical Drawing (Tech Pack)'}</h3>
+                                <p className="text-green-300 text-sm">{language === 'tr' ? 'Üretim Sürecinizi Hızlandırın' : 'Accelerate Your Production Process'}</p>
+                            </div>
+                        </div>
+                        <p className="text-slate-300 leading-relaxed mb-8 text-lg max-w-3xl">
+                            {language === 'tr'
+                                ? 'Fotoğraflarınızı saniyeler içinde detaylı teknik çizimlere dönüştürün. Tedarikçileriniz ve atölyelerinizle paylaşabileceğiniz, karmaşadan uzak, saf teknik çizimler elde edin.'
+                                : 'Transform your photos into detailed technical drawings in seconds. Get clean, production-ready technical drawings to share with suppliers and workshops.'}
+                        </p>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {(language === 'tr'
+                                ? ['📐 Fotoğraftan direkt dikiş korumalı çizim', '🧵 Dikiş ve Kalıp Analizi (AI Algılama)', '📋 Üretime Hazır Çıktılar', '🔄 Aynı model için Sınırsız Varyasyon']
+                                : ['📐 Photo to stitch-protected technical drawing', '🧵 Stitching & Pattern Analysis (AI Detection)', '📋 Production-Ready Outputs', '🔄 Unlimited Variations for same model']
+                            ).map((feature, idx) => (
+                                <div key={idx} className="bg-slate-800/60 rounded-xl p-4 border border-white/5 hover:border-green-500/30 transition">
+                                    <span className="text-sm text-slate-200">{feature}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section className="px-6 pb-20">
                 <div className="max-w-4xl mx-auto">
                     <div className="relative rounded-3xl overflow-hidden">

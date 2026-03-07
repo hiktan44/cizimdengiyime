@@ -1206,7 +1206,316 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
-      {/* Özellikler artık FeaturesPage'de gösteriliyor */}
+      {/* Use Cases - Güçlü Özellikler */}
+      <section className="py-20 px-6 z-10 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.howItWorks.useCases.title}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
+              {t.howItWorks.useCases.subtitle}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* 1. Çizimden Ürüne */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-cyan-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-cyan-600 transition-colors">
+                  {t.howItWorks.useCases.feature1.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.feature1.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.feature1.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-cyan-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* 2. Canlı Model */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-purple-600 transition-colors">
+                  {t.howItWorks.useCases.feature2.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.feature2.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.feature2.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-purple-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* 3. Video Oluşturma */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-blue-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors">
+                  {t.howItWorks.useCases.feature3.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.feature3.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.feature3.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-blue-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* 4. Teknik Çizim */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-green-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-green-400/20 to-emerald-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-green-600 transition-colors">
+                  {t.howItWorks.useCases.feature4.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.feature4.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.feature4.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-green-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+
+            {/* 5. Pixshop */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-orange-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-orange-600 transition-colors">
+                  {t.howItWorks.useCases.feature5.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.feature5.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.feature5.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-orange-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+
+            {/* 6. Fotomatik */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-teal-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-teal-400/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-teal-600 transition-colors">
+                  {t.howItWorks.useCases.feature6.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.feature6.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.feature6.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-teal-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+
+            {/* 7. Kolaj Oluşturma */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-cyan-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-cyan-600 transition-colors">
+                  {t.howItWorks.useCases.collage.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.collage.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.collage.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-cyan-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+
+            {/* 8. Reklam Medyası */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-pink-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-400/20 to-rose-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-rose-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-pink-600 transition-colors">
+                  {t.howItWorks.useCases.adMedia.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.adMedia.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.adMedia.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-pink-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+
+            {/* 9. E-ticaret Çözümleri */}
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-indigo-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-400/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-indigo-600 transition-colors">
+                  {t.howItWorks.useCases.ecommerce.title}
+                </h3>
+                <p className="text-black font-semibold leading-relaxed mb-4">
+                  {t.howItWorks.useCases.ecommerce.desc}
+                </p>
+                <ul className="text-black font-medium text-sm space-y-2">
+                  {t.howItWorks.useCases.ecommerce.features.map((feature: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-indigo-500 mt-1">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* How It Works - 3 Steps */}
+      < section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
+            {t.howItWorks.title}
+          </h2>
+          <p className={`${secondaryTextClass} text-center mb-16`}>
+            {t.howItWorks.subtitle}
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Step 1 */}
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
+              <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl font-black text-white">01</span>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.howItWorks.step1Title}
+              </h3>
+              <p className={secondaryTextClass}>
+                {t.howItWorks.step1Desc}
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
+              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl font-black text-white">02</span>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.howItWorks.step2Title}
+              </h3>
+              <p className={secondaryTextClass}>
+                {t.howItWorks.step2Desc}
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-orange-500 transition`}>
+              <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-4xl font-black text-white">03</span>
+              </div>
+              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+                {t.howItWorks.step3Title}
+              </h3>
+              <p className={secondaryTextClass}>
+                {t.howItWorks.step3Desc}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section >
 
       {/* Pricing - Credit Packages Only */}
       < section className="py-20 px-6 z-10 relative" id="pricing" >
