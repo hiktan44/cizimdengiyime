@@ -356,3 +356,57 @@ ${hotspotText}
     return handleApiResponse(response, 'add_product_logo');
 };
 
+/**
+ * Face Swap - Replaces the face in the target image with the face from the source image.
+ * @param targetImage The image containing the person whose face will be replaced.
+ * @param sourceImage The image containing the face to use as replacement.
+ * @param resolution Output resolution ('2K' or '4K').
+ * @returns A promise that resolves to the data URL of the face-swapped image.
+ */
+export const pixshopFaceSwap = async (
+    targetImage: File,
+    sourceImage: File,
+    resolution: '2K' | '4K' = '2K'
+): Promise<string> => {
+    console.log('Starting face swap...');
+    checkApiKey();
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+    const targetImagePart = await fileToPart(targetImage);
+    const sourceImagePart = await fileToPart(sourceImage);
+
+    const prompt = `SYSTEM_COMMAND: EXECUTE_FACE_SWAP_PROTOCOL
+
+OBJECTIVE: Replace the face in the FIRST image (target) with the face from the SECOND image (source).
+
+*** HYPER-REALISTIC FACE SWAP RULES ***:
+1. FACE DETECTION: Identify the primary face in the target image and the face in the source image.
+2. SEAMLESS REPLACEMENT: Replace ONLY the face (forehead to chin, ear to ear) in the target image with the source face. The swap must be completely invisible and undetectable.
+3. LIGHTING MATCH: The swapped face MUST perfectly match the lighting direction, intensity, color temperature, and shadow patterns of the target image's scene.
+4. SKIN TONE BLEND: Blend the skin tone of the source face to match the neck and body skin tone visible in the target image for seamless continuity.
+5. EXPRESSION PRESERVATION: Maintain the general head angle, tilt, and pose from the target image while applying the facial features from the source.
+6. HAIR PRESERVATION: Keep the original hairstyle from the TARGET image. Do NOT change hair from the target.
+7. PERSPECTIVE MATCH: Apply correct 3D perspective transformation so the source face aligns with the target's head angle and camera distance.
+8. PRESERVE EVERYTHING ELSE: Do NOT modify clothing, background, body, accessories, or any other element outside the face area.
+9. MAINTAIN DIMENSIONS: The output MUST have the EXACT SAME dimensions and aspect ratio as the first (target) image.
+10. QUALITY: The result must look like a genuine, unedited photograph — no blending artifacts, no color mismatches, no uncanny valley effects.`;
+
+    const textPart = { text: prompt };
+
+    console.log('Sending target and source images for face swap...');
+    const response: GenerateContentResponse = await ai.models.generateContent({
+        model: IMAGE_MODEL_PRIMARY,
+        contents: { parts: [targetImagePart, sourceImagePart, textPart] },
+        config: {
+            safetySettings,
+            responseModalities: [Modality.IMAGE],
+            imageConfig: {
+                imageSize: resolution,
+            }
+        },
+    });
+    console.log('Received response from model for face swap.', response);
+
+    return handleApiResponse(response, 'face_swap');
+};
+

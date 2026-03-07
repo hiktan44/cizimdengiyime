@@ -7,7 +7,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useI18n, useTranslation, TranslationRecord } from '../lib/i18n';
 import ReactCrop, { type Crop, type PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { pixshopGenerateEditedImage, pixshopGenerateFilteredImage, pixshopGenerateAdjustedImage, pixshopRemoveBackground, pixshopUpscaleImage, pixshopAddProductOrLogo } from '../services/pixshopService';
+import { pixshopGenerateEditedImage, pixshopGenerateFilteredImage, pixshopGenerateAdjustedImage, pixshopRemoveBackground, pixshopUpscaleImage, pixshopAddProductOrLogo, pixshopFaceSwap } from '../services/pixshopService';
 import Spinner from '../components/pixshop/Spinner';
 import FilterPanel from '../components/pixshop/FilterPanel';
 import AdjustmentPanel from '../components/pixshop/AdjustmentPanel';
@@ -86,11 +86,11 @@ function centerAspectCrop(
   )
 }
 
-type Tab = 'upload' | 'retouch' | 'adjust' | 'filters' | 'crop' | 'upscale' | 'addproduct';
+type Tab = 'upload' | 'retouch' | 'adjust' | 'filters' | 'crop' | 'upscale' | 'addproduct' | 'faceswap';
 
 
 const trPixshop = {
-  tabs: { upload: 'Yükle', retouch: 'Rötuş', crop: 'Kırp', adjust: 'Ayarla', filters: 'Filtreler', upscale: 'Yükselt', addproduct: 'Ürün Yerleştir' },
+  tabs: { upload: 'Yükle', retouch: 'Rötuş', crop: 'Kırp', adjust: 'Ayarla', filters: 'Filtreler', upscale: 'Yükselt', addproduct: 'Ürün Yerleştir', faceswap: 'Yüz Değiştir' },
   buttons: { removeBackground: 'Arka Planı Kaldır', smartErase: 'Nesneyi Sil', generate: 'Oluştur', download: 'İndir', reset: 'Sıfırla', apply: 'Uygula', cancel: 'İptal', undo: 'Geri Al', redo: 'İleri Al' },
   placeholders: { retouchPrompt: "ör., 'gömleğimi mavi yap'", selectPoint: 'Önce resimde bir nokta seçin' },
   messages: { creditCheck: 'Kredi kontrol ediliyor...', processing: 'İşleniyor...', noCredits: 'Yeterli krediniz yok', success: 'İşlem başarılı!', error: 'Bir hata oluştu', uploadFirst: 'Önce bir görsel yükleyin', selectArea: 'Silmek için bir alan seçin' },
@@ -132,6 +132,14 @@ const trPixshop = {
     standard: 'Standart',
     adding: 'Ekleniyor...',
     addProductBtn: 'Logo / Ürün Ekle',
+    faceSwapBtn: 'Yüz Değiştir',
+    faceSwapping: 'Yüz değiştiriliyor...',
+    faceSwapFailed: 'Yüz değiştirme başarısız oldu.',
+    faceSwapUploadSource: 'Kaynak Yüz Görseli Yükle',
+    faceSwapSelectSource: 'Yüzü kullanılacak görseli seçin',
+    faceSwapSourceHint: 'Net, önden çekilmiş bir portre yükleyin',
+    faceSwapInfo: 'Ana görseldeki yüzü, yüklediğiniz kaynak görseldeki yüz ile değiştirir. Saç, kıyafet ve arka plan korunur.',
+    faceSwapTitle: 'Yüz Değiştirme (Face Swap)',
     examplesTitle: '📋 Örnek Kullanımlar:',
     exLogo: '"Bu logoyu sağ üst köşeye küçük boyutta ekle"',
     exTie: '"Bu kravatı kişiye doğal bir şekilde giydir"',
@@ -158,7 +166,7 @@ const trPixshop = {
 const pixshopTranslations: TranslationRecord<typeof trPixshop> = {
   tr: trPixshop,
   en: {
-    tabs: { upload: 'Upload', retouch: 'Retouch', crop: 'Crop', adjust: 'Adjust', filters: 'Filters', upscale: 'Upscale', addproduct: 'Add Product' },
+    tabs: { upload: 'Upload', retouch: 'Retouch', crop: 'Crop', adjust: 'Adjust', filters: 'Filters', upscale: 'Upscale', addproduct: 'Add Product', faceswap: 'Face Swap' },
     buttons: { removeBackground: 'Remove Background', smartErase: 'Smart Erase', generate: 'Generate', download: 'Download', reset: 'Reset', apply: 'Apply', cancel: 'Cancel', undo: 'Undo', redo: 'Redo' },
     placeholders: { retouchPrompt: "e.g., 'make my shirt blue'", selectPoint: 'Select a point on the image first' },
     messages: { creditCheck: 'Checking credits...', processing: 'Processing...', noCredits: 'Insufficient credits', success: 'Operation successful!', error: 'An error occurred', uploadFirst: 'Upload an image first', selectArea: 'Select an area to erase' },
@@ -200,6 +208,14 @@ const pixshopTranslations: TranslationRecord<typeof trPixshop> = {
       standard: 'Standard',
       adding: 'Adding...',
       addProductBtn: 'Add Logo / Product',
+      faceSwapBtn: 'Swap Face',
+      faceSwapping: 'Swapping face...',
+      faceSwapFailed: 'Face swap failed.',
+      faceSwapUploadSource: 'Upload Source Face Image',
+      faceSwapSelectSource: 'Select the image with the face to use',
+      faceSwapSourceHint: 'Upload a clear, front-facing portrait',
+      faceSwapInfo: 'Replaces the face in the main image with the face from the source image. Hair, clothing, and background are preserved.',
+      faceSwapTitle: 'Face Swap',
       examplesTitle: '📋 Usage Examples:',
       exLogo: '"Add this logo small in the top-right corner"',
       exTie: '"Naturally put this tie on the person"',
@@ -232,6 +248,7 @@ const getTabs = (t: typeof trPixshop): { id: Tab, name: string }[] => [
   { id: 'adjust', name: t.tabs.adjust },
   { id: 'filters', name: t.tabs.filters },
   { id: 'upscale', name: t.tabs.upscale },
+  { id: 'faceswap', name: t.tabs.faceswap },
 ];
 
 export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProfile, onShowBuyCredits }) => {
@@ -277,6 +294,10 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
   const [overlayPrompt, setOverlayPrompt] = useState<string>('');
   const [overlayImageUrl, setOverlayImageUrl] = useState<string | null>(null);
 
+  // Face Swap states
+  const [faceSwapSource, setFaceSwapSource] = useState<File | null>(null);
+  const [faceSwapSourceUrl, setFaceSwapSourceUrl] = useState<string | null>(null);
+
   // Output resolution selection
   const [outputResolution, setOutputResolution] = useState<'2K' | '4K'>('2K');
 
@@ -320,6 +341,17 @@ export const PixshopPage: React.FC<PixshopPageProps> = ({ profile, onRefreshProf
       setOverlayImageUrl(null);
     }
   }, [overlayImage]);
+
+  // Effect for face swap source image URL
+  useEffect(() => {
+    if (faceSwapSource) {
+      const url = URL.createObjectURL(faceSwapSource);
+      setFaceSwapSourceUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setFaceSwapSourceUrl(null);
+    }
+  }, [faceSwapSource]);
 
   // Effect to generate rotated/flipped preview for Cropping
   useEffect(() => {
@@ -697,6 +729,50 @@ STRICT RULES:
       setIsLoading(false);
     }
   }, [currentImage, overlayImage, overlayPrompt, editHotspot, addImageToHistory, profile]);
+
+  // Face Swap function
+  const handleFaceSwap = useCallback(async () => {
+    if (!currentImage) {
+      setError(t.errors.uploadMainImage);
+      return;
+    }
+
+    if (!faceSwapSource) {
+      setError(language === 'tr' ? 'Lütfen kaynak yüz görselini yükleyin.' : 'Please upload the source face image.');
+      return;
+    }
+
+    if (!await checkCredits()) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const swappedImageUrl = await pixshopFaceSwap(
+        currentImage,
+        faceSwapSource,
+        outputResolution
+      );
+      const newImageFile = dataURLtoFile(swappedImageUrl, `faceswap-${Date.now()}.png`);
+
+      let inputUrl = null;
+      if (profile) inputUrl = await uploadInputImage(currentImage, profile.id);
+
+      addImageToHistory(newImageFile);
+      await saveToHistory(swappedImageUrl, inputUrl);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : t.errors.unknownError;
+      setError(`${t.ui.faceSwapFailed} ${errorMessage}`);
+      console.error(err);
+      if (profile) {
+        const cost = outputResolution === '4K' ? CREDIT_COSTS.PIXSHOP_4K : CREDIT_COSTS.PIXSHOP;
+        await refundCredits(profile.id, 'pixshop', cost);
+        onRefreshProfile();
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentImage, faceSwapSource, addImageToHistory, profile, outputResolution, language]);
 
   // Remove Background function
   const handleRemoveBackground = useCallback(async () => {
@@ -1500,6 +1576,117 @@ STRICT RULES:
                   <li>• <strong>{language === 'tr' ? 'Kravat' : 'Tie'}:</strong> {t.ui.exTie}</li>
                   <li>• <strong>{language === 'tr' ? 'Şal' : 'Scarf'}:</strong> {t.ui.exScarf}</li>
                   <li>• <strong>{language === 'tr' ? 'Aksesuar' : 'Accessory'}:</strong> {t.ui.exAccessory}</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'faceswap' && (
+            <div className="flex flex-col items-center gap-6 animate-fade-in">
+              {/* Info Text */}
+              <div className="w-full max-w-2xl bg-gradient-to-r from-rose-900/20 to-orange-900/20 border border-rose-500/30 rounded-xl p-4">
+                <h3 className="text-lg font-bold text-rose-300 mb-2">🎭 {t.ui.faceSwapTitle}</h3>
+                <p className="text-sm text-gray-300 leading-relaxed">
+                  {t.ui.faceSwapInfo}
+                </p>
+              </div>
+
+              {/* Source Face Upload */}
+              <div className="w-full max-w-2xl">
+                <label className="block text-sm font-semibold text-gray-300 mb-3">
+                  📤 {t.ui.faceSwapUploadSource}
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setFaceSwapSource(file);
+                    }}
+                    className="hidden"
+                    id="faceswap-source-upload"
+                  />
+                  <label
+                    htmlFor="faceswap-source-upload"
+                    className="flex flex-col items-center justify-center w-full h-48 bg-gray-900/50 border-2 border-dashed border-gray-600 rounded-xl cursor-pointer hover:bg-gray-800/50 hover:border-rose-500 transition-all"
+                  >
+                    {faceSwapSourceUrl ? (
+                      <div className="relative w-full h-full p-4">
+                        <img
+                          src={faceSwapSourceUrl}
+                          alt="Face Source Preview"
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setFaceSwapSource(null);
+                          }}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <svg className="w-14 h-14 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                        </svg>
+                        <p className="text-sm text-gray-400 font-medium">{t.ui.faceSwapSelectSource}</p>
+                        <p className="text-xs text-gray-500 mt-1">{t.ui.faceSwapSourceHint}</p>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              {/* Resolution Selector */}
+              <div className="w-full max-w-2xl flex items-center justify-between bg-gray-900/50 border border-gray-700 rounded-xl p-4">
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-gray-200">{t.ui.outputQuality}</span>
+                  <span className="text-xs text-gray-400">{t.ui.extraCreditFor4K}</span>
+                </div>
+                <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+                  <button
+                    onClick={() => setOutputResolution('2K')}
+                    className={`px-4 py-2 rounded-md text-sm font-semibold transition-all ${outputResolution === '2K'
+                      ? 'bg-gray-600 text-white shadow-sm'
+                      : 'text-gray-400 hover:text-white'}`}
+                  >
+                    2K ({t.ui.standard})
+                  </button>
+                  <button
+                    onClick={() => setOutputResolution('4K')}
+                    className={`px-4 py-2 rounded-md text-sm font-semibold transition-all flex items-center gap-1 ${outputResolution === '4K'
+                      ? 'bg-rose-600 text-white shadow-sm'
+                      : 'text-gray-400 hover:text-white'}`}
+                  >
+                    <span>4K (Ultra)</span>
+                    <span className="text-[10px] bg-white/20 px-1 rounded">PRO</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Face Swap Button */}
+              <button
+                onClick={handleFaceSwap}
+                disabled={isLoading || !faceSwapSource || !currentImage}
+                className="w-full max-w-2xl bg-gradient-to-r from-rose-600 to-orange-600 text-white font-bold py-5 px-10 text-lg rounded-2xl shadow-xl hover:shadow-2xl hover:from-rose-500 hover:to-orange-500 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? t.ui.faceSwapping : t.ui.faceSwapBtn}
+              </button>
+
+              {/* Tips */}
+              <div className="w-full max-w-2xl bg-gray-900/30 border border-gray-700/50 rounded-xl p-4">
+                <h4 className="text-sm font-bold text-gray-300 mb-3">{language === 'tr' ? '💡 İpuçları:' : '💡 Tips:'}</h4>
+                <ul className="space-y-2 text-sm text-gray-400">
+                  <li>• {language === 'tr' ? 'Kaynak görsel net ve yüksek çözünürlüklü olmalı' : 'Source image should be clear and high resolution'}</li>
+                  <li>• {language === 'tr' ? 'Önden çekilmiş portreler en iyi sonucu verir' : 'Front-facing portraits give the best results'}</li>
+                  <li>• {language === 'tr' ? 'Her iki görselde de yüzler açıkça görünür olmalı' : 'Faces should be clearly visible in both images'}</li>
+                  <li>• {language === 'tr' ? 'Saç, kıyafet ve arka plan hedef görselden korunur' : 'Hair, clothing, and background are preserved from the target image'}</li>
                 </ul>
               </div>
             </div>
