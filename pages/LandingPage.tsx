@@ -1069,6 +1069,121 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
+      {/* Before/After Showcase - Çizimden Gerçeğe Dönüşüm */}
+      <section id="showcase" className="relative py-24 px-6 z-10">
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.showcase.title}
+            </h2>
+            <p className={`text-xl ${descriptionTextClass} max-w-3xl mx-auto`}>
+              {t.showcase.subtitle}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Step 1: Çizim → Ürün */}
+            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-cyan-500/50 transition-all duration-500 hover:-translate-y-2">
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10 p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-cyan-600 transition-colors">{t.showcase.step1}</h3>
+                </div>
+                <p className="text-black font-medium text-sm mb-6 leading-relaxed">
+                  {t.showcase.step1Desc}
+                </p>
+              </div>
+              {/* Before/After Slider */}
+              <div className="aspect-[3/4] w-full">
+                <BeforeAfterSlider
+                  beforeImage={demoSketch}
+                  afterImage={demoProduct}
+                  beforeLabel={t.showcase.step1Before}
+                  afterLabel={t.showcase.step1After}
+                />
+              </div>
+            </div>
+
+            {/* Step 2: Ürün → Canlı Model */}
+            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:-translate-y-2">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10 p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-purple-600 transition-colors">{t.showcase.step2}</h3>
+                </div>
+                <p className="text-black font-medium text-sm mb-6 leading-relaxed">
+                  {t.showcase.step2Desc}
+                </p>
+              </div>
+              {/* Before/After Slider */}
+              <div className="aspect-[3/4] w-full">
+                <BeforeAfterSlider
+                  beforeImage={demoProduct}
+                  afterImage={demoModel}
+                  beforeLabel={t.showcase.step2Before}
+                  afterLabel={t.showcase.step2After}
+                />
+              </div>
+            </div>
+
+            {/* Step 3: Görsel → Video */}
+            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-orange-500/50 transition-all duration-500 hover:-translate-y-2">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="relative z-10 p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                    <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-orange-600 transition-colors">{t.showcase.step3}</h3>
+                </div>
+                <p className="text-black font-medium text-sm mb-6 leading-relaxed">
+                  {t.showcase.step3Desc}
+                </p>
+              </div>
+              {/* Video or Placeholder */}
+              <div className="aspect-[3/4] w-full bg-gradient-to-br from-orange-900/30 to-red-900/30 flex items-center justify-center">
+                {demoVideo ? (
+                  <video src={demoVideo} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+                ) : (
+                  <div className="text-center p-6">
+                    <svg className="w-20 h-20 text-orange-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <p className="text-orange-400 text-sm font-semibold">
+                      {t.showcase.professionalVideo}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="text-center mt-12">
+            <button
+              onClick={handleGetStarted}
+              className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:from-cyan-500 hover:to-blue-500 transition-all shadow-xl hover:shadow-cyan-500/30 transform hover:scale-105"
+            >
+              {t.showcase.tryNow}
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Use Cases - Güçlü Özellikler */}
       <section className="py-20 px-6 z-10 relative">
         <div className="max-w-7xl mx-auto">
@@ -1326,103 +1441,6 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
-      {/* Before/After Showcase */}
-      < section id="showcase" className="relative py-20 px-6 z-10" >
-        <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
-            {t.showcase.title}
-          </h2>
-          <p className={`${secondaryTextClass} text-center mb-16`}>
-            {t.showcase.subtitle}
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Step 1: Çizimden Ürüne */}
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-cyan-500 transition`}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                </div>
-                <h3 className={`text-2xl font-bold ${textClass}`}>{t.showcase.step1}</h3>
-              </div>
-              <p className={`${secondaryTextClass} mb-6`}>
-                {t.showcase.step1Desc}
-              </p>
-              <div className="aspect-[3/4] rounded-xl overflow-hidden">
-                <BeforeAfterSlider
-                  beforeImage={demoSketch}
-                  afterImage={demoProduct}
-                  beforeLabel={t.showcase.step1Before}
-                  afterLabel={t.showcase.step1After}
-                />
-              </div>
-            </div>
-
-            {/* Step 2: Üründen Modele */}
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-purple-500 transition`}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <h3 className={`text-2xl font-bold ${textClass}`}>{t.showcase.step2}</h3>
-              </div>
-              <p className={`${secondaryTextClass} mb-6`}>
-                {t.showcase.step2Desc}
-              </p>
-              <div className="aspect-[3/4] rounded-xl overflow-hidden">
-                <BeforeAfterSlider
-                  beforeImage={demoProduct}
-                  afterImage={demoModel}
-                  beforeLabel={t.showcase.step2Before}
-                  afterLabel={t.showcase.step2After}
-                />
-              </div>
-            </div>
-
-            {/* Step 3: Modelden Videoya */}
-            <div className={`${cardBg} rounded-2xl p-8 hover:border-orange-500 transition`}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h3 className={`text-2xl font-bold ${textClass}`}>{t.showcase.step3}</h3>
-              </div>
-              <p className={`${secondaryTextClass} mb-6`}>
-                {t.showcase.step3Desc}
-              </p>
-              <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-br from-orange-900/30 to-red-900/30 border-2 border-orange-500/50 flex items-center justify-center">
-                {demoVideo ? (
-                  <video src={demoVideo} className="w-full h-full object-cover" autoPlay loop muted playsInline />
-                ) : (
-                  <div className="text-center p-6">
-                    <svg className="w-20 h-20 text-orange-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-orange-400 text-sm font-semibold">
-                      {t.showcase.professionalVideo}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-12">
-            <button
-              onClick={handleGetStarted}
-              className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-cyan-500 hover:to-blue-500 transition shadow-xl"
-            >
-              {t.showcase.tryNow}
-            </button>
-          </div>
-        </div>
-      </section >
 
       {/* How It Works - 3 Steps */}
       < section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
