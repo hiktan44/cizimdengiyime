@@ -2214,8 +2214,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
-                    <span className="font-semibold text-white block">🇹🇷 BAHÇELİEVLER/İSTANBUL</span>
-                    ZAFER MAH. KUMRULU SK. SARAY İŞ MERKEZİ NO:2 İÇ KAPI NO:18 BAHÇELİEVLER/İSTANBUL-TÜRKİYE
+                    <span className="font-semibold text-white block">🇹🇷 BAHÇELİEVLER/İSTANBUL-TÜRKİYE</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
