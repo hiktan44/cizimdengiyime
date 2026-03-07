@@ -2434,6 +2434,7 @@ const App: React.FC = () => {
                     }}
                     onAdminClick={isAdmin ? () => setCurrentPage('admin') : undefined}
                     onBuyCreditsClick={user ? () => setShowBuyCreditsModal(true) : undefined}
+                    logoMediaUrl={logoMediaUrl}
                 />
             )}
             {currentPage === 'features' && (
