@@ -2200,23 +2200,23 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <a
-                    href="tel:+905551234567"
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm`}
-                  >
-                    +90 555 123 45 67
-                  </a>
+                  <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
+                    <span className="font-semibold text-white block">🇬🇧 TEXMART LTD</span>
+                    284 CHASE ROAD A BLOCK UNIT, 2ND FLOOR, LONDON
+                  </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
-                    ZAFER MAH. KUMRULU SK. SARAY İŞ MERKEZİ NO:2 IÇ KAPI NO:18 BAHÇELİEVLER/İSTANBUL-TÜRKİYE
-                  </span>
+                  <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
+                    <span className="font-semibold text-white block">🇹🇷 BAHÇELİEVLER/İSTANBUL</span>
+                    ZAFER MAH. KUMRULU SK. SARAY İŞ MERKEZİ NO:2 İÇ KAPI NO:18 BAHÇELİEVLER/İSTANBUL-TÜRKİYE
+                  </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2237,7 +2237,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 {t.footer.allRights}
               </p>
               <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-500'}`}>
-                Made with ❤️ in Turkey
+                Made with ❤️ in London & Istanbul
               </p>
             </div>
           </div>
