@@ -870,6 +870,71 @@ const landingTranslations: TranslationRecord<typeof trLanding> = {
 };
 
 
+// Before/After Slider Card
+const BeforeAfterCard: React.FC<{ before: string; after: string; label: string; theme: string; language: string }> = ({ before, after, label, theme, language }) => {
+  const [sliderPos, setSliderPos] = React.useState(50);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const isDragging = React.useRef(false);
+
+  const handleMove = (clientX: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    setSliderPos((x / rect.width) * 100);
+  };
+
+  const handleMouseDown = () => { isDragging.current = true; };
+  const handleMouseUp = () => { isDragging.current = false; };
+  const handleMouseMove = (e: React.MouseEvent) => { if (isDragging.current) handleMove(e.clientX); };
+  const handleTouchMove = (e: React.TouchEvent) => { handleMove(e.touches[0].clientX); };
+
+  React.useEffect(() => {
+    const up = () => { isDragging.current = false; };
+    window.addEventListener('mouseup', up);
+    return () => window.removeEventListener('mouseup', up);
+  }, []);
+
+  return (
+    <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/10 bg-slate-800/50' : 'border-slate-200 bg-white'} shadow-xl hover:shadow-2xl transition-shadow`}>
+      <div
+        ref={containerRef}
+        className="relative w-full aspect-[4/3] cursor-col-resize select-none overflow-hidden"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleMouseUp}
+      >
+        {/* After image (full) */}
+        <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" />
+        {/* Before image (clipped) */}
+        <div className="absolute inset-0 overflow-hidden" style={{ width: `${sliderPos}%` }}>
+          <img src={before} alt="Before" className="absolute inset-0 w-full h-full object-cover" style={{ width: containerRef.current?.clientWidth || '100%', maxWidth: 'none' }} />
+        </div>
+        {/* Slider line */}
+        <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg z-10" style={{ left: `${sliderPos}%` }}>
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
+            <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+            </svg>
+          </div>
+        </div>
+        {/* Labels */}
+        <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md font-semibold z-20">
+          {language === 'tr' ? 'Öncesi' : 'Before'}
+        </div>
+        <div className="absolute top-3 right-3 bg-cyan-500/80 text-white text-xs px-2 py-1 rounded-md font-semibold z-20">
+          {language === 'tr' ? 'Sonrası' : 'After'}
+        </div>
+      </div>
+      <div className="p-4 text-center">
+        <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{label}</span>
+      </div>
+    </div>
+  );
+};
+
 export const LandingPage: React.FC<LandingPageProps> = (props) => {
   const {
     onGetStarted,
@@ -1463,6 +1528,43 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
+      {/* Before/After Showcase */}
+      {(() => {
+        const baItems: { before: string; after: string; label: string }[] = [];
+        const featureLabels = language === 'tr'
+          ? ['Çizimden Ürüne', 'Canlı Model', 'Video Oluşturma', 'Teknik Çizim', 'Pixshop', 'Fotomatik', 'Kolaj', 'Reklam Medyası', 'E-ticaret']
+          : ['Sketch to Product', 'Live Model', 'Video Creation', 'Tech Drawing', 'Pixshop', 'Fotomatik', 'Collage', 'Ad Media', 'E-commerce'];
+        for (let i = 1; i <= 9; i++) {
+          const before = localStorage.getItem(`ba_feature${i}_before`);
+          const after = localStorage.getItem(`ba_feature${i}_after`);
+          if (before && after) {
+            baItems.push({ before, after, label: featureLabels[i - 1] });
+          }
+        }
+        if (baItems.length === 0) return null;
+
+        return (
+          <section className="relative py-20 px-6 z-10">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className={`text-3xl md:text-4xl font-bold ${textClass} mb-4`}>
+                  {language === 'tr' ? '✨ Öncesi / Sonrası' : '✨ Before / After'}
+                </h2>
+                <p className={`text-lg ${secondaryTextClass} max-w-2xl mx-auto`}>
+                  {language === 'tr'
+                    ? 'Yapay zeka ile dönüştürülen gerçek projelerimizi inceleyin'
+                    : 'Check out real projects transformed with AI'}
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {baItems.map((item, idx) => (
+                  <BeforeAfterCard key={idx} before={item.before} after={item.after} label={item.label} theme={theme} language={language} />
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
 
       {/* How It Works - 3 Steps */}
       < section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
