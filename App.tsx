@@ -88,11 +88,17 @@ interface PageHeaderProps {
 
 const ToolPage: React.FC<{
     onNavigateHome: () => void;
+    onFeaturesClick?: () => void;
+    onBlogClick?: () => void;
+    onContactClick?: () => void;
     profile: any;
     onRefreshProfile: () => void;
     initialTab?: 'design' | 'technical' | 'pixshop' | 'fotomatik' | 'adgenius' | 'collage' | 'techpack';
 } & PageHeaderProps> = ({
     onNavigateHome,
+    onFeaturesClick,
+    onBlogClick,
+    onContactClick,
     isLoggedIn,
     userName,
     onLoginClick,
@@ -824,6 +830,9 @@ const ToolPage: React.FC<{
                     onLoginClick={onLoginClick}
                     onLogoutClick={onLogoutClick}
                     onHomeClick={onNavigateHome}
+                    onFeaturesClick={onFeaturesClick}
+                    onBlogClick={onBlogClick}
+                    onContactClick={onContactClick}
                     onAdminClick={onAdminClick}
                     onAffiliateClick={onAffiliateClick}
                     onBuyCreditsClick={onBuyCreditsClick}
@@ -2456,6 +2465,15 @@ const App: React.FC = () => {
                 <ToolPage
                     initialTab={initialToolTab}
                     onNavigateHome={() => setCurrentPage('landing')}
+                    onFeaturesClick={() => setCurrentPage('features')}
+                    onBlogClick={() => setCurrentPage('blog')}
+                    onContactClick={() => {
+                        setCurrentPage('landing');
+                        setTimeout(() => {
+                            const el = document.getElementById('contact');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }, 300);
+                    }}
                     isLoggedIn={!!user}
                     userRole={isAdmin ? 'admin' : 'user'}
                     userName={profile.full_name}

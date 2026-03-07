@@ -8,6 +8,7 @@ const trHeader = {
     home: 'Ana Sayfa',
     features: 'Özellikler',
     blog: 'Blog',
+    contact: 'İletişim',
     credits: 'Kredi',
     buyCredits: 'Kredi Al',
     history: 'Geçmiş',
@@ -27,6 +28,7 @@ const headerTranslations: TranslationRecord<typeof trHeader> = {
         home: 'Home',
         features: 'Features',
         blog: 'Blog',
+        contact: 'Contact',
         credits: 'Credits',
         buyCredits: 'Buy Credits',
         history: 'History',
@@ -46,6 +48,7 @@ interface HeaderProps {
     onFeaturesClick?: () => void;
     onBlogClick?: () => void;
     onToolTabClick?: (tab: 'design' | 'technical' | 'pixshop' | 'fotomatik' | 'adgenius') => void;
+    onContactClick?: () => void;
     onNavigateHome?: () => void;
     isLoggedIn: boolean;
     userRole: 'admin' | 'user' | null;
@@ -65,6 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
     onHomeClick,
     onFeaturesClick,
     onBlogClick,
+    onContactClick,
     isLoggedIn,
     userRole,
     userName,
@@ -123,26 +127,30 @@ export const Header: React.FC<HeaderProps> = ({
 
                 {/* Desktop Menu */}
                 <div className="hidden md:flex items-center gap-2 lg:gap-3">
-                    {/* Landing page menüleri (giriş yapılmamışsa) */}
-                    {!isLoggedIn && (
-                        <>
-                            {onFeaturesClick && (
-                                <button
-                                    onClick={onFeaturesClick}
-                                    className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors px-2 py-1"
-                                >
-                                    {ht.features}
-                                </button>
-                            )}
-                            {onBlogClick && (
-                                <button
-                                    onClick={onBlogClick}
-                                    className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors px-2 py-1"
-                                >
-                                    {ht.blog}
-                                </button>
-                            )}
-                        </>
+                    {/* Sayfa linkleri - her zaman görünür */}
+                    {onFeaturesClick && (
+                        <button
+                            onClick={onFeaturesClick}
+                            className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors px-2 py-1"
+                        >
+                            {ht.features}
+                        </button>
+                    )}
+                    {onBlogClick && (
+                        <button
+                            onClick={onBlogClick}
+                            className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors px-2 py-1"
+                        >
+                            {ht.blog}
+                        </button>
+                    )}
+                    {onContactClick && (
+                        <button
+                            onClick={onContactClick}
+                            className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition-colors px-2 py-1"
+                        >
+                            {ht.contact}
+                        </button>
                     )}
 
                     {/* Credits Badge & Buy Button - Giriş yapmışsa */}
@@ -381,6 +389,35 @@ export const Header: React.FC<HeaderProps> = ({
                             )}
 
                             <div className="py-1.5">
+                                {/* Sayfa linkleri - Mobilde de görünür */}
+                                {onFeaturesClick && (
+                                    <button
+                                        onClick={() => handleMenuItemClick(onFeaturesClick)}
+                                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                    >
+                                        <span className="text-sm w-4 text-center">⭐</span>
+                                        <span className="text-sm font-medium text-white">{ht.features}</span>
+                                    </button>
+                                )}
+                                {onBlogClick && (
+                                    <button
+                                        onClick={() => handleMenuItemClick(onBlogClick)}
+                                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                    >
+                                        <span className="text-sm w-4 text-center">📝</span>
+                                        <span className="text-sm font-medium text-white">{ht.blog}</span>
+                                    </button>
+                                )}
+                                {onContactClick && (
+                                    <button
+                                        onClick={() => handleMenuItemClick(onContactClick)}
+                                        className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                    >
+                                        <span className="text-sm w-4 text-center">📧</span>
+                                        <span className="text-sm font-medium text-white">{ht.contact}</span>
+                                    </button>
+                                )}
+                                <div className="my-1.5 border-t border-slate-700"></div>
                                 {/* Buy Credits */}
                                 {onBuyCreditsClick && (
                                     <button
