@@ -4,12 +4,16 @@ interface HeroVideoCarouselProps {
     videos: string[];
     logoVideo?: string;
     logoDisplayDuration?: number;
+    logoSkipStart?: number;
+    logoHoldEnd?: number;
 }
 
 export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
     videos,
     logoVideo,
-    logoDisplayDuration = 5000
+    logoDisplayDuration = 5000,
+    logoSkipStart = 2,
+    logoHoldEnd = 1
 }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [nextIndex, setNextIndex] = useState(-1);
@@ -32,8 +36,12 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
         if (isLogoIndex(index)) {
             if (logoVideo && logoRef.current && logoVideo.match(/\.(mp4|webm|mov)$/i)) {
                 const duration = logoRef.current.duration;
-                // If duration is valid use it, otherwise fallback
-                return duration && !isNaN(duration) && duration > 0 ? duration * 1000 : logoDisplayDuration;
+                if (duration && !isNaN(duration) && duration > 0) {
+                    // Gerçek video süresi - başlangıç atlaması + bitiş bekleme süresi
+                    const effectiveDuration = Math.max(duration - logoSkipStart, 1);
+                    return (effectiveDuration + logoHoldEnd) * 1000;
+                }
+                return logoDisplayDuration;
             }
             return logoDisplayDuration;
         } else {
@@ -60,7 +68,7 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
             // Play next video/logo
             if (isLogoIndex(next)) {
                 if (logoRef.current && logoVideo?.match(/\.(mp4|webm|mov)$/i)) {
-                    logoRef.current.currentTime = 0;
+                    logoRef.current.currentTime = logoSkipStart;
                     logoRef.current.play().catch(e => console.log('Logo video play error:', e));
                 }
             } else {
