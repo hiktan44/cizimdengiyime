@@ -100,6 +100,7 @@ const ContentCard: React.FC<{
         if (file) {
             onFileSelect(file);
         }
+        event.target.value = '';
     };
 
     return (

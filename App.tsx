@@ -2202,66 +2202,65 @@ const App: React.FC = () => {
 
     const handleFileUpload = async (file: File, type: 'sketch' | 'product' | 'model' | 'video' | 'heroVideo' | 'heroVideo1' | 'heroVideo2' | 'heroVideo3' | 'adgenius_main' | 'adgenius_collage' | 'logo_media' | 'pixshop_retush' | 'pixshop_product_placement' | 'adgenius_model' | 'adgenius_campaign' | 'adgenius_video' | 'adgenius_product_placement') => {
         try {
-            // Convert file to base64 for immediate display
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result as string;
+            // Video dosyaları için: ObjectURL kullan (base64 → bellek sorunu çözer)
+            const isVideoType = type === 'video' || type === 'heroVideo' || type === 'heroVideo1' || type === 'heroVideo2' || type === 'heroVideo3' || type === 'adgenius_video' || type === 'logo_media';
 
-                // Update local state immediately for instant feedback
-                if (type === 'sketch') {
-                    setSketchUrl(base64String);
-                    localStorage.setItem('sketchUrl', base64String);
-                } else if (type === 'product') {
-                    setProductUrl(base64String);
-                    localStorage.setItem('productUrl', base64String);
-                } else if (type === 'model') {
-                    setModelUrl(base64String);
-                    localStorage.setItem('modelUrl', base64String);
-                } else if (type === 'video') {
-                    setVideoUrl(base64String);
-                    localStorage.setItem('videoUrl', base64String);
+            if (isVideoType) {
+                const objectUrl = URL.createObjectURL(file);
+                if (type === 'video') {
+                    setVideoUrl(objectUrl);
                 } else if (type === 'heroVideo') {
-                    setHeroVideoUrl(base64String);
-                    localStorage.setItem('heroVideoUrl', base64String);
+                    setHeroVideoUrl(objectUrl);
                 } else if (type === 'heroVideo1') {
-                    setHeroVideo1Url(base64String);
-                    localStorage.setItem('heroVideo1Url', base64String);
+                    setHeroVideo1Url(objectUrl);
                 } else if (type === 'heroVideo2') {
-                    setHeroVideo2Url(base64String);
-                    localStorage.setItem('heroVideo2Url', base64String);
+                    setHeroVideo2Url(objectUrl);
                 } else if (type === 'heroVideo3') {
-                    setHeroVideo3Url(base64String);
-                    localStorage.setItem('heroVideo3Url', base64String);
-                } else if (type === 'adgenius_main') {
-                    setAdGeniusMainUrl(base64String);
-                    localStorage.setItem('adGeniusMainUrl', base64String);
-                } else if (type === 'adgenius_collage') {
-                    setAdGeniusCollageUrl(base64String);
-                    localStorage.setItem('adGeniusCollageUrl', base64String);
-                } else if (type === 'logo_media') {
-                    setLogoMediaUrl(base64String);
-                    localStorage.setItem('logoMediaUrl', base64String);
-                } else if (type === 'pixshop_retush') {
-                    setPixshopRetushUrl(base64String);
-                    localStorage.setItem('pixshopRetushUrl', base64String);
-                } else if (type === 'pixshop_product_placement') {
-                    setPixshopProductPlacementUrl(base64String);
-                    localStorage.setItem('pixshopProductPlacementUrl', base64String);
-                } else if (type === 'adgenius_model') {
-                    setAdGeniusModelUrl(base64String);
-                    localStorage.setItem('adGeniusModelUrl', base64String);
-                } else if (type === 'adgenius_campaign') {
-                    setAdGeniusCampaignUrl(base64String);
-                    localStorage.setItem('adGeniusCampaignUrl', base64String);
+                    setHeroVideo3Url(objectUrl);
                 } else if (type === 'adgenius_video') {
-                    setAdGeniusVideoUrl(base64String);
-                    localStorage.setItem('adGeniusVideoUrl', base64String);
-                } else if (type === 'adgenius_product_placement') {
-                    setAdGeniusProductPlacementUrl(base64String);
-                    localStorage.setItem('adGeniusProductPlacementUrl', base64String);
+                    setAdGeniusVideoUrl(objectUrl);
+                } else if (type === 'logo_media') {
+                    setLogoMediaUrl(objectUrl);
                 }
-            };
-            reader.readAsDataURL(file);
+            } else {
+                // Görsel dosyaları için: base64 kullan (küçük dosyalar, localStorage destekli)
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    if (type === 'sketch') {
+                        setSketchUrl(base64String);
+                        localStorage.setItem('sketchUrl', base64String);
+                    } else if (type === 'product') {
+                        setProductUrl(base64String);
+                        localStorage.setItem('productUrl', base64String);
+                    } else if (type === 'model') {
+                        setModelUrl(base64String);
+                        localStorage.setItem('modelUrl', base64String);
+                    } else if (type === 'adgenius_main') {
+                        setAdGeniusMainUrl(base64String);
+                        localStorage.setItem('adGeniusMainUrl', base64String);
+                    } else if (type === 'adgenius_collage') {
+                        setAdGeniusCollageUrl(base64String);
+                        localStorage.setItem('adGeniusCollageUrl', base64String);
+                    } else if (type === 'pixshop_retush') {
+                        setPixshopRetushUrl(base64String);
+                        localStorage.setItem('pixshopRetushUrl', base64String);
+                    } else if (type === 'pixshop_product_placement') {
+                        setPixshopProductPlacementUrl(base64String);
+                        localStorage.setItem('pixshopProductPlacementUrl', base64String);
+                    } else if (type === 'adgenius_model') {
+                        setAdGeniusModelUrl(base64String);
+                        localStorage.setItem('adGeniusModelUrl', base64String);
+                    } else if (type === 'adgenius_campaign') {
+                        setAdGeniusCampaignUrl(base64String);
+                        localStorage.setItem('adGeniusCampaignUrl', base64String);
+                    } else if (type === 'adgenius_product_placement') {
+                        setAdGeniusProductPlacementUrl(base64String);
+                        localStorage.setItem('adGeniusProductPlacementUrl', base64String);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
 
             // Upload to Supabase in the background
             if (type === 'heroVideo' || type === 'heroVideo1' || type === 'heroVideo2' || type === 'heroVideo3') {
