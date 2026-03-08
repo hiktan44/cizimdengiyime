@@ -973,6 +973,47 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
     large: { credits: 200, price: 1000 },
   });
 
+  // Before/After showcase state
+  const [baData, setBaData] = useState<{ before: string; after: string; idx: number }[]>([]);
+
+  // Before/After görselleri localStorage'dan yükle (language bağımsız)
+  const loadBeforeAfterItems = React.useCallback(() => {
+    const items: { before: string; after: string; idx: number }[] = [];
+    for (let i = 1; i <= 9; i++) {
+      const before = localStorage.getItem(`ba_feature${i}_before`);
+      const after = localStorage.getItem(`ba_feature${i}_after`);
+      if (before && after) {
+        items.push({ before, after, idx: i - 1 });
+      }
+    }
+    setBaData(items);
+  }, []);
+
+  // Mount + storage event (admin panelden yüklenince tetiklenir)
+  useEffect(() => {
+    loadBeforeAfterItems();
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key?.startsWith('ba_feature')) {
+        loadBeforeAfterItems();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // Sayfa görünür olduğunda da yeniden yükle (tab geçişi)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadBeforeAfterItems();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [loadBeforeAfterItems]);
+
   const handleGetStarted = () => {
     trackEvent('cta_click', { p_label: 'Get Started', source: 'landing_page' });
     const menu = document.getElementById('mobile-menu');
@@ -1529,19 +1570,10 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section>
 
       {/* Before/After Showcase */}
-      {(() => {
-        const baItems: { before: string; after: string; label: string }[] = [];
+      {baData.length > 0 && (() => {
         const featureLabels = language === 'tr'
           ? ['Çizimden Ürüne', 'Canlı Model', 'Video Oluşturma', 'Teknik Çizim', 'Pixshop', 'Fotomatik', 'Kolaj', 'Reklam Medyası', 'E-ticaret']
           : ['Sketch to Product', 'Live Model', 'Video Creation', 'Tech Drawing', 'Pixshop', 'Fotomatik', 'Collage', 'Ad Media', 'E-commerce'];
-        for (let i = 1; i <= 9; i++) {
-          const before = localStorage.getItem(`ba_feature${i}_before`);
-          const after = localStorage.getItem(`ba_feature${i}_after`);
-          if (before && after) {
-            baItems.push({ before, after, label: featureLabels[i - 1] });
-          }
-        }
-        if (baItems.length === 0) return null;
 
         return (
           <section className="relative py-20 px-6 z-10">
@@ -1557,8 +1589,8 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 </p>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {baItems.map((item, idx) => (
-                  <BeforeAfterCard key={idx} before={item.before} after={item.after} label={item.label} theme={theme} language={language} />
+                {baData.map((item, idx) => (
+                  <BeforeAfterCard key={idx} before={item.before} after={item.after} label={featureLabels[item.idx]} theme={theme} language={language} />
                 ))}
               </div>
             </div>
