@@ -29,7 +29,7 @@ import { ResultDisplay } from './components/ResultDisplay';
 import { MultiItemUploader, MultiItem } from './components/MultiItemUploader';
 import { SparklesIcon } from './components/icons/SparklesIcon';
 import { ColorPicker } from './components/ColorPicker';
-import { generateImage, generateVideoFromImage, generateProductFromSketch, generateSketchFromProduct, VideoGenerationSettings } from './services/geminiService';
+import { generateImage, generateVideoFromImage, generateProductFromSketch, generateSketchFromProduct, analyzeGarmentParts, VideoGenerationSettings } from './services/geminiService';
 import { base64ToFile } from './utils/fileUtils';
 import { CheckCircleIcon } from './components/icons/CheckCircleIcon';
 import { UploadIcon } from './components/icons/UploadIcon';
@@ -155,7 +155,11 @@ const ToolPage: React.FC<{
         const [techInputPreview, setTechInputPreview] = useState<string | undefined>(undefined);
         const [generatedTechSketchUrl, setGeneratedTechSketchUrl] = useState<string | null>(null);
         const [isTechLoading, setIsTechLoading] = useState(false);
-        const [techSketchStyle, setTechSketchStyle] = useStickyState<'colored' | 'blackwhite'>('blackwhite', 'fasheone_techSketchStyle'); // New: Renkli veya Karakalem
+        const [techSketchStyle, setTechSketchStyle] = useStickyState<'colored' | 'blackwhite'>('blackwhite', 'fasheone_techSketchStyle');
+        const [garmentParts, setGarmentParts] = useState<{ name: string; hasPattern: boolean }[]>([]);
+        const [techPartColors, setTechPartColors] = useState<Record<string, string>>({});
+        const [isAnalyzingParts, setIsAnalyzingParts] = useState(false);
+        const [activeColorPicker, setActiveColorPicker] = useState<string | null>(null);
 
         // Product color for sketch-to-product
         const [productColor, setProductColor] = useStickyState('', 'fasheone_productColor');
@@ -633,10 +637,35 @@ const ToolPage: React.FC<{
         };
 
         // Tech Sketch Handlers
-        const handleTechUpload = (file: File) => {
+        const handleTechUpload = async (file: File) => {
             setTechInputFile(file);
             setTechInputPreview(URL.createObjectURL(file));
             setGeneratedTechSketchUrl(null);
+            setGarmentParts([]);
+            setTechPartColors({});
+            setActiveColorPicker(null);
+
+            // Otomatik parça analizi başlat
+            if (techSketchStyle === 'colored') {
+                setIsAnalyzingParts(true);
+                try {
+                    const parts = await analyzeGarmentParts(file);
+                    setGarmentParts(parts);
+                    // Her parça için boş renk + desen rengi ekle
+                    const initialColors: Record<string, string> = {};
+                    parts.forEach(p => {
+                        initialColors[p.name] = '';
+                        if (p.hasPattern) initialColors[`${p.name} (Desen)`] = '';
+                    });
+                    setTechPartColors(initialColors);
+                } catch (e) {
+                    console.error('Parça analizi hatası:', e);
+                    setGarmentParts([{ name: 'Kıyafet', hasPattern: false }]);
+                    setTechPartColors({ 'Kıyafet': '' });
+                } finally {
+                    setIsAnalyzingParts(false);
+                }
+            }
         };
 
         const handleGenerateTechSketch = async () => {
@@ -654,7 +683,7 @@ const ToolPage: React.FC<{
             startProgressSimulation(90, 200);
 
             try {
-                const sketchUrl = await generateSketchFromProduct(techInputFile, techSketchStyle);
+                const sketchUrl = await generateSketchFromProduct(techInputFile, techSketchStyle, techPartColors);
                 finishProgress();
 
                 setGeneratedTechSketchUrl(sketchUrl);
@@ -1760,7 +1789,28 @@ const ToolPage: React.FC<{
                                                     {t.technicalDrawing.blackAndWhite}
                                                 </button>
                                                 <button
-                                                    onClick={() => setTechSketchStyle('colored')}
+                                                    onClick={async () => {
+                                                        setTechSketchStyle('colored');
+                                                        // Dosya yüklü ama parçalar analiz edilmemişse, analiz başlat
+                                                        if (techInputFile && garmentParts.length === 0 && !isAnalyzingParts) {
+                                                            setIsAnalyzingParts(true);
+                                                            try {
+                                                                const parts = await analyzeGarmentParts(techInputFile);
+                                                                setGarmentParts(parts);
+                                                                const initialColors: Record<string, string> = {};
+                                                                parts.forEach(p => {
+                                                                    initialColors[p.name] = '';
+                                                                    if (p.hasPattern) initialColors[`${p.name} (Desen)`] = '';
+                                                                });
+                                                                setTechPartColors(initialColors);
+                                                            } catch {
+                                                                setGarmentParts([{ name: 'Kıyafet', hasPattern: false }]);
+                                                                setTechPartColors({ 'Kıyafet': '' });
+                                                            } finally {
+                                                                setIsAnalyzingParts(false);
+                                                            }
+                                                        }
+                                                    }}
                                                     className={`flex-1 py-3 px-4 rounded-xl font-semibold text-sm transition-all ${techSketchStyle === 'colored'
                                                         ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white border-2 border-purple-400 shadow-lg'
                                                         : 'bg-slate-800 text-slate-400 border border-slate-600 hover:border-slate-500'
@@ -1769,6 +1819,71 @@ const ToolPage: React.FC<{
                                                     {t.technicalDrawing.colored}
                                                 </button>
                                             </div>
+                                        </div>
+                                    )}
+
+                                    {/* Dinamik Renk Kutuları — Renkli Mod + Dosya yüklü + Parçalar analiz edilmiş */}
+                                    {techSketchStyle === 'colored' && techInputFile && (
+                                        <div className="mt-4">
+                                            {isAnalyzingParts ? (
+                                                <div className="flex items-center gap-2 text-sm text-slate-400 bg-slate-800/50 rounded-xl p-4">
+                                                    <div className="w-4 h-4 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
+                                                    Kıyafet parçaları analiz ediliyor...
+                                                </div>
+                                            ) : garmentParts.length > 0 && (
+                                                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                                                    <label className="block text-sm font-semibold text-slate-300 mb-3">
+                                                        🎨 Parça Renkleri ({garmentParts.length} parça algılandı)
+                                                    </label>
+                                                    <div className="space-y-2">
+                                                        {Object.entries(techPartColors).map(([partName, color]) => (
+                                                            <div key={partName} className="flex items-center gap-3 bg-slate-700/30 rounded-lg p-2.5">
+                                                                <span className="text-sm text-slate-300 flex-1 truncate">{partName}</span>
+                                                                <div className="relative">
+                                                                    <button
+                                                                        onClick={() => setActiveColorPicker(activeColorPicker === partName ? null : partName)}
+                                                                        className="w-10 h-10 rounded-lg border-2 border-slate-500 hover:border-purple-400 transition-colors cursor-pointer flex items-center justify-center"
+                                                                        style={{ backgroundColor: color || '#374151' }}
+                                                                    >
+                                                                        {!color && <span className="text-slate-400 text-lg">+</span>}
+                                                                    </button>
+                                                                    {activeColorPicker === partName && (
+                                                                        <div className="absolute right-0 bottom-12 z-50 bg-slate-800 rounded-xl p-3 border border-slate-600 shadow-2xl">
+                                                                            <input
+                                                                                type="color"
+                                                                                value={color || '#ffffff'}
+                                                                                onChange={(e) => {
+                                                                                    setTechPartColors(prev => ({ ...prev, [partName]: e.target.value }));
+                                                                                }}
+                                                                                className="w-48 h-48 cursor-pointer rounded-lg border-0"
+                                                                                style={{ padding: 0 }}
+                                                                            />
+                                                                            <div className="flex gap-2 mt-2">
+                                                                                <button
+                                                                                    onClick={() => {
+                                                                                        setTechPartColors(prev => ({ ...prev, [partName]: '' }));
+                                                                                        setActiveColorPicker(null);
+                                                                                    }}
+                                                                                    className="flex-1 text-xs py-1.5 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600"
+                                                                                >
+                                                                                    Temizle
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={() => setActiveColorPicker(null)}
+                                                                                    className="flex-1 text-xs py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-500"
+                                                                                >
+                                                                                    Tamam
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <p className="text-xs text-slate-500 mt-2">Renk seçmezseniz, orijinal renkler korunur.</p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 

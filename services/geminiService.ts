@@ -296,30 +296,66 @@ BAŞKA RENK KULLANMA.` : '';
     }
 };
 
-export const generateSketchFromProduct = async (productFile: File, style: 'colored' | 'blackwhite' = 'blackwhite'): Promise<string> => {
+export const generateSketchFromProduct = async (productFile: File, style: 'colored' | 'blackwhite' = 'blackwhite', partColors?: Record<string, string>): Promise<string> => {
     checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(productFile);
 
+    // Renk talimatı oluştur
+    let colorInstruction = '';
+    if (partColors && Object.keys(partColors).length > 0) {
+        const colorLines = Object.entries(partColors)
+            .filter(([, hex]) => hex && hex !== '')
+            .map(([part, hex]) => `- ${part}: HEX ${hex} rengini kullan`)
+            .join('\n');
+        if (colorLines) {
+            colorInstruction = `\n\n*** RENK TALİMATI (ZORUNLU) ***\nAşağıdaki parçalara belirtilen renkleri uygula:\n${colorLines}\nBu renkleri BİREBİR kullan, tonlarını değiştirme.\n`;
+        }
+    }
+
     const prompt = style === 'colored'
         ? `Bu ürün fotoğrafını analiz et ve moda tasarımı üretimi için profesyonel bir 'Renkli Teknik Çizim' (Colored Technical Flat Sketch) oluştur.
+    
+    *** KRİTİK: TAM BOY (FULL BODY) KORUMA ***
+    - Fotoğraftaki kıyafetin TAMAMINI çiz. Bel üstü veya kırpma YAPMA.
+    - Fotoğrafta alt+üst parça varsa, İKİSİNİ DE tek çizimde göster.
+    - Tam boy elbise ise etek ucuna kadar, pantolon ise paça ucuna kadar çiz.
+    - Fotoğraftaki ÜRÜN ne ise (üst, alt, elbise, mont, takım elbise) TAMAMINI çiz.
+    - Hiçbir parçayı kesme, kırpma veya dışarıda bırakma.
+    
+    *** PARÇA ANALİZİ ***
+    - Fotoğraftaki kıyafeti parçalarına ayır: üst, alt, dış giyim, aksesuar vb.
+    - Her parçanın sınırlarını net çizgilerle belirt.
+    - Alt ve üst parça varsa, bel çizgisinde ayrımı net göster.
     
     Kurallar:
     1. Stil: Siyah kontur çizgileri + Gerçekçi renkler. Ürünün orijinal renklerini koru.
     2. Detay: Dikiş yerleri (topstitching), fermuarlar, cepler, ribana detayları, düğmeler net bir şekilde çizilmeli.
     3. Perspektif: Ürün tamamen önden, düz (flat) ve simetrik bir şekilde çizilmeli.
     4. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
-     5. Kalite: 2K çözünürlükte (en az 2048px), vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
+    5. Kalite: 2K çözünürlükte (en az 2048px), vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.
     6. Renklendirme: Kumaş renkleri, detay renkleri (düğme, fermuar vb.) fotoğraftaki ile birebir aynı olmalı. Gölge ve ışık oyunlarıyla derinlik katılmalı.
-    7. Doku: Kumaşın dokusu (Texture) çizimde hissedilmeli.`
+    7. Doku: Kumaşın dokusu (Texture) çizimde hissedilmeli.
+    8. Desen: Ürünün kendinden deseni varsa (çizgili, kareli, çiçekli vb.) deseni de birebir çiz.${colorInstruction}`
         : `Bu ürün fotoğrafını analiz et ve moda tasarımı üretimi için profesyonel bir 'Teknik Çizim' (Technical Flat Sketch / CAD) oluştur.
+    
+    *** KRİTİK: TAM BOY (FULL BODY) KORUMA ***
+    - Fotoğraftaki kıyafetin TAMAMINI çiz. Bel üstü veya kırpma YAPMA.
+    - Fotoğrafta alt+üst parça varsa, İKİSİNİ DE tek çizimde göster.
+    - Tam boy elbise ise etek ucuna kadar, pantolon ise paça ucuna kadar çiz.
+    - Fotoğraftaki ÜRÜN ne ise (üst, alt, elbise, mont, takım elbise) TAMAMINI çiz.
+    - Hiçbir parçayı kesme, kırpma veya dışarıda bırakma.
+    
+    *** PARÇA ANALİZİ ***
+    - Fotoğraftaki kıyafeti parçalarına ayır: üst, alt, dış giyim, aksesuar vb.
+    - Her parçanın sınırlarını net çizgilerle belirt.
     
     Kurallar:
     1. Stil: Sadece siyah kontur çizgileri (clean line art). Gölgelendirme, renk veya doku YOK.
     2. Detay: Dikiş yerleri (topstitching), fermuarlar, cepler, ribana detayları, düğmeler net bir şekilde çizilmeli.
     3. Perspektif: Ürün tamamen önden, düz (flat) ve simetrik bir şekilde çizilmeli.
     4. Sunum: Arka plan saf beyaz olmalı. İnsan figürü veya manken kullanılmamalı.
-     5. Kalite: 2K çözünürlükte (en az 2048px), vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.`;
+    5. Kalite: 2K çözünürlükte (en az 2048px), vektörel çizim hassasiyetinde, keskin ve temiz çizgiler.`;
 
     try {
         return await withRetry(async (model) => {
@@ -358,6 +394,49 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
     } catch (e) {
         console.error("Teknik Çizim Hatası:", e);
         throw e;
+    }
+};
+
+// Analyze garment parts from image using Gemini
+export const analyzeGarmentParts = async (productFile: File): Promise<{ name: string; hasPattern: boolean }[]> => {
+    checkApiKey();
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    const imagePart = await fileToGenerativePart(productFile);
+
+    const prompt = `Bu moda/kıyafet fotoğrafını analiz et ve kıyafetin kaç parçadan oluştuğunu belirle.
+
+Her parça için JSON formatında yanıt ver. SADECE JSON array döndür, başka metin ekleme.
+
+Parça tipleri: üst giyim (t-shirt, gömlek, kazak, ceket, mont vb.), alt giyim (pantolon, şort, etek vb.), elbise, dış giyim, aksesuar (kemer, atkı vb.)
+
+Her parça için:
+- "name": Parçanın Türkçe adı (örn: "Üst - Gömlek", "Alt - Pantolon", "Elbise", "Dış - Ceket")
+- "hasPattern": true/false — parçanın kendinden deseni var mı (çizgili, kareli, çiçekli, puantiyeli vb.)
+
+Örnek yanıt:
+[{"name":"Üst - Gömlek","hasPattern":false},{"name":"Alt - Pantolon","hasPattern":true}]
+
+ÇOK ÖNEMLİ: Sadece GİYSİ parçalarını say. Ayakkabı, çanta gibi aksesuarları SAYMA. Sadece kıyafet parçaları.`;
+
+    try {
+        const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+        for (const model of models) {
+            try {
+                const response = await ai.models.generateContent({
+                    model,
+                    contents: { parts: [imagePart, { text: prompt }] },
+                });
+                const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const jsonMatch = text.match(/\[[\s\S]*?\]/);
+                if (jsonMatch) {
+                    return JSON.parse(jsonMatch[0]);
+                }
+            } catch { continue; }
+        }
+        // Fallback: tek parça varsay
+        return [{ name: 'Kıyafet', hasPattern: false }];
+    } catch {
+        return [{ name: 'Kıyafet', hasPattern: false }];
     }
 };
 
