@@ -821,3 +821,140 @@ export const getTopCreditUsers = async (
     return [];
   }
 };
+
+// ==========================================
+// BEFORE/AFTER SHOWCASE FUNCTIONS
+// ==========================================
+
+export interface BeforeAfterImage {
+  id: string;
+  image_url: string;
+  type: string;
+  order_index: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+// Upload Before/After image to Supabase
+export const uploadBeforeAfterImage = async (
+  file: File,
+  featureNum: number,
+  side: 'before' | 'after'
+): Promise<{ success: boolean; imageUrl?: string; error?: string }> => {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const uniqueFileName = `ba-${featureNum}-${side}-${Date.now()}.${fileExt}`;
+    const dbType = `ba_${featureNum}_${side}`;
+
+    console.log(`📤 Uploading BA image: ${dbType}`, uniqueFileName);
+
+    // Eski kaydı sil
+    const { data: existing } = await supabase
+      .from('showcase_images')
+      .select('id, image_url')
+      .eq('type', dbType)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      try {
+        const urlParts = existing[0].image_url.split('/object/public/showcase-images/');
+        if (urlParts.length > 1) {
+          await supabase.storage.from('showcase-images').remove([urlParts[1]]);
+        }
+      } catch (e) { /* ignore */ }
+      await supabase.from('showcase_images').delete().eq('id', existing[0].id);
+    }
+
+    // Yeni dosyayı yükle
+    const { error: uploadError } = await supabase.storage
+      .from('showcase-images')
+      .upload(uniqueFileName, file, { contentType: file.type, upsert: false });
+
+    if (uploadError) throw uploadError;
+
+    // Public URL al
+    const { data: urlData } = supabase.storage.from('showcase-images').getPublicUrl(uniqueFileName);
+    const imageUrl = urlData.publicUrl;
+
+    // Database kaydı oluştur
+    const { error: dbError } = await supabase.from('showcase_images').insert({
+      image_url: imageUrl,
+      type: dbType,
+      order_index: featureNum,
+      is_active: true,
+    });
+
+    if (dbError) throw dbError;
+
+    console.log('✅ BA image uploaded:', imageUrl);
+    return { success: true, imageUrl };
+  } catch (error: any) {
+    console.error('❌ BA upload error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Get all Before/After images (public)
+export const getPublicBeforeAfterImages = async (): Promise<{ featureNum: number; before: string; after: string }[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('showcase_images')
+      .select('*')
+      .like('type', 'ba_%')
+      .eq('is_active', true)
+      .order('order_index', { ascending: true });
+
+    if (error) throw error;
+
+    // Pair before/after
+    const pairs = new Map<number, { before?: string; after?: string }>();
+    for (const item of data || []) {
+      const match = item.type.match(/ba_(\d+)_(before|after)/);
+      if (match) {
+        const num = parseInt(match[1]);
+        const side = match[2] as 'before' | 'after';
+        if (!pairs.has(num)) pairs.set(num, {});
+        pairs.get(num)![side] = item.image_url;
+      }
+    }
+
+    // Sadece hem before hem after olanları döndür
+    const result: { featureNum: number; before: string; after: string }[] = [];
+    pairs.forEach((value, key) => {
+      if (value.before && value.after) {
+        result.push({ featureNum: key, before: value.before, after: value.after });
+      }
+    });
+
+    return result.sort((a, b) => a.featureNum - b.featureNum);
+  } catch (error) {
+    console.error('Error fetching BA images:', error);
+    return [];
+  }
+};
+
+// Delete Before/After image
+export const deleteBeforeAfterImage = async (featureNum: number, side: 'before' | 'after'): Promise<boolean> => {
+  try {
+    const dbType = `ba_${featureNum}_${side}`;
+    const { data } = await supabase
+      .from('showcase_images')
+      .select('id, image_url')
+      .eq('type', dbType)
+      .limit(1);
+
+    if (data && data.length > 0) {
+      try {
+        const urlParts = data[0].image_url.split('/object/public/showcase-images/');
+        if (urlParts.length > 1) {
+          await supabase.storage.from('showcase-images').remove([urlParts[1]]);
+        }
+      } catch (e) { /* ignore */ }
+      await supabase.from('showcase_images').delete().eq('id', data[0].id);
+    }
+    return true;
+  } catch (error) {
+    console.error('Error deleting BA image:', error);
+    return false;
+  }
+};

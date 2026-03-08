@@ -4,7 +4,7 @@ import { Logo } from '../components/Logo';
 import { Header } from '../components/Header';
 import { CREDIT_PACKAGES } from '../lib/supabase';
 import { BeforeAfterSlider } from '../components/BeforeAfterSlider';
-import { getPublicHeroVideos, getPublicShowcaseImages, getSiteSettings } from '../lib/adminService';
+import { getPublicHeroVideos, getPublicShowcaseImages, getSiteSettings, getPublicBeforeAfterImages } from '../lib/adminService';
 import { trackEvent, ANALYTICS_EVENTS } from '../utils/analytics';
 import { HeroVideoCarousel } from '../components/HeroVideoCarousel';
 
@@ -976,43 +976,22 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
   // Before/After showcase state
   const [baData, setBaData] = useState<{ before: string; after: string; idx: number }[]>([]);
 
-  // Before/After görselleri localStorage'dan yükle (language bağımsız)
-  const loadBeforeAfterItems = React.useCallback(() => {
-    const items: { before: string; after: string; idx: number }[] = [];
-    for (let i = 1; i <= 9; i++) {
-      const before = localStorage.getItem(`ba_feature${i}_before`);
-      const after = localStorage.getItem(`ba_feature${i}_after`);
-      if (before && after) {
-        items.push({ before, after, idx: i - 1 });
-      }
-    }
-    setBaData(items);
-  }, []);
-
-  // Mount + storage event (admin panelden yüklenince tetiklenir)
+  // Before/After görselleri Supabase'den yükle
   useEffect(() => {
-    loadBeforeAfterItems();
-
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key?.startsWith('ba_feature')) {
-        loadBeforeAfterItems();
+    const loadBA = async () => {
+      try {
+        const items = await getPublicBeforeAfterImages();
+        setBaData(items.map(item => ({
+          before: item.before,
+          after: item.after,
+          idx: item.featureNum - 1,
+        })));
+      } catch (err) {
+        console.error('Before/After yüklenemedi:', err);
       }
     };
-    window.addEventListener('storage', handleStorage);
-
-    // Sayfa görünür olduğunda da yeniden yükle (tab geçişi)
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') {
-        loadBeforeAfterItems();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    return () => {
-      window.removeEventListener('storage', handleStorage);
-      document.removeEventListener('visibilitychange', handleVisibility);
-    };
-  }, [loadBeforeAfterItems]);
+    loadBA();
+  }, []);
 
   const handleGetStarted = () => {
     trackEvent('cta_click', { p_label: 'Get Started', source: 'landing_page' });

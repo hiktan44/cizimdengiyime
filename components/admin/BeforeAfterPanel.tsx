@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { uploadBeforeAfterImage, getPublicBeforeAfterImages, deleteBeforeAfterImage } from '../../lib/adminService';
 
 const FEATURE_LABELS_TR = [
     '1. Çizimden Ürüne',
@@ -16,84 +17,74 @@ interface BeforeAfterPanelProps {
     language?: string;
 }
 
-// Görseli sıkıştır — localStorage boyut limitini aşmamak için
-const compressImage = (file: File, maxWidth = 800, quality = 0.7): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        const canvas = document.createElement('canvas');
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-            img.onload = () => {
-                let w = img.naturalWidth;
-                let h = img.naturalHeight;
-
-                // Boyutu küçült
-                if (w > maxWidth) {
-                    h = Math.round((h * maxWidth) / w);
-                    w = maxWidth;
-                }
-
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) { reject(new Error('Canvas context oluşturulamadı')); return; }
-                ctx.drawImage(img, 0, 0, w, h);
-                const compressed = canvas.toDataURL('image/webp', quality);
-                resolve(compressed);
-            };
-            img.onerror = () => reject(new Error('Görsel okunamadı'));
-            img.src = reader.result as string;
-        };
-        reader.onerror = () => reject(new Error('Dosya okunamadı'));
-        reader.readAsDataURL(file);
-    });
-};
-
 export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = 'tr' }) => {
     const [images, setImages] = useState<Record<string, string>>({});
     const [uploading, setUploading] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    // Supabase'den mevcut görselleri yükle
     useEffect(() => {
-        const loaded: Record<string, string> = {};
-        for (let i = 1; i <= 9; i++) {
-            const before = localStorage.getItem(`ba_feature${i}_before`);
-            const after = localStorage.getItem(`ba_feature${i}_after`);
-            if (before) loaded[`ba_feature${i}_before`] = before;
-            if (after) loaded[`ba_feature${i}_after`] = after;
-        }
-        setImages(loaded);
+        const load = async () => {
+            try {
+                const baImages = await getPublicBeforeAfterImages();
+                const loaded: Record<string, string> = {};
+                for (const item of baImages) {
+                    loaded[`ba_feature${item.featureNum}_before`] = item.before;
+                    loaded[`ba_feature${item.featureNum}_after`] = item.after;
+                }
+                setImages(loaded);
+            } catch (err) {
+                console.error('BA resimler yüklenemedi:', err);
+            }
+        };
+        load();
     }, []);
 
     const handleUpload = useCallback(async (key: string, file: File) => {
         setUploading(key);
         setError(null);
+
+        // key format: ba_feature{num}_{side}
+        const match = key.match(/ba_feature(\d+)_(before|after)/);
+        if (!match) {
+            setError('Geçersiz anahtar.');
+            setUploading(null);
+            return;
+        }
+
+        const featureNum = parseInt(match[1]);
+        const side = match[2] as 'before' | 'after';
+
         try {
-            const compressed = await compressImage(file, 800, 0.7);
-            try {
-                localStorage.setItem(key, compressed);
-                setImages(prev => ({ ...prev, [key]: compressed }));
-            } catch (storageErr) {
-                // localStorage dolu — kullanıcıya bildir
-                console.error('localStorage hatası:', storageErr);
-                setError('Depolama alanı dolu! Lütfen bazı görselleri silip tekrar deneyin.');
+            const result = await uploadBeforeAfterImage(file, featureNum, side);
+            if (result.success && result.imageUrl) {
+                setImages(prev => ({ ...prev, [key]: result.imageUrl! }));
+            } else {
+                setError(result.error || 'Yükleme başarısız.');
             }
-        } catch (err) {
-            console.error('Sıkıştırma hatası:', err);
-            setError('Görsel işlenirken hata oluştu. Lütfen farklı bir görsel deneyin.');
+        } catch (err: any) {
+            console.error('Yükleme hatası:', err);
+            setError(err.message || 'Yükleme sırasında bir hata oluştu.');
         } finally {
             setUploading(null);
         }
     }, []);
 
-    const handleRemove = useCallback((key: string) => {
-        localStorage.removeItem(key);
-        setImages(prev => {
-            const next = { ...prev };
-            delete next[key];
-            return next;
-        });
+    const handleRemove = useCallback(async (key: string) => {
+        const match = key.match(/ba_feature(\d+)_(before|after)/);
+        if (!match) return;
+
+        const featureNum = parseInt(match[1]);
+        const side = match[2] as 'before' | 'after';
+
+        const success = await deleteBeforeAfterImage(featureNum, side);
+        if (success) {
+            setImages(prev => {
+                const next = { ...prev };
+                delete next[key];
+                return next;
+            });
+        }
         setError(null);
     }, []);
 
@@ -105,8 +96,8 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                 </h3>
                 <p className="text-slate-400 text-sm">
                     {language === 'tr'
-                        ? 'Her özellik kutusu için öncesi ve sonrası görsellerini yükleyin. Bu görseller landing sayfasında görünecek.'
-                        : 'Upload before and after images for each feature box. These will appear on the landing page.'}
+                        ? 'Her özellik kutusu için öncesi ve sonrası görsellerini yükleyin. Görseller Supabase\'e yüklenir ve landing sayfasında tüm ziyaretçilere görünür.'
+                        : 'Upload before and after images for each feature. Images are stored in Supabase and visible to all visitors.'}
                 </p>
             </div>
 
@@ -176,7 +167,6 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUplo
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            // Dosya boyutu kontrolü (10MB max)
             if (file.size > 10 * 1024 * 1024) {
                 alert('Dosya boyutu çok büyük! Maksimum 10MB.');
                 return;
@@ -191,7 +181,7 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUplo
             {isUploading ? (
                 <div className="w-full h-36 border-2 border-dashed border-cyan-500/50 rounded-lg flex flex-col items-center justify-center bg-slate-800/50">
                     <div className="w-6 h-6 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mb-2" />
-                    <span className="text-xs text-cyan-400">Yükleniyor...</span>
+                    <span className="text-xs text-cyan-400">Supabase'e yükleniyor...</span>
                 </div>
             ) : imageUrl ? (
                 <div className="relative group">
