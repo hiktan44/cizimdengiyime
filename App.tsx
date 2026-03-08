@@ -160,6 +160,7 @@ const ToolPage: React.FC<{
         const [techPartColors, setTechPartColors] = useState<Record<string, string>>({});
         const [isAnalyzingParts, setIsAnalyzingParts] = useState(false);
         const [activeColorPicker, setActiveColorPicker] = useState<string | null>(null);
+        const [techImageAspectRatio, setTechImageAspectRatio] = useState<string | undefined>(undefined);
 
         // Product color for sketch-to-product
         const [productColor, setProductColor] = useStickyState('', 'fasheone_productColor');
@@ -639,32 +640,48 @@ const ToolPage: React.FC<{
         // Tech Sketch Handlers
         const handleTechUpload = async (file: File) => {
             setTechInputFile(file);
-            setTechInputPreview(URL.createObjectURL(file));
+            const previewUrl = URL.createObjectURL(file);
+            setTechInputPreview(previewUrl);
             setGeneratedTechSketchUrl(null);
             setGarmentParts([]);
             setTechPartColors({});
             setActiveColorPicker(null);
 
-            // Otomatik parça analizi başlat
-            if (techSketchStyle === 'colored') {
-                setIsAnalyzingParts(true);
-                try {
-                    const parts = await analyzeGarmentParts(file);
-                    setGarmentParts(parts);
-                    // Her parça için boş renk + desen rengi ekle
-                    const initialColors: Record<string, string> = {};
-                    parts.forEach(p => {
-                        initialColors[p.name] = '';
-                        if (p.hasPattern) initialColors[`${p.name} (Desen)`] = '';
-                    });
-                    setTechPartColors(initialColors);
-                } catch (e) {
-                    console.error('Parça analizi hatası:', e);
-                    setGarmentParts([{ name: 'Kıyafet', hasPattern: false }]);
-                    setTechPartColors({ 'Kıyafet': '' });
-                } finally {
-                    setIsAnalyzingParts(false);
-                }
+            // Görselin aspect ratio'sunu tespit et
+            const img = new Image();
+            img.onload = () => {
+                const w = img.naturalWidth;
+                const h = img.naturalHeight;
+                const ratio = w / h;
+                // En yakın desteklenen aspect ratio'yu bul
+                let ar: string;
+                if (ratio <= 0.6) ar = '9:16';       // dikey uzun (portrait)
+                else if (ratio <= 0.85) ar = '3:4';   // dikey
+                else if (ratio <= 1.15) ar = '1:1';   // kare
+                else if (ratio <= 1.5) ar = '4:3';    // yatay
+                else ar = '16:9';                      // geniş yatay
+                console.log(`📐 Görsel boyutu: ${w}x${h}, oran: ${ratio.toFixed(2)}, AR: ${ar}`);
+                setTechImageAspectRatio(ar);
+            };
+            img.src = previewUrl;
+
+            // Her zaman parça analizi yap (renkli moda geçilirse hazır olsun)
+            setIsAnalyzingParts(true);
+            try {
+                const parts = await analyzeGarmentParts(file);
+                setGarmentParts(parts);
+                const initialColors: Record<string, string> = {};
+                parts.forEach(p => {
+                    initialColors[p.name] = '';
+                    if (p.hasPattern) initialColors[`${p.name} (Desen)`] = '';
+                });
+                setTechPartColors(initialColors);
+            } catch (e) {
+                console.error('Parça analizi hatası:', e);
+                setGarmentParts([{ name: 'Kıyafet', hasPattern: false }]);
+                setTechPartColors({ 'Kıyafet': '' });
+            } finally {
+                setIsAnalyzingParts(false);
             }
         };
 
@@ -683,7 +700,7 @@ const ToolPage: React.FC<{
             startProgressSimulation(90, 200);
 
             try {
-                const sketchUrl = await generateSketchFromProduct(techInputFile, techSketchStyle, techPartColors);
+                const sketchUrl = await generateSketchFromProduct(techInputFile, techSketchStyle, techPartColors, techImageAspectRatio);
                 finishProgress();
 
                 setGeneratedTechSketchUrl(sketchUrl);
@@ -1822,8 +1839,8 @@ const ToolPage: React.FC<{
                                         </div>
                                     )}
 
-                                    {/* Dinamik Renk Kutuları — Renkli Mod + Dosya yüklü + Parçalar analiz edilmiş */}
-                                    {techSketchStyle === 'colored' && techInputFile && (
+                                    {/* Dinamik Renk Kutuları — Dosya yüklü + Parçalar analiz edilmiş */}
+                                    {techInputFile && (
                                         <div className="mt-4">
                                             {isAnalyzingParts ? (
                                                 <div className="flex items-center gap-2 text-sm text-slate-400 bg-slate-800/50 rounded-xl p-4">

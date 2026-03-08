@@ -296,7 +296,7 @@ BAŞKA RENK KULLANMA.` : '';
     }
 };
 
-export const generateSketchFromProduct = async (productFile: File, style: 'colored' | 'blackwhite' = 'blackwhite', partColors?: Record<string, string>): Promise<string> => {
+export const generateSketchFromProduct = async (productFile: File, style: 'colored' | 'blackwhite' = 'blackwhite', partColors?: Record<string, string>, aspectRatio?: string): Promise<string> => {
     checkApiKey();
     const ai = new GoogleGenAI({ apiKey: API_KEY });
     const imagePart = await fileToGenerativePart(productFile);
@@ -371,6 +371,7 @@ export const generateSketchFromProduct = async (productFile: File, style: 'color
                     responseModalities: [Modality.IMAGE],
                     imageConfig: {
                         imageSize: '2K',
+                        ...(aspectRatio ? { aspectRatio } : {}),
                     },
                 },
             });
