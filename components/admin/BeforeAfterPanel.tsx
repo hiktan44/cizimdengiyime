@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const FEATURE_LABELS_TR = [
     '1. Çizimden Ürüne',
@@ -16,8 +16,44 @@ interface BeforeAfterPanelProps {
     language?: string;
 }
 
+// Görseli sıkıştır — localStorage boyut limitini aşmamak için
+const compressImage = (file: File, maxWidth = 800, quality = 0.7): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const canvas = document.createElement('canvas');
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            img.onload = () => {
+                let w = img.naturalWidth;
+                let h = img.naturalHeight;
+
+                // Boyutu küçült
+                if (w > maxWidth) {
+                    h = Math.round((h * maxWidth) / w);
+                    w = maxWidth;
+                }
+
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) { reject(new Error('Canvas context oluşturulamadı')); return; }
+                ctx.drawImage(img, 0, 0, w, h);
+                const compressed = canvas.toDataURL('image/webp', quality);
+                resolve(compressed);
+            };
+            img.onerror = () => reject(new Error('Görsel okunamadı'));
+            img.src = reader.result as string;
+        };
+        reader.onerror = () => reject(new Error('Dosya okunamadı'));
+        reader.readAsDataURL(file);
+    });
+};
+
 export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = 'tr' }) => {
     const [images, setImages] = useState<Record<string, string>>({});
+    const [uploading, setUploading] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const loaded: Record<string, string> = {};
@@ -30,24 +66,36 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
         setImages(loaded);
     }, []);
 
-    const handleUpload = (key: string, file: File) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64 = reader.result as string;
-            localStorage.setItem(key, base64);
-            setImages(prev => ({ ...prev, [key]: base64 }));
-        };
-        reader.readAsDataURL(file);
-    };
+    const handleUpload = useCallback(async (key: string, file: File) => {
+        setUploading(key);
+        setError(null);
+        try {
+            const compressed = await compressImage(file, 800, 0.7);
+            try {
+                localStorage.setItem(key, compressed);
+                setImages(prev => ({ ...prev, [key]: compressed }));
+            } catch (storageErr) {
+                // localStorage dolu — kullanıcıya bildir
+                console.error('localStorage hatası:', storageErr);
+                setError('Depolama alanı dolu! Lütfen bazı görselleri silip tekrar deneyin.');
+            }
+        } catch (err) {
+            console.error('Sıkıştırma hatası:', err);
+            setError('Görsel işlenirken hata oluştu. Lütfen farklı bir görsel deneyin.');
+        } finally {
+            setUploading(null);
+        }
+    }, []);
 
-    const handleRemove = (key: string) => {
+    const handleRemove = useCallback((key: string) => {
         localStorage.removeItem(key);
         setImages(prev => {
             const next = { ...prev };
             delete next[key];
             return next;
         });
-    };
+        setError(null);
+    }, []);
 
     return (
         <div className="space-y-6">
@@ -61,6 +109,13 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                         : 'Upload before and after images for each feature box. These will appear on the landing page.'}
                 </p>
             </div>
+
+            {error && (
+                <div className="bg-red-500/20 border border-red-500/30 text-red-300 text-sm p-3 rounded-lg flex items-center gap-2">
+                    <span>⚠️</span> {error}
+                    <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-300">✕</button>
+                </div>
+            )}
 
             <div className="grid gap-6">
                 {FEATURE_LABELS_TR.map((label, idx) => {
@@ -80,12 +135,14 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                                 <ImageUploadBox
                                     label={language === 'tr' ? 'Öncesi' : 'Before'}
                                     imageUrl={images[beforeKey]}
+                                    isUploading={uploading === beforeKey}
                                     onUpload={(f) => handleUpload(beforeKey, f)}
                                     onRemove={() => handleRemove(beforeKey)}
                                 />
                                 <ImageUploadBox
                                     label={language === 'tr' ? 'Sonrası' : 'After'}
                                     imageUrl={images[afterKey]}
+                                    isUploading={uploading === afterKey}
                                     onUpload={(f) => handleUpload(afterKey, f)}
                                     onRemove={() => handleRemove(afterKey)}
                                 />
@@ -101,26 +158,51 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
 interface ImageUploadBoxProps {
     label: string;
     imageUrl?: string;
+    isUploading?: boolean;
     onUpload: (file: File) => void;
     onRemove: () => void;
 }
 
-const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, onUpload, onRemove }) => {
+const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUploading, onUpload, onRemove }) => {
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleClick = () => {
+        if (inputRef.current) {
+            inputRef.current.value = '';
+            inputRef.current.click();
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Dosya boyutu kontrolü (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Dosya boyutu çok büyük! Maksimum 10MB.');
+                return;
+            }
+            onUpload(file);
+        }
+    };
 
     return (
         <div className="space-y-2">
             <span className="text-xs font-semibold text-slate-300 uppercase tracking-wide">{label}</span>
-            {imageUrl ? (
+            {isUploading ? (
+                <div className="w-full h-36 border-2 border-dashed border-cyan-500/50 rounded-lg flex flex-col items-center justify-center bg-slate-800/50">
+                    <div className="w-6 h-6 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin mb-2" />
+                    <span className="text-xs text-cyan-400">Yükleniyor...</span>
+                </div>
+            ) : imageUrl ? (
                 <div className="relative group">
                     <img
                         src={imageUrl}
                         alt={label}
-                        className="w-full h-32 object-cover rounded-lg border border-white/10"
+                        className="w-full h-36 object-cover rounded-lg border border-white/10"
                     />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <button
-                            onClick={() => inputRef.current?.click()}
+                            onClick={handleClick}
                             className="bg-cyan-500 hover:bg-cyan-400 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition"
                         >
                             Değiştir
@@ -135,8 +217,8 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, onUplo
                 </div>
             ) : (
                 <button
-                    onClick={() => inputRef.current?.click()}
-                    className="w-full h-32 border-2 border-dashed border-slate-600 hover:border-cyan-500 rounded-lg flex flex-col items-center justify-center transition-colors cursor-pointer group"
+                    onClick={handleClick}
+                    className="w-full h-36 border-2 border-dashed border-slate-600 hover:border-cyan-500 rounded-lg flex flex-col items-center justify-center transition-colors cursor-pointer group"
                 >
                     <svg className="w-8 h-8 text-slate-500 group-hover:text-cyan-400 transition-colors mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -147,13 +229,9 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, onUplo
             <input
                 ref={inputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 className="hidden"
-                onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) onUpload(file);
-                    e.target.value = '';
-                }}
+                onChange={handleChange}
             />
         </div>
     );
