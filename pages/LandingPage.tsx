@@ -2306,7 +2306,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
-                    <span className="font-semibold text-white block">🇬🇧 TEXMART LTD</span>
+                    <span className={`font-semibold block ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>🇬🇧 TEXMART LTD</span>
                     284 CHASE ROAD A BLOCK UNIT, 2ND FLOOR, LONDON
                   </div>
                 </li>
@@ -2316,7 +2316,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
-                    <span className="font-semibold text-white block">🇹🇷 BAHÇELİEVLER/İSTANBUL-TÜRKİYE</span>
+                    <span className={`font-semibold block ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>🇹🇷 BAHÇELİEVLER/İSTANBUL-TÜRKİYE</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-2">
