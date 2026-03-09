@@ -1329,6 +1329,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 0) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 0)!.before} after={baData.find(b => b.idx === 0)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1355,6 +1358,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 1) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 1)!.before} after={baData.find(b => b.idx === 1)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1381,6 +1387,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 2) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 2)!.before} after={baData.find(b => b.idx === 2)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1407,6 +1416,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 3) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 3)!.before} after={baData.find(b => b.idx === 3)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1434,6 +1446,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 4) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 4)!.before} after={baData.find(b => b.idx === 4)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1461,6 +1476,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 5) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 5)!.before} after={baData.find(b => b.idx === 5)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1488,6 +1506,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 6) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 6)!.before} after={baData.find(b => b.idx === 6)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1515,6 +1536,9 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 7) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 7)!.before} after={baData.find(b => b.idx === 7)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
 
@@ -1542,40 +1566,16 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     </li>
                   ))}
                 </ul>
+                {baData.find(b => b.idx === 8) && (
+                  <div className="mt-5"><BeforeAfterCard before={baData.find(b => b.idx === 8)!.before} after={baData.find(b => b.idx === 8)!.after} label={language === 'tr' ? 'Öncesi / Sonrası' : 'Before / After'} theme={theme} language={language} /></div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Before/After Showcase */}
-      {baData.length > 0 && (() => {
-        const featureLabels = language === 'tr'
-          ? ['Çizimden Ürüne', 'Canlı Model', 'Video Oluşturma', 'Teknik Çizim', 'Pixshop', 'Fotomatik', 'Kolaj', 'Reklam Medyası', 'E-ticaret']
-          : ['Sketch to Product', 'Live Model', 'Video Creation', 'Tech Drawing', 'Pixshop', 'Fotomatik', 'Collage', 'Ad Media', 'E-commerce'];
 
-        return (
-          <section className="relative py-20 px-6 z-10">
-            <div className="max-w-7xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className={`text-3xl md:text-4xl font-bold ${textClass} mb-4`}>
-                  {language === 'tr' ? '✨ Öncesi / Sonrası' : '✨ Before / After'}
-                </h2>
-                <p className={`text-lg ${secondaryTextClass} max-w-2xl mx-auto`}>
-                  {language === 'tr'
-                    ? 'Yapay zeka ile dönüştürülen gerçek projelerimizi inceleyin'
-                    : 'Check out real projects transformed with AI'}
-                </p>
-              </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {baData.map((item, idx) => (
-                  <BeforeAfterCard key={idx} before={item.before} after={item.after} label={featureLabels[item.idx]} theme={theme} language={language} />
-                ))}
-              </div>
-            </div>
-          </section>
-        );
-      })()}
 
       {/* How It Works - 3 Steps */}
       < section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>

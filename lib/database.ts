@@ -112,9 +112,29 @@ export const saveGeneration = async (
   outputVideoUrl: string | null,
   settings: Record<string, any>
 ): Promise<void> => {
-  // ⚠️ DEVRE DIŞI BIRAKILDI - generations tablosuna kayıt yapılmıyor
-  console.log(`[DISABLED] saveGeneration skipped for user: ${userId}, type: ${type}`);
-  return;
+  try {
+    // Generations tablosuna metadata kaydet (istatistikler için)
+    // Görseller/videolar storage'a YÜKLENMİYOR — sadece kredi/tip/kullanıcı bilgisi
+    const { error } = await supabase.from('generations').insert({
+      user_id: userId,
+      type,
+      credits_used: creditsUsed,
+      input_url: null,   // Görsel kayıt devre dışı
+      result_url: null,  // Görsel kayıt devre dışı
+      video_url: null,   // Video kayıt devre dışı
+      settings,
+      created_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      console.error('❌ Generation kaydı hatası:', error);
+    } else {
+      console.log(`✅ Generation kaydedildi: ${type}, ${creditsUsed} kredi (görsel yok)`);
+    }
+  } catch (error) {
+    // Kayıt hatası ana işlemi engellemez
+    console.error('❌ Generation kayıt hatası (kritik değil):', error);
+  }
 };
 
 export const uploadImageToStorage = async (
@@ -122,8 +142,7 @@ export const uploadImageToStorage = async (
   userId: string,
   type: 'input' | 'output'
 ): Promise<string | null> => {
-  // ⚠️ DEVRE DIŞI BIRAKILDI - generations storage'a dosya yüklenmiyor
-  console.log(`[DISABLED] uploadImageToStorage skipped for user: ${userId}, type: ${type}`);
+  // ⚠️ DEVRE DIŞI - görseller storage'a yüklenmiyor
   return null;
 };
 
@@ -132,8 +151,7 @@ export const uploadBase64ToStorage = async (
   userId: string,
   type: 'input' | 'output' | 'video'
 ): Promise<string | null> => {
-  // ⚠️ DEVRE DIŞI BIRAKILDI - generations storage'a base64 yüklenmiyor
-  console.log(`[DISABLED] uploadBase64ToStorage skipped for user: ${userId}, type: ${type}`);
+  // ⚠️ DEVRE DIŞI - görseller storage'a yüklenmiyor
   return null;
 };
 
