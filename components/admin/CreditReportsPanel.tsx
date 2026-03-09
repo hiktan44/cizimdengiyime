@@ -16,9 +16,11 @@ import { useI18n, useTranslation, TranslationRecord } from '../../lib/i18n';
 // ==========================================
 const trTranslations = {
     title: 'Kredi Kullanım Raporları',
-    subtitle: 'Admin kullanıcılar hariç tüm kredi aktiviteleri',
+    subtitle: 'Tüm kredi aktiviteleri',
     loading: 'Veriler yükleniyor...',
     noData: 'Seçilen tarih aralığında veri bulunamadı.',
+    includeAdmins: 'Admin Dahil',
+    excludeAdmins: 'Admin Hariç',
     filters: {
         daily: 'Bugün',
         weekly: 'Bu Hafta',
@@ -89,8 +91,10 @@ const trTranslations = {
 
 const enTranslations: typeof trTranslations = {
     title: 'Credit Usage Reports',
-    subtitle: 'All credit activities excluding admin users',
+    subtitle: 'All credit activities',
     loading: 'Loading data...',
+    includeAdmins: 'Include Admins',
+    excludeAdmins: 'Exclude Admins',
     noData: 'No data found for the selected date range.',
     filters: {
         daily: 'Today',
@@ -222,6 +226,7 @@ export const CreditReportsPanel: React.FC = () => {
     const [period, setPeriod] = useState<PeriodKey>('monthly');
     const [customStart, setCustomStart] = useState('');
     const [customEnd, setCustomEnd] = useState('');
+    const [excludeAdmins, setExcludeAdmins] = useState(false);
     const [loading, setLoading] = useState(true);
 
     // Data state
@@ -248,10 +253,10 @@ export const CreditReportsPanel: React.FC = () => {
                 : getDateRange(period);
 
             const [gens, dist, trendData, top] = await Promise.all([
-                getCreditUsageReport(range.start, range.end),
-                getCreditDistributionByType(range.start, range.end),
-                getDailyCreditTrend(range.start, range.end),
-                getTopCreditUsers(range.start, range.end, 20),
+                getCreditUsageReport(range.start, range.end, excludeAdmins),
+                getCreditDistributionByType(range.start, range.end, excludeAdmins),
+                getDailyCreditTrend(range.start, range.end, excludeAdmins),
+                getTopCreditUsers(range.start, range.end, 20, excludeAdmins),
             ]);
 
             setAllGenerations(gens);
@@ -266,9 +271,9 @@ export const CreditReportsPanel: React.FC = () => {
             const monthRange = getDateRange('monthly');
 
             const [todayGens, weekGens, monthGens] = await Promise.all([
-                getCreditUsageReport(todayRange.start, todayRange.end),
-                getCreditUsageReport(weekRange.start, weekRange.end),
-                getCreditUsageReport(monthRange.start, monthRange.end),
+                getCreditUsageReport(todayRange.start, todayRange.end, excludeAdmins),
+                getCreditUsageReport(weekRange.start, weekRange.end, excludeAdmins),
+                getCreditUsageReport(monthRange.start, monthRange.end, excludeAdmins),
             ]);
 
             setTodayCredits(todayGens.reduce((s, g) => s + g.credits_used, 0));
@@ -279,11 +284,11 @@ export const CreditReportsPanel: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [period, customStart, customEnd]);
+    }, [period, customStart, customEnd, excludeAdmins]);
 
     useEffect(() => {
         if (period !== 'custom') fetchData();
-    }, [period]);
+    }, [period, excludeAdmins]);
 
     // Active users count
     const activeUserCount = useMemo(() => {
@@ -457,6 +462,19 @@ export const CreditReportsPanel: React.FC = () => {
                     <h2 className="text-2xl font-bold text-white">{t.title}</h2>
                     <p className="text-slate-400 text-sm mt-1">{t.subtitle}</p>
                 </div>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setExcludeAdmins(!excludeAdmins)}
+                        className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none ${excludeAdmins ? 'bg-amber-600' : 'bg-cyan-600'
+                            }`}
+                    >
+                        <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${excludeAdmins ? 'translate-x-8' : 'translate-x-1'
+                            }`} />
+                    </button>
+                    <span className="text-sm text-slate-300 whitespace-nowrap">
+                        {excludeAdmins ? t.excludeAdmins : t.includeAdmins}
+                    </span>
+                </div>
                 <button
                     onClick={handleExportCSV}
                     disabled={!allGenerations.length}
@@ -492,8 +510,8 @@ export const CreditReportsPanel: React.FC = () => {
                             key={p}
                             onClick={() => setPeriod(p)}
                             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${period === p
-                                    ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
-                                    : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
+                                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg'
+                                : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 hover:text-white'
                                 }`}
                         >
                             {(t.filters as any)[p]}
@@ -575,9 +593,9 @@ export const CreditReportsPanel: React.FC = () => {
                                             <tr key={user.user_id} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
                                                 <td className="py-3 px-3">
                                                     <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${i === 0 ? 'bg-amber-500/20 text-amber-400' :
-                                                            i === 1 ? 'bg-slate-400/20 text-slate-300' :
-                                                                i === 2 ? 'bg-orange-500/20 text-orange-400' :
-                                                                    'bg-slate-700 text-slate-400'
+                                                        i === 1 ? 'bg-slate-400/20 text-slate-300' :
+                                                            i === 2 ? 'bg-orange-500/20 text-orange-400' :
+                                                                'bg-slate-700 text-slate-400'
                                                         }`}>
                                                         {i + 1}
                                                     </span>

@@ -667,12 +667,23 @@ export interface TopCreditUser {
   most_used_type: string;
 }
 
-// Belirli tarih aralığında tüm generation'ları getir
+// Belirli tarih aralığında generation'ları getir (opsiyonel admin filtresi)
 export const getCreditUsageReport = async (
   startDate: string,
-  endDate: string
+  endDate: string,
+  excludeAdmins: boolean = false
 ): Promise<CreditReportGeneration[]> => {
   try {
+    // Admin filtresi aktifse admin ID'lerini al
+    let adminIds: string[] = [];
+    if (excludeAdmins) {
+      const { data: adminProfiles } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('is_admin', true);
+      adminIds = (adminProfiles || []).map((p: any) => p.id);
+    }
+
     // Tüm generation'ları getir (tarih filtreli)
     const { data, error } = await supabase
       .from('generations')
@@ -686,7 +697,7 @@ export const getCreditUsageReport = async (
 
     if (error) throw error;
 
-    return (data || []).map((g: any) => ({
+    const all = (data || []).map((g: any) => ({
       id: g.id,
       user_id: g.user_id,
       user_email: g.profiles?.email || 'Bilinmiyor',
@@ -695,19 +706,22 @@ export const getCreditUsageReport = async (
       credits_used: g.credits_used || 0,
       created_at: g.created_at,
     }));
+
+    return excludeAdmins ? all.filter(g => !adminIds.includes(g.user_id)) : all;
   } catch (error) {
     console.error('Error fetching credit usage report:', error);
     return [];
   }
 };
 
-// Operasyon tipine göre kredi dağılımı (admin hariç)
+// Operasyon tipine göre kredi dağılımı
 export const getCreditDistributionByType = async (
   startDate: string,
-  endDate: string
+  endDate: string,
+  excludeAdmins: boolean = false
 ): Promise<TypeDistribution[]> => {
   try {
-    const generations = await getCreditUsageReport(startDate, endDate);
+    const generations = await getCreditUsageReport(startDate, endDate, excludeAdmins);
 
     const typeMap = new Map<string, { total_credits: number; count: number }>();
     for (const gen of generations) {
@@ -726,13 +740,14 @@ export const getCreditDistributionByType = async (
   }
 };
 
-// Günlük kredi kullanım trendi (admin hariç)
+// Günlük kredi kullanım trendi
 export const getDailyCreditTrend = async (
   startDate: string,
-  endDate: string
+  endDate: string,
+  excludeAdmins: boolean = false
 ): Promise<DailyTrend[]> => {
   try {
-    const generations = await getCreditUsageReport(startDate, endDate);
+    const generations = await getCreditUsageReport(startDate, endDate, excludeAdmins);
 
     const dailyMap = new Map<string, { total_credits: number; count: number }>();
     for (const gen of generations) {
@@ -752,14 +767,15 @@ export const getDailyCreditTrend = async (
   }
 };
 
-// En çok kredi kullanan kullanıcılar (admin hariç)
+// En çok kredi kullanan kullanıcılar
 export const getTopCreditUsers = async (
   startDate: string,
   endDate: string,
-  limit: number = 20
+  limit: number = 20,
+  excludeAdmins: boolean = false
 ): Promise<TopCreditUser[]> => {
   try {
-    const generations = await getCreditUsageReport(startDate, endDate);
+    const generations = await getCreditUsageReport(startDate, endDate, excludeAdmins);
 
     const userMap = new Map<string, {
       email: string;
