@@ -119,9 +119,9 @@ export const saveGeneration = async (
       user_id: userId,
       type,
       credits_used: creditsUsed,
-      input_url: null,   // Görsel kayıt devre dışı
-      result_url: null,  // Görsel kayıt devre dışı
-      video_url: null,   // Video kayıt devre dışı
+      input_image_url: null,    // Görsel kayıt devre dışı
+      output_image_url: null,   // Görsel kayıt devre dışı
+      output_video_url: null,   // Video kayıt devre dışı
       settings,
       created_at: new Date().toISOString(),
     });
@@ -129,7 +129,7 @@ export const saveGeneration = async (
     if (error) {
       console.error('❌ Generation kaydı hatası:', error);
     } else {
-      console.log(`✅ Generation kaydedildi: ${type}, ${creditsUsed} kredi (görsel yok)`);
+      console.log(`✅ Generation kaydedildi: ${type}, ${creditsUsed} kredi`);
     }
   } catch (error) {
     // Kayıt hatası ana işlemi engellemez
