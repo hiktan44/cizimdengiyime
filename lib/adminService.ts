@@ -667,22 +667,14 @@ export interface TopCreditUser {
   most_used_type: string;
 }
 
-// Belirli tarih aralığında admin HARİÇ tüm generation'ları getir
+// Belirli tarih aralığında tüm generation'ları getir
 export const getCreditUsageReport = async (
   startDate: string,
   endDate: string
 ): Promise<CreditReportGeneration[]> => {
   try {
-    // Admin user ID'lerini al (is_admin boolean alanı ile)
-    const { data: adminProfiles } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('is_admin', true);
-
-    const adminIds = (adminProfiles || []).map((p: any) => p.id);
-
     // Tüm generation'ları getir (tarih filtreli)
-    let query = supabase
+    const { data, error } = await supabase
       .from('generations')
       .select(`
         id, user_id, type, credits_used, created_at,
@@ -692,23 +684,17 @@ export const getCreditUsageReport = async (
       .lte('created_at', endDate)
       .order('created_at', { ascending: false });
 
-    const { data, error } = await query;
     if (error) throw error;
 
-    // Admin kullanıcıları filtrele (client-side)
-    const filtered = (data || [])
-      .filter((g: any) => !adminIds.includes(g.user_id))
-      .map((g: any) => ({
-        id: g.id,
-        user_id: g.user_id,
-        user_email: g.profiles?.email || 'Bilinmiyor',
-        user_name: g.profiles?.full_name || null,
-        type: g.type,
-        credits_used: g.credits_used || 0,
-        created_at: g.created_at,
-      }));
-
-    return filtered;
+    return (data || []).map((g: any) => ({
+      id: g.id,
+      user_id: g.user_id,
+      user_email: g.profiles?.email || 'Bilinmiyor',
+      user_name: g.profiles?.full_name || null,
+      type: g.type,
+      credits_used: g.credits_used || 0,
+      created_at: g.created_at,
+    }));
   } catch (error) {
     console.error('Error fetching credit usage report:', error);
     return [];
