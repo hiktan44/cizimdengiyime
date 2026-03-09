@@ -828,9 +828,9 @@ export const getTopCreditUsers = async (
 
 export interface BeforeAfterImage {
   id: string;
+  feature_num: number;
+  side: 'before' | 'after';
   image_url: string;
-  type: string;
-  order_index: number;
   is_active: boolean;
   created_at: string;
 }
@@ -844,15 +844,15 @@ export const uploadBeforeAfterImage = async (
   try {
     const fileExt = file.name.split('.').pop();
     const uniqueFileName = `ba-${featureNum}-${side}-${Date.now()}.${fileExt}`;
-    const dbType = `ba_${featureNum}_${side}`;
 
-    console.log(`📤 Uploading BA image: ${dbType}`, uniqueFileName);
+    console.log(`📤 Uploading BA image: feature ${featureNum} ${side}`, uniqueFileName);
 
-    // Eski kaydı sil
+    // Eski kaydı sil (UNIQUE constraint olduğu için upsert yerine delete+insert)
     const { data: existing } = await supabase
-      .from('showcase_images')
+      .from('before_after_images')
       .select('id, image_url')
-      .eq('type', dbType)
+      .eq('feature_num', featureNum)
+      .eq('side', side)
       .limit(1);
 
     if (existing && existing.length > 0) {
@@ -862,7 +862,7 @@ export const uploadBeforeAfterImage = async (
           await supabase.storage.from('showcase-images').remove([urlParts[1]]);
         }
       } catch (e) { /* ignore */ }
-      await supabase.from('showcase_images').delete().eq('id', existing[0].id);
+      await supabase.from('before_after_images').delete().eq('id', existing[0].id);
     }
 
     // Yeni dosyayı yükle
@@ -877,10 +877,10 @@ export const uploadBeforeAfterImage = async (
     const imageUrl = urlData.publicUrl;
 
     // Database kaydı oluştur
-    const { error: dbError } = await supabase.from('showcase_images').insert({
+    const { error: dbError } = await supabase.from('before_after_images').insert({
+      feature_num: featureNum,
+      side,
       image_url: imageUrl,
-      type: dbType,
-      order_index: featureNum,
       is_active: true,
     });
 
@@ -898,24 +898,18 @@ export const uploadBeforeAfterImage = async (
 export const getPublicBeforeAfterImages = async (): Promise<{ featureNum: number; before: string; after: string }[]> => {
   try {
     const { data, error } = await supabase
-      .from('showcase_images')
+      .from('before_after_images')
       .select('*')
-      .like('type', 'ba_%')
       .eq('is_active', true)
-      .order('order_index', { ascending: true });
+      .order('feature_num', { ascending: true });
 
     if (error) throw error;
 
     // Pair before/after
     const pairs = new Map<number, { before?: string; after?: string }>();
     for (const item of data || []) {
-      const match = item.type.match(/ba_(\d+)_(before|after)/);
-      if (match) {
-        const num = parseInt(match[1]);
-        const side = match[2] as 'before' | 'after';
-        if (!pairs.has(num)) pairs.set(num, {});
-        pairs.get(num)![side] = item.image_url;
-      }
+      if (!pairs.has(item.feature_num)) pairs.set(item.feature_num, {});
+      pairs.get(item.feature_num)![item.side as 'before' | 'after'] = item.image_url;
     }
 
     // Sadece hem before hem after olanları döndür
@@ -936,11 +930,11 @@ export const getPublicBeforeAfterImages = async (): Promise<{ featureNum: number
 // Delete Before/After image
 export const deleteBeforeAfterImage = async (featureNum: number, side: 'before' | 'after'): Promise<boolean> => {
   try {
-    const dbType = `ba_${featureNum}_${side}`;
     const { data } = await supabase
-      .from('showcase_images')
+      .from('before_after_images')
       .select('id, image_url')
-      .eq('type', dbType)
+      .eq('feature_num', featureNum)
+      .eq('side', side)
       .limit(1);
 
     if (data && data.length > 0) {
@@ -950,7 +944,7 @@ export const deleteBeforeAfterImage = async (featureNum: number, side: 'before' 
           await supabase.storage.from('showcase-images').remove([urlParts[1]]);
         }
       } catch (e) { /* ignore */ }
-      await supabase.from('showcase_images').delete().eq('id', data[0].id);
+      await supabase.from('before_after_images').delete().eq('id', data[0].id);
     }
     return true;
   } catch (error) {
@@ -958,3 +952,4 @@ export const deleteBeforeAfterImage = async (featureNum: number, side: 'before' 
     return false;
   }
 };
+
