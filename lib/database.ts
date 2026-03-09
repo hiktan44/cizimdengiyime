@@ -1,4 +1,5 @@
 import { supabase, CREDIT_COSTS, Generation } from '../lib/supabase';
+import { isR2Configured, uploadBase64ToR2, uploadUrlToR2, uploadToR2 } from './r2Service';
 
 export const checkAndDeductCredits = async (
   userId: string,
@@ -113,15 +114,48 @@ export const saveGeneration = async (
   settings: Record<string, any>
 ): Promise<void> => {
   try {
-    // Generations tablosuna metadata kaydet (istatistikler için)
-    // Görseller/videolar storage'a YÜKLENMİYOR — sadece kredi/tip/kullanıcı bilgisi
+    // Görselleri Cloudflare R2'ye upload et (yapılandırılmışsa)
+    let r2InputUrl: string | null = null;
+    let r2OutputUrl: string | null = null;
+    let r2VideoUrl: string | null = null;
+
+    if (isR2Configured()) {
+      // Input görsel (URL ise R2'ye taşı)
+      if (inputImageUrl) {
+        if (inputImageUrl.startsWith('data:')) {
+          r2InputUrl = await uploadBase64ToR2(inputImageUrl, userId, 'input');
+        } else if (inputImageUrl.startsWith('http')) {
+          r2InputUrl = await uploadUrlToR2(inputImageUrl, userId, 'input');
+        }
+      }
+
+      // Output görsel
+      if (outputImageUrl) {
+        if (outputImageUrl.startsWith('data:')) {
+          r2OutputUrl = await uploadBase64ToR2(outputImageUrl, userId, 'output');
+        } else if (outputImageUrl.startsWith('http')) {
+          r2OutputUrl = await uploadUrlToR2(outputImageUrl, userId, 'output');
+        }
+      }
+
+      // Video
+      if (outputVideoUrl) {
+        if (outputVideoUrl.startsWith('data:')) {
+          r2VideoUrl = await uploadBase64ToR2(outputVideoUrl, userId, 'video');
+        } else if (outputVideoUrl.startsWith('http')) {
+          r2VideoUrl = await uploadUrlToR2(outputVideoUrl, userId, 'video');
+        }
+      }
+    }
+
+    // Generations tablosuna kaydet (R2 URL'leri veya null)
     const { error } = await supabase.from('generations').insert({
       user_id: userId,
       type,
       credits_used: creditsUsed,
-      input_image_url: null,    // Görsel kayıt devre dışı
-      output_image_url: null,   // Görsel kayıt devre dışı
-      output_video_url: null,   // Video kayıt devre dışı
+      input_image_url: r2InputUrl,
+      output_image_url: r2OutputUrl,
+      output_video_url: r2VideoUrl,
       settings,
       created_at: new Date().toISOString(),
     });
@@ -129,7 +163,8 @@ export const saveGeneration = async (
     if (error) {
       console.error('❌ Generation kaydı hatası:', error);
     } else {
-      console.log(`✅ Generation kaydedildi: ${type}, ${creditsUsed} kredi`);
+      const hasMedia = r2InputUrl || r2OutputUrl || r2VideoUrl;
+      console.log(`✅ Generation kaydedildi: ${type}, ${creditsUsed} kredi${hasMedia ? ' (R2 media ✓)' : ''}`);
     }
   } catch (error) {
     // Kayıt hatası ana işlemi engellemez
@@ -142,7 +177,19 @@ export const uploadImageToStorage = async (
   userId: string,
   type: 'input' | 'output'
 ): Promise<string | null> => {
-  // ⚠️ DEVRE DIŞI - görseller storage'a yüklenmiyor
+  // R2 yapılandırılmışsa R2'ye yükle
+  if (isR2Configured()) {
+    try {
+      const buffer = await file.arrayBuffer();
+      const timestamp = Date.now();
+      const ext = file.name.split('.').pop() || 'png';
+      const fileName = `generations/${userId}/${type}_${timestamp}.${ext}`;
+      return await uploadToR2(buffer, fileName, file.type || 'image/png');
+    } catch (error) {
+      console.error('❌ R2 file upload hatası:', error);
+      return null;
+    }
+  }
   return null;
 };
 
@@ -151,7 +198,10 @@ export const uploadBase64ToStorage = async (
   userId: string,
   type: 'input' | 'output' | 'video'
 ): Promise<string | null> => {
-  // ⚠️ DEVRE DIŞI - görseller storage'a yüklenmiyor
+  // R2 yapılandırılmışsa R2'ye yükle
+  if (isR2Configured()) {
+    return await uploadBase64ToR2(base64Data, userId, type);
+  }
   return null;
 };
 
