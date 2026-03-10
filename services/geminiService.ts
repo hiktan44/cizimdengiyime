@@ -529,11 +529,8 @@ export const generateVideoFromImage = async (
         console.warn(`⚠️ durationSeconds ${settings.durationSecs} geçersiz, ${durationSeconds}'e yuvarlandı`);
     }
 
-    // Google Veo API Constraint: When using reference images, durationSeconds must be 8.
-    const apiDuration = 8;
-    if (durationSeconds !== 8) {
-        console.warn(`⚠️ API Kısıtlaması: Görselden video üretimi (Image-to-Video) için Veo API sadece 8 saniyeyi destekler. Süre 8s olarak zorlanıyor.`);
-    }
+    // Veo 3.1 API: Image-to-Video 4, 6, 8 saniye destekliyor
+    const apiDuration = durationSeconds;
 
     // Enhanced fashion video prompt
     const enhancedPrompt = settings.prompt + ' Professional fashion photography lighting, magazine quality. Professional fashion video. No audio, no music, no sound effects. Silent video only.';
@@ -541,7 +538,7 @@ export const generateVideoFromImage = async (
     // Negative prompt for quality filtering
     const negativePrompt = 'blurry, low quality, distorted, deformed, ugly, amateur, watermark, text overlay, logo, rapid movement, shaky camera, horror, violent, cartoon, drawing';
 
-    console.log(`Video üretimi başlatıldı - Çözünürlük: ${effectiveResolution}, İstenen Süre: ${durationSeconds}s (API: ${apiDuration}s)`);
+    console.log(`Video üretimi başlatıldı - Çözünürlük: ${effectiveResolution}, Süre: ${apiDuration}s`);
 
     const MAX_RETRIES = 2;
     let lastError: Error | null = null;
