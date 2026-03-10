@@ -11,6 +11,7 @@ const FEATURE_LABELS_TR = [
     '7. Kolaj Oluşturma',
     '8. Reklam Medyası',
     '9. E-ticaret Çözümleri',
+    '10. 🧩 Widget Sanal Deneme',
 ];
 
 interface BeforeAfterPanelProps {
@@ -113,16 +114,27 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                     const featureNum = idx + 1;
                     const beforeKey = `ba_feature${featureNum}_before`;
                     const afterKey = `ba_feature${featureNum}_after`;
+                    const isWidget = featureNum === 10;
 
                     return (
-                        <div key={featureNum} className="bg-slate-800/60 rounded-xl p-5 border border-white/5">
-                            <h4 className="text-white font-semibold mb-4 flex items-center gap-2">
-                                <span className="w-7 h-7 bg-cyan-500/20 text-cyan-400 rounded-lg flex items-center justify-center text-xs font-bold">
+                        <div key={featureNum} className={`rounded-xl p-5 border ${isWidget ? 'bg-gradient-to-r from-purple-900/30 to-orange-900/30 border-purple-500/30' : 'bg-slate-800/60 border-white/5'}`}>
+                            <h4 className="text-white font-semibold mb-1 flex items-center gap-2">
+                                <span className={`w-7 h-7 ${isWidget ? 'bg-gradient-to-r from-purple-500/30 to-orange-500/30 text-purple-400' : 'bg-cyan-500/20 text-cyan-400'} rounded-lg flex items-center justify-center text-xs font-bold`}>
                                     {featureNum}
                                 </span>
                                 {label}
+                                {isWidget && (
+                                    <span className="ml-auto text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30">Landing Page Widget</span>
+                                )}
                             </h4>
-                            <div className="grid grid-cols-2 gap-4">
+                            {isWidget && (
+                                <p className="text-xs text-slate-400 mb-3 ml-9">
+                                    {language === 'tr'
+                                        ? 'Bu görseller landing page\'deki "Sitenize Widget Yerleştirin" bölümünün öncesi/sonrası kutusunda gösterilir.'
+                                        : 'These images are shown in the before/after box of the "Add Widget to Your Site" section on the landing page.'}
+                                </p>
+                            )}
+                            <div className={`grid grid-cols-2 gap-4 ${!isWidget ? 'mt-3' : ''}`}>
                                 <ImageUploadBox
                                     label={language === 'tr' ? 'Öncesi' : 'Before'}
                                     imageUrl={images[beforeKey]}

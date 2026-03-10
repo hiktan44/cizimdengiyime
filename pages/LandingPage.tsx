@@ -1458,59 +1458,72 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </div>
 
             {/* Right: Before/After Comparison */}
-            <div className="relative">
-              <div className={`rounded-3xl overflow-hidden border-2 ${theme === 'dark' ? 'border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80' : 'border-slate-200 bg-gradient-to-br from-white to-slate-50'} shadow-2xl`}>
-                {/* Before/After Container */}
-                <div className="grid grid-cols-2">
-                  {/* Before */}
-                  <div className="relative">
-                    <div className={`aspect-[3/4] ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-slate-100'} flex items-center justify-center`}>
-                      <div className="text-center px-4">
-                        <svg className={`w-16 h-16 mx-auto mb-3 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p className={`text-sm font-medium ${secondaryTextClass}`}>{t.widgetPromo.beforeDesc}</p>
+            {(() => {
+              const widgetBA = baData.find(b => b.idx === 9);
+              return (
+                <div className="relative">
+                  <div className={`rounded-3xl overflow-hidden border-2 ${theme === 'dark' ? 'border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80' : 'border-slate-200 bg-gradient-to-br from-white to-slate-50'} shadow-2xl`}>
+                    {/* Before/After Container */}
+                    <div className="grid grid-cols-2">
+                      {/* Before */}
+                      <div className="relative">
+                        {widgetBA?.before ? (
+                          <img src={widgetBA.before} alt="Before" className="aspect-[3/4] w-full object-cover" />
+                        ) : (
+                          <div className={`aspect-[3/4] ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-slate-100'} flex items-center justify-center`}>
+                            <div className="text-center px-4">
+                              <svg className={`w-16 h-16 mx-auto mb-3 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <p className={`text-sm font-medium ${secondaryTextClass}`}>{t.widgetPromo.beforeDesc}</p>
+                            </div>
+                          </div>
+                        )}
+                        <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                          {t.widgetPromo.before}
+                        </div>
+                      </div>
+
+                      {/* After */}
+                      <div className="relative">
+                        {widgetBA?.after ? (
+                          <img src={widgetBA.after} alt="After" className="aspect-[3/4] w-full object-cover" />
+                        ) : (
+                          <div className={`aspect-[3/4] bg-gradient-to-br ${theme === 'dark' ? 'from-purple-900/30 to-orange-900/30' : 'from-purple-50 to-orange-50'} flex items-center justify-center`}>
+                            <div className="text-center px-4">
+                              <svg className="w-16 h-16 mx-auto mb-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{t.widgetPromo.afterDesc}</p>
+                            </div>
+                          </div>
+                        )}
+                        <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                          {t.widgetPromo.after}
+                        </div>
                       </div>
                     </div>
-                    <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                      {t.widgetPromo.before}
-                    </div>
-                  </div>
 
-                  {/* After */}
-                  <div className="relative">
-                    <div className={`aspect-[3/4] bg-gradient-to-br ${theme === 'dark' ? 'from-purple-900/30 to-orange-900/30' : 'from-purple-50 to-orange-50'} flex items-center justify-center`}>
-                      <div className="text-center px-4">
-                        <svg className="w-16 h-16 mx-auto mb-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    {/* Divider Line */}
+                    <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-gradient-to-b from-purple-500 via-white to-orange-500 z-10">
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-purple-500">
+                        <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                         </svg>
-                        <p className={`text-sm font-medium ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{t.widgetPromo.afterDesc}</p>
                       </div>
                     </div>
-                    <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                      {t.widgetPromo.after}
+                  </div>
+
+                  {/* Widget Preview Badge */}
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20">
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-xl ${theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'}`}>
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className={`text-xs font-semibold ${textClass}`}>Fasheone AI Widget</span>
                     </div>
                   </div>
                 </div>
-
-                {/* Divider Line */}
-                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-gradient-to-b from-purple-500 via-white to-orange-500 z-10">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-purple-500">
-                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Widget Preview Badge */}
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20">
-                <div className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-xl ${theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'}`}>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className={`text-xs font-semibold ${textClass}`}>Fasheone AI Widget</span>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
         </div>
       </section>
