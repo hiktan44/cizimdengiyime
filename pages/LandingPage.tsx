@@ -1595,6 +1595,176 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section>
 
+      {/* Chrome Extension Section */}
+      <section id="chrome-extension" className={`py-20 px-6 z-10 relative overflow-hidden`}>
+        {/* Background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full ${theme === 'dark' ? 'bg-gradient-to-br from-green-500/5 via-blue-500/5 to-yellow-500/5' : 'bg-gradient-to-br from-green-100/30 via-blue-100/30 to-yellow-100/30'} blur-3xl`}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-full px-5 py-2 mb-6">
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="#4285F4" />
+                <circle cx="12" cy="12" r="4" fill="white" />
+                <path d="M12 2 A10 10 0 0 1 21.5 7.5 L12 12 Z" fill="#EA4335" />
+                <path d="M21.5 7.5 A10 10 0 0 1 21.5 16.5 L12 12 Z" fill="#FBBC05" />
+                <path d="M21.5 16.5 A10 10 0 0 1 2.5 16.5 L12 12 Z" fill="#34A853" />
+                <path d="M2.5 16.5 A10 10 0 0 1 2.5 7.5 L12 12 Z" fill="#4285F4" />
+                <path d="M2.5 7.5 A10 10 0 0 1 12 2 L12 12 Z" fill="#EA4335" />
+                <circle cx="12" cy="12" r="4" fill="white" />
+                <circle cx="12" cy="12" r="2" fill="#4285F4" />
+              </svg>
+              <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-green-400' : 'text-green-700'}`}>Chrome Extension</span>
+              <span className="text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-0.5 rounded-full">{t.chromeExtension.badge}</span>
+            </div>
+            <h2 className={`text-3xl md:text-5xl font-bold ${textClass} mb-5`}>
+              {t.chromeExtension.title}
+            </h2>
+            <p className={`text-lg md:text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
+              {t.chromeExtension.subtitle}
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Visual Card */}
+            <div className="relative group">
+              <div className={`relative rounded-3xl overflow-hidden border-2 ${theme === 'dark' ? 'border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80' : 'border-slate-200 bg-gradient-to-br from-white to-slate-50'} p-8 md:p-10 shadow-2xl hover:shadow-green-500/10 transition-all duration-500`}>
+                {/* Chrome Browser Mockup */}
+                <div className={`rounded-xl overflow-hidden border ${theme === 'dark' ? 'border-slate-600/50' : 'border-slate-200'}`}>
+                  {/* Browser Tab Bar */}
+                  <div className={`flex items-center gap-2 px-4 py-3 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}>
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <div className={`flex-1 text-center text-xs ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} flex items-center justify-center gap-2`}>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                      <span>chrome.google.com/webstore</span>
+                    </div>
+                  </div>
+                  {/* Content Area */}
+                  <div className={`p-6 md:p-8 ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <div className="flex items-start gap-4 mb-6">
+                      <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <svg className="w-10 h-10" viewBox="0 0 48 48">
+                          <path d="M44 24c0 11.044-8.956 20-20 20S4 35.044 4 24 12.956 4 24 4s20 8.956 20 20z" fill="#fff" />
+                          <path d="M24 4C12.956 4 4 12.956 4 24h12.8c0-3.976 3.224-7.2 7.2-7.2s7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4z" fill="#EA4335" />
+                          <path d="M4 24c0 11.044 8.956 20 20 20V31.2c-3.976 0-7.2-3.224-7.2-7.2H4z" fill="#4285F4" />
+                          <path d="M24 44c11.044 0 20-8.956 20-20H31.2c0 3.976-3.224 7.2-7.2 7.2V44z" fill="#34A853" />
+                          <path d="M31.2 24c0 3.976-3.224 7.2-7.2 7.2V44c11.044 0 20-8.956 20-20H31.2z" fill="#34A853" />
+                          <path d="M16.8 24c0-3.976 3.224-7.2 7.2-7.2V4C12.956 4 4 12.956 4 24h12.8z" fill="#EA4335" />
+                          <path d="M24 16.8c3.976 0 7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4v12.8z" fill="#FBBC05" />
+                          <circle cx="24" cy="24" r="7.2" fill="white" />
+                          <circle cx="24" cy="24" r="4.8" fill="#4285F4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className={`text-lg font-bold ${textClass}`}>Fasheone AI - Sanal Deneme</h3>
+                        <p className={`text-sm ${secondaryTextClass} mt-1`}>FASHEONE</p>
+                        <div className="flex items-center gap-1 mt-2">
+                          {[...Array(5)].map((_, i) => (
+                            <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p className={`text-sm ${descriptionTextClass} leading-relaxed`}>
+                      {t.chromeExtension.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Floating Elements */}
+                <div className="absolute -top-3 -right-3 w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </div>
+                <div className="absolute -bottom-2 -left-2 w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Steps & CTA */}
+            <div className="space-y-6">
+              {/* Step 1 */}
+              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/5`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-xl font-black text-white">01</span>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step1Title}</h3>
+                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step1Desc}</p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-xl font-black text-white">02</span>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step2Title}</h3>
+                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step2Desc}</p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-xl font-black text-white">03</span>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step3Title}</h3>
+                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step3Desc}</p>
+                </div>
+              </div>
+
+              {/* Features List */}
+              <div className={`grid grid-cols-2 gap-3 mt-4`}>
+                {t.chromeExtension.features.map((feature: string, i: number) => (
+                  <div key={i} className={`flex items-center gap-2 text-sm ${secondaryTextClass}`}>
+                    <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Install Button */}
+              <a
+                href="https://chromewebstore.google.com/detail/blpelhnphmmaojdoanjjofhbggapkllk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5 group w-full justify-center md:w-auto"
+              >
+                <svg className="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="#F44336" d="M24 4C16.18 4 9.47 8.72 6.73 15.5l8.56 14.83A11.96 11.96 0 0024 36c1.77 0 3.44-.39 4.95-1.07L37.5 21H24" />
+                  <path fill="#FFC107" d="M37.5 21c.93-2.07 1.5-4.35 1.5-6.78 0-3.82-1.34-7.33-3.57-10.09L26.95 18.96A11.93 11.93 0 0136 24c0 2.24-.63 4.33-1.7 6.13L24.17 45.87" />
+                  <path fill="#4CAF50" d="M6.73 15.5A19.93 19.93 0 004 24c0 9.14 6.12 16.85 14.5 19.26L26.95 18.96l-8.39-4.46L6.73 15.5z" />
+                  <circle fill="#2196F3" cx="24" cy="24" r="8" />
+                  <circle fill="#FAFAFA" cx="24" cy="24" r="3.5" />
+                </svg>
+                {t.chromeExtension.installButton}
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Use Cases - Güçlü Özellikler */}
       <section className="py-20 px-6 z-10 relative">
         <div className="max-w-7xl mx-auto">
@@ -2340,175 +2510,6 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section >
 
-      {/* Chrome Extension Section */}
-      <section id="chrome-extension" className={`py-20 px-6 z-10 relative overflow-hidden`}>
-        {/* Background decoration */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full ${theme === 'dark' ? 'bg-gradient-to-br from-green-500/5 via-blue-500/5 to-yellow-500/5' : 'bg-gradient-to-br from-green-100/30 via-blue-100/30 to-yellow-100/30'} blur-3xl`}></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto relative">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-full px-5 py-2 mb-6">
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" fill="#4285F4" />
-                <circle cx="12" cy="12" r="4" fill="white" />
-                <path d="M12 2 A10 10 0 0 1 21.5 7.5 L12 12 Z" fill="#EA4335" />
-                <path d="M21.5 7.5 A10 10 0 0 1 21.5 16.5 L12 12 Z" fill="#FBBC05" />
-                <path d="M21.5 16.5 A10 10 0 0 1 2.5 16.5 L12 12 Z" fill="#34A853" />
-                <path d="M2.5 16.5 A10 10 0 0 1 2.5 7.5 L12 12 Z" fill="#4285F4" />
-                <path d="M2.5 7.5 A10 10 0 0 1 12 2 L12 12 Z" fill="#EA4335" />
-                <circle cx="12" cy="12" r="4" fill="white" />
-                <circle cx="12" cy="12" r="2" fill="#4285F4" />
-              </svg>
-              <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-green-400' : 'text-green-700'}`}>Chrome Extension</span>
-              <span className="text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-0.5 rounded-full">{t.chromeExtension.badge}</span>
-            </div>
-            <h2 className={`text-3xl md:text-5xl font-bold ${textClass} mb-5`}>
-              {t.chromeExtension.title}
-            </h2>
-            <p className={`text-lg md:text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
-              {t.chromeExtension.subtitle}
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Visual Card */}
-            <div className="relative group">
-              <div className={`relative rounded-3xl overflow-hidden border-2 ${theme === 'dark' ? 'border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80' : 'border-slate-200 bg-gradient-to-br from-white to-slate-50'} p-8 md:p-10 shadow-2xl hover:shadow-green-500/10 transition-all duration-500`}>
-                {/* Chrome Browser Mockup */}
-                <div className={`rounded-xl overflow-hidden border ${theme === 'dark' ? 'border-slate-600/50' : 'border-slate-200'}`}>
-                  {/* Browser Tab Bar */}
-                  <div className={`flex items-center gap-2 px-4 py-3 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}>
-                    <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                    </div>
-                    <div className={`flex-1 text-center text-xs ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} flex items-center justify-center gap-2`}>
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                      <span>chrome.google.com/webstore</span>
-                    </div>
-                  </div>
-                  {/* Content Area */}
-                  <div className={`p-6 md:p-8 ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'}`}>
-                    <div className="flex items-start gap-4 mb-6">
-                      <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-lg">
-                        <svg className="w-10 h-10" viewBox="0 0 48 48">
-                          <path d="M44 24c0 11.044-8.956 20-20 20S4 35.044 4 24 12.956 4 24 4s20 8.956 20 20z" fill="#fff" />
-                          <path d="M24 4C12.956 4 4 12.956 4 24h12.8c0-3.976 3.224-7.2 7.2-7.2s7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4z" fill="#EA4335" />
-                          <path d="M4 24c0 11.044 8.956 20 20 20V31.2c-3.976 0-7.2-3.224-7.2-7.2H4z" fill="#4285F4" />
-                          <path d="M24 44c11.044 0 20-8.956 20-20H31.2c0 3.976-3.224 7.2-7.2 7.2V44z" fill="#34A853" />
-                          <path d="M31.2 24c0 3.976-3.224 7.2-7.2 7.2V44c11.044 0 20-8.956 20-20H31.2z" fill="#34A853" />
-                          <path d="M16.8 24c0-3.976 3.224-7.2 7.2-7.2V4C12.956 4 4 12.956 4 24h12.8z" fill="#EA4335" />
-                          <path d="M24 16.8c3.976 0 7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4v12.8z" fill="#FBBC05" />
-                          <circle cx="24" cy="24" r="7.2" fill="white" />
-                          <circle cx="24" cy="24" r="4.8" fill="#4285F4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className={`text-lg font-bold ${textClass}`}>Fasheone AI - Sanal Deneme</h3>
-                        <p className={`text-sm ${secondaryTextClass} mt-1`}>FASHEONE</p>
-                        <div className="flex items-center gap-1 mt-2">
-                          {[...Array(5)].map((_, i) => (
-                            <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    <p className={`text-sm ${descriptionTextClass} leading-relaxed`}>
-                      {t.chromeExtension.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Floating Elements */}
-                <div className="absolute -top-3 -right-3 w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                </div>
-                <div className="absolute -bottom-2 -left-2 w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Steps & CTA */}
-            <div className="space-y-6">
-              {/* Step 1 */}
-              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/5`}>
-                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-xl font-black text-white">01</span>
-                </div>
-                <div>
-                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step1Title}</h3>
-                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step1Desc}</p>
-                </div>
-              </div>
-
-              {/* Step 2 */}
-              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5`}>
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-xl font-black text-white">02</span>
-                </div>
-                <div>
-                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step2Title}</h3>
-                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step2Desc}</p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5`}>
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <span className="text-xl font-black text-white">03</span>
-                </div>
-                <div>
-                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step3Title}</h3>
-                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step3Desc}</p>
-                </div>
-              </div>
-
-              {/* Features List */}
-              <div className={`grid grid-cols-2 gap-3 mt-4`}>
-                {t.chromeExtension.features.map((feature: string, i: number) => (
-                  <div key={i} className={`flex items-center gap-2 text-sm ${secondaryTextClass}`}>
-                    <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Install Button */}
-              <a
-                href="https://chromewebstore.google.com/detail/blpelhnphmmaojdoanjjofhbggapkllk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5 group w-full justify-center md:w-auto"
-              >
-                <svg className="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                  <path fill="#F44336" d="M24 4C16.18 4 9.47 8.72 6.73 15.5l8.56 14.83A11.96 11.96 0 0024 36c1.77 0 3.44-.39 4.95-1.07L37.5 21H24" />
-                  <path fill="#FFC107" d="M37.5 21c.93-2.07 1.5-4.35 1.5-6.78 0-3.82-1.34-7.33-3.57-10.09L26.95 18.96A11.93 11.93 0 0136 24c0 2.24-.63 4.33-1.7 6.13L24.17 45.87" />
-                  <path fill="#4CAF50" d="M6.73 15.5A19.93 19.93 0 004 24c0 9.14 6.12 16.85 14.5 19.26L26.95 18.96l-8.39-4.46L6.73 15.5z" />
-                  <circle fill="#2196F3" cx="24" cy="24" r="8" />
-                  <circle fill="#FAFAFA" cx="24" cy="24" r="3.5" />
-                </svg>
-                {t.chromeExtension.installButton}
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       < section className="py-20 px-6 z-10 relative" >
