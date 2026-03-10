@@ -1462,61 +1462,87 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               const widgetBA = baData.find(b => b.idx === 9);
               return (
                 <div className="relative">
-                  <div className={`rounded-3xl overflow-hidden border-2 ${theme === 'dark' ? 'border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80' : 'border-slate-200 bg-gradient-to-br from-white to-slate-50'} shadow-2xl`}>
-                    {/* Before/After Container */}
-                    <div className="grid grid-cols-2">
-                      {/* Before */}
-                      <div className="relative">
+                  {/* Phone Frames Side by Side */}
+                  <div className="grid grid-cols-2 gap-4 md:gap-6">
+                    {/* Before Phone */}
+                    <div className="relative group">
+                      <div className={`rounded-[2rem] overflow-hidden border-[3px] ${theme === 'dark' ? 'border-slate-600 bg-slate-800' : 'border-slate-300 bg-white'} shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]`}>
+                        {/* Phone Notch */}
+                        <div className={`h-6 ${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} flex items-center justify-center`}>
+                          <div className={`w-20 h-3 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded-full`}></div>
+                        </div>
+                        {/* Screen Content */}
                         {widgetBA?.before ? (
-                          <img src={widgetBA.before} alt="Before" className="aspect-[3/4] w-full object-cover" />
+                          <img src={widgetBA.before} alt="Before" className="w-full object-contain" style={{ maxHeight: '500px' }} />
                         ) : (
-                          <div className={`aspect-[3/4] ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-slate-100'} flex items-center justify-center`}>
+                          <div className={`h-[400px] ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-slate-100'} flex items-center justify-center`}>
                             <div className="text-center px-4">
-                              <svg className={`w-16 h-16 mx-auto mb-3 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className={`w-12 h-12 mx-auto mb-2 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
-                              <p className={`text-sm font-medium ${secondaryTextClass}`}>{t.widgetPromo.beforeDesc}</p>
+                              <p className={`text-xs ${secondaryTextClass}`}>{t.widgetPromo.beforeDesc}</p>
                             </div>
                           </div>
                         )}
-                        <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                          {t.widgetPromo.before}
+                        {/* Phone Bottom Bar */}
+                        <div className={`h-4 ${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} flex items-center justify-center`}>
+                          <div className={`w-16 h-1 ${theme === 'dark' ? 'bg-slate-600' : 'bg-slate-300'} rounded-full`}></div>
                         </div>
                       </div>
-
-                      {/* After */}
-                      <div className="relative">
-                        {widgetBA?.after ? (
-                          <img src={widgetBA.after} alt="After" className="aspect-[3/4] w-full object-cover" />
-                        ) : (
-                          <div className={`aspect-[3/4] bg-gradient-to-br ${theme === 'dark' ? 'from-purple-900/30 to-orange-900/30' : 'from-purple-50 to-orange-50'} flex items-center justify-center`}>
-                            <div className="text-center px-4">
-                              <svg className="w-16 h-16 mx-auto mb-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                              </svg>
-                              <p className={`text-sm font-medium ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{t.widgetPromo.afterDesc}</p>
-                            </div>
-                          </div>
-                        )}
-                        <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                          {t.widgetPromo.after}
-                        </div>
+                      {/* Label */}
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                        <span className="bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                          {t.widgetPromo.before}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Divider Line */}
-                    <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-gradient-to-b from-purple-500 via-white to-orange-500 z-10">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-purple-500">
-                        <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                        </svg>
+                    {/* After Phone */}
+                    <div className="relative group">
+                      <div className={`rounded-[2rem] overflow-hidden border-[3px] ${theme === 'dark' ? 'border-purple-500/50 bg-slate-800' : 'border-purple-400 bg-white'} shadow-2xl shadow-purple-500/10 transition-transform duration-500 group-hover:scale-[1.02]`}>
+                        {/* Phone Notch */}
+                        <div className={`h-6 ${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} flex items-center justify-center`}>
+                          <div className={`w-20 h-3 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded-full`}></div>
+                        </div>
+                        {/* Screen Content */}
+                        {widgetBA?.after ? (
+                          <img src={widgetBA.after} alt="After" className="w-full object-contain" style={{ maxHeight: '500px' }} />
+                        ) : (
+                          <div className={`h-[400px] bg-gradient-to-br ${theme === 'dark' ? 'from-purple-900/30 to-orange-900/30' : 'from-purple-50 to-orange-50'} flex items-center justify-center`}>
+                            <div className="text-center px-4">
+                              <svg className="w-12 h-12 mx-auto mb-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                              <p className={`text-xs ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{t.widgetPromo.afterDesc}</p>
+                            </div>
+                          </div>
+                        )}
+                        {/* Phone Bottom Bar */}
+                        <div className={`h-4 ${theme === 'dark' ? 'bg-slate-800' : 'bg-white'} flex items-center justify-center`}>
+                          <div className={`w-16 h-1 ${theme === 'dark' ? 'bg-slate-600' : 'bg-slate-300'} rounded-full`}></div>
+                        </div>
+                      </div>
+                      {/* Label */}
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                        <span className="bg-gradient-to-r from-purple-500 to-orange-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                          {t.widgetPromo.after}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Widget Preview Badge */}
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20">
-                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-xl ${theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'}`}>
+                  {/* Arrow Between */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-xl ${theme === 'dark' ? 'bg-slate-800 border-2 border-purple-500' : 'bg-white border-2 border-purple-500'}`}>
+                      <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Widget Badge */}
+                  <div className="text-center mt-6">
+                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full shadow-lg ${theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'}`}>
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                       <span className={`text-xs font-semibold ${textClass}`}>Fasheone AI Widget</span>
                     </div>
