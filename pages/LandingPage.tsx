@@ -298,6 +298,46 @@ const trLanding = {
     q4: 'Ürettiğim içeriklerin telif hakkı kime ait?',
     a4: 'Oluşturduğunuz tüm içerikler size aittir. Ticari amaçlarla kullanabilir, paylaşabilir ve satabilirsiniz.',
   },
+  widgetPromo: {
+    badge: 'E-TİCARET ENTEGRASYONU',
+    title: 'Sitenize Widget Yerleştirin',
+    subtitle: 'Müşterileriniz Fotoğrafını Yüklesin, Kıyafeti Üstünde Görsün',
+    description: 'Tek satır kod ile e-ticaret sitenize Fasheone AI widget\'ını entegre edin. Müşterileriniz ürünleri satın almadan önce kendi üzerinde görsün, beden ölçüsü tespit edilsin, iade oranınız düşsün.',
+    feature1: 'Sanal Deneme — Müşteri fotoğrafı + ürün görseli = gerçekçi sonuç',
+    feature2: 'Beden Ölçüsü Tespiti — AI ile otomatik vücut analizi',
+    feature3: 'İade Oranı Düşürme — Doğru beden, doğru ürün seçimi',
+    feature4: 'Tek Satır Kod — Herhangi bir e-ticaret platformuna kolay entegrasyon',
+    ctaButton: 'Widget Entegrasyonunu Keşfet',
+    ctaSecondary: 'Canlı Demo',
+    before: 'ÖNCE',
+    after: 'SONRA',
+    beforeDesc: 'Standart ürün fotoğrafı',
+    afterDesc: 'Müşterinin üzerinde sanal deneme',
+    stats: [
+      { value: '%40', label: 'Daha Az İade' },
+      { value: '%25', label: 'Daha Yüksek Dönüşüm' },
+      { value: '3sn', label: 'İçinde Sonuç' },
+    ],
+  },
+  chromeExtension: {
+    title: 'Chrome Eklentimizi Kurun',
+    subtitle: 'E-ticaret sitelerinde gezinirken kıyafetleri anında üzerinizde deneyin',
+    description: 'Fasheone Chrome eklentisi ile herhangi bir e-ticaret sitesindeki ürünü satın almadan önce kendi üzerinizde görün. Sadece 3 adımda kurulum tamamlanır.',
+    step1Title: 'Eklentiyi Ekle',
+    step1Desc: 'Chrome Web Store\'dan Fasheone eklentisini tarayıcınıza ekleyin',
+    step2Title: 'Ürün Sayfasına Git',
+    step2Desc: 'Herhangi bir e-ticaret sitesinde ürün sayfasını açın',
+    step3Title: 'Üzerinizde Görün',
+    step3Desc: 'Fotoğrafınızı yükleyin ve ürünü anında üzerinizde deneyin',
+    installButton: 'Chrome\'a Ekle — Ücretsiz',
+    features: [
+      'Gerçekçi AI sanal deneme',
+      'Tüm e-ticaret sitelerinde çalışır',
+      'Hızlı önizleme & yüksek kalite',
+      'Kişisel verileriniz güvende'
+    ],
+    badge: 'ÜCRETSİZ',
+  },
   cta: {
     title: 'Hemen Başlayın',
     subtitle: 'İlk tasarımınızı ücretsiz deneyin. Kredi kartı gerekmez.',
@@ -847,6 +887,46 @@ const landingTranslations: TranslationRecord<typeof trLanding> = {
       ],
       creditInfo: 'Collage creation: 2 credits | Video conversion: +3 credits'
     },
+    widgetPromo: {
+      badge: 'E-COMMERCE INTEGRATION',
+      title: 'Add Widget to Your Site',
+      subtitle: 'Let Your Customers Upload Photos & Try On Clothes',
+      description: 'Integrate the Fasheone AI widget into your e-commerce site with a single line of code. Let customers see products on themselves before buying, detect body measurements, and reduce return rates.',
+      feature1: 'Virtual Try-On — Customer photo + product image = realistic result',
+      feature2: 'Body Measurement — AI-powered automatic body analysis',
+      feature3: 'Reduce Returns — Right size, right product selection',
+      feature4: 'Single Line Code — Easy integration to any e-commerce platform',
+      ctaButton: 'Explore Widget Integration',
+      ctaSecondary: 'Live Demo',
+      before: 'BEFORE',
+      after: 'AFTER',
+      beforeDesc: 'Standard product photo',
+      afterDesc: 'Virtual try-on on customer',
+      stats: [
+        { value: '40%', label: 'Less Returns' },
+        { value: '25%', label: 'Higher Conversion' },
+        { value: '3sec', label: 'Results' },
+      ],
+    },
+    chromeExtension: {
+      title: 'Install Our Chrome Extension',
+      subtitle: 'Try on clothes instantly while browsing e-commerce sites',
+      description: 'With the Fasheone Chrome extension, see any product on yourself before buying on any e-commerce site. Setup completes in just 3 steps.',
+      step1Title: 'Add Extension',
+      step1Desc: 'Add the Fasheone extension to your browser from Chrome Web Store',
+      step2Title: 'Visit Product Page',
+      step2Desc: 'Open any product page on any e-commerce site',
+      step3Title: 'See It On You',
+      step3Desc: 'Upload your photo and instantly try the product on yourself',
+      installButton: 'Add to Chrome — Free',
+      features: [
+        'Realistic AI virtual try-on',
+        'Works on all e-commerce sites',
+        'Fast preview & high quality',
+        'Your data stays safe'
+      ],
+      badge: 'FREE',
+    },
     footer: {
       quickLinks: 'Quick Links',
       features: 'Features',
@@ -1287,6 +1367,150 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             >
               {t.showcase.tryNow}
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Widget Promo Section */}
+      <section id="widget-promo" className={`py-20 px-6 z-10 relative overflow-hidden ${theme === 'dark' ? 'bg-gradient-to-b from-transparent via-purple-950/20 to-transparent' : 'bg-gradient-to-b from-transparent via-purple-50/50 to-transparent'}`}>
+        {/* Background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full ${theme === 'dark' ? 'bg-purple-500/5' : 'bg-purple-200/20'} blur-3xl`}></div>
+          <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full ${theme === 'dark' ? 'bg-orange-500/5' : 'bg-orange-200/20'} blur-3xl`}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/10 to-orange-500/10 border border-purple-500/20 rounded-full px-5 py-2 mb-6">
+              <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-purple-400' : 'text-purple-700'}`}>{t.widgetPromo.badge}</span>
+            </div>
+            <h2 className={`text-3xl md:text-5xl font-bold ${textClass} mb-4`}>
+              {t.widgetPromo.title}
+            </h2>
+            <p className={`text-lg md:text-2xl font-semibold bg-gradient-to-r from-purple-500 to-orange-500 bg-clip-text text-transparent mb-4`}>
+              {t.widgetPromo.subtitle}
+            </p>
+            <p className={`text-base ${secondaryTextClass} max-w-3xl mx-auto`}>
+              {t.widgetPromo.description}
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Features & CTA */}
+            <div className="space-y-6">
+              {/* Stats Row */}
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                {t.widgetPromo.stats.map((stat: { value: string; label: string }, i: number) => (
+                  <div key={i} className={`text-center p-4 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/60 border border-slate-700/50' : 'bg-white border border-slate-200'} shadow-lg`}>
+                    <div className="text-2xl md:text-3xl font-black bg-gradient-to-r from-purple-500 to-orange-500 bg-clip-text text-transparent">
+                      {stat.value}
+                    </div>
+                    <div className={`text-xs mt-1 font-medium ${secondaryTextClass}`}>{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Feature Items */}
+              {[
+                { text: t.widgetPromo.feature1, icon: '👗', color: 'from-purple-500 to-pink-500', hoverBorder: 'hover:border-purple-500/50' },
+                { text: t.widgetPromo.feature2, icon: '📏', color: 'from-blue-500 to-cyan-500', hoverBorder: 'hover:border-blue-500/50' },
+                { text: t.widgetPromo.feature3, icon: '📦', color: 'from-orange-500 to-red-500', hoverBorder: 'hover:border-orange-500/50' },
+                { text: t.widgetPromo.feature4, icon: '⚡', color: 'from-green-500 to-emerald-500', hoverBorder: 'hover:border-green-500/50' },
+              ].map((item, i) => (
+                <div key={i} className={`flex items-center gap-4 p-4 rounded-xl ${theme === 'dark' ? 'bg-slate-800/40 border border-slate-700/30' : 'bg-white/80 border border-slate-200'} ${item.hoverBorder} transition-all duration-300 hover:shadow-lg group`}>
+                  <div className={`w-10 h-10 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform`}>
+                    <span className="text-lg">{item.icon}</span>
+                  </div>
+                  <p className={`text-sm font-medium ${textClass}`}>{item.text}</p>
+                </div>
+              ))}
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <a
+                  href="https://virtual-try-on.fasheone.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-orange-600 hover:from-purple-500 hover:to-orange-500 text-white px-6 py-3.5 rounded-xl font-bold text-base shadow-xl hover:shadow-purple-500/30 transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  {t.widgetPromo.ctaButton}
+                </a>
+                <a
+                  href="https://virtual-try-on.fasheone.com/demo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-base border-2 transition-all duration-300 hover:-translate-y-0.5 ${theme === 'dark' ? 'border-purple-500/50 text-purple-400 hover:bg-purple-500/10' : 'border-purple-500 text-purple-600 hover:bg-purple-50'}`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {t.widgetPromo.ctaSecondary}
+                </a>
+              </div>
+            </div>
+
+            {/* Right: Before/After Comparison */}
+            <div className="relative">
+              <div className={`rounded-3xl overflow-hidden border-2 ${theme === 'dark' ? 'border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80' : 'border-slate-200 bg-gradient-to-br from-white to-slate-50'} shadow-2xl`}>
+                {/* Before/After Container */}
+                <div className="grid grid-cols-2">
+                  {/* Before */}
+                  <div className="relative">
+                    <div className={`aspect-[3/4] ${theme === 'dark' ? 'bg-slate-700/50' : 'bg-slate-100'} flex items-center justify-center`}>
+                      <div className="text-center px-4">
+                        <svg className={`w-16 h-16 mx-auto mb-3 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p className={`text-sm font-medium ${secondaryTextClass}`}>{t.widgetPromo.beforeDesc}</p>
+                      </div>
+                    </div>
+                    <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                      {t.widgetPromo.before}
+                    </div>
+                  </div>
+
+                  {/* After */}
+                  <div className="relative">
+                    <div className={`aspect-[3/4] bg-gradient-to-br ${theme === 'dark' ? 'from-purple-900/30 to-orange-900/30' : 'from-purple-50 to-orange-50'} flex items-center justify-center`}>
+                      <div className="text-center px-4">
+                        <svg className="w-16 h-16 mx-auto mb-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <p className={`text-sm font-medium ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`}>{t.widgetPromo.afterDesc}</p>
+                      </div>
+                    </div>
+                    <div className="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                      {t.widgetPromo.after}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Divider Line */}
+                <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1 bg-gradient-to-b from-purple-500 via-white to-orange-500 z-10">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-purple-500">
+                    <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Widget Preview Badge */}
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-20">
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-xl ${theme === 'dark' ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'}`}>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className={`text-xs font-semibold ${textClass}`}>Fasheone AI Widget</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -2036,6 +2260,174 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         </div>
       </section >
 
+      {/* Chrome Extension Section */}
+      <section id="chrome-extension" className={`py-20 px-6 z-10 relative overflow-hidden`}>
+        {/* Background decoration */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full ${theme === 'dark' ? 'bg-gradient-to-br from-green-500/5 via-blue-500/5 to-yellow-500/5' : 'bg-gradient-to-br from-green-100/30 via-blue-100/30 to-yellow-100/30'} blur-3xl`}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20 rounded-full px-5 py-2 mb-6">
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="#4285F4" />
+                <circle cx="12" cy="12" r="4" fill="white" />
+                <path d="M12 2 A10 10 0 0 1 21.5 7.5 L12 12 Z" fill="#EA4335" />
+                <path d="M21.5 7.5 A10 10 0 0 1 21.5 16.5 L12 12 Z" fill="#FBBC05" />
+                <path d="M21.5 16.5 A10 10 0 0 1 2.5 16.5 L12 12 Z" fill="#34A853" />
+                <path d="M2.5 16.5 A10 10 0 0 1 2.5 7.5 L12 12 Z" fill="#4285F4" />
+                <path d="M2.5 7.5 A10 10 0 0 1 12 2 L12 12 Z" fill="#EA4335" />
+                <circle cx="12" cy="12" r="4" fill="white" />
+                <circle cx="12" cy="12" r="2" fill="#4285F4" />
+              </svg>
+              <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-green-400' : 'text-green-700'}`}>Chrome Extension</span>
+              <span className="text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 py-0.5 rounded-full">{t.chromeExtension.badge}</span>
+            </div>
+            <h2 className={`text-3xl md:text-5xl font-bold ${textClass} mb-5`}>
+              {t.chromeExtension.title}
+            </h2>
+            <p className={`text-lg md:text-xl ${secondaryTextClass} max-w-3xl mx-auto`}>
+              {t.chromeExtension.subtitle}
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Visual Card */}
+            <div className="relative group">
+              <div className={`relative rounded-3xl overflow-hidden border-2 ${theme === 'dark' ? 'border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80' : 'border-slate-200 bg-gradient-to-br from-white to-slate-50'} p-8 md:p-10 shadow-2xl hover:shadow-green-500/10 transition-all duration-500`}>
+                {/* Chrome Browser Mockup */}
+                <div className={`rounded-xl overflow-hidden border ${theme === 'dark' ? 'border-slate-600/50' : 'border-slate-200'}`}>
+                  {/* Browser Tab Bar */}
+                  <div className={`flex items-center gap-2 px-4 py-3 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-100'}`}>
+                    <div className="flex gap-1.5">
+                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <div className={`flex-1 text-center text-xs ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} flex items-center justify-center gap-2`}>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                      <span>chrome.google.com/webstore</span>
+                    </div>
+                  </div>
+                  {/* Content Area */}
+                  <div className={`p-6 md:p-8 ${theme === 'dark' ? 'bg-slate-800/50' : 'bg-white'}`}>
+                    <div className="flex items-start gap-4 mb-6">
+                      <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <svg className="w-10 h-10" viewBox="0 0 48 48">
+                          <path d="M44 24c0 11.044-8.956 20-20 20S4 35.044 4 24 12.956 4 24 4s20 8.956 20 20z" fill="#fff" />
+                          <path d="M24 4C12.956 4 4 12.956 4 24h12.8c0-3.976 3.224-7.2 7.2-7.2s7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4z" fill="#EA4335" />
+                          <path d="M4 24c0 11.044 8.956 20 20 20V31.2c-3.976 0-7.2-3.224-7.2-7.2H4z" fill="#4285F4" />
+                          <path d="M24 44c11.044 0 20-8.956 20-20H31.2c0 3.976-3.224 7.2-7.2 7.2V44z" fill="#34A853" />
+                          <path d="M31.2 24c0 3.976-3.224 7.2-7.2 7.2V44c11.044 0 20-8.956 20-20H31.2z" fill="#34A853" />
+                          <path d="M16.8 24c0-3.976 3.224-7.2 7.2-7.2V4C12.956 4 4 12.956 4 24h12.8z" fill="#EA4335" />
+                          <path d="M24 16.8c3.976 0 7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4v12.8z" fill="#FBBC05" />
+                          <circle cx="24" cy="24" r="7.2" fill="white" />
+                          <circle cx="24" cy="24" r="4.8" fill="#4285F4" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className={`text-lg font-bold ${textClass}`}>Fasheone AI - Sanal Deneme</h3>
+                        <p className={`text-sm ${secondaryTextClass} mt-1`}>FASHEONE</p>
+                        <div className="flex items-center gap-1 mt-2">
+                          {[...Array(5)].map((_, i) => (
+                            <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p className={`text-sm ${descriptionTextClass} leading-relaxed`}>
+                      {t.chromeExtension.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Floating Elements */}
+                <div className="absolute -top-3 -right-3 w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </div>
+                <div className="absolute -bottom-2 -left-2 w-10 h-10 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Steps & CTA */}
+            <div className="space-y-6">
+              {/* Step 1 */}
+              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/5`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-xl font-black text-white">01</span>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step1Title}</h3>
+                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step1Desc}</p>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-xl font-black text-white">02</span>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step2Title}</h3>
+                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step2Desc}</p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className={`flex items-start gap-5 p-5 rounded-2xl ${theme === 'dark' ? 'bg-slate-800/50 hover:bg-slate-800/80' : 'bg-white hover:bg-slate-50'} border ${theme === 'dark' ? 'border-slate-700/50' : 'border-slate-200'} transition-all duration-300 group hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-xl font-black text-white">03</span>
+                </div>
+                <div>
+                  <h3 className={`text-lg font-bold ${textClass} mb-1`}>{t.chromeExtension.step3Title}</h3>
+                  <p className={`${secondaryTextClass} text-sm`}>{t.chromeExtension.step3Desc}</p>
+                </div>
+              </div>
+
+              {/* Features List */}
+              <div className={`grid grid-cols-2 gap-3 mt-4`}>
+                {t.chromeExtension.features.map((feature: string, i: number) => (
+                  <div key={i} className={`flex items-center gap-2 text-sm ${secondaryTextClass}`}>
+                    <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Install Button */}
+              <a
+                href="https://chromewebstore.google.com/detail/blpelhnphmmaojdoanjjofhbggapkllk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5 group w-full justify-center md:w-auto"
+              >
+                <svg className="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" fill="white" fillOpacity="0.2" />
+                  <circle cx="12" cy="12" r="4" fill="white" fillOpacity="0.6" />
+                  <circle cx="12" cy="12" r="2" fill="white" />
+                </svg>
+                {t.chromeExtension.installButton}
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       < section className="py-20 px-6 z-10 relative" >
         <div className="max-w-4xl mx-auto text-center">
@@ -2185,6 +2577,16 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   >
                     {t.footer.faq}
                   </button>
+                </li>
+                <li>
+                  <a
+                    href="https://chromewebstore.google.com/detail/blpelhnphmmaojdoanjjofhbggapkllk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-green-400' : 'text-slate-600 hover:text-green-600'} transition-colors text-sm flex items-center gap-1`}
+                  >
+                    🧩 Chrome Extension
+                  </a>
                 </li>
                 <li>
                   <button

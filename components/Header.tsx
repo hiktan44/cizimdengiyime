@@ -153,6 +153,26 @@ export const Header: React.FC<HeaderProps> = ({
                         </button>
                     )}
 
+                    {/* Chrome Extension Link */}
+                    <a
+                        href="https://chromewebstore.google.com/detail/blpelhnphmmaojdoanjjofhbggapkllk"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-sm font-medium text-slate-300 hover:text-green-400 transition-colors px-2 py-1 group"
+                        title="Chrome Extension"
+                    >
+                        <svg className="w-4 h-4 group-hover:scale-110 transition-transform" viewBox="0 0 48 48">
+                            <path d="M44 24c0 11.044-8.956 20-20 20S4 35.044 4 24 12.956 4 24 4s20 8.956 20 20z" fill="#fff" />
+                            <path d="M24 4C12.956 4 4 12.956 4 24h12.8c0-3.976 3.224-7.2 7.2-7.2s7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4z" fill="#EA4335" />
+                            <path d="M4 24c0 11.044 8.956 20 20 20V31.2c-3.976 0-7.2-3.224-7.2-7.2H4z" fill="#4285F4" />
+                            <path d="M24 44c11.044 0 20-8.956 20-20H31.2c0 3.976-3.224 7.2-7.2 7.2V44z" fill="#34A853" />
+                            <path d="M24 16.8c3.976 0 7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4v12.8z" fill="#FBBC05" />
+                            <circle cx="24" cy="24" r="7.2" fill="white" />
+                            <circle cx="24" cy="24" r="4.8" fill="#4285F4" />
+                        </svg>
+                        <span className="hidden lg:inline">Extension</span>
+                    </a>
+
                     {/* Credits Badge & Buy Button - Giriş yapmışsa */}
                     {isLoggedIn && credits !== undefined && (
                         <>
@@ -417,6 +437,26 @@ export const Header: React.FC<HeaderProps> = ({
                                         <span className="text-sm font-medium text-white">{ht.contact}</span>
                                     </button>
                                 )}
+
+                                {/* Chrome Extension */}
+                                <a
+                                    href="https://chromewebstore.google.com/detail/blpelhnphmmaojdoanjjofhbggapkllk"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-800 transition-colors active:scale-95"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    <svg className="w-4 h-4" viewBox="0 0 48 48">
+                                        <path d="M44 24c0 11.044-8.956 20-20 20S4 35.044 4 24 12.956 4 24 4s20 8.956 20 20z" fill="#fff" />
+                                        <path d="M24 4C12.956 4 4 12.956 4 24h12.8c0-3.976 3.224-7.2 7.2-7.2s7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4z" fill="#EA4335" />
+                                        <path d="M4 24c0 11.044 8.956 20 20 20V31.2c-3.976 0-7.2-3.224-7.2-7.2H4z" fill="#4285F4" />
+                                        <path d="M24 44c11.044 0 20-8.956 20-20H31.2c0 3.976-3.224 7.2-7.2 7.2V44z" fill="#34A853" />
+                                        <path d="M24 16.8c3.976 0 7.2 3.224 7.2 7.2H44C44 12.956 35.044 4 24 4v12.8z" fill="#FBBC05" />
+                                        <circle cx="24" cy="24" r="7.2" fill="white" />
+                                        <circle cx="24" cy="24" r="4.8" fill="#4285F4" />
+                                    </svg>
+                                    <span className="text-sm font-medium text-green-400">Chrome Extension</span>
+                                </a>
                                 <div className="my-1.5 border-t border-slate-700"></div>
                                 {/* Buy Credits */}
                                 {onBuyCreditsClick && (
