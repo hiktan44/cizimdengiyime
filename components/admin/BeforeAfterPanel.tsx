@@ -195,10 +195,17 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUplo
         }
     };
 
-    const isVideo = imageUrl && (imageUrl.includes('.mp4') || imageUrl.includes('.webm') || imageUrl.includes('.mov') || imageUrl.includes('.avi'));
+    const isVideo = imageUrl && /\.(mp4|webm|mov|avi)(\?|$)/i.test(imageUrl);
     const acceptTypes = acceptVideo
         ? 'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime'
         : 'image/jpeg,image/png,image/webp,image/gif';
+
+    // Video autoplay'i garanti et
+    const videoRef = React.useCallback((node: HTMLVideoElement | null) => {
+        if (node) {
+            node.play().catch(() => { });
+        }
+    }, []);
 
     return (
         <div className="space-y-2">
@@ -212,9 +219,10 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUplo
                 <div className="relative group">
                     {isVideo ? (
                         <video
+                            ref={videoRef}
                             src={imageUrl}
                             className="w-full h-36 object-cover rounded-lg border border-white/10"
-                            autoPlay loop muted playsInline
+                            autoPlay loop muted playsInline preload="auto"
                         />
                     ) : (
                         <img
