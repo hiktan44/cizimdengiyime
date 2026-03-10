@@ -981,24 +981,24 @@ const BeforeAfterCard: React.FC<{ before: string; after: string; label: string; 
   if (hasVideo) {
     return (
       <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/10 bg-slate-800/50' : 'border-slate-200 bg-white'} shadow-xl hover:shadow-2xl transition-shadow`}>
-        <div className="grid grid-cols-2 gap-0" style={{ height: '400px' }}>
+        <div className="grid grid-cols-2 gap-0">
           {/* Before */}
-          <div className="relative overflow-hidden">
+          <div className={`relative overflow-hidden ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-100'}`} style={{ aspectRatio: '3/4' }}>
             {isVideoUrl(before) ? (
-              <video src={before} className="w-full h-full object-cover" autoPlay loop muted playsInline preload="auto" />
+              <video src={before} className="w-full h-full object-contain" autoPlay loop muted playsInline preload="auto" />
             ) : (
-              <img src={before} alt="Before" className="w-full h-full object-cover" />
+              <img src={before} alt="Before" className="w-full h-full object-contain" />
             )}
             <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded font-bold z-10">
               {language === 'tr' ? 'Öncesi' : 'Before'}
             </div>
           </div>
           {/* After */}
-          <div className="relative overflow-hidden border-l border-white/10">
+          <div className={`relative overflow-hidden border-l ${theme === 'dark' ? 'border-white/10 bg-slate-900' : 'border-slate-200 bg-slate-100'}`} style={{ aspectRatio: '3/4' }}>
             {isVideoUrl(after) ? (
-              <video src={after} className="w-full h-full object-cover" autoPlay loop muted playsInline preload="auto" />
+              <video src={after} className="w-full h-full object-contain" autoPlay loop muted playsInline preload="auto" />
             ) : (
-              <img src={after} alt="After" className="w-full h-full object-cover" />
+              <img src={after} alt="After" className="w-full h-full object-contain" />
             )}
             <div className="absolute top-2 right-2 bg-cyan-500/80 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded font-bold z-10">
               {language === 'tr' ? 'Sonrası' : 'After'}
@@ -1014,8 +1014,8 @@ const BeforeAfterCard: React.FC<{ before: string; after: string; label: string; 
     <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/10 bg-slate-800/50' : 'border-slate-200 bg-white'} shadow-xl hover:shadow-2xl transition-shadow`}>
       <div
         ref={containerRef}
-        className="relative w-full cursor-col-resize select-none overflow-hidden"
-        style={{ height: '400px' }}
+        className={`relative w-full cursor-col-resize select-none overflow-hidden ${theme === 'dark' ? 'bg-slate-900' : 'bg-slate-100'}`}
+        style={{ aspectRatio: '3/4' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
