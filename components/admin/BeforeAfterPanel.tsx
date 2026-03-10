@@ -115,6 +115,7 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                     const beforeKey = `ba_feature${featureNum}_before`;
                     const afterKey = `ba_feature${featureNum}_after`;
                     const isWidget = featureNum === 10;
+                    const isVideoFeature = featureNum === 3; // Video Oluşturma
 
                     return (
                         <div key={featureNum} className={`rounded-xl p-5 border ${isWidget ? 'bg-gradient-to-r from-purple-900/30 to-orange-900/30 border-purple-500/30' : 'bg-slate-800/60 border-white/5'}`}>
@@ -125,6 +126,9 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                                 {label}
                                 {isWidget && (
                                     <span className="ml-auto text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30">Landing Page Widget</span>
+                                )}
+                                {isVideoFeature && (
+                                    <span className="ml-auto text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full border border-orange-500/30">📹 Video Destekli</span>
                                 )}
                             </h4>
                             {isWidget && (
@@ -141,6 +145,7 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                                     isUploading={uploading === beforeKey}
                                     onUpload={(f) => handleUpload(beforeKey, f)}
                                     onRemove={() => handleRemove(beforeKey)}
+                                    acceptVideo={isVideoFeature}
                                 />
                                 <ImageUploadBox
                                     label={language === 'tr' ? 'Sonrası' : 'After'}
@@ -148,6 +153,7 @@ export const BeforeAfterPanel: React.FC<BeforeAfterPanelProps> = ({ language = '
                                     isUploading={uploading === afterKey}
                                     onUpload={(f) => handleUpload(afterKey, f)}
                                     onRemove={() => handleRemove(afterKey)}
+                                    acceptVideo={isVideoFeature}
                                 />
                             </div>
                         </div>
@@ -164,9 +170,10 @@ interface ImageUploadBoxProps {
     isUploading?: boolean;
     onUpload: (file: File) => void;
     onRemove: () => void;
+    acceptVideo?: boolean;
 }
 
-const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUploading, onUpload, onRemove }) => {
+const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUploading, onUpload, onRemove, acceptVideo }) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleClick = () => {
@@ -179,13 +186,19 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUplo
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            if (file.size > 10 * 1024 * 1024) {
-                alert('Dosya boyutu çok büyük! Maksimum 10MB.');
+            const maxSize = acceptVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert(`Dosya boyutu çok büyük! Maksimum ${acceptVideo ? '50' : '10'}MB.`);
                 return;
             }
             onUpload(file);
         }
     };
+
+    const isVideo = imageUrl && (imageUrl.includes('.mp4') || imageUrl.includes('.webm') || imageUrl.includes('.mov') || imageUrl.includes('.avi'));
+    const acceptTypes = acceptVideo
+        ? 'image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime'
+        : 'image/jpeg,image/png,image/webp,image/gif';
 
     return (
         <div className="space-y-2">
@@ -197,11 +210,19 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUplo
                 </div>
             ) : imageUrl ? (
                 <div className="relative group">
-                    <img
-                        src={imageUrl}
-                        alt={label}
-                        className="w-full h-36 object-cover rounded-lg border border-white/10"
-                    />
+                    {isVideo ? (
+                        <video
+                            src={imageUrl}
+                            className="w-full h-36 object-cover rounded-lg border border-white/10"
+                            autoPlay loop muted playsInline
+                        />
+                    ) : (
+                        <img
+                            src={imageUrl}
+                            alt={label}
+                            className="w-full h-36 object-cover rounded-lg border border-white/10"
+                        />
+                    )}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <button
                             onClick={handleClick}
@@ -222,16 +243,24 @@ const ImageUploadBox: React.FC<ImageUploadBoxProps> = ({ label, imageUrl, isUplo
                     onClick={handleClick}
                     className="w-full h-36 border-2 border-dashed border-slate-600 hover:border-cyan-500 rounded-lg flex flex-col items-center justify-center transition-colors cursor-pointer group"
                 >
-                    <svg className="w-8 h-8 text-slate-500 group-hover:text-cyan-400 transition-colors mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-xs text-slate-500 group-hover:text-cyan-400 transition-colors">+ Görsel Yükle</span>
+                    {acceptVideo ? (
+                        <svg className="w-8 h-8 text-slate-500 group-hover:text-cyan-400 transition-colors mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    ) : (
+                        <svg className="w-8 h-8 text-slate-500 group-hover:text-cyan-400 transition-colors mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    )}
+                    <span className="text-xs text-slate-500 group-hover:text-cyan-400 transition-colors">
+                        {acceptVideo ? '+ Görsel / Video Yükle' : '+ Görsel Yükle'}
+                    </span>
                 </button>
             )}
             <input
                 ref={inputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
+                accept={acceptTypes}
                 className="hidden"
                 onChange={handleChange}
             />

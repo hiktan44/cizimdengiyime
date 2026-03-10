@@ -956,6 +956,9 @@ const BeforeAfterCard: React.FC<{ before: string; after: string; label: string; 
   const containerRef = React.useRef<HTMLDivElement>(null);
   const isDragging = React.useRef(false);
 
+  const isVideoUrl = (url: string) => /\.(mp4|webm|mov|avi)/i.test(url);
+  const hasVideo = isVideoUrl(before) || isVideoUrl(after);
+
   const handleMove = (clientX: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -974,6 +977,39 @@ const BeforeAfterCard: React.FC<{ before: string; after: string; label: string; 
     return () => window.removeEventListener('mouseup', up);
   }, []);
 
+  // Video varsa yan yana gösterim
+  if (hasVideo) {
+    return (
+      <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/10 bg-slate-800/50' : 'border-slate-200 bg-white'} shadow-xl hover:shadow-2xl transition-shadow`}>
+        <div className="grid grid-cols-2 gap-0" style={{ height: '280px' }}>
+          {/* Before */}
+          <div className="relative overflow-hidden">
+            {isVideoUrl(before) ? (
+              <video src={before} className="w-full h-full object-contain bg-black" autoPlay loop muted playsInline />
+            ) : (
+              <img src={before} alt="Before" className="w-full h-full object-contain bg-slate-900/5" />
+            )}
+            <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded font-bold z-10">
+              {language === 'tr' ? 'Öncesi' : 'Before'}
+            </div>
+          </div>
+          {/* After */}
+          <div className="relative overflow-hidden border-l border-white/10">
+            {isVideoUrl(after) ? (
+              <video src={after} className="w-full h-full object-contain bg-black" autoPlay loop muted playsInline />
+            ) : (
+              <img src={after} alt="After" className="w-full h-full object-contain bg-slate-900/5" />
+            )}
+            <div className="absolute top-2 right-2 bg-cyan-500/80 backdrop-blur-sm text-white text-[10px] px-2 py-0.5 rounded font-bold z-10">
+              {language === 'tr' ? 'Sonrası' : 'After'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Resim-resim: slider modunda
   return (
     <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/10 bg-slate-800/50' : 'border-slate-200 bg-white'} shadow-xl hover:shadow-2xl transition-shadow`}>
       <div
