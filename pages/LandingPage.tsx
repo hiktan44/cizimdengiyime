@@ -2493,10 +2493,12 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-green-500/30 transition-all duration-300 hover:-translate-y-0.5 group w-full justify-center md:w-auto"
               >
-                <svg className="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" fill="white" fillOpacity="0.2" />
-                  <circle cx="12" cy="12" r="4" fill="white" fillOpacity="0.6" />
-                  <circle cx="12" cy="12" r="2" fill="white" />
+                <svg className="w-6 h-6 group-hover:scale-110 transition-transform" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="#F44336" d="M24 4C16.18 4 9.47 8.72 6.73 15.5l8.56 14.83A11.96 11.96 0 0024 36c1.77 0 3.44-.39 4.95-1.07L37.5 21H24" />
+                  <path fill="#FFC107" d="M37.5 21c.93-2.07 1.5-4.35 1.5-6.78 0-3.82-1.34-7.33-3.57-10.09L26.95 18.96A11.93 11.93 0 0136 24c0 2.24-.63 4.33-1.7 6.13L24.17 45.87" />
+                  <path fill="#4CAF50" d="M6.73 15.5A19.93 19.93 0 004 24c0 9.14 6.12 16.85 14.5 19.26L26.95 18.96l-8.39-4.46L6.73 15.5z" />
+                  <circle fill="#2196F3" cx="24" cy="24" r="8" />
+                  <circle fill="#FAFAFA" cx="24" cy="24" r="3.5" />
                 </svg>
                 {t.chromeExtension.installButton}
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
