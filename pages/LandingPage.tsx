@@ -978,7 +978,8 @@ const BeforeAfterCard: React.FC<{ before: string; after: string; label: string; 
     <div className={`rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/10 bg-slate-800/50' : 'border-slate-200 bg-white'} shadow-xl hover:shadow-2xl transition-shadow`}>
       <div
         ref={containerRef}
-        className="relative w-full aspect-[4/3] cursor-col-resize select-none overflow-hidden"
+        className="relative w-full cursor-col-resize select-none overflow-hidden"
+        style={{ height: '280px' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -986,30 +987,34 @@ const BeforeAfterCard: React.FC<{ before: string; after: string; label: string; 
         onTouchMove={handleTouchMove}
         onTouchEnd={handleMouseUp}
       >
-        {/* After image (full) */}
-        <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" />
+        {/* After image (full background) */}
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/5">
+          <img src={after} alt="After" className="w-full h-full object-contain" />
+        </div>
         {/* Before image (clipped) */}
         <div className="absolute inset-0 overflow-hidden" style={{ width: `${sliderPos}%` }}>
-          <img src={before} alt="Before" className="absolute inset-0 w-full h-full object-cover" style={{ width: containerRef.current?.clientWidth || '100%', maxWidth: 'none' }} />
+          <div className="relative w-full h-full flex items-center justify-center" style={{ width: containerRef.current?.clientWidth || '100%', minWidth: containerRef.current?.clientWidth || '100%' }}>
+            <img src={before} alt="Before" className="w-full h-full object-contain" />
+          </div>
         </div>
         {/* Slider line */}
         <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg z-10" style={{ left: `${sliderPos}%` }}>
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
-            <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-white rounded-full shadow-xl flex items-center justify-center border border-slate-300">
+            <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+            <svg className="w-4 h-4 text-slate-600 -ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
           </div>
         </div>
         {/* Labels */}
-        <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md font-semibold z-20">
+        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-md font-semibold z-20">
           {language === 'tr' ? 'Öncesi' : 'Before'}
         </div>
-        <div className="absolute top-3 right-3 bg-cyan-500/80 text-white text-xs px-2 py-1 rounded-md font-semibold z-20">
+        <div className="absolute top-3 right-3 bg-cyan-500/80 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-md font-semibold z-20">
           {language === 'tr' ? 'Sonrası' : 'After'}
         </div>
-      </div>
-      <div className="p-4 text-center">
-        <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{label}</span>
       </div>
     </div>
   );
@@ -1288,7 +1293,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 </p>
               </div>
               {/* Before/After Slider */}
-              <div className="aspect-[3/4] w-full">
+              <div className="w-full" style={{ height: '320px' }}>
                 <BeforeAfterSlider
                   beforeImage={demoSketch}
                   afterImage={demoProduct}
@@ -1315,7 +1320,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 </p>
               </div>
               {/* Before/After Slider */}
-              <div className="aspect-[3/4] w-full">
+              <div className="w-full" style={{ height: '320px' }}>
                 <BeforeAfterSlider
                   beforeImage={demoProduct}
                   afterImage={demoModel}
@@ -1342,7 +1347,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 </p>
               </div>
               {/* Video or Placeholder */}
-              <div className="aspect-[3/4] w-full bg-gradient-to-br from-orange-900/30 to-red-900/30 flex items-center justify-center">
+              <div className="w-full bg-gradient-to-br from-orange-900/30 to-red-900/30 flex items-center justify-center" style={{ height: '320px' }}>
                 {demoVideo ? (
                   <video src={demoVideo} className="w-full h-full object-cover" autoPlay loop muted playsInline />
                 ) : (

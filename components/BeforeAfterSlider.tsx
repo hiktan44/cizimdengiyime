@@ -40,7 +40,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
     window.addEventListener('touchmove', handleTouchMove);
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('touchend', handleMouseUp);
-    
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
@@ -52,12 +52,12 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   const hasBothImages = beforeImage && afterImage;
 
   return (
-    <div 
-        ref={containerRef}
-        className="relative w-full h-full select-none overflow-hidden"
-        onMouseDown={hasBothImages ? handleMouseDown : undefined}
-        onTouchStart={hasBothImages ? handleMouseDown : undefined}
-        style={{ cursor: hasBothImages ? 'ew-resize' : 'default' }}
+    <div
+      ref={containerRef}
+      className="relative w-full h-full select-none overflow-hidden bg-slate-900/5"
+      onMouseDown={hasBothImages ? handleMouseDown : undefined}
+      onTouchStart={hasBothImages ? handleMouseDown : undefined}
+      style={{ cursor: hasBothImages ? 'ew-resize' : 'default' }}
     >
       {hasBothImages ? (
         <>
@@ -66,18 +66,18 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
             <img
               src={beforeImage}
               alt={beforeLabel}
-              className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+              className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
             />
-            
+
             {/* After Image (clipped) */}
-            <div 
-                className="absolute top-0 left-0 w-full h-full overflow-hidden" 
-                style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+            <div
+              className="absolute top-0 left-0 w-full h-full overflow-hidden"
+              style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
             >
               <img
                 src={afterImage}
                 alt={afterLabel}
-                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
               />
             </div>
 
@@ -91,11 +91,11 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           </div>
 
           {/* Slider Handle */}
-          <div 
-              className="absolute top-0 bottom-0 w-1 bg-white shadow-lg cursor-ew-resize z-10"
-              style={{ left: `${sliderPosition}%` }}
-              onMouseDown={handleMouseDown}
-              onTouchStart={handleMouseDown}
+          <div
+            className="absolute top-0 bottom-0 w-1 bg-white shadow-lg cursor-ew-resize z-10"
+            style={{ left: `${sliderPosition}%` }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleMouseDown}
           >
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full h-10 w-10 flex items-center justify-center shadow-xl border-2 border-slate-300 pointer-events-none">
               <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
@@ -105,8 +105,8 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           </div>
         </>
       ) : (
-         <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-            <p className="text-slate-500">Görseller yükleniyor...</p>
+        <div className="w-full h-full bg-slate-800 flex items-center justify-center">
+          <p className="text-slate-500">Görseller yükleniyor...</p>
         </div>
       )}
     </div>
