@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface HeroVideoCarouselProps {
     videos: string[];
@@ -23,9 +23,13 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     const validVideos = videos.filter(v => v && v.trim() !== '');
+    // If logo exists, total items is videos * 2 (Video -> Logo -> Video -> Logo...)
     const totalItems = logoVideo ? validVideos.length * 2 : validVideos.length;
 
+    // Helper to check if current index should show logo
     const isLogoIndex = (index: number) => logoVideo && index % 2 !== 0;
+
+    // Helper to get video index from carousel index
     const getVideoIndex = (index: number) => logoVideo ? Math.floor(index / 2) : index;
 
     const getCurrentDuration = (index: number): number => {
@@ -33,6 +37,7 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
             if (logoVideo && logoRef.current && logoVideo.match(/\.(mp4|webm|mov)$/i)) {
                 const duration = logoRef.current.duration;
                 if (duration && !isNaN(duration) && duration > 0) {
+                    // Gerçek video süresi - başlangıç atlaması + bitiş bekleme süresi
                     const effectiveDuration = Math.max(duration - logoSkipStart, 1);
                     return (effectiveDuration + logoHoldEnd) * 1000;
                 }
@@ -49,63 +54,32 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
         }
     };
 
-    // Mobil-safe play fonksiyonu
-    const safePlay = useCallback((video: HTMLVideoElement | null) => {
-        if (!video) return;
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(() => {
-                // Mobilde autoplay engellenirse, muted olarak tekrar dene
-                video.muted = true;
-                video.play().catch(() => { });
-            });
-        }
-    }, []);
-
-    // Mobil-safe pause fonksiyonu
-    const safePause = useCallback((video: HTMLVideoElement | null) => {
-        if (!video) return;
-        try { video.pause(); } catch (e) { }
-    }, []);
-
-    // Aktif video dışındakileri pause et — mobilde kaynak tasarrufu
-    const manageVideoPlayback = useCallback((activeCarouselIndex: number) => {
-        validVideos.forEach((_, i) => {
-            const myCarouselIndex = logoVideo ? i * 2 : i;
-            const video = videoRefs.current[i];
-            if (myCarouselIndex === activeCarouselIndex) {
-                if (video) {
-                    video.currentTime = 0;
-                    safePlay(video);
-                }
-            } else {
-                safePause(video);
-            }
-        });
-
-        // Logo video yönetimi
-        if (logoRef.current && logoVideo?.match(/\.(mp4|webm|mov)$/i)) {
-            if (isLogoIndex(activeCarouselIndex)) {
-                logoRef.current.currentTime = logoSkipStart;
-                safePlay(logoRef.current);
-            } else {
-                safePause(logoRef.current);
-            }
-        }
-    }, [validVideos, logoVideo, logoSkipStart, safePlay, safePause]);
-
-    const transitionToNext = useCallback(() => {
+    const transitionToNext = () => {
         const next = (currentIndex + 1) % totalItems;
         setNextIndex(next);
         setIsTransitioning(true);
 
+        // Start fading out current and fading in next
         setTimeout(() => {
             setCurrentIndex(next);
             setNextIndex(-1);
             setIsTransitioning(false);
-            manageVideoPlayback(next);
-        }, 1000);
-    }, [currentIndex, totalItems, manageVideoPlayback]);
+
+            // Play next video/logo
+            if (isLogoIndex(next)) {
+                if (logoRef.current && logoVideo?.match(/\.(mp4|webm|mov)$/i)) {
+                    logoRef.current.currentTime = logoSkipStart;
+                    logoRef.current.play().catch(e => console.log('Logo video play error:', e));
+                }
+            } else {
+                const videoIndex = getVideoIndex(next);
+                if (videoRefs.current[videoIndex]) {
+                    videoRefs.current[videoIndex]!.currentTime = 0;
+                    videoRefs.current[videoIndex]!.play().catch(e => console.log('Video play error:', e));
+                }
+            }
+        }, 1000); // 1 second crossfade
+    };
 
     useEffect(() => {
         if (totalItems === 0) return;
@@ -116,6 +90,7 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
 
         const setupTimer = () => {
             const duration = getCurrentDuration(currentIndex);
+
             timerRef.current = setTimeout(() => {
                 transitionToNext();
             }, duration);
@@ -132,7 +107,8 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                     video.removeEventListener('loadedmetadata', handleLoadedMetadata);
                 };
                 video.addEventListener('loadedmetadata', handleLoadedMetadata);
-                setTimeout(setupTimer, 3000);
+                // Fallback timeout to prevent stuck if metadata never loads
+                setTimeout(setupTimer, 2000);
             } else {
                 setupTimer();
             }
@@ -145,32 +121,13 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                 clearTimeout(timerRef.current);
             }
         };
-    }, [currentIndex, totalItems, transitionToNext]);
+    }, [currentIndex, totalItems]);
 
-    // İlk video oynatma + diğerlerini pause et
     useEffect(() => {
-        if (validVideos.length > 0) {
-            // İlk video başlat, diğerlerini durdur
-            manageVideoPlayback(0);
+        if (validVideos.length > 0 && videoRefs.current[0] && !isLogoIndex(0)) {
+            videoRefs.current[0]!.play().catch(e => console.log('Initial video play error:', e));
         }
     }, [validVideos.length]);
-
-    // Mobil için: sayfa görünürlük değişince video yönet
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                // Sayfa gizlenince tüm videoları durdur
-                validVideos.forEach((_, i) => safePause(videoRefs.current[i]));
-                safePause(logoRef.current);
-            } else {
-                // Sayfa tekrar görününce aktif videoyu oynat
-                manageVideoPlayback(currentIndex);
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [currentIndex, manageVideoPlayback, safePause]);
 
     if (totalItems === 0) {
         return (
@@ -178,6 +135,7 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
         );
     }
 
+    // New helper to determine if a specific video/logo element is visible
     const isElementVisible = (type: 'video' | 'logo', index: number) => {
         if (type === 'logo') {
             if (!logoVideo) return 'opacity-0';
@@ -185,12 +143,13 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
             const isCurrentLogo = isLogoIndex(currentIndex);
             const isNextLogo = isTransitioning && isLogoIndex(nextIndex);
 
-            if (isCurrentLogo && !isTransitioning) return 'opacity-100';
-            if (isCurrentLogo && isTransitioning) return 'opacity-0';
-            if (isNextLogo) return 'opacity-100';
+            if (isCurrentLogo && !isTransitioning) return 'opacity-100'; // Steady state
+            if (isCurrentLogo && isTransitioning) return 'opacity-0'; // Fading out
+            if (isNextLogo) return 'opacity-100'; // Fading in
 
             return 'opacity-0';
         } else {
+            // Video[i]
             const myCarouselIndex = logoVideo ? index * 2 : index;
 
             const isCurrentMe = currentIndex === myCarouselIndex;
@@ -213,10 +172,10 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                     ref={(el) => (videoRefs.current[index] = el)}
                     src={video}
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${isElementVisible('video', index)}`}
+                    autoPlay
                     muted
                     playsInline
-                    preload={index === 0 ? 'auto' : 'metadata'}
-                    style={{ WebkitTransform: 'translate3d(0,0,0)' }}
+                    preload="auto"
                 >
                     <source src={video} type="video/mp4" />
                 </video>
@@ -230,10 +189,10 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                             ref={logoRef}
                             src={logoVideo}
                             className={`absolute inset-0 w-full h-full object-contain bg-black/90 transition-opacity duration-1000 ease-in-out ${isElementVisible('logo', 0)}`}
+                            autoPlay
                             muted
                             playsInline
                             preload="auto"
-                            style={{ WebkitTransform: 'translate3d(0,0,0)' }}
                         >
                             <source src={logoVideo} type="video/mp4" />
                         </video>
