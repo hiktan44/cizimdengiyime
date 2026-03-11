@@ -44,21 +44,34 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
         const src = getCurrentSrc(currentIndex);
         if (!src) return;
 
+        const startPlayback = () => {
+            if (isLogoIndex(currentIndex) && logoVideo?.match(/\.(mp4|webm|mov)$/i)) {
+                video.currentTime = logoSkipStart;
+            } else {
+                video.currentTime = 0;
+            }
+            video.muted = true;
+            const p = video.play();
+            if (p) p.catch(() => { });
+        };
+
         // Src değişti mi kontrol et
-        if (video.src !== src && !video.src.endsWith(src)) {
+        const srcChanged = video.src !== src && !video.src.endsWith(src);
+        if (srcChanged) {
+            video.oncanplay = null;
+            video.oncanplay = () => {
+                video.oncanplay = null;
+                startPlayback();
+            };
             video.src = src;
             video.load();
-        }
-
-        if (isLogoIndex(currentIndex) && logoVideo?.match(/\.(mp4|webm|mov)$/i)) {
-            video.currentTime = logoSkipStart;
+            // Fallback: 3sn içinde canplay gelmezse dene
+            setTimeout(() => {
+                if (video.paused) startPlayback();
+            }, 3000);
         } else {
-            video.currentTime = 0;
+            startPlayback();
         }
-
-        video.muted = true;
-        const p = video.play();
-        if (p) p.catch(() => { });
     }, [currentIndex, getCurrentSrc, logoSkipStart, logoVideo]);
 
     // Sonraki video'ya geçiş
