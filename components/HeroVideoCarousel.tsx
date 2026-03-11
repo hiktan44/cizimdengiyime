@@ -59,7 +59,7 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
         setNextIndex(next);
         setIsTransitioning(true);
 
-        // Önceki videoyu durdur (play() interrupted hatasını önler)
+        // Önceki videoyu durdur
         if (!isLogoIndex(currentIndex)) {
             const prevVideoIndex = getVideoIndex(currentIndex);
             const prevVideo = videoRefs.current[prevVideoIndex];
@@ -68,47 +68,26 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
             try { logoRef.current.pause(); } catch (e) { }
         }
 
-        // Start fading out current and fading in next
         setTimeout(() => {
             setCurrentIndex(next);
             setNextIndex(-1);
             setIsTransitioning(false);
 
-            // Play next video/logo
+            // Mobil: play() yerine load() kullan — autoPlay browser tarafından tetiklenir
             if (isLogoIndex(next)) {
                 if (logoRef.current && logoVideo?.match(/\.(mp4|webm|mov)$/i)) {
                     logoRef.current.currentTime = logoSkipStart;
-                    const p = logoRef.current.play();
-                    if (p) p.catch(() => { });
+                    logoRef.current.load();
                 }
             } else {
                 const videoIndex = getVideoIndex(next);
                 const video = videoRefs.current[videoIndex];
                 if (video) {
                     video.currentTime = 0;
-                    // Mobil: video hazır değilse canplay bekle
-                    if (video.readyState >= 3) {
-                        const p = video.play();
-                        if (p) p.catch(() => { });
-                    } else {
-                        const onReady = () => {
-                            video.removeEventListener('canplay', onReady);
-                            const p = video.play();
-                            if (p) p.catch(() => { });
-                        };
-                        video.addEventListener('canplay', onReady);
-                        video.load(); // Mobilde preload=metadata olan videoyu yükle
-                        // Fallback
-                        setTimeout(() => {
-                            if (video.paused) {
-                                const p = video.play();
-                                if (p) p.catch(() => { });
-                            }
-                        }, 3000);
-                    }
+                    video.load();
                 }
             }
-        }, 1000); // 1 second crossfade
+        }, 1000);
     };
 
     useEffect(() => {
@@ -156,7 +135,8 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
 
     useEffect(() => {
         if (validVideos.length > 0 && videoRefs.current[0] && !isLogoIndex(0)) {
-            videoRefs.current[0]!.play().catch(e => console.log('Initial video play error:', e));
+            // İlk video: autoPlay tarayıcı tarafından tetiklenecek, load() ile garanti et
+            videoRefs.current[0]!.load();
         }
     }, [validVideos.length]);
 
@@ -246,9 +226,11 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                     ref={(el) => (videoRefs.current[index] = el)}
                     src={video}
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${isElementVisible('video', index)}`}
+                    autoPlay
                     muted
                     playsInline
-                    preload="metadata"
+                    loop
+                    preload="auto"
                 >
                     <source src={video} type="video/mp4" />
                 </video>
@@ -262,10 +244,12 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                         <video
                             ref={logoRef}
                             src={logoVideo}
-                            className={`absolute inset-0 w-full h-full object-contain bg-black/90 transition-opacity duration-1000 ease-in-out ${isElementVisible('logo', 0)}`}
+                            className={`absolute inset-0 w-full h-full object-cover bg-black/90 transition-opacity duration-1000 ease-in-out ${isElementVisible('logo', 0)}`}
+                            autoPlay
                             muted
                             playsInline
-                            preload="metadata"
+                            loop
+                            preload="auto"
                         >
                             <source src={logoVideo} type="video/mp4" />
                         </video>
