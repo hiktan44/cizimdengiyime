@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
     };
 
     return (
-        <header className="sticky top-0 bg-slate-900/95 backdrop-blur-md z-[100] border-b border-slate-800 shadow-xl w-full safe-area-inset-top">
+        <header className="sticky top-0 bg-[#0a1628] backdrop-blur-md z-[100] border-b border-[#1e3a5f] shadow-xl shadow-[#0a1628]/50 w-full safe-area-inset-top">
             <nav className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3">
                 {/* Logo - tıklayınca ana sayfaya */}
                 <div className="flex items-center gap-3 sm:gap-4">

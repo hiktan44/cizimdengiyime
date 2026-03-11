@@ -1216,35 +1216,19 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
   const t = landingTranslations[language];
 
-  const bgClass = theme === 'dark'
-    ? 'bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900'
-    : 'bg-gradient-to-br from-blue-100 via-white via-purple-50 to-orange-100';
+  const bgClass = 'bg-white';
 
-  const textClass = theme === 'dark' ? 'text-white' : 'text-slate-900';
-  const secondaryTextClass = 'text-black font-medium';
-  const descriptionTextClass = 'text-black font-semibold';
-  const cardBg = theme === 'dark' ? 'bg-slate-900/50 border-slate-700' : 'bg-white/80 border-slate-200';
+  const textClass = 'text-slate-800';
+  const secondaryTextClass = 'text-slate-800 font-bold';
+  const descriptionTextClass = 'text-slate-800 font-bold';
+  const cardBg = 'bg-white border-slate-200';
 
   return (
-    <div className="min-h-screen relative">
-      {/* Fixed gradient background with smooth animation */}
+    <div className="min-h-screen relative bg-white">
+      {/* Fixed white background */}
       <div
-        className="fixed inset-0 -z-10"
-        style={{
-          background: 'linear-gradient(135deg, #3C3F4A 0%, #A67C52 25%, #2C3E50 50%, #9FA86A 75%, #C4B5B8 100%)',
-          backgroundSize: '400% 400%',
-          animation: 'gradientShift 15s ease infinite'
-        }}
+        className="fixed inset-0 -z-10 bg-white"
       ></div>
-      <style>{`
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
-      {/* Subtle animated overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-slate-800/10 via-amber-700/10 to-rose-300/10 animate-pulse pointer-events-none -z-5"></div>
 
       {/* Header - Unified Component */}
       <Header
@@ -1284,13 +1268,13 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               {t.hero.subtitle}
             </span>
           </h1>
-          <p className={`text-xl ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'} mb-12 max-w-3xl mx-auto drop-shadow-lg`}>
+          <p className={`text-xl ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700 font-semibold'} mb-12 max-w-3xl mx-auto`}>
             {t.hero.description}
           </p>
 
           <button
             onClick={handleGetStarted}
-            className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-6 py-3 md:px-10 md:py-5 rounded-xl font-bold text-base md:text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all transform hover:scale-105 relative z-40"
+            className="bg-gradient-to-r from-orange-500 via-green-500 to-blue-600 text-white px-6 py-3 md:px-10 md:py-5 rounded-xl font-bold text-base md:text-lg hover:shadow-lg hover:shadow-[#0891b2]/20 transition-all transform hover:scale-105 relative z-40"
           >
             {isLoggedIn ? t.header.continueUsing : t.hero.cta}
           </button>
@@ -1312,19 +1296,19 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1: Çizim → Ürün */}
-            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-cyan-500/50 transition-all duration-500 hover:-translate-y-2">
+            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#0891b2]/20 transition-all duration-500 hover:-translate-y-2">
               {/* Glow effect */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#0891b2]/10 to-[#0891b2]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10 p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#0891b2] to-[#06b6d4] rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
                     <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-cyan-600 transition-colors">{t.showcase.step1}</h3>
+                  <h3 className="text-xl font-bold text-[#0891b2] group-hover:text-[#0891b2]/80 transition-colors">{t.showcase.step1}</h3>
                 </div>
-                <p className="text-black font-medium text-sm mb-6 leading-relaxed">
+                <p className="text-slate-800 font-bold text-sm mb-6 leading-relaxed">
                   {t.showcase.step1Desc}
                 </p>
               </div>
@@ -1340,18 +1324,18 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </div>
 
             {/* Step 2: Ürün → Canlı Model */}
-            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:-translate-y-2">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#e11d48]/20 transition-all duration-500 hover:-translate-y-2">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#e11d48]/10 to-[#e11d48]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10 p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#e11d48] to-[#f43f5e] rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
                     <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-purple-600 transition-colors">{t.showcase.step2}</h3>
+                  <h3 className="text-xl font-bold text-[#e11d48] group-hover:text-[#e11d48]/80 transition-colors">{t.showcase.step2}</h3>
                 </div>
-                <p className="text-black font-medium text-sm mb-6 leading-relaxed">
+                <p className="text-slate-800 font-bold text-sm mb-6 leading-relaxed">
                   {t.showcase.step2Desc}
                 </p>
               </div>
@@ -1367,18 +1351,18 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </div>
 
             {/* Step 3: Görsel → Video */}
-            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-orange-500/50 transition-all duration-500 hover:-translate-y-2">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#7c3aed]/20 transition-all duration-500 hover:-translate-y-2">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#7c3aed]/10 to-[#7c3aed]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10 p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#7c3aed] to-[#8b5cf6] rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
                     <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-orange-600 transition-colors">{t.showcase.step3}</h3>
+                  <h3 className="text-xl font-bold text-[#7c3aed] group-hover:text-[#7c3aed]/80 transition-colors">{t.showcase.step3}</h3>
                 </div>
-                <p className="text-black font-medium text-sm mb-6 leading-relaxed">
+                <p className="text-slate-800 font-bold text-sm mb-6 leading-relaxed">
                   {t.showcase.step3Desc}
                 </p>
               </div>
@@ -1404,7 +1388,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           <div className="text-center mt-12">
             <button
               onClick={handleGetStarted}
-              className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:from-cyan-500 hover:to-blue-500 transition-all shadow-xl hover:shadow-cyan-500/30 transform hover:scale-105"
+              className="bg-gradient-to-r from-[#f97316] to-[#fb923c] text-white px-10 py-4 rounded-xl font-bold text-lg hover:from-[#0891b2]/90 hover:to-[#0891b2]/70 transition-all shadow-xl hover:shadow-[#0891b2]/30 transform hover:scale-105"
             >
               {t.showcase.tryNow}
             </button>
@@ -1779,26 +1763,26 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* 1. Çizimden Ürüne */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-cyan-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#0891b2]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
               {/* Glow effect on hover */}
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#0891b2]/10 to-[#0891b2]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
 
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#0891b2] to-[#06b6d4] rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-cyan-600 transition-colors">
+                <h3 className="text-2xl font-bold text-[#0891b2] mb-4 group-hover:text-[#0891b2]/80 transition-colors">
                   {t.howItWorks.useCases.feature1.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.feature1.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.feature1.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-cyan-500 mt-1">✓</span>
+                      <span className="text-[#0891b2] mt-1">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -1810,24 +1794,24 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </div>
 
             {/* 2. Canlı Model */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#e11d48]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#e11d48]/10 to-[#e11d48]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#e11d48] to-[#f43f5e] rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-purple-600 transition-colors">
+                <h3 className="text-2xl font-bold text-[#e11d48] mb-4 group-hover:text-[#e11d48]/80 transition-colors">
                   {t.howItWorks.useCases.feature2.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.feature2.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.feature2.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-purple-500 mt-1">✓</span>
+                      <span className="text-[#f97316] mt-1">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -1839,24 +1823,24 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </div>
 
             {/* 3. Video Oluşturma */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-blue-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#0891b2]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#f97316]/10 to-[#f97316]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#f97316] to-[#fb923c] rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-2xl font-bold text-[#0891b2] mb-4 group-hover:text-[#0891b2]/80 transition-colors">
                   {t.howItWorks.useCases.feature3.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.feature3.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.feature3.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-blue-500 mt-1">✓</span>
+                      <span className="text-[#0891b2] mt-1">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -1868,24 +1852,24 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </div>
 
             {/* 4. Teknik Çizim */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-green-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-green-400/20 to-emerald-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#22c55e]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#22c55e]/10 to-[#22c55e]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#22c55e] to-[#16a34a] rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-green-600 transition-colors">
+                <h3 className="text-2xl font-bold text-[#22c55e] mb-4 group-hover:text-[#22c55e]/80 transition-colors">
                   {t.howItWorks.useCases.feature4.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.feature4.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.feature4.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-green-500 mt-1">✓</span>
+                      <span className="text-[#22c55e] mt-1">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -1898,24 +1882,24 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
             {/* 5. Pixshop */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-orange-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-orange-400/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#f97316]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#f97316]/10 to-[#f97316]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#f97316] to-[#fb923c] rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-orange-600 transition-colors">
+                <h3 className="text-2xl font-bold text-[#f97316] mb-4 group-hover:text-[#f97316]/80 transition-colors">
                   {t.howItWorks.useCases.feature5.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.feature5.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.feature5.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-orange-500 mt-1">✓</span>
+                      <span className="text-[#f97316] mt-1">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -1928,24 +1912,24 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
             {/* 6. Fotomatik */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-teal-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-teal-400/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#be185d]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#be185d]/10 to-[#be185d]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-cyan-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#be185d] to-[#e11d48] rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-teal-600 transition-colors">
+                <h3 className="text-2xl font-bold text-[#be185d] mb-4 group-hover:text-[#be185d]/80 transition-colors">
                   {t.howItWorks.useCases.feature6.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.feature6.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.feature6.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-teal-500 mt-1">✓</span>
+                      <span className="text-[#be185d] mt-1">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -1958,24 +1942,24 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
             {/* 7. Kolaj Oluşturma */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-cyan-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-lg hover:shadow-[#1e40af]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#1e40af]/10 to-[#1e40af]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#1e40af] to-[#3b82f6] rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-cyan-600 transition-colors">
+                <h3 className="text-2xl font-bold text-[#1e40af] mb-4 group-hover:text-[#1e40af]/80 transition-colors">
                   {t.howItWorks.useCases.collage.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.collage.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.collage.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-cyan-500 mt-1">✓</span>
+                      <span className="text-[#1e40af] mt-1">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -1988,7 +1972,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
             {/* 8. Reklam Medyası */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-pink-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-2xl hover:shadow-pink-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-400/20 to-rose-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
                 <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-rose-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
@@ -1999,10 +1983,10 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-pink-600 transition-colors">
                   {t.howItWorks.useCases.adMedia.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.adMedia.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.adMedia.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="text-pink-500 mt-1">✓</span>
@@ -2018,7 +2002,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
             {/* 9. E-ticaret Çözümleri */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white/20 border border-white/30 shadow-2xl hover:shadow-indigo-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-white border-2 border-slate-100 shadow-2xl hover:shadow-indigo-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-400/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
                 <div className="w-20 h-20 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-3xl flex items-center justify-center mb-6 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
@@ -2029,10 +2013,10 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 <h3 className="text-2xl font-bold text-slate-900 mb-4 group-hover:text-indigo-600 transition-colors">
                   {t.howItWorks.useCases.ecommerce.title}
                 </h3>
-                <p className="text-black font-semibold leading-relaxed mb-4">
+                <p className="text-slate-800 font-semibold leading-relaxed mb-4">
                   {t.howItWorks.useCases.ecommerce.desc}
                 </p>
-                <ul className="text-black font-medium text-sm space-y-2">
+                <ul className="text-slate-800 font-bold text-sm space-y-2">
                   {t.howItWorks.useCases.ecommerce.features.map((feature: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2">
                       <span className="text-indigo-500 mt-1">✓</span>
@@ -2052,51 +2036,51 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
 
       {/* How It Works - 3 Steps */}
-      < section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-blue-50/40'} z-10`}>
+      < section id="how-it-works" className={`relative py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-[#0a1628]'} z-10`}>
         <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-4`}>
+          <h2 className="text-2xl md:text-4xl font-bold text-white text-center mb-4">
             {t.howItWorks.title}
           </h2>
-          <p className={`${secondaryTextClass} text-center mb-16`}>
+          <p className="text-white/80 font-semibold text-center mb-16">
             {t.howItWorks.subtitle}
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
+            <div className={`bg-white/10 border border-white/20 rounded-2xl p-8 text-center backdrop-blur-sm hover:border-cyan-500 transition`}>
               <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl font-black text-white">01</span>
               </div>
-              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+              <h3 className="text-2xl font-bold text-white mb-4">
                 {t.howItWorks.step1Title}
               </h3>
-              <p className={secondaryTextClass}>
+              <p className="text-white/70 font-medium">
                 {t.howItWorks.step1Desc}
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
+            <div className={`bg-white/10 border border-white/20 rounded-2xl p-8 text-center backdrop-blur-sm hover:border-purple-500 transition`}>
               <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl font-black text-white">02</span>
               </div>
-              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+              <h3 className="text-2xl font-bold text-white mb-4">
                 {t.howItWorks.step2Title}
               </h3>
-              <p className={secondaryTextClass}>
+              <p className="text-white/70 font-medium">
                 {t.howItWorks.step2Desc}
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-orange-500 transition`}>
+            <div className={`bg-white/10 border border-white/20 rounded-2xl p-8 text-center backdrop-blur-sm hover:border-orange-500 transition`}>
               <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl font-black text-white">03</span>
               </div>
-              <h3 className={`text-2xl font-bold ${textClass} mb-4`}>
+              <h3 className="text-2xl font-bold text-white mb-4">
                 {t.howItWorks.step3Title}
               </h3>
-              <p className={secondaryTextClass}>
+              <p className="text-white/70 font-medium">
                 {t.howItWorks.step3Desc}
               </p>
             </div>
@@ -2116,7 +2100,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
           {/* Credit Packages */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-cyan-500 transition`}>
+            <div className={`bg-white/10 border border-white/20 rounded-2xl p-8 text-center backdrop-blur-sm hover:border-cyan-500 transition`}>
               <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.small.credits}</div>
               <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
               <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.small.price}₺</div>
@@ -2159,7 +2143,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               </button>
             </div>
 
-            <div className={`${cardBg} rounded-2xl p-8 text-center hover:border-purple-500 transition`}>
+            <div className={`bg-white/10 border border-white/20 rounded-2xl p-8 text-center backdrop-blur-sm hover:border-purple-500 transition`}>
               <div className={`text-4xl font-bold ${textClass} mb-3`}>{creditPackages.large.credits}</div>
               <div className={`text-sm ${secondaryTextClass} mb-4`}>{t.pricing.credits}</div>
               <div className="text-3xl font-bold text-cyan-400 mb-4">{creditPackages.large.price}₺</div>
@@ -2180,13 +2164,13 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
             </div>
 
             {/* Enterprise Card */}
-            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-500/20 border-2 border-purple-500/50 shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
+            <div className="group relative rounded-3xl p-8 backdrop-blur-xl bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-500/20 border-2 border-purple-500/50 shadow-lg hover:shadow-[#e11d48]/20 transition-all duration-500 hover:-translate-y-2 hover:scale-105">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
                 {t.pricing.enterprise}
               </div>
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#e11d48]/10 to-[#e11d48]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
               <div className="relative z-10">
-                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-400 to-pink-600 rounded-2xl flex items-center justify-center mb-4 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-[#e11d48] to-[#f43f5e] rounded-2xl flex items-center justify-center mb-4 shadow-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
@@ -2237,7 +2221,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 </ul>
                 <button
                   onClick={() => window.location.href = 'mailto:info@fasheone.com?subject=Enterprise%20Plan%20Inquiry'}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-[#f97316]/30"
                 >
                   {t.pricing.contactUs}
                 </button>
@@ -2308,7 +2292,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 {t.testimonials.quote1}
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full"></div>
+                <div className="w-12 h-12 bg-gradient-to-br from-[#0891b2] to-[#06b6d4] rounded-full"></div>
                 <div>
                   <div className={`font-semibold ${textClass}`}>{t.testimonials.name1}</div>
                   <div className={`text-sm ${secondaryTextClass}`}>Fashion Designer</div>
@@ -2328,7 +2312,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 {t.testimonials.quote2}
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full"></div>
+                <div className="w-12 h-12 bg-gradient-to-br from-[#e11d48] to-[#f43f5e] rounded-full"></div>
                 <div>
                   <div className={`font-semibold ${textClass}`}>{t.testimonials.name2}</div>
                   <div className={`text-sm ${secondaryTextClass}`}>Brand Owner</div>
@@ -2348,7 +2332,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                 {t.testimonials.quote3}
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-600 rounded-full"></div>
+                <div className="w-12 h-12 bg-gradient-to-br from-[#e11d48] to-[#f43f5e] rounded-full"></div>
                 <div>
                   <div className={`font-semibold ${textClass}`}>{t.testimonials.name3}</div>
                   <div className={`text-sm ${secondaryTextClass}`}>E-commerce Manager</div>
@@ -2433,19 +2417,19 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className={`${cardBg} rounded-2xl p-8`}>
-              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 mb-2">10K+</div>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0891b2] to-[#06b6d4] mb-2">10K+</div>
               <div className={secondaryTextClass}>{t.stats.videosCreated}</div>
             </div>
             <div className={`${cardBg} rounded-2xl p-8`}>
-              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-2">50K+</div>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#f43f5e] mb-2">50K+</div>
               <div className={secondaryTextClass}>{t.stats.imagesCreated}</div>
             </div>
             <div className={`${cardBg} rounded-2xl p-8`}>
-              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600 mb-2">98%</div>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#f43f5e] mb-2">98%</div>
               <div className={secondaryTextClass}>{t.stats.satisfiedUsers}</div>
             </div>
             <div className={`${cardBg} rounded-2xl p-8`}>
-              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600 mb-2">24/7</div>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] to-[#8b5cf6] mb-2">24/7</div>
               <div className={secondaryTextClass}>{t.stats.platformAccess}</div>
             </div>
           </div>
@@ -2453,56 +2437,56 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section >
 
       {/* FAQ Section */}
-      < section id="faq" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-rose-50/40'} z-10 relative`}>
+      < section id="faq" className={`py-20 px-6 ${theme === 'dark' ? 'bg-slate-800/80' : 'bg-[#0a1628]'} z-10 relative`}>
         <div className="max-w-4xl mx-auto">
-          <h2 className={`text-2xl md:text-4xl font-bold ${textClass} text-center mb-16`}>
+          <h2 className="text-2xl md:text-4xl font-bold text-white text-center mb-16">
             {t.faq.title}
           </h2>
           <div className="space-y-4">
-            <details className={`${cardBg} rounded-xl p-6 group`}>
-              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+            <details className={`bg-white/10 border border-white/20 rounded-xl p-6 group backdrop-blur-sm`}>
+              <summary className={`text-xl font-semibold text-white cursor-pointer list-none flex items-center justify-between`}>
                 <span>{t.faq.q1}</span>
-                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-5 h-5 text-white/70 group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
-              <p className={`mt-4 ${secondaryTextClass}`}>
+              <p className="mt-4 text-white/70 font-medium">
                 {t.faq.a1}
               </p>
             </details>
 
-            <details className={`${cardBg} rounded-xl p-6 group`}>
-              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+            <details className={`bg-white/10 border border-white/20 rounded-xl p-6 group backdrop-blur-sm`}>
+              <summary className={`text-xl font-semibold text-white cursor-pointer list-none flex items-center justify-between`}>
                 <span>{t.faq.q2}</span>
-                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-5 h-5 text-white/70 group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
-              <p className={`mt-4 ${secondaryTextClass}`}>
+              <p className="mt-4 text-white/70 font-medium">
                 {t.faq.a2}
               </p>
             </details>
 
-            <details className={`${cardBg} rounded-xl p-6 group`}>
-              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+            <details className={`bg-white/10 border border-white/20 rounded-xl p-6 group backdrop-blur-sm`}>
+              <summary className={`text-xl font-semibold text-white cursor-pointer list-none flex items-center justify-between`}>
                 <span>{t.faq.q3}</span>
-                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-5 h-5 text-white/70 group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
-              <p className={`mt-4 ${secondaryTextClass}`}>
+              <p className="mt-4 text-white/70 font-medium">
                 {t.faq.a3}
               </p>
             </details>
 
-            <details className={`${cardBg} rounded-xl p-6 group`}>
-              <summary className={`text-xl font-semibold ${textClass} cursor-pointer list-none flex items-center justify-between`}>
+            <details className={`bg-white/10 border border-white/20 rounded-xl p-6 group backdrop-blur-sm`}>
+              <summary className={`text-xl font-semibold text-white cursor-pointer list-none flex items-center justify-between`}>
                 <span>{t.faq.q4}</span>
-                <svg className={`w-5 h-5 ${secondaryTextClass} group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-5 h-5 text-white/70 group-open:rotate-180 transition`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
-              <p className={`mt-4 ${secondaryTextClass}`}>
+              <p className="mt-4 text-white/70 font-medium">
                 {t.faq.a4}
               </p>
             </details>
@@ -2530,14 +2514,14 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
       </section >
 
       {/* Footer */}
-      < footer className={`py-16 px-6 border-t ${theme === 'dark' ? 'border-slate-700 bg-slate-900/95' : 'border-slate-200 bg-slate-50'} z-10 relative`}>
+      < footer className={`py-16 px-6 border-t ${theme === 'dark' ? 'border-slate-700 bg-slate-900/95' : 'border-[#1e3a5f] bg-[#0a1628]'} z-10 relative`}>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
 
             {/* Column 1: About */}
             <div className="space-y-4">
               <Logo className="h-12" theme={theme} />
-              <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} leading-relaxed`}>
+              <p className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-300'} leading-relaxed`}>
                 Yapay zeka destekli görsel üretim platformu. Çizimlerinizi gerçek ürünlere, fotoğraflarınızı profesyonel görsellere dönüştürün.
               </p>
               {/* Social Media */}
@@ -2546,7 +2530,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   href="https://twitter.com/fasheone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors`}
+                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors`}
                   aria-label="Twitter"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -2557,7 +2541,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   href="https://instagram.com/fasheone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors`}
+                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors`}
                   aria-label="Instagram"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -2568,7 +2552,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   href="https://www.youtube.com/@fasheone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors`}
+                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors`}
                   aria-label="YouTube"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -2579,7 +2563,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   href="https://www.facebook.com/profile.php?id=61586671977870"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors`}
+                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors`}
                   aria-label="Facebook"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -2590,7 +2574,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   href="https://www.linkedin.com/company/fasheone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors`}
+                  className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors`}
                   aria-label="LinkedIn"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -2602,7 +2586,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
             {/* Column 2: Quick Links */}
             <div className="space-y-4">
-              <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-white'}`}>
                 {t.footer.quickLinks}
               </h3>
               <ul className="space-y-3">
@@ -2612,7 +2596,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                       const element = document.getElementById('features');
                       element?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.features}
                   </button>
@@ -2623,7 +2607,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                       const element = document.getElementById('how-it-works');
                       element?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.howItWorks}
                   </button>
@@ -2634,7 +2618,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                       const element = document.getElementById('pricing');
                       element?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.pricing}
                   </button>
@@ -2645,7 +2629,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                       const element = document.getElementById('showcase');
                       element?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.examples}
                   </button>
@@ -2656,7 +2640,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                       const element = document.getElementById('faq');
                       element?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.faq}
                   </button>
@@ -2666,7 +2650,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     href="https://chromewebstore.google.com/detail/blpelhnphmmaojdoanjjofhbggapkllk"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-green-400' : 'text-slate-600 hover:text-green-600'} transition-colors text-sm flex items-center gap-1`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-green-400' : 'text-slate-300 hover:text-green-400'} transition-colors text-sm flex items-center gap-1`}
                   >
                     🧩 Chrome Extension
                   </a>
@@ -2679,7 +2663,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.affiliateProgram}
                   </button>
@@ -2689,7 +2673,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
             {/* Column 3: Legal */}
             <div className="space-y-4">
-              <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-white'}`}>
                 {t.footer.legal}
               </h3>
 
@@ -2706,7 +2690,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                         console.error('❌ onNavigate is undefined!');
                       }
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.privacyPolicy}
                   </button>
@@ -2719,7 +2703,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.kvkk}
                   </button>
@@ -2732,7 +2716,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.termsOfService}
                   </button>
@@ -2745,7 +2729,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.cookiePolicy}
                   </button>
@@ -2758,7 +2742,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer`}
                   >
                     {t.footer.refundPolicy}
                   </button>
@@ -2771,7 +2755,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }
                     }}
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer flex items-center gap-1`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm bg-transparent border-none p-0 cursor-pointer flex items-center gap-1`}
                   >
                     <span>🤖</span> {t.footer.aiUsage}
                   </button>
@@ -2781,7 +2765,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
 
             {/* Column 4: Contact */}
             <div className="space-y-4">
-              <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+              <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-white'}`}>
                 {t.footer.contact}
               </h3>
               <ul className="space-y-3">
@@ -2791,7 +2775,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   </svg>
                   <a
                     href="mailto:info@fasheone.com"
-                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-cyan-600'} transition-colors text-sm`}
+                    className={`${theme === 'dark' ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-300 hover:text-cyan-400'} transition-colors text-sm`}
                   >
                     info@fasheone.com
                   </a>
@@ -2801,7 +2785,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
+                  <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-300'} text-sm`}>
                     <span className={`font-semibold block ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>🇬🇧 TEXMART LTD</span>
                     284 CHASE ROAD A BLOCK UNIT, 2ND FLOOR, LONDON
                   </div>
@@ -2811,7 +2795,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
+                  <div className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-300'} text-sm`}>
                     <span className={`font-semibold block ${theme === 'dark' ? 'text-white' : 'text-slate-800'}`}>🇹🇷 BAHÇELİEVLER/İSTANBUL-TÜRKİYE</span>
                   </div>
                 </li>
@@ -2819,7 +2803,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
                   <svg className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme === 'dark' ? 'text-cyan-400' : 'text-cyan-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} text-sm`}>
+                  <span className={`${theme === 'dark' ? 'text-slate-400' : 'text-slate-300'} text-sm`}>
                     {t.footer.support}
                   </span>
                 </li>
@@ -2849,7 +2833,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
           : 'opacity-0 translate-y-10 pointer-events-none'
           } ${theme === 'dark'
             ? 'bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-cyan-500/30 hover:shadow-cyan-400/50'
-            : 'bg-gradient-to-br from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 shadow-cyan-600/30 hover:shadow-cyan-500/50'
+            : 'bg-gradient-to-br from-cyan-600 to-blue-700 hover:from-cyan-500 hover:to-blue-600 shadow-cyan-600/30 hover:shadow-[#0891b2]/30'
           }`}
         aria-label="Sayfanın başına dön"
       >

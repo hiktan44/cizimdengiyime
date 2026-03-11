@@ -132,7 +132,7 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
 
     if (totalItems === 0) {
         return (
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50 to-white" />
         );
     }
 
@@ -254,7 +254,7 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
             )}
 
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-transparent to-slate-900 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-transparent to-white/80 pointer-events-none" />
 
             {/* Progress Indicators */}
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
