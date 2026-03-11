@@ -216,9 +216,12 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                     ref={(el) => (videoRefs.current[index] = el)}
                     src={video}
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${isElementVisible('video', index)}`}
+                    autoPlay
                     muted
                     playsInline
-                    preload="metadata"
+                    loop
+                    preload="auto"
+                    webkit-playsinline="true"
                 >
                     <source src={video} type="video/mp4" />
                 </video>
@@ -233,9 +236,12 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
                             ref={logoRef}
                             src={logoVideo}
                             className={`absolute inset-0 w-full h-full object-contain bg-black/90 transition-opacity duration-1000 ease-in-out ${isElementVisible('logo', 0)}`}
+                            autoPlay
                             muted
                             playsInline
-                            preload="metadata"
+                            loop
+                            preload="auto"
+                            webkit-playsinline="true"
                         >
                             <source src={logoVideo} type="video/mp4" />
                         </video>
