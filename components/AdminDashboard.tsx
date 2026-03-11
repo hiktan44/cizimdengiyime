@@ -110,7 +110,7 @@ const ContentCard: React.FC<{
                 {mediaType === 'image' ? (
                     <img src={mediaUrl} alt={title} className="w-full h-full object-cover absolute inset-0" />
                 ) : (
-                    <video src={mediaUrl} controls loop className="w-full h-full object-cover absolute inset-0" />
+                    <video src={mediaUrl} controls loop muted playsInline preload="auto" className="w-full h-full object-cover absolute inset-0" />
                 )}
             </div>
             <input
