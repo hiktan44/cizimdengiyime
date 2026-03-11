@@ -59,6 +59,15 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
         setNextIndex(next);
         setIsTransitioning(true);
 
+        // Önceki videoyu durdur (play() interrupted hatasını önler)
+        if (!isLogoIndex(currentIndex)) {
+            const prevVideoIndex = getVideoIndex(currentIndex);
+            const prevVideo = videoRefs.current[prevVideoIndex];
+            if (prevVideo) try { prevVideo.pause(); } catch (e) { }
+        } else if (logoRef.current) {
+            try { logoRef.current.pause(); } catch (e) { }
+        }
+
         // Start fading out current and fading in next
         setTimeout(() => {
             setCurrentIndex(next);
@@ -69,13 +78,34 @@ export const HeroVideoCarousel: React.FC<HeroVideoCarouselProps> = ({
             if (isLogoIndex(next)) {
                 if (logoRef.current && logoVideo?.match(/\.(mp4|webm|mov)$/i)) {
                     logoRef.current.currentTime = logoSkipStart;
-                    logoRef.current.play().catch(e => console.log('Logo video play error:', e));
+                    const p = logoRef.current.play();
+                    if (p) p.catch(() => { });
                 }
             } else {
                 const videoIndex = getVideoIndex(next);
-                if (videoRefs.current[videoIndex]) {
-                    videoRefs.current[videoIndex]!.currentTime = 0;
-                    videoRefs.current[videoIndex]!.play().catch(e => console.log('Video play error:', e));
+                const video = videoRefs.current[videoIndex];
+                if (video) {
+                    video.currentTime = 0;
+                    // Mobil: video hazır değilse canplay bekle
+                    if (video.readyState >= 3) {
+                        const p = video.play();
+                        if (p) p.catch(() => { });
+                    } else {
+                        const onReady = () => {
+                            video.removeEventListener('canplay', onReady);
+                            const p = video.play();
+                            if (p) p.catch(() => { });
+                        };
+                        video.addEventListener('canplay', onReady);
+                        video.load(); // Mobilde preload=metadata olan videoyu yükle
+                        // Fallback
+                        setTimeout(() => {
+                            if (video.paused) {
+                                const p = video.play();
+                                if (p) p.catch(() => { });
+                            }
+                        }, 3000);
+                    }
                 }
             }
         }, 1000); // 1 second crossfade
