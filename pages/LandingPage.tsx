@@ -1369,7 +1369,7 @@ export const LandingPage: React.FC<LandingPageProps> = (props) => {
               {/* Video or Placeholder */}
               <div className="w-full bg-gradient-to-br from-orange-900/30 to-red-900/30 flex items-center justify-center" style={{ minHeight: '320px' }}>
                 {demoVideo ? (
-                  <video src={demoVideo} className="w-full h-full object-contain" style={{ maxHeight: '500px' }} autoPlay loop muted playsInline preload="auto" />
+                  <video src={demoVideo} className="w-full h-full object-contain" style={{ maxHeight: '500px' }} autoPlay loop muted playsInline preload="metadata" />
                 ) : (
                   <div className="text-center p-6">
                     <svg className="w-20 h-20 text-orange-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
