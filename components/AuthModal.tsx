@@ -94,18 +94,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
 
       setSuccess(true);
+      setLoading(false);
 
       setTimeout(() => {
         onClose();
         setTimeout(() => {
           setSuccess(false);
+          setError('');
           setEmail('');
           setPassword('');
           setFullName('');
+          setMode('signin');
         }, 300);
       }, 5000);
     } catch (err: any) {
       setError(err.message || t.defaultError);
+    } finally {
       setLoading(false);
     }
   };
