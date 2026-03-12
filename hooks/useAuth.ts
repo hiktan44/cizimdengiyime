@@ -336,6 +336,12 @@ export function useAuth() {
     if (errorMessage.includes('Email rate limit exceeded')) {
       return 'Çok fazla deneme yaptınız. Lütfen bir süre bekleyin.';
     }
+    if (errorMessage.includes('Error sending confirmation email') || errorMessage.includes('Error sending')) {
+      return 'Onay e-postası gönderilemedi. Lütfen daha sonra tekrar deneyin veya farklı bir e-posta adresi kullanın.';
+    }
+    if (errorMessage.includes('over_email_send_rate_limit')) {
+      return 'E-posta gönderim limiti aşıldı. Lütfen birkaç dakika bekleyin.';
+    }
 
     // Genel hata mesajı
     return errorMessage || 'Bir hata oluştu. Lütfen tekrar deneyin.';
