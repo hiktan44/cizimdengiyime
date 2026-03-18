@@ -13,15 +13,15 @@ const checkApiKey = () => {
 
 // Model fallback listesi - 503 hatası durumunda sırayla denenecek
 const IMAGE_MODELS = [
-    'gemini-3.1-flash-image-preview',
     'gemini-3-pro-image-preview',
+    'gemini-3.1-flash-image-preview',
     'gemini-3-pro-preview',
     'gemini-2.0-flash-preview-image-generation',
     'imagen-3.0-generate-002'
 ] as const;
 
-// Canlı model için Flash model (2K, 2 sonuç)
-const LIVE_MODEL_PRIMARY = 'gemini-3.1-flash-image-preview';
+// Birincil model: Pro (2K çıktı)
+const LIVE_MODEL_PRIMARY = 'gemini-3-pro-image-preview';
 
 // Retry helper fonksiyonu - 503 hatalarında otomatik yeniden deneme + fal.ai fallback
 const withRetry = async <T>(
@@ -100,6 +100,45 @@ const withRetry = async <T>(
     }
     throw lastError || new Error('ALL_MODELS_FAILED');
 };
+
+// *** LOGO & NAKIŞ SADAKATİ BLOĞU — Tüm görsel üretimlerinde kullanılır ***
+const LOGO_FIDELITY_BLOCK = `
+*** LOGO, NAKIŞ VE MARKA SADAKATİ TALİMATLARI (EN YÜKSEK ÖNCELİK) ***
+
+Bu bölüm KESİNLİKLE uyulması gereken ZORUNLU kurallardır. Logo hataları KABUL EDİLMEZ.
+
+1. GENEL LOGO KORUMA İLKELERİ:
+   - Referans görseldeki TÜM logolar, marka isimleri, semboller, amblemler ve grafikler PİKSEL DÜZEYINDE BİREBİR korunmalıdır.
+   - Logo oranları (genişlik:yükseklik) KESİNLİKLE değiştirilmemelidir — ne sıkıştır ne uzat.
+   - Logo konumu (göğüs sol, göğüs orta, sırt, kol, yaka vb.) referansla AYNI yerde olmalıdır.
+   - Logo boyutu referansla orantılı olmalıdır.
+   - Logo renkleri (tek renk, çok renkli, degradeli) KESİNLİKLE değiştirilmemeli.
+
+2. NAKIŞLI LOGO DETAYLARI (KRİTİK — EN HASSAS ALAN):
+   - Nakış (embroidery) logoları özel bir DOKUNSAL DOKU (tactile texture) içerir. Bu doku MUTLAKA korunmalıdır:
+     a) İPLİK YAPISI: Nakış iplikleri tek tek seçilebilir netlikte olmalı. İpliklerin PARALEL sıral dizilimi, saten dikiş (satin stitch) veya dolgu dikişi (fill stitch) yapısı, ve iplik yönü bire bir korunmalı.
+     b) KABARTMA EFEKTİ: Nakış logoları kumaş yüzeyinden hafifçe kabarık (raised/3D) görünür. Bu 3 boyutlu kabartma etkisi doğru gölgelendirmeyle TEMSİL EDİLMELİDİR.
+     c) İPLİK PARLAKLIĞI: Nakış iplikleri kumaştan farklı bir parlaklığa sahiptir (genellikle rayon/saten iplik kullanılır). Bu IŞIK YANSIMASI farkı korunmalı.
+     d) KENAR KESKİNLİĞİ: Nakışın kenarları kumaşla buluştuğu yerde net ve keskin bir geçiş olmalı — bulanık veya kaybolmuş kenarlar YASAKTIR.
+     e) RENK DEĞİŞKENLİĞİ: Gerçek nakışlarda ipliklerin yönüne göre renkte hafif ton farklılıkları oluşur. Bu doğal ton varyasyonu dahil edilmeli.
+     f) ALT DOKU: Nakışın altındaki kumaş hafifçe çekilmiş/gerilmiş görünür (puckering). Bu gerçekçi detay eklenebilir.
+
+3. BASKI (PRINT) LOGO DETAYLARI:
+   - Serigrafi/screen print: Mürekkep tabakası kumaş dokusunun üzerine oturur, hafif kalınlık hissedilir.
+   - Dijital transfer print: Kumaşla bütünleşik, kumaş dokusunu takip eder.
+   - DTG (Direct to Garment): Kumaş lif aralarına işler, kumaş dokusu üzerinden görünür.
+   - Her baskı tekniğine uygun görünüm sağlanmalı.
+
+4. YAZI VE HARF SADAKATİ:
+   - Logodaki/üründeki her harf, rakam ve sembol KARAKTER KARAKTER doğru yazılmalı.
+   - Font stili (serif/sans-serif/script), kalınlığı (bold/regular/light) ve boyutu referansla AYNI olmalı.
+   - Harfler arası boşluk (kerning) ve satır aralığı korunmalı.
+   - BÜYÜK/küçük harf ayrımı BİREBİR korunmalı.
+
+5. LOGO FİNAL KONTROL:
+   - Her üretimde logonun referansla eşleştiğini DOĞRULA.
+   - Logo eksik, bozuk, bulanık, yanlış yazılmış veya yanlış konumda İSE üretimi REDDET ve düzelt.
+`;
 
 // Simple hash function (djb2 algorithm)
 const hashString = (str: string): number => {
@@ -245,6 +284,8 @@ BAŞKA RENK KULLANMA.` : '';
     >>> ÜRÜN RENGİ KURALI <<<
     - Referans çizimdeki rengi %100 KORU.
     `}
+    
+    ${LOGO_FIDELITY_BLOCK}
     
     *** 2. GÖRSEL KALİTE VE GERÇEKÇİLİK STANDARDI ***:
     1. Kumaş Dokusu (Texture Fidelity): Kumaşın cinsi (pamuk, ipek, yün, denim vb.) fotoğrafta %100 GERÇEKÇİ görünmeli. Makro çekim kalitesinde iplik detayları görünmeli. " Dijital çizim" hissi KESİNLİKLE olmamalı.
@@ -420,7 +461,7 @@ Her parça için:
 ÇOK ÖNEMLİ: Sadece GİYSİ parçalarını say. Ayakkabı, çanta gibi aksesuarları SAYMA. Sadece kıyafet parçaları.`;
 
     try {
-        const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+        const models = ['gemini-3.1-flash-image-preview', 'gemini-2.0-flash'];
         for (const model of models) {
             try {
                 const response = await ai.models.generateContent({
@@ -956,8 +997,9 @@ export const generateImage = async (
     ` : ''}
     
     *** 2. MARKA VE TASARIM KORUMA TALİMATLARI ***
-    - LOGO VE YAZI KORUMASI: Kıyafetin üzerindeki marka isimleri, logolar, grafik baskılar ve metinler PİKSELİ PİKSELİNE KORUNMALIDIR.
     - TASARIM SADAKATİ: Kıyafetin kesimi, dikiş detayları, yaka şekli ve kalıbı referans görselle tıpatıp aynı olmalıdır.
+    
+    ${LOGO_FIDELITY_BLOCK}
     
     *** 3. KRİTİK: MODEL KİMLİĞİ VE YÜZ AYRIMI ***
     - GÖREV: Referans görseldeki KIYAFETİ al, yeni bir insan modele giydir.
@@ -1135,7 +1177,7 @@ Verilen ${totalImages} görselin her birini analiz et ve doğru katmanlama sıra
     // Add text prompt to parts
     promptParts.push({ text: prompt });
 
-    // 🔥 gemini-3.1-flash-image-preview ile 2 varyant üret
+    // 🔥 gemini-3-pro-image-preview ile 2K çıktı üret
     const selectedModel = LIVE_MODEL_PRIMARY;
     const targetAspectRatio = aspectRatio === '16:9' ? '16:9' :
         aspectRatio === '9:16' ? '9:16' :
@@ -1190,11 +1232,11 @@ Verilen ${totalImages} görselin her birini analiz et ve doğru katmanlama sıra
     } catch (e: any) {
         console.error('❌ Üretim başarısız:', e.message);
 
-        // Fallback: gemini-3-pro-image-preview ile tek sonuç dene
+        // Fallback: gemini-3.1-flash-image-preview ile tek sonuç dene
         console.log('🔀 Fallback ile tekli üretim deneniyor...');
         try {
             const fallbackResponse = await ai.models.generateContent({
-                model: 'gemini-3-pro-image-preview',
+                model: 'gemini-3.1-flash-image-preview',
                 contents: {
                     parts: promptParts,
                 },
@@ -1424,7 +1466,7 @@ export const analyzeOutfitItems = async (imageInput: File | string): Promise<Pro
 
     try {
         const result = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
+            model: 'gemini-3.1-flash-image-preview',
             contents: {
                 parts: [imagePart, { text: prompt }],
             }
@@ -1701,7 +1743,7 @@ Kurallar:
                 responseModalities: [Modality.IMAGE],
                 temperature: 0.4,
                 imageConfig: {
-                    imageSize: '1K',
+                    imageSize: '2K',
                 },
             }
         });
@@ -1738,7 +1780,7 @@ Kurallar:
                 responseModalities: [Modality.IMAGE],
                 temperature: 0.4,
                 imageConfig: {
-                    imageSize: '1K',
+                    imageSize: '2K',
                 },
             }
         });
@@ -1793,7 +1835,7 @@ Kurallar:
 Profesyonel tech pack formatında sun.`;
 
         const specsResponse = await ai.models.generateContent({
-            model: 'gemini-3-pro-preview',
+            model: 'gemini-3-pro-image-preview',
             contents: {
                 parts: [imagePart, { text: specsPrompt }]
             },
@@ -1987,7 +2029,7 @@ Renk kodları PANTONE formatında olmalıdır. Dikiş tipleri ISO numarasıyla b
         console.log("JSON analiz başlatılıyor...");
 
         // Fallback modelleri: Pro meşgulse Flash'a düş
-        const JSON_MODELS = ['gemini-3-pro-preview', 'gemini-3-flash-preview', 'gemini-2.0-flash'];
+        const JSON_MODELS = ['gemini-3-pro-image-preview', 'gemini-3.1-flash-image-preview', 'gemini-2.0-flash'];
         let jsonResponse = null;
         let usedModel = '';
 
@@ -2040,7 +2082,7 @@ KRİTİK KURALLAR:
             config: {
                 responseModalities: [Modality.IMAGE],
                 temperature: 0.4,
-                imageConfig: { imageSize: '1K' },
+                imageConfig: { imageSize: '2K' },
             }
         });
 
@@ -2072,7 +2114,7 @@ KRİTİK KURALLAR:
                 config: {
                     responseModalities: [Modality.IMAGE],
                     temperature: 0.4,
-                    imageConfig: { imageSize: '1K' },
+                    imageConfig: { imageSize: '2K' },
                 }
             });
 

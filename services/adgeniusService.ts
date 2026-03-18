@@ -92,7 +92,7 @@ export const analyzeProductImage = async (file: File): Promise<ProductAnalysis> 
     try {
       console.log(`🔄 Ürün analizi deneme: ${attempt}/${MAX_RETRIES}`);
       const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
+        model: 'gemini-3-pro-image-preview',
         contents: {
           parts: [
             {
@@ -275,6 +275,17 @@ export const generateAdPrompts = (analysis: ProductAnalysis, formData: FormData)
    - Logo placement and size relative to the garment must match perfectly.
    - Internal details of logos (small elements, thin lines, dots) must NOT be lost or simplified.
    - If a logo has text inside it, that text must be spelled correctly.
+   
+   *** EMBROIDERED LOGO SPECIAL RULES (CRITICAL) ***:
+   - If the logo is EMBROIDERED (nakışlı), you MUST render the THREAD TEXTURE:
+     a) Individual embroidery threads must be visible at close range — parallel satin stitch or fill stitch patterns.
+     b) The logo must appear slightly RAISED/3D from the fabric surface with correct shadow underneath.
+     c) Embroidery thread has a DIFFERENT SHEEN than fabric (rayon/satin thread reflects light differently) — preserve this.
+     d) Edges of the embroidery must be SHARP and CLEAN where thread meets fabric — no blurring.
+     e) Include natural thread TONE VARIATION based on stitch direction (light catches threads at different angles).
+     f) Subtle fabric PUCKERING around the embroidery edges is realistic and should be included.
+   - If the logo is SCREEN PRINTED, render the ink layer sitting ON TOP of the fabric with slight thickness.
+   - If the logo is DTG (Direct to Garment), render it integrated INTO the fabric fibers.
    ` : ''}
    ${analysis.ozel_detaylar?.length > 0 ? `
    CONSTRUCTION DETAILS (PRESERVE ALL):
@@ -540,7 +551,7 @@ export const generateAdImage = async (
   referenceImageMimeType: string,
   optionalImageB64: string | null,
   optionalImageMimeType: string | null,
-  model: ImageModel = 'gemini-3.1-flash-image-preview',
+  model: ImageModel = 'gemini-3-pro-image-preview',
   aspectRatio: string = '16:9',
   patternImageB64?: string | null,
   patternImageMimeType?: string | null,

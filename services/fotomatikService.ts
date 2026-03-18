@@ -15,8 +15,8 @@ const checkApiKey = () => {
 };
 
 // Birincil image model (hızlı + maliyet düşük)
-const IMAGE_MODEL_PRIMARY = 'gemini-3.1-flash-image-preview';
-const IMAGE_MODEL_FALLBACK = 'gemini-3-pro-image-preview';
+const IMAGE_MODEL_PRIMARY = 'gemini-3-pro-image-preview';
+const IMAGE_MODEL_FALLBACK = 'gemini-3.1-flash-image-preview';
 
 /**
  * Görüntüyü dönüştürür (Transform modu)
@@ -44,7 +44,13 @@ export const fotomatikGenerateEditedImage = async (
       contents: {
         parts: [
           {
-            text: prompt,
+            text: `${prompt}
+
+*** LOGO & NAKIŞ KORUMA (ZORUNLU) ***
+- Ürün üzerindeki TÜM logolar, nakışlar, baskılar ve yazılar BİREBİR korunmalıdır.
+- Nakışlı logolarda: iplik yapısı, kabartma efekti, iplik parlaklığı, kenar keskinliği korunmalı.
+- Logonun konumu, boyutu, renkleri ve oranları DEĞİŞTİRİLMEMELİDİR.
+- Logo eksik, bozuk veya bulanık olmamalıdır.`,
           },
           {
             inlineData: {
@@ -115,7 +121,7 @@ export const fotomatikGenerateImagePrompt = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-flash-image-preview',
       contents: {
         parts: [
           {
@@ -191,7 +197,7 @@ export const fotomatikSuggestEnhancements = async (
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3.1-flash-image-preview',
       contents: {
         parts: [
           {
@@ -272,7 +278,7 @@ export const fotomatikRemoveBackground = async (
       contents: {
         parts: [
           {
-            text: "Remove the background from this image completely, leaving only the main subject. Make the background pure white or transparent. Preserve all details of the main subject with clean edges. Perfect for e-commerce product photography.",
+            text: "Remove the background from this image completely, leaving only the main subject. Make the background pure white or transparent. Preserve all details of the main subject with clean edges. Perfect for e-commerce product photography.\n\n*** LOGO & NAKIŞ KORUMA (ZORUNLU) ***\n- Ürün üzerindeki TÜM logolar, nakışlar, baskılar ve yazılar BİREBİR korunmalıdır.\n- Nakışlı logolarda: iplik yapısı, kabartma efekti, iplik parlaklığı, kenar keskinliği korunmalı.\n- Logonun konumu, boyutu, renkleri ve oranları DEĞİŞTİRİLMEMELİDİR.",
           },
           {
             inlineData: {
@@ -329,7 +335,12 @@ export const fotomatikRetouch = async (
       contents: {
         parts: [
           {
-            text: `Professional product photo retouch. ${levelPrompts[retouchLevel]} Maintain product authenticity while making it look professionally photographed.`,
+            text: `Professional product photo retouch. ${levelPrompts[retouchLevel]} Maintain product authenticity while making it look professionally photographed.
+
+*** LOGO & NAKIŞ KORUMA (ZORUNLU) ***
+- Ürün üzerindeki TÜM logolar, nakışlar, baskılar ve yazılar BİREBİR korunmalıdır.
+- Nakışlı logolarda: iplik yapısı, kabartma efekti, iplik parlaklığı, kenar keskinliği korunmalı.
+- Retouch sırasında logolar KESİNLİKLE bulanıklaştırılmamalı veya değiştirilmemelidir.`,
           },
           {
             inlineData: {
@@ -386,7 +397,12 @@ export const fotomatikCatalogPrep = async (
       contents: {
         parts: [
           {
-            text: stylePrompts[style],
+            text: `${stylePrompts[style]}
+
+*** LOGO & NAKIŞ KORUMA (ZORUNLU) ***
+- Ürün üzerindeki TÜM logolar, nakışlar, baskılar ve yazılar BİREBİR korunmalıdır.
+- Nakışlı logolarda: iplik yapısı, kabartma efekti, iplik parlaklığı, kenar keskinliği korunmalı.
+- Katalog hazırlığında logolar KESİNLİKLE net ve okunaklı kalmalıdır.`,
           },
           {
             inlineData: {

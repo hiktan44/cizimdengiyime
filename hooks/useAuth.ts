@@ -275,12 +275,22 @@ export function useAuth() {
     await initialize();
   }, [initialize]);
 
+  // Production redirect URL — www/non-www uyumsuzluğunu önler
+  const getRedirectUrl = () => {
+    const origin = window.location.origin;
+    // Localhost'ta dinamik URL kullan, production'da sabit URL
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return origin;
+    }
+    // Production: her zaman non-www URL kullan (Supabase'deki ayarla uyumlu)
+    return 'https://fasheone.com';
+  };
+
   // Google ile giriş
   const signInWithGoogle = async () => {
     try {
       console.log('🔵 Google ile giriş başlatılıyor...');
-      // Mevcut sayfanın origin'ini kullan (localhost veya production)
-      const redirectUrl = window.location.origin;
+      const redirectUrl = getRedirectUrl();
       console.log('🔗 KULLANILAN REDIRECT URL:', redirectUrl);
 
       const { error } = await supabase.auth.signInWithOAuth({
@@ -415,6 +425,12 @@ export function useAuth() {
       // E-posta doğrulama açıksa session null gelebilir
       console.log('✅ Kayıt işlemi tamamlandı.');
 
+      // Google Ads dönüşüm ölçümü - Abone olma
+      if (typeof (window as any).gtag_report_conversion === 'function') {
+        (window as any).gtag_report_conversion();
+        console.log('📊 Google Ads dönüşüm bildirimi gönderildi');
+      }
+
       if (data.session && data.user) {
         setLoading(true);
         setUser(data.user);
@@ -452,7 +468,7 @@ export function useAuth() {
   // Şifre sıfırlama e-postası gönder
   const sendPasswordResetEmail = async (email: string) => {
     console.log('📧 Şifre sıfırlama e-postası gönderiliyor:', email);
-    const redirectUrl = window.location.origin;
+    const redirectUrl = getRedirectUrl();
 
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,

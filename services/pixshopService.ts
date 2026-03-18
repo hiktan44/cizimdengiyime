@@ -15,8 +15,8 @@ const checkApiKey = () => {
 };
 
 // Birincil model (maliyet düşük, hızlı)
-const IMAGE_MODEL_PRIMARY = 'gemini-3.1-flash-image-preview';
-const IMAGE_MODEL_FALLBACK = 'gemini-3-pro-image-preview';
+const IMAGE_MODEL_PRIMARY = 'gemini-3-pro-image-preview';
+const IMAGE_MODEL_FALLBACK = 'gemini-3.1-flash-image-preview';
 
 // Helper function to convert a File object to a Gemini API Part
 const fileToPart = async (file: File): Promise<{ inlineData: { mimeType: string; data: string; } }> => {
@@ -108,7 +108,8 @@ Edit Location: Focus on the area around pixel coordinates (x: ${hotspot.x}, y: $
 3. TEXTURE MATCHING: If the original image has film grain or sensor noise, the edited part perfectly copy that noise pattern.
 4. LIGHTING CONSISTENCY: Subsurface scattering and shadow softness must match the original scene exactly.
 5. INVISIBLE EDIT: The result should look like it was captured in-camera, not photoshopped.
-6. MINIMAL CHANGE: Only modify the requested area. Leave ALL other pixels unchanged.`;
+6. MINIMAL CHANGE: Only modify the requested area. Leave ALL other pixels unchanged.
+7. LOGO/EMBROIDERY PROTECTION: Any logos, embroidered marks, prints, or text on the product MUST be preserved EXACTLY. Embroidered logos must keep their thread texture, raised 3D effect, thread sheen, and sharp edges. NEVER blur, distort, or remove logos.`;
 
     const textPart = { text: prompt };
 
@@ -147,7 +148,12 @@ export const pixshopGenerateFilteredImage = async (
     const originalImagePart = await fileToPart(originalImage);
     const prompt = `Apply a stylistic filter to this image.
 Filter Request: "${filterPrompt}"
-Do not change the content, composition, or dimensions. Only apply the visual style. Preserve the exact same aspect ratio and resolution.`;
+Do not change the content, composition, or dimensions. Only apply the visual style. Preserve the exact same aspect ratio and resolution.
+
+*** LOGO/EMBROIDERY PROTECTION ***:
+- Any logos, embroidered marks, prints, or text on the product MUST be preserved EXACTLY during filter application.
+- Embroidered logos must keep their thread texture, raised 3D effect, thread sheen, and sharp edges.
+- Logos should remain crystal clear and readable after the filter is applied.`;
 
     const textPart = { text: prompt };
 
@@ -191,7 +197,8 @@ Request: "${adjustmentPrompt}"
 1. PRESERVE DIMENSIONS: The output image MUST have the EXACT SAME dimensions and aspect ratio as the input.
 2. PRESERVE DYNAMIC RANGE: Do not blow out highlights or crush shadows excessively unless requested.
 3. NATURAL SKIN TONES: If people are present, skin tones must remain within natural vectors (Vectorscope line). Avoid orange/teal abuse on skin.
-4. ORGANIC FEEL: The adjustment should feel like optical filters or professional chemical film processing, not digital overlays.`;
+4. ORGANIC FEEL: The adjustment should feel like optical filters or professional chemical film processing, not digital overlays.
+5. LOGO/EMBROIDERY PROTECTION: Any logos, embroidered marks, prints, or text on the product MUST be preserved EXACTLY during color adjustments. Embroidered logos must keep their thread texture, raised 3D effect, and sharp edges.`;
 
     const textPart = { text: prompt };
 
@@ -236,7 +243,8 @@ STRICT RULES:
 3. EDGE QUALITY: Ensure clean, anti-aliased edges around the subject. NO white outlines, halos, or fringing artifacts.
 4. PRESERVE SUBJECT: Do NOT modify, crop, resize, or alter the main subject in any way. Keep exact same dimensions.
 5. HAIR & FINE DETAILS: Carefully preserve hair strands, fur, and other fine details at the edges.
-6. MAINTAIN DIMENSIONS: The output MUST have the EXACT SAME width and height as the input image.`;
+6. MAINTAIN DIMENSIONS: The output MUST have the EXACT SAME width and height as the input image.
+7. LOGO/EMBROIDERY PROTECTION: Any logos, embroidered marks, prints, or text on the product MUST be preserved with maximum fidelity during background removal. Embroidered logos must keep their thread texture, raised 3D effect, thread sheen, and sharp clean edges.`;
 
     const textPart = { text: prompt };
 

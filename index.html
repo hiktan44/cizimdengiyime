@@ -2,6 +2,18 @@
 <html lang="tr" class="notranslate" translate="no">
 
 <head>
+  <!-- www → non-www yönlendirme (OAuth redirect uyumu için) -->
+  <script>
+    if (window.location.hostname.startsWith('www.')) {
+      window.location.replace(
+        window.location.protocol + '//' +
+        window.location.hostname.replace('www.', '') +
+        window.location.pathname +
+        window.location.search +
+        window.location.hash
+      );
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google" content="notranslate" />
@@ -99,6 +111,25 @@
     gtag('js', new Date());
 
     gtag('config', 'G-D5FF6F3JSM');
+    gtag('config', 'AW-18007313349');
+  </script>
+
+  <!-- Google Ads Dönüşüm Ölçümü - Abone Olma -->
+  <script>
+    function gtag_report_conversion(url) {
+      var callback = function () {
+        if (typeof(url) != 'undefined') {
+          window.location = url;
+        }
+      };
+      gtag('event', 'conversion', {
+        'send_to': 'AW-18007313349/WNGoCICgm4YcEMWXx4pD',
+        'value': 1.0,
+        'currency': 'TRY',
+        'event_callback': callback
+      });
+      return false;
+    }
   </script>
 
   <!-- Meta Pixel Code -->

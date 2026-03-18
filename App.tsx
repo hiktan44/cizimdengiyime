@@ -2467,6 +2467,11 @@ const App: React.FC = () => {
             const lastLogin = localStorage.getItem('fasheone_last_login');
             if (!lastLogin) {
                 trackEvent('sign_up', { method: 'auto', userId: user.id });
+                // Google Ads dönüşüm ölçümü - İlk kayıt (Google/Email)
+                if (typeof (window as any).gtag_report_conversion === 'function') {
+                    (window as any).gtag_report_conversion();
+                    console.log('📊 Google Ads dönüşüm bildirimi gönderildi (ilk kayıt)');
+                }
                 localStorage.setItem('fasheone_last_login', new Date().toISOString());
             } else {
                 trackEvent('login', { userId: user.id });
